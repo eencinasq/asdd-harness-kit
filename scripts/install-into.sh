@@ -212,7 +212,6 @@ install_agents_core() {
   copy_tree "$KIT_DIR/.agents/modules" "$TARGET/.agents/modules" refresh
   copy_tree "$KIT_DIR/.agents/mcp/bin" "$TARGET/.agents/mcp/bin" refresh
   copy_file "$KIT_DIR/.agents/mcp/sync-runtime-mcp.cjs" "$TARGET/.agents/mcp/sync-runtime-mcp.cjs" refresh
-  copy_file "$KIT_DIR/.agents/mcp/mcp.json.example" "$TARGET/.agents/mcp/mcp.json.example" refresh
   copy_file "$KIT_DIR/.agents/mcp/README.md" "$TARGET/.agents/mcp/README.md" refresh
   if [[ "$FORCE_MCP" -eq 1 ]]; then
     local old_force=$FORCE
