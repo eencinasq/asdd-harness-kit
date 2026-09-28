@@ -37,6 +37,32 @@ node .harness/scripts/check-invariants.mjs
 
 Read [AGENTS.md](AGENTS.md) every session. Portability model: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md).
 
+
+## Add to an existing project
+
+```bash
+# From a local clone of this kit:
+./scripts/install-into.sh /path/to/existing-repo \
+  --modules=http-api,web-ui \
+  --runtime=cursor
+
+# Or one-liner (clones kit to a temp dir):
+curl -fsSL https://raw.githubusercontent.com/eencinasq/asdd-harness-kit/main/scripts/install-into.sh \
+  | bash -s -- /path/to/existing-repo --from-git --modules=http-api --runtime=cursor
+```
+
+Safe by default: does **not** overwrite existing bindings, `PROGRESS.md`, slice state, specs, or `mcp.json`.
+
+| Flag | Effect |
+|------|--------|
+| `--modules=…` | Enable opt-in modules (`bruno`, `playwright-e2e`, `web-ui`, `http-api`, or `all`) |
+| `--runtime=cursor` / `claude` | Symlink agents/skills/MCP into the IDE folder |
+| `--force` | Refresh portable contracts/agents/skills already present |
+| `--force-bindings` | Overwrite binding stubs (dangerous) |
+| `--dry-run` | Print actions only |
+
+Smoke test: `./scripts/test-install-into.sh`
+
 ## What's included
 
 | Layer | Contents |

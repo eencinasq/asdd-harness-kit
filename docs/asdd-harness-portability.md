@@ -23,3 +23,13 @@ How this template maps to product repos.
 ## Do not copy from a product monorepo
 
 Specs, PROGRESS history, filled product/structure/tech, or Nx-specific boundary scripts from another app.
+
+
+## Install into an existing repo
+
+```bash
+./scripts/install-into.sh /path/to/existing-repo --modules=http-api --runtime=cursor
+# or: curl …/install-into.sh | bash -s -- /path/to/repo --from-git …
+```
+
+See root README § *Add to an existing project*. Smoke: `./scripts/test-install-into.sh`.
