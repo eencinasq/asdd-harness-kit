@@ -37,7 +37,7 @@ Portability: [docs/asdd-harness-portability.md](../../docs/asdd-harness-portabil
 | `quality-gates.project.md` | Gate commands + findings |
 | `design-system.md` | Optional (module web-ui) |
 
-Templates: [`templates/`](templates/).
+Optional: [`templates/slice-manifest.stub.json`](templates/slice-manifest.stub.json) for new slices.
 
 ## Baseline reads
 
