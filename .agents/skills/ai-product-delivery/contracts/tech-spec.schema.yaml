@@ -1,0 +1,53 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: TechnicalSpecification
+type: object
+required:
+  - overview
+  - source_requirements
+  - functional_requirements
+  - testing_strategy
+properties:
+  overview: {type: string}
+  source_requirements:
+    type: array
+    items: {type: string}
+  functional_requirements:
+    type: array
+    items: {type: string}
+  non_functional_requirements:
+    type: array
+    items: {type: string}
+  domain_model:
+    type: array
+    items: {type: string}
+  system_changes:
+    type: object
+    properties:
+      frontend: {type: array, items: {type: string}}
+      backend: {type: array, items: {type: string}}
+      data: {type: array, items: {type: string}}
+      integrations: {type: array, items: {type: string}}
+  contracts:
+    type: array
+    items: {type: object, additionalProperties: true}
+  error_handling:
+    type: array
+    items: {type: string}
+  security_considerations:
+    type: array
+    items: {type: string}
+  observability:
+    type: array
+    items: {type: string}
+  testing_strategy:
+    type: object
+    additionalProperties: true
+  rollout:
+    type: array
+    items: {type: string}
+  risks:
+    type: array
+    items: {type: string}
+  pending_decisions:
+    type: array
+    items: {type: string}

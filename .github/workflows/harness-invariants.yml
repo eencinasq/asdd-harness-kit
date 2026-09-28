@@ -1,0 +1,16 @@
+name: harness-invariants
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  invariants:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check harness invariants
+        run: node .harness/scripts/check-invariants.mjs

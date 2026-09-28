@@ -1,0 +1,46 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: SprintPlan
+type: object
+required:
+  - sprint_goal
+  - included_work
+  - planning_status
+properties:
+  sprint_goal:
+    type: string
+  included_work:
+    type: array
+    items:
+      type: object
+      required: [title, tasks]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        priority: {type: string}
+        dependencies:
+          type: array
+          items: {type: string}
+        tasks:
+          type: array
+          items: {type: string}
+        validation:
+          type: array
+          items: {type: string}
+  recommended_execution_order:
+    type: array
+    items: {type: string}
+  blockers:
+    type: array
+    items: {type: string}
+  risks:
+    type: array
+    items: {type: string}
+  team_capacity:
+    type: string
+  estimates:
+    type: string
+  planning_status:
+    enum: [READY, PARTIALLY_READY, CAPACITY_VALIDATION_REQUIRED, BLOCKED]
+  sprint_success_criteria:
+    type: array
+    items: {type: string}

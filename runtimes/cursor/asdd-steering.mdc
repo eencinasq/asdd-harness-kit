@@ -1,0 +1,35 @@
+---
+description: ASDD pipeline — load project steering from .harness/steering before spec, design, or implementation work
+alwaysApply: true
+---
+
+# ASDD project steering
+
+**Source of truth:** `.harness/steering/` — parent and every ASDD subagent must **`Read`** these files directly (no `.kiro/steering`).
+
+Index: `.harness/steering/README.md` · Skills: `.harness/steering/skills.md` · Portability: `docs/asdd-harness-portability.md` · Modules: `.agents/modules/README.md`
+
+## When to load steering
+
+**INIT:** Read `.harness/PROGRESS.md` → global `.harness/state/manifest.json` → `.harness/state/slices/<slice-id>/manifest.json` → `paths.features` (if set) → `.harness/steering/` (`structure`, `product`, `manifest`, `codegraph`, `session-loop`). Pick one feature **only** when `phase` is `implementation`. If every slice is `DONE`/`PARKED`/`ABANDONED` and the human named no slice: stop — ask for new intent or explicit unpark.
+
+| Work | Read (minimum) |
+|------|----------------|
+| Any ASDD work | `structure.md`, `product.md`, `manifest.md`, `codegraph.md`, `session-loop.md` |
+| Spec, validation | + `quality-gates.md` (+ `quality-gates.project.md` when judging gates); HTTP/API → skill `api-and-interface-design` if installed |
+| Design, tasks, implementation | + `tech.md`, `domain-layer.md` + `domain-layer.project.md`; UI → `design-system.md` if present + frontend skill if installed |
+| QA, refactor | + both quality-gates files, domain-layer + binding |
+| Domain | + `domain-layer.md` + `domain-layer.project.md` |
+
+## Conventions
+
+- Domain language path from `structure.md` — do not invent entities.
+- Business logic: portable `domain-layer.md` + `domain-layer.project.md` (run the binding's gate).
+- Specs: EARS; traceability to `capability.md`.
+- API/UI conventions from project bindings and enabled modules — never hardcode another product's stack.
+- Codegraph first (`codegraph_explore`).
+- Quality: CCS ≥ 0.65; see `quality-gates.md` + `.project.md`.
+
+## State
+
+Write `.harness/state/slices/<slice-id>/manifest.json` at end of phase; sync global registry row. Implementation follows `session-loop.md`.
