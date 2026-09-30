@@ -68,6 +68,10 @@ Safe by default: does **not** overwrite existing bindings, `PROGRESS.md`, slice 
 
 Smoke test: `./scripts/test-install-into.sh`
 
+Runtime recipes remain in this kit and are not copied into consuming
+repositories. The installer removes a previously copied runtimes directory;
+selected runtime links and configuration are still installed in the project.
+
 ## What's included
 
 | Layer | Contents |

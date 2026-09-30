@@ -31,7 +31,7 @@ Options:
   --force-bindings        Overwrite product/structure/tech/*.project.md (DANGEROUS)
   --force-mcp             Replace .agents/mcp/mcp.json with kit baseline
   --skip-bindings         Do not create binding stubs
-  --skip-docs             Skip AGENTS.md / docs / runtimes copy
+  --skip-docs             Skip AGENTS.md / docs copy
   --dry-run               Print actions only
   -h, --help              Show help
 
@@ -293,12 +293,20 @@ install_docs_root() {
   copy_file "$KIT_DIR/AGENTS.md" "$TARGET/AGENTS.md" create
   copy_file "$KIT_DIR/docs/asdd-harness-portability.md" "$TARGET/docs/asdd-harness-portability.md" create
   copy_file "$KIT_DIR/docs/asdd-and-harness-engineering.md" "$TARGET/docs/asdd-and-harness-engineering.md" create
-  copy_tree "$KIT_DIR/runtimes" "$TARGET/runtimes" refresh
   copy_file "$KIT_DIR/scripts/enable-module.sh" "$TARGET/scripts/enable-module.sh" refresh
   copy_file "$KIT_DIR/scripts/install-into.sh" "$TARGET/scripts/install-into.sh" refresh
   if [[ "$DRY_RUN" -eq 0 ]]; then
     chmod +x "$TARGET/scripts/enable-module.sh" "$TARGET/scripts/install-into.sh" 2>/dev/null || true
   fi
+}
+
+remove_runtime_docs() {
+  if [[ ! -e "$TARGET/runtimes" ]]; then
+    return 0
+  fi
+  log "REMOVE $TARGET/runtimes (runtime recipes remain in asdd-harness-kit)"
+  [[ "$DRY_RUN" -eq 1 ]] && return 0
+  rm -rf "$TARGET/runtimes"
 }
 
 enable_one_module() {
@@ -555,6 +563,7 @@ main() {
   install_harness_scaffold
   install_project_adapter
   install_agents_core
+  remove_runtime_docs
   install_docs_root
   enable_modules
   wire_runtimes
