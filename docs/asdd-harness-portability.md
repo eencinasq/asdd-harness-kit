@@ -9,13 +9,13 @@ How this template maps to product repos.
 | **A. Kit core** | This repository |
 | **B. Modules** | `.agents/modules/` — `scripts/enable-module.sh <name>` |
 | **C. Bindings** | `.harness/steering/{product,structure,tech,*.project}.md` stubs |
-| **D. Runtimes** | `runtimes/README.md` |
+| **D. Runtimes** | Runtime adapters maintained in this kit under runtimes/ |
 
 ## Adopter checklist
 
 1. Use this template (GitHub "Use this template" or clone).
 2. Fill all required bindings.
-3. Wire IDE per `runtimes/README.md`.
+3. Install the runtime links you use with scripts/install-into.sh. Runtime recipes stay in this kit and are not copied into product repos.
 4. Enable modules you need.
 5. Validate the generated adapter: `node .harness/scripts/check-project-config.mjs`.
 6. Validate Harness state: `node .harness/scripts/check-invariants.mjs`.
