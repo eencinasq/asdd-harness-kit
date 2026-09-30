@@ -25,7 +25,8 @@ Options:
   --from-git              Clone kit into a temp dir (for curl | bash)
   --kit-dir <path>        Kit source (default: parent of scripts/)
   --modules=<list>        bruno,playwright-e2e,web-ui,http-api — or "all"
-  --runtime=<name>        cursor | claude | cursor,claude | none (default: none)
+  --runtime=<name>        cursor | claude | opencode | kimi | junie | devin | kiro
+                          comma-separated values or none (default: none)
   --force                 Overwrite portable kit files that already exist
   --force-bindings        Overwrite product/structure/tech/*.project.md (DANGEROUS)
   --force-mcp             Replace .agents/mcp/mcp.json with kit baseline
@@ -402,6 +403,112 @@ wire_runtime_claude() {
   fi
 }
 
+link_runtime_agent_files() {
+  local runtime_dir="$1"
+  mkdir -p "$TARGET/$runtime_dir/agents"
+  local f base
+  for f in "$TARGET/.agents/agents"/asdd-*.md; do
+    [[ -f "$f" ]] || continue
+    base="$(basename "$f")"
+    ln -sfn "../../.agents/agents/$base" "$TARGET/$runtime_dir/agents/$base"
+    log "LINK $TARGET/$runtime_dir/agents/$base"
+  done
+}
+
+link_runtime_skills() {
+  local runtime_dir="$1"
+  local path="$TARGET/$runtime_dir/skills"
+  if [[ -L "$path" || ! -e "$path" ]]; then
+    rm -f "$path" 2>/dev/null || true
+    ln -sfn ../.agents/skills "$path"
+    log "LINK $path"
+  else
+    log "KEEP $path"
+  fi
+}
+
+link_runtime_mcp() {
+  local target_path="$1"
+  local source_path="$2"
+  if [[ -L "$target_path" || ! -e "$target_path" ]]; then
+    rm -f "$target_path" 2>/dev/null || true
+    mkdir -p "$(dirname "$target_path")"
+    ln -sfn "$source_path" "$target_path"
+    log "LINK $target_path"
+  else
+    log "KEEP $target_path"
+  fi
+}
+
+link_runtime_dir() {
+  local target_path="$1"
+  local source_path="$2"
+  if [[ -L "$target_path" || ! -e "$target_path" ]]; then
+    rm -f "$target_path" 2>/dev/null || true
+    mkdir -p "$(dirname "$target_path")"
+    ln -sfn "$source_path" "$target_path"
+    log "LINK $target_path"
+  else
+    log "KEEP $target_path"
+  fi
+}
+
+wire_runtime_opencode() {
+  log "RUNTIME opencode"
+  [[ "$DRY_RUN" -eq 1 ]] && return 0
+  link_runtime_agent_files ".opencode"
+  link_runtime_skills ".opencode"
+  if [[ ! -e "$TARGET/opencode.json" ]]; then
+    cat >"$TARGET/opencode.json" <<'EOF'
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"]
+}
+EOF
+    log "COPY $TARGET/opencode.json"
+  else
+    log "KEEP $TARGET/opencode.json"
+  fi
+  if command -v node >/dev/null 2>&1 && [[ -f "$TARGET/.agents/mcp/sync-runtime-mcp.cjs" ]]; then
+    (cd "$TARGET" && node .agents/mcp/sync-runtime-mcp.cjs)
+  else
+    log "WARN node or MCP projection script unavailable — skip OpenCode MCP projection"
+  fi
+}
+
+wire_runtime_kimi() {
+  log "RUNTIME kimi"
+  [[ "$DRY_RUN" -eq 1 ]] && return 0
+  mkdir -p "$TARGET/.kimi-code"
+  link_runtime_dir "$TARGET/.kimi-code/agents" "../.agents/agents"
+  link_runtime_skills ".kimi-code"
+  link_runtime_mcp "$TARGET/.kimi-code/mcp.json" "../.agents/mcp/mcp.json"
+}
+
+wire_runtime_junie() {
+  log "RUNTIME junie"
+  [[ "$DRY_RUN" -eq 1 ]] && return 0
+  link_runtime_agent_files ".junie"
+  link_runtime_skills ".junie"
+  link_runtime_mcp "$TARGET/.junie/mcp/mcp.json" "../../.agents/mcp/mcp.json"
+}
+
+wire_runtime_devin() {
+  log "RUNTIME devin"
+  [[ "$DRY_RUN" -eq 1 ]] && return 0
+  link_runtime_agent_files ".devin"
+  link_runtime_skills ".devin"
+  link_runtime_mcp "$TARGET/.devin/mcp_config.json" "../.agents/mcp/mcp.json"
+}
+
+wire_runtime_kiro() {
+  log "RUNTIME kiro"
+  [[ "$DRY_RUN" -eq 1 ]] && return 0
+  link_runtime_agent_files ".kiro"
+  link_runtime_skills ".kiro"
+  link_runtime_mcp "$TARGET/.kiro/settings/mcp.json" "../../.agents/mcp/mcp.json"
+}
+
 wire_runtimes() {
   [[ -n "$RUNTIMES" && "$RUNTIMES" != "none" ]] || return 0
   local r
@@ -411,8 +518,13 @@ wire_runtimes() {
     case "$r" in
       cursor) wire_runtime_cursor ;;
       claude|claude-code) wire_runtime_claude ;;
+      opencode|open-code) wire_runtime_opencode ;;
+      kimi|kimi-code) wire_runtime_kimi ;;
+      juni|junie) wire_runtime_junie ;;
+      devin) wire_runtime_devin ;;
+      kiro) wire_runtime_kiro ;;
       none|"") ;;
-      *) die "unknown runtime: $r (use cursor|claude)" ;;
+      *) die "unknown runtime: $r (use cursor|claude|opencode|kimi|junie|devin|kiro)" ;;
     esac
   done
 }

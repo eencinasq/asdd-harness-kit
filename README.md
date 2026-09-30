@@ -47,6 +47,10 @@ Read [AGENTS.md](AGENTS.md) every session. Portability model: [docs/asdd-harness
   --modules=http-api,web-ui \
   --runtime=cursor
 
+# Multiple runtimes can be wired in one pass:
+./scripts/install-into.sh /path/to/existing-repo \
+  --runtime=opencode,kimi,junie,devin,kiro
+
 # Or one-liner (clones kit to a temp dir):
 curl -fsSL https://raw.githubusercontent.com/eencinasq/asdd-harness-kit/main/scripts/install-into.sh \
   | bash -s -- /path/to/existing-repo --from-git --modules=http-api --runtime=cursor
@@ -57,7 +61,7 @@ Safe by default: does **not** overwrite existing bindings, `PROGRESS.md`, slice 
 | Flag | Effect |
 |------|--------|
 | `--modules=…` | Enable opt-in modules (`bruno`, `playwright-e2e`, `web-ui`, `http-api`, or `all`) |
-| `--runtime=cursor` / `claude` | Symlink agents/skills/MCP into the IDE folder |
+| `--runtime=cursor`, `claude`, `opencode`, `kimi`, `junie`, `devin`, `kiro` | Symlink agents/skills/MCP into the runtime folder |
 | `--force` | Refresh portable contracts/agents/skills already present |
 | `--force-bindings` | Overwrite binding stubs (dangerous) |
 | `--dry-run` | Print actions only |

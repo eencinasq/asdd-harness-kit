@@ -29,9 +29,36 @@ ln -sfn .agents/mcp/mcp.json .mcp.json
 echo 'Follow [`AGENTS.md`](AGENTS.md).' > CLAUDE.md
 ```
 
+## OpenCode
+
+The installer creates .opencode/agents links, a .opencode/skills link, and
+the project-level opencode.json MCP projection.
+
+## Kimi Code
+
+The installer creates .kimi-code/agents and .kimi-code/skills links plus
+.kimi-code/mcp.json.
+
+## Junie
+
+The installer creates Junie agent and skill links plus
+.junie/mcp/mcp.json. Existing Junie settings and hooks are preserved.
+
+## Devin
+
+The installer creates Devin agent and skill links plus
+.devin/mcp_config.json. Existing Devin configuration is preserved.
+
+## Kiro
+
+The installer creates Kiro agent and skill links plus
+.kiro/settings/mcp.json. Kiro hooks remain project-specific.
+
 ## Other IDEs
 
-Same pattern: agents → `.agents/agents`, skills → `.agents/skills`, MCP → `.agents/mcp/mcp.json` (or projected TOML for Codex — use `node .agents/mcp/sync-runtime-mcp.cjs` after adding projection configs from a product repo).
+Same pattern: agents → .agents/agents, skills → .agents/skills, MCP →
+.agents/mcp/mcp.json. Codex and OpenCode projections are generated with
+node .agents/mcp/sync-runtime-mcp.cjs.
 
 ## Enabling modules
 
