@@ -15,7 +15,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 5. Read steering for the phase (`structure`, `product`, `codegraph`, `manifest`, `session-loop`, plus phase-specific). Small work → [`asdd-lite.md`](.harness/steering/asdd-lite.md).
 6. Pick work:
    - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.
-   - `phase` is `implementation` → exactly one feature `not_started` or the single `in_progress`.
+   - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners, disjoint file scopes, and coordinator-held slice lock; otherwise work serially.
 
 ## System of record
 
@@ -32,7 +32,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 
 ## Working rules
 
-1. At most one `in_progress` feature.
+1. One `in_progress` by default. Same-slice concurrency must follow ownership, dependency, scope, and coordinator-lock rules in `.harness/steering/session-loop.md`.
 2. Never `passing` without `verification` + `evidence`.
 3. Update per-slice manifest at end of each ASDD phase ([manifest.md](.harness/steering/manifest.md)).
 4. Codegraph first ([codegraph.md](.harness/steering/codegraph.md)).

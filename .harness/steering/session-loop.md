@@ -4,7 +4,7 @@ inclusion: always
 
 # Session loop (Harness Engineering ∩ ASDD)
 
-Closes the gap between **ASDD phases** (manifest + specs) and **coding sessions** (one feature, verify, handoff). Explainer + diagrams: [`docs/asdd-and-harness-engineering.md`](../../docs/asdd-and-harness-engineering.md).
+Closes the gap between **ASDD phases** (manifest + specs) and **coding sessions** (scoped task execution, verification, handoff). Explainer + diagrams: [`docs/asdd-and-harness-engineering.md`](../../docs/asdd-and-harness-engineering.md).
 
 ## Artifacts
 
@@ -54,21 +54,28 @@ Each item in `.features.json`:
 - `evidence` — filled only when passing (what ran + result)
 - `notes` — optional; link REQs / blockers
 - `req_ids` — optional traceability
+- `owner` — required for concurrent work; unique runtime/worker id
+- `scope_paths` — required for concurrent work; non-empty repo-relative files/directories this task may edit
+- `depends_on` — optional task ids; all listed dependencies must be `passing` before dispatch
 
-**Rules:** at most one `in_progress`; `passing` requires non-empty `evidence`; on repeated verify fail → `blocked` + [agent-failure-log](../../docs/agent-failure-log.md).
+**Rules:** one `in_progress` by default. Multiple tasks may be `in_progress` only when each has a unique `owner`, non-empty non-overlapping `scope_paths`, and the coordinator holds the slice lock. Scope overlap includes a file and its ancestor directory. Workers must not edit shared Harness state, tracker, manifests, progress records, or index. `passing` requires non-empty `evidence`; on repeated verify fail → `blocked` + [agent-failure-log](../../docs/agent-failure-log.md).
 
 ## When to create / update features.json
 
 1. **Task Planning (mandatory):** project `tasks.md` → `.harness/features/<slice_id>.features.json`; set `manifest.paths.features`. Do not hand off to Implementation until this file exists with one item per `TASK-NNN`, all `not_started`.
-2. **Implementation:** flip **one** item to `in_progress`; on green verify → `passing` + evidence; update `PROGRESS.md`. Waves in `tasks.md` are dependency groups only — serialize through this tracker (see Implementation agent).
+2. **Implementation:** coordinator projects tasks, dependencies, owners, and file scopes into the tracker before dispatch. Set eligible entries to `in_progress`; workers return verification evidence; coordinator audits and records `passing` + evidence and updates shared state.
 3. **QA:** may add evidence or mark blocked; do not invent `passing` without running verification.
 4. **Do not** replace `tasks.md` — features are the session projection for Harness; tasks remain ASDD SoT for waves/deps.
 5. **Do not** backfill historical slices as `passing` without re-running each `verification`. Pre-harness slices may stay without a features file.
 
-## Waves vs one `in_progress`
+## Waves, dependencies, and concurrency
 
-`tasks.md` waves describe **what can start after deps**. `.features.json` allows **at most one** `in_progress`. Spawn a context-fresh sub-agent per TASK, but wait until that feature is `passing` or `blocked` before starting the next. Do not mark a whole wave `in_progress`.
+`tasks.md` waves define dependency barriers; task dependencies determine which DAG nodes are ready. Same-wave tasks may run concurrently only when every task has an explicit owner and a non-empty `scope_paths`, scopes do not overlap (including parent/child directory paths), and the coordinator holds the slice lock. Tasks without these declarations run serially.
+
+The coordinator alone writes `.features.json`, manifests, progress records, and `.harness/PROGRESS.md`. Workers edit only their owned task scope and report changed files, verification commands/results, blockers, and relevant requirement coverage. The coordinator reconciles results and marks a task `passing` only after evidence review. Shared-state changes happen at wave barriers. See [Orca task orchestration](../../docs/orca-task-orchestration.md) for a supervised DAG workflow.
+
+ASDD-Lite remains single-worker and serial.
 
 ## INIT order
 
-See root `AGENTS.md` INIT. Always: PROGRESS → global index → per-slice manifest → steering. Read features when present. Pick one feature only in `implementation`. If the board is only `DONE`/`PARKED`/`ABANDONED` and no slice was named: stop and ask the human (new intent or unpark).
+See root `AGENTS.md` INIT. Always: PROGRESS → global index → per-slice manifest → steering. Read features when present. Pick dependency-ready features in `implementation`; concurrent work must meet the ownership and file-scope contract above. If the board is only `DONE`/`PARKED`/`ABANDONED` and no slice was named: stop and ask the human (new intent or unpark).

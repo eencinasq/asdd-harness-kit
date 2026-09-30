@@ -40,7 +40,7 @@ Rule of thumb: if the work touches ≤3 files and introduces ≤1 new domain con
 3. **Traceability** — requirements → tasks → features.
 4. **Codegraph first** — before edits in unfamiliar modules.
 5. **Lock protocol** — one writer per slice (`.harness/state/locks/<slice-id>.lock`).
-6. **One feature at a time** — at most one `in_progress` in `.features.json`.
+6. **Serial execution** — ASDD-Lite allows at most one `in_progress` feature in `.features.json`; the parallel task contract is for fully planned slices only.
 
 ## Dropped from full ASDD
 

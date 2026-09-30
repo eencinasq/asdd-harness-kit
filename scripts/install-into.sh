@@ -188,6 +188,11 @@ install_bindings() {
 
 install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/check-invariants.mjs" "$TARGET/.harness/scripts/check-invariants.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/check-project-config.mjs" "$TARGET/.harness/scripts/check-project-config.mjs" refresh
+  copy_file "$KIT_DIR/.harness/config/project.schema.json" "$TARGET/.harness/config/project.schema.json" refresh
+  copy_file "$KIT_DIR/.harness/config/README.md" "$TARGET/.harness/config/README.md" refresh
+  copy_file "$KIT_DIR/.harness/features/feature_list.schema.json" "$TARGET/.harness/features/feature_list.schema.json" refresh
+  copy_file "$KIT_DIR/scripts/harness-migrate.mjs" "$TARGET/scripts/harness-migrate.mjs" refresh
   copy_file "$KIT_DIR/.harness/PROGRESS.md" "$TARGET/.harness/PROGRESS.md" create
   copy_file "$KIT_DIR/.harness/state/manifest.json" "$TARGET/.harness/state/manifest.json" create
   copy_file "$KIT_DIR/.harness/state/locks/README.md" "$TARGET/.harness/state/locks/README.md" create
@@ -204,6 +209,65 @@ install_harness_scaffold() {
       log "COPY $TARGET/.harness/$d/README.md"
     fi
   done
+}
+
+install_project_adapter() {
+  local config="$TARGET/.harness/config/project.json"
+  if [[ -e "$config" ]]; then
+    log "KEEP $config"
+    return 0
+  fi
+  local project_id
+  project_id="$(basename "$TARGET" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9][^a-z0-9]*/-/g; s/^-//; s/-$//')"
+  [[ -n "$project_id" ]] || project_id="project"
+  log "CREATE $config"
+  [[ "$DRY_RUN" -eq 1 ]] && return 0
+  mkdir -p "$(dirname "$config")"
+  cat >"$config" <<EOF
+{
+  "schema_version": "1.0",
+  "project_id": "$project_id",
+  "kit": {
+    "name": "asdd-harness-kit",
+    "source": "$KIT_REMOTE_DEFAULT",
+    "ref": "$KIT_REF_DEFAULT"
+  },
+  "harness_version": "2.0",
+  "mode": "full",
+  "bindings_complete": false,
+  "paths": {
+    "steering": ".harness/steering",
+    "specs": ".harness/specs",
+    "state": ".harness/state",
+    "features": ".harness/features",
+    "progress": ".harness/progress",
+    "progress_index": ".harness/PROGRESS.md",
+    "locks": ".harness/state/locks"
+  },
+  "bindings": {
+    "product": ".harness/steering/product.md",
+    "structure": ".harness/steering/structure.md",
+    "tech": ".harness/steering/tech.md",
+    "domain_layer": ".harness/steering/domain-layer.project.md",
+    "quality_gates": ".harness/steering/quality-gates.project.md"
+  },
+  "commands": {
+    "invariants": "node .harness/scripts/check-invariants.mjs"
+  },
+  "modules": {},
+  "capabilities": {
+    "codegraph": {
+      "enabled": false,
+      "required": false
+    },
+    "orca": {
+      "enabled": false,
+      "experimental": true
+    }
+  },
+  "runtimes": []
+}
+EOF
 }
 
 install_agents_core() {
@@ -359,6 +423,8 @@ verify() {
     return
   fi
   if command -v node >/dev/null 2>&1; then
+    log "VERIFY node .harness/scripts/check-project-config.mjs"
+    (cd "$TARGET" && node .harness/scripts/check-project-config.mjs) || die "project configuration failed"
     log "VERIFY node .harness/scripts/check-invariants.mjs"
     (cd "$TARGET" && node .harness/scripts/check-invariants.mjs) || die "invariants failed"
   else
@@ -375,6 +441,7 @@ main() {
   install_portable_steering
   install_bindings
   install_harness_scaffold
+  install_project_adapter
   install_agents_core
   install_docs_root
   enable_modules

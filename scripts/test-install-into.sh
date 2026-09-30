@@ -25,6 +25,10 @@ test -f "$TMP/existing-app/.agents/agents/asdd-discovery-agent.md"
 test -f "$TMP/existing-app/.agents/skills/api-and-interface-design/SKILL.md"
 test -L "$TMP/existing-app/.cursor/skills"
 test -f "$TMP/existing-app/.harness/scripts/check-invariants.mjs"
+test -f "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
+test -f "$TMP/existing-app/.harness/config/project.schema.json"
+test -f "$TMP/existing-app/scripts/harness-migrate.mjs"
+node "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 
 # second run keeps binding, does not require --force for create-only
 "$ROOT/scripts/install-into.sh" "$TMP/existing-app" >/dev/null

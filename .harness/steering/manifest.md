@@ -52,5 +52,5 @@ Historical pre-v2 stubs may omit `gates` / `ccs` — do not invent scores; invar
 3. Claim the lock; read `.harness/state/slices/<slice-id>/manifest.json`.
 4. Read features from `paths.features` when present.
 5. Read required files from `.harness/steering/` for the phase.
-6. During Implementation, one feature at a time ([session-loop.md](./session-loop.md)).
+6. During Implementation, use the serial default or the scoped same-slice concurrency contract ([session-loop.md](./session-loop.md)).
 7. On phase complete: **write per-slice manifest**, sync global registry row + `PROGRESS.md` row; on implementation also update features evidence.

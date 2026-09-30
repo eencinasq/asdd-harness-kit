@@ -17,8 +17,9 @@ How this template maps to product repos.
 2. Fill all required bindings.
 3. Wire IDE per `runtimes/README.md`.
 4. Enable modules you need.
-5. `node .harness/scripts/check-invariants.mjs`
-6. Create first slice via Discovery or ASDD-Lite.
+5. Validate the generated adapter: `node .harness/scripts/check-project-config.mjs`.
+6. Validate Harness state: `node .harness/scripts/check-invariants.mjs`.
+7. Create first slice via Discovery or ASDD-Lite.
 
 ## Do not copy from a product monorepo
 

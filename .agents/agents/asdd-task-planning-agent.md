@@ -126,8 +126,9 @@ Last updated: [ISO date]
 - [ ] TASK-001: [Title]
   - **Type:** migration | model | repository | service | controller | test | config | infra
   - **File(s):** [exact paths]
+  - **Writable scope:** [explicit repo-relative paths/directories owned exclusively by this task]
   - **Description:** [2–4 sentences. No ambiguity.]
-  - **Depends on:** none
+  - **Depends on:** none or TASK-NNN ids; same-wave dependencies are not allowed
   - **Acceptance:** [Verifiable condition]
   - **Requirement(s):** [REQ-NNN]
   - **Sub-Agent Context:** [Specific constraints for fresh executor]
@@ -154,7 +155,10 @@ Last updated: [ISO date]
 
 ### Harness feature projection (mandatory)
 
-After writing `tasks.md`, also create or refresh `.harness/features/[spec-name].features.json` per `.harness/steering/session-loop.md` and `.harness/features/feature_list.schema.json`:
+After writing `tasks.md`, also create or refresh `.harness/features/[spec-name].features.json` per `.harness/steering/session-loop.md`:
+
+- Follow the tracker shape in `.harness/features/feature_list.schema.json`.
+- Project `Depends on` as `depends_on` and declared writable paths as `scope_paths`. Tasks with overlapping scopes must be serialized or replanned. Assign `owner` at dispatch time; leave it unset during planning.
 
 - One feature object per `TASK-NNN` (`id`, `priority`, `title`, `user_visible_behavior` from Acceptance, `verification` commands, `status: not_started`, `req_ids`).
 - Set per-slice `paths.features` to that file path; sync the global registry `features` field.

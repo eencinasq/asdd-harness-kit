@@ -6,7 +6,7 @@
  * Supports:
  * - Global manifest schema v2.0 (active_slices array)
  * - Per-slice manifests (state/slices/<id>/manifest.json)
- * - Feature tracker invariants (one in_progress, evidence required)
+ * - Feature tracker invariants (dependencies, concurrent ownership/scope, evidence)
  * - Orphan slice detection
  * - Stale lock detection
  */
@@ -42,6 +42,132 @@ function readJson(rel) {
 function dirExists(rel) {
   return existsSync(join(root, rel));
 }
+
+function normalizeScopePath(value) {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  const path = value.trim().replaceAll('\\', '/').replace(/\/+/g, '/').replace(/\/$/, '');
+  if (!path || path.startsWith('/') || /^[A-Za-z]:/.test(path)) return null;
+  const parts = path.split('/');
+  if (parts.some((part) => !part || part === '.' || part === '..')) return null;
+  return parts.join('/');
+}
+
+function pathsOverlap(left, right) {
+  return left === right || left.startsWith(`${right}/`) || right.startsWith(`${left}/`);
+}
+
+function validateFeatureDocument(data, rel) {
+  if (data?.schema_version !== '1.0') {
+    fail(rel + ': schema_version must be "1.0"');
+  }
+  if (typeof data?.slice_id !== 'string' || !data.slice_id.trim()) {
+    fail(rel + ': slice_id must be a non-empty string');
+  }
+  if (typeof data?.source_tasks !== 'string' || !data.source_tasks.trim()) {
+    fail(rel + ': source_tasks must be a non-empty repository-relative path');
+  } else if (!existsSync(join(root, data.source_tasks))) {
+    fail(rel + ': source_tasks does not exist: ' + data.source_tasks);
+  }
+  if (!Array.isArray(data?.features) || data.features.length === 0) {
+    fail(rel + ': features must be a non-empty array');
+    return;
+  }
+  for (const feature of data.features) {
+    for (const key of ['id', 'title', 'user_visible_behavior', 'status']) {
+      if (typeof feature?.[key] !== 'string' || !feature[key].trim()) {
+        fail(rel + ': feature ' + (feature?.id ?? '<unknown>') + ' missing ' + key);
+      }
+    }
+    if (!Number.isInteger(feature.priority) || feature.priority < 1) {
+      fail(rel + ': feature ' + (feature?.id ?? '<unknown>') + ' priority must be a positive integer');
+    }
+    if (!Array.isArray(feature.verification) || feature.verification.length < 1) {
+      fail(rel + ': feature ' + (feature?.id ?? '<unknown>') + ' missing verification');
+    }
+  }
+}
+
+function validateFeatureExecution(data, rel, sliceId) {
+  const list = Array.isArray(data?.features) ? data.features : [];
+  const byId = new Map(list.map((feature) => [feature.id, feature]));
+  const active = list.filter((feature) => feature.status === 'in_progress');
+
+  for (const feature of list) {
+    const dependencies = feature.depends_on ?? [];
+    if (!Array.isArray(dependencies)) {
+      fail(`${rel}: feature ${feature.id} depends_on must be an array`);
+      continue;
+    }
+    for (const dependencyId of dependencies) {
+      const dependency = byId.get(dependencyId);
+      if (!dependency) {
+        fail(`${rel}: feature ${feature.id} depends on unknown feature ${dependencyId}`);
+      } else if (feature.status === 'in_progress' && dependency.status !== 'passing') {
+        fail(`${rel}: feature ${feature.id} is in_progress before dependency ${dependencyId} is passing`);
+      }
+    }
+  }
+
+  if (active.length <= 1) return;
+
+  const lockPath = `.harness/state/locks/${sliceId}.lock`;
+  if (!existsSync(join(root, lockPath))) {
+    fail(`${rel}: concurrent tasks require the slice coordinator lock ${lockPath}`);
+  } else {
+    const lock = readJson(lockPath);
+    if (lock && lock.slice !== sliceId) {
+      fail(`${rel}: coordinator lock ${lockPath} identifies slice "${lock.slice}"`);
+    }
+    if (lock && (typeof lock.agent !== 'string' || !lock.agent.trim())) {
+      fail(`${rel}: coordinator lock ${lockPath} needs a non-empty agent identity`);
+    }
+  }
+
+  const owners = new Set();
+  const scopedTasks = [];
+  const reserved = ['.harness/state', '.harness/features', '.harness/progress', '.harness/PROGRESS.md'];
+  for (const feature of active) {
+    if (typeof feature.owner !== 'string' || !feature.owner.trim()) {
+      fail(`${rel}: concurrent feature ${feature.id} needs an owner`);
+    } else if (owners.has(feature.owner)) {
+      fail(`${rel}: concurrent features share owner "${feature.owner}"`);
+    } else {
+      owners.add(feature.owner);
+    }
+
+    if (!Array.isArray(feature.scope_paths) || feature.scope_paths.length === 0) {
+      fail(`${rel}: concurrent feature ${feature.id} needs non-empty scope_paths`);
+      continue;
+    }
+
+    const paths = [];
+    for (const rawPath of feature.scope_paths) {
+      const normalized = normalizeScopePath(rawPath);
+      if (!normalized) {
+        fail(`${rel}: feature ${feature.id} has invalid repository-relative scope path "${rawPath}"`);
+        continue;
+      }
+      if (reserved.some((prefix) => pathsOverlap(normalized, prefix))) {
+        fail(`${rel}: feature ${feature.id} cannot own shared harness state path "${normalized}"`);
+      }
+      paths.push(normalized);
+    }
+    scopedTasks.push({ id: feature.id, paths });
+  }
+
+  for (let i = 0; i < scopedTasks.length; i += 1) {
+    for (let j = i + 1; j < scopedTasks.length; j += 1) {
+      for (const left of scopedTasks[i].paths) {
+        for (const right of scopedTasks[j].paths) {
+          if (pathsOverlap(left, right)) {
+            fail(`${rel}: concurrent features ${scopedTasks[i].id} and ${scopedTasks[j].id} have overlapping scopes: ${left} / ${right}`);
+          }
+        }
+      }
+    }
+  }
+}
+
 
 // === 1. Banned SoT paths ===
 
@@ -130,10 +256,7 @@ if (manifest) {
                 fail(`features.slice_id (${features.slice_id}) != slice_id (${slice.slice_id}) in ${slice.slice_id}`);
               }
               const list = Array.isArray(features.features) ? features.features : [];
-              const inProgress = list.filter((f) => f.status === 'in_progress');
-              if (inProgress.length > 1) {
-                fail(`slice "${slice.slice_id}" has ${inProgress.length} in_progress features: ${inProgress.map((f) => f.id).join(', ')}`);
-              }
+              validateFeatureExecution(features, slice.features || sliceManifest.paths.features, slice.slice_id);
               for (const f of list) {
                 if (f.status === 'passing' && !String(f.evidence || '').trim()) {
                   fail(`feature ${f.id} in "${slice.slice_id}" is passing without evidence`);
@@ -224,14 +347,12 @@ if (existsSync(featuresDir)) {
     const rel = `.harness/features/${name}`;
     const data = readJson(rel);
     if (!data) continue;
+    validateFeatureDocument(data, rel);
     const list = Array.isArray(data.features) ? data.features : [];
-    const inProgress = list.filter((f) => f.status === 'in_progress');
-    if (inProgress.length > 1) {
-      fail(`${rel}: ${inProgress.length} in_progress features`);
-    }
+    const sliceId = data.slice_id;
+    validateFeatureExecution(data, rel, sliceId);
 
     // Check features without a corresponding slice in global manifest
-    const sliceId = data.slice_id;
     if (sliceId) {
       const knownSliceIds = new Set(
         Array.isArray(manifest?.active_slices) ? manifest.active_slices.map((s) => s.slice_id) : [],

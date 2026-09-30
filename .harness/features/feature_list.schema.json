@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://draft-ly.app/schemas/harness-feature-list.json",
+  "title": "Harness feature list",
+  "type": "object",
+  "required": ["schema_version", "slice_id", "source_tasks", "features"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "slice_id": { "type": "string" },
+    "source_tasks": { "type": "string", "description": "Path to tasks.md" },
+    "updated_at": { "type": "string" },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "priority",
+          "area",
+          "title",
+          "user_visible_behavior",
+          "status",
+          "verification"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "priority": { "type": "integer", "minimum": 1 },
+          "area": { "type": "string" },
+          "title": { "type": "string" },
+          "user_visible_behavior": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["not_started", "in_progress", "blocked", "passing"]
+          },
+          "verification": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          },
+          "evidence": { "type": "string" },
+          "notes": { "type": "string" },
+          "owner": {
+            "type": "string",
+            "description": "Worker identity assigned by the slice coordinator while this task is in_progress"
+          },
+          "scope_paths": {
+            "type": "array",
+            "description": "Exclusive repository-relative files or directories this task may modify while running concurrently",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "depends_on": {
+            "type": "array",
+            "description": "Feature IDs that must be passing before this task starts",
+            "items": { "type": "string" },
+            "uniqueItems": true
+          },
+          "req_ids": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "project_id": "asdd-harness-kit",
+  "kit": {
+    "name": "asdd-harness-kit",
+    "source": "https://github.com/eencinasq/asdd-harness-kit",
+    "ref": "main"
+  },
+  "harness_version": "2.0",
+  "mode": "full",
+  "bindings_complete": true,
+  "paths": {
+    "steering": ".harness/steering",
+    "specs": ".harness/specs",
+    "state": ".harness/state",
+    "features": ".harness/features",
+    "progress": ".harness/progress",
+    "progress_index": ".harness/PROGRESS.md",
+    "locks": ".harness/state/locks"
+  },
+  "bindings": {
+    "product": ".harness/steering/product.md",
+    "structure": ".harness/steering/structure.md",
+    "tech": ".harness/steering/tech.md",
+    "domain_layer": ".harness/steering/domain-layer.project.md",
+    "quality_gates": ".harness/steering/quality-gates.project.md"
+  },
+  "commands": {
+    "invariants": "node .harness/scripts/check-invariants.mjs"
+  },
+  "modules": {},
+  "capabilities": {
+    "codegraph": {
+      "enabled": true,
+      "required": false
+    },
+    "orca": {
+      "enabled": false,
+      "experimental": true
+    }
+  },
+  "runtimes": []
+}
+

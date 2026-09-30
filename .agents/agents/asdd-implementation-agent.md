@@ -106,13 +106,14 @@ At the end of your execution, you must **write** `.harness/state/slices/<slice-i
 
 Per `.harness/steering/session-loop.md` and root `AGENTS.md`:
 
-- Work **one** feature (`TASK-*`) at a time in `.harness/features/<slice_id>.features.json`.
-- Set `in_progress` before coding; after verification passes, set `passing` and write `evidence` (command + result). Never mark `passing` without running verification.
+- Work from eligible `TASK-*` entries in `.harness/features/<slice_id>.features.json`; dependencies must be passing.
+- Default to one active feature. Parallelize independent tasks only when each has a unique `owner`, non-empty and non-overlapping `scope_paths`, and the coordinator holds the slice lock. Set ownership/status before dispatch. Workers modify only owned task paths and return verification evidence; coordinator audits the combined diff and alone updates trackers, manifests, progress records, and index rows. Prefer isolated worktrees when available.
+- After verification passes, coordinator sets `passing` and writes `evidence` (command + result). Never mark `passing` without running verification.
 - **Defect review (when skill present):** After feature `verification` is green, run skill `open-code-review` on the feature/branch diff before `passing`. Unresolved CRITICAL/HIGH → leave `in_progress`/`blocked` with notes. If `ocr` is missing, ask the human; record skipped in evidence/notes — do not invent a review and do not skip test verification.
 - On repeated failure, set `blocked` and append `docs/agent-failure-log.md`.
 - Update `.harness/progress/<slice_id>.md` (session record) and the slice row in `.harness/PROGRESS.md`.
 
-**Waves vs tracker:** Waves in `tasks.md` are dependency groups (what may start after deps). They do **not** authorize parallel `in_progress` rows. Spawn one context-fresh sub-agent per TASK; wait until that feature is `passing` or `blocked` before starting the next TASK, even if the wave lists several items. Many agents over the slice lifetime is fine; the JSON may have at most one `in_progress`.
+**Waves and DAG execution:** Treat each task as a DAG node; dispatch only nodes whose `depends_on` features are `passing`. Same-wave tasks may run concurrently only when their declared file scopes are disjoint and ownership is explicit. Project tasks, dependencies, and scopes into the feature tracker before dispatch. Keep a barrier before dependent tasks. If paths overlap, scope is missing, or a conflict appears, serialize those tasks. Use Orca supervised task-DAG coordination when available; the coordinator retains the slice lock and serializes shared-state writes.
 
 ## Execution Flow
 

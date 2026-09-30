@@ -29,13 +29,14 @@ cp runtimes/cursor/asdd-steering.mdc .cursor/rules/asdd-steering.mdc
 # cp -R .agents/modules/http-api/skills/api-and-interface-design .agents/skills/
 # … see .agents/modules/README.md
 
-# 4. Verify harness shape
+# 4. Verify project adapter and harness shape
+node .harness/scripts/check-project-config.mjs
 node .harness/scripts/check-invariants.mjs
 
 # 5. Start Discovery — create .harness/specs/<slice>/intent.md
 ```
 
-Read [AGENTS.md](AGENTS.md) every session. Portability model: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md).
+Read [AGENTS.md](AGENTS.md) every session. Portability model: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md). Orca same-slice task orchestration: [docs/orca-task-orchestration.md](docs/orca-task-orchestration.md).
 
 
 ## Add to an existing project

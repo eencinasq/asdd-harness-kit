@@ -41,17 +41,22 @@ All conditions must pass before entering task planning.
 
 | Metric | Threshold | Action |
 |---|---|---|
-| Design confidence score | ≥ 0.85 | BLOCK |
-| Requirements status | READY | BLOCK |
-| Validation gate decision | PASSED or PASSED_WITH_WARNINGS | BLOCK |
+| Design confidence score | ≥ 0.85 | PASS |
+| Design confidence score | < 0.85 | BLOCK — revise design |
+| Requirements status | READY | PASS |
+| Requirements status | Any other status | BLOCK |
+| Validation gate decision | PASSED or PASSED_WITH_WARNINGS | PASS |
+| Validation gate decision | Any other status | BLOCK |
 
 ## Task Planning Readiness Gate
 
 | Metric | Threshold | Action |
 |---|---|---|
-| Task planning confidence score | ≥ 0.85 | BLOCK — revise task plan |
+| Task planning confidence score | ≥ 0.85 | PASS |
+| Task planning confidence score | 0.70–< 0.85 | WARN — proceed with flagged uncertainty |
 | Task planning confidence score | < 0.70 | BLOCK — return to design phase |
-| Design status | READY | BLOCK |
+| Design status | READY | PASS |
+| Design status | Any other status | BLOCK |
 
 ## Domain Placement Gate
 
