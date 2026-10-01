@@ -11,26 +11,23 @@ mode: subagent
 This file is the **same ASDD role as** `.agents/agents/asdd-refactor-agent.md` (responsibilities, inputs, outputs, gates). Adapt only the runtime:
 
 1. **Steering:** `Read` files under `.harness/steering/` directly (SoT). Do not use `.kiro/steering`.
-2. **Skills:** `Read` `.agents/skills/<name>/SKILL.md` for each required skill below and apply its workflow. Skip a skill if that file is absent. List loaded skills in the final message. Index: `.harness/steering/skills.md`.
+2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
 3. **Edits:** Use `Write` / `StrReplace` / `Shell` (not Kiro `fsWrite`).
 4. **Codegraph:** Use Cursor MCP (`GetDynamicTools` / `CallDynamicTool` or equivalent). Primary tool: `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`. List tools used in the final message.
 5. **State:** Read `.harness/PROGRESS.md` and global `.harness/state/manifest.json` (index only) at start; resolve the slice; **write** `.harness/state/slices/<slice-id>/manifest.json` at end of a completed phase and **sync that slice's registry row** in the global index per `.harness/steering/manifest.md`. Never treat the global file as the phase machine. For implementation, also update features + PROGRESS per `.harness/steering/session-loop.md`.
 6. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via Task.
 7. **Parallel work:** Prefer the `Task` tool for context-fresh sub-agents / waves (instead of Kiro `invokeSubAgent`).
 
-## Project skills (Cursor — mandatory `Read`)
+## Project skills
 
-**Always `Read` (skip if the file is absent):**
-- `.agents/skills/test-driven-development/SKILL.md` — suite must stay green; Prove-It if a change risks behavior
+Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts.
 
-**Conditional `Read` (skip if absent):**
-- Diff / security findings feed: `.agents/skills/open-code-review/SKILL.md` (requires `ocr` CLI; if missing, ask human — do not invent findings; still honor CRITICAL/HIGH from any existing `ocr-result.json` / `code-review-report.md`)
-- UI refactor: `.agents/skills/frontend-ui-engineering/SKILL.md`
-- UI browser regression / visual check: `.agents/skills/browser-testing-with-devtools/SKILL.md` — **Chrome DevTools MCP** only. Do **not** use Playwright MCP for refactor smoke; automation tests belong to `@asdd-e2e-tester`.
-- Documenting decision changes / ADR updates: `.agents/skills/documentation-and-adrs/SKILL.md`
-- HTTP / API refactor: `.agents/skills/api-and-interface-design/SKILL.md`
-
-List loaded skills in the final message.
+- When you start a refactor that can change behavior: `Read` `.agents/skills/test-driven-development/SKILL.md`
+- When you start from a diff or security-findings feed: `Read` `.agents/skills/open-code-review/SKILL.md`. If `ocr` is missing, ask a human. Do not invent findings. Still honor CRITICAL/HIGH already recorded in `ocr-result.json` or `code-review-report.md`.
+- When you start a UI refactor, and the folder exists: `Read` `.agents/skills/frontend-ui-engineering/SKILL.md`
+- When you start a browser regression check, and the folder exists: `Read` `.agents/skills/browser-testing-with-devtools/SKILL.md`. Use Chrome DevTools MCP. Leave Playwright automation to `@asdd-e2e-tester`.
+- When you start an ADR or decision-record update: `Read` `.agents/skills/documentation-and-adrs/SKILL.md`
+- When you start an HTTP or API refactor, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
 
 ---
 

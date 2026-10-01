@@ -32,11 +32,13 @@ cp runtimes/cursor/asdd-steering.mdc .cursor/rules/asdd-steering.mdc
 # 4. Verify project adapter and harness shape
 node .harness/scripts/check-project-config.mjs
 node .harness/scripts/check-invariants.mjs
+# Cursor stop hook (with --runtime=cursor): .cursor/hooks.json runs
+# node .harness/scripts/verify-on-stop.mjs and injects FAIL output into the prompt.
 
 # 5. Start Discovery — create .harness/specs/<slice>/intent.md
 ```
 
-Read [AGENTS.md](AGENTS.md) every session. The complete product-to-implementation flow is documented in [docs/pipeline-documentation.md](docs/pipeline-documentation.md). The Product Delivery → ASDD + Harness handoff is defined in [.agents/skills/product-delivery/references/asdd-harness-handoff.md](.agents/skills/product-delivery/references/asdd-harness-handoff.md). Portability model: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md). Orca same-slice task orchestration: [docs/orca-task-orchestration.md](docs/orca-task-orchestration.md).
+Read [AGENTS.md](AGENTS.md) every session. How guides, sensors, file scope, and session close fit is in [docs/asdd-and-harness-engineering.md](docs/asdd-and-harness-engineering.md). The product-to-implementation flow is in [docs/pipeline-documentation.md](docs/pipeline-documentation.md). The Product Delivery → ASDD + Harness handoff is defined in [.agents/skills/product-delivery/references/asdd-harness-handoff.md](.agents/skills/product-delivery/references/asdd-harness-handoff.md). Portability model: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md). Orca same-slice task orchestration: [docs/orca-task-orchestration.md](docs/orca-task-orchestration.md).
 
 For teams using Shape Up practices with ASDD and Harness, read [docs/shape-up-asdd-harness-integration.md](docs/shape-up-asdd-harness-integration.md) and use the core [`shape-up`](.agents/skills/shape-up/SKILL.md) skill before betting a slice.
 
@@ -78,7 +80,7 @@ selected runtime links and configuration are still installed in the project.
 
 | Layer | Contents |
 |-------|----------|
-| **A. Kit core** | `@asdd-*` pipeline agents, product/spec skills, portable steering, empty state, `check-invariants` |
+| **A. Kit core** | `@asdd-*` pipeline agents, skills catalog, steering (including `controls.md` and EARS quality gates), empty state, `check-invariants`, Verify-on-Stop |
 | **B. Modules** | Bruno, Playwright, web-UI, HTTP-API under `.agents/modules/` (opt-in) |
 | **C. Bindings** | Stub `product.md`, `structure.md`, `tech.md`, `*.project.md` — **rewrite these** |
 | **D. Runtimes** | Recipes under `runtimes/` (Cursor, Claude Code, …) |

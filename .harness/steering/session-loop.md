@@ -58,7 +58,7 @@ Each item in `.features.json`:
 - `scope_paths` — required for concurrent work; non-empty repo-relative files/directories this task may edit
 - `depends_on` — optional task ids; all listed dependencies must be `passing` before dispatch
 
-**Rules:** one `in_progress` by default. Multiple tasks may be `in_progress` only when each has a unique `owner`, non-empty non-overlapping `scope_paths`, and the coordinator holds the slice lock. Scope overlap includes a file and its ancestor directory. Workers must not edit shared Harness state, tracker, manifests, progress records, or index. `passing` requires non-empty `evidence`; on repeated verify fail → `blocked` + [agent-failure-log](../../docs/agent-failure-log.md).
+**Rules:** one `in_progress` by default. Multiple tasks may be `in_progress` only when each has a unique `owner`, non-empty non-overlapping `scope_paths`, and the coordinator holds the slice lock. Scope overlap includes a file and its ancestor directory. Workers must not edit shared Harness state, tracker, manifests, progress records, or index. `passing` requires non-empty `evidence` and a passing Verify-on-Stop check in the same session; on repeated verify fail → `blocked` + [agent-failure-log](../../docs/agent-failure-log.md).
 
 ## When to create / update features.json
 
@@ -75,6 +75,28 @@ Each item in `.features.json`:
 The coordinator alone writes `.features.json`, manifests, progress records, and `.harness/PROGRESS.md`. Workers edit only their owned task scope and report changed files, verification commands/results, blockers, and relevant requirement coverage. The coordinator reconciles results and marks a task `passing` only after evidence review. Shared-state changes happen at wave barriers. See [Orca task orchestration](../../docs/orca-task-orchestration.md) for a supervised DAG workflow.
 
 ASDD-Lite remains single-worker and serial.
+
+## Gold-plating
+
+Modify only the files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors.
+
+Mapped files are the paths named by that `intent.md` and by the slice `design.md` and `tasks.md` that trace to it, plus `scope_paths` on the in-progress feature. ASDD-Lite uses `.harness/specs/<slice>/spec.md` in place of `intent.md`. Slice harness records this contract requires (per-slice manifest, features, progress, lock, and the `PROGRESS.md` index row) stay writable. Any other product file is out of scope. A refactor inside a mapped file is in scope only when that spec, the current task, or the slice phase `refactor` requests it.
+
+## Verify-on-Stop
+
+Before the session ends, and before a feature is marked `passing`, the agent shall run:
+
+```bash
+node .harness/scripts/check-invariants.mjs
+```
+
+Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The agent shall fix every FAIL and shall not mark the feature `passing` while the command exits non-zero.
+
+Cursor runs that command automatically. `.cursor/hooks.json` binds the `stop` event to `node .harness/scripts/verify-on-stop.mjs` (`timeout` 60, `loop_limit` 3, `failClosed` true). When `check-invariants.mjs` exits non-zero, the hook submits the FAIL output as the next user message so the agent corrects the harness state before the session ends. When the command exits 0, the hook returns `{}` and the session may end. The hook does not inject a follow-up when `status` is `aborted` or `error`. After `loop_limit`, a remaining FAIL still means the feature is not `passing`.
+
+Other runtimes do not inject that prompt. The same command is still mandatory before handoff.
+
+Session close, and what wins when a control disagrees with this file, is in [controls.md](./controls.md). Gold-plating in this file still decides which files may change.
 
 ## INIT order
 

@@ -7,6 +7,9 @@ paths, bindings, commands, modules, and capabilities.
 Validate the installed adapter from the project root:
 
     node .harness/scripts/check-project-config.mjs
+    node .harness/scripts/check-invariants.mjs
+
+`check-invariants.mjs` also checks that the skills catalog matches `.agents/skills/`. Regenerate that catalog with `node .harness/scripts/check-skills-index.mjs --write`. `project.json` records `commands.invariants` and `commands.verify_on_stop`. The Cursor stop hook is `.cursor/hooks.json`, which runs `node .harness/scripts/verify-on-stop.mjs`; it does not read `project.json`.
 
 The installer creates a conservative adapter when the project does not have
 one. Fill the project bindings before starting Discovery. Existing

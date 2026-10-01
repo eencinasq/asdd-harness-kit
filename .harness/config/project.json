@@ -26,7 +26,8 @@
     "quality_gates": ".harness/steering/quality-gates.project.md"
   },
   "commands": {
-    "invariants": "node .harness/scripts/check-invariants.mjs"
+    "invariants": "node .harness/scripts/check-invariants.mjs",
+    "verify_on_stop": "node .harness/scripts/verify-on-stop.mjs"
   },
   "modules": {},
   "capabilities": {

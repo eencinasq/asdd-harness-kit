@@ -1,50 +1,26 @@
 # ASDD skills index (kit)
 
-Skill **files** live in `.agents/skills/` once installed. Optional UI/API skills remain in the kit and are copied only when enabled with the kit installer.
+Initial catalog for folders under `.agents/skills/`. Each folder exposes only its name and description here. The skill body stays in `SKILL.md` until the matching task starts.
 
-Skip a skill if the file is absent.
+## Disclosure
 
-## Core skills (shipped under `.agents/skills/`)
+- Read this file to choose a skill. This is the initial index.
+- When you start the task that matches a description, `Read` `.agents/skills/<name>/SKILL.md` and follow that file.
+- Until that task starts, do not `Read` that `SKILL.md`, its `references/`, or its `agents/`.
+- Do not copy a skill body into this index. After adding or editing a skill folder, regenerate the catalog with `node .harness/scripts/check-skills-index.mjs --write`.
+- A skill that is not yet copied into `.agents/skills/` is not part of this index.
 
-| Skill | Purpose |
-|-------|---------|
-| `domain-language-extraction` | Ubiquitous language |
-| `anti-pattern-detection` | Spec anti-patterns |
-| `user-story-decomposition` | Split epics |
-| `business-model-canvas` | BMC → capabilities |
-| `capability-prioritization` | RICE / MoSCoW |
-| `product-delivery` | Pitch intake / epics / stories / dependencies / sprint |
-| `documentation-and-adrs` | ADRs / docs |
-| `shape-up` | Shape Up pitches, appetite, boundaries, conversions, and betting readiness |
-| `test-driven-development` | RED-GREEN-REFACTOR |
-| `open-code-review` | Defect review via `ocr` |
-
-## Module skills (copy to enable)
-
-| Module | Skills |
-|--------|--------|
-| `http-api` | `api-and-interface-design` |
-| `web-ui` | `frontend-ui-engineering`, `browser-testing-with-devtools` |
-
-## Per-agent required reads
-
-| Agent | Always | Conditional |
-|-------|--------|-------------|
-| `asdd-discovery-agent` | `domain-language-extraction`, `anti-pattern-detection` | epic / BMC / 2+ caps as needed |
-| `asdd-spec-agent` | `domain-language-extraction`, `anti-pattern-detection` | `api-and-interface-design` if API **and installed** |
-| `asdd-validation-agent` | `anti-pattern-detection` | API skill if installed |
-| `asdd-domain-agent` | `domain-language-extraction` | — |
-| `asdd-design-agent` | — | frontend / API / docs skills when relevant **and installed** |
-| `asdd-task-planning-agent` | — | frontend / API / `test-driven-development` |
-| `asdd-implementation-agent` | **`test-driven-development`** | `open-code-review`; API/UI skills if installed |
-| `asdd-qa-agent` | — | anti-pattern / TDD / OCR / UI / API as relevant |
-| `asdd-refactor-agent` | **`test-driven-development`** | OCR / UI / API / docs as relevant |
-| `asdd-e2e-tester` | — | (module playwright-e2e) frontend skill if installed |
-| `asdd-integration-tester` | — | (module bruno) API skill if installed |
-| `asdd-knowledge-agent` | **`documentation-and-adrs`** | — |
-
-## Execution rule
-
-1. Load **Always** skills for your agent.
-2. Load **Conditional** skills when the concern applies **and** the skill file exists.
-3. List loaded skills in the final message.
+<!-- skills-index:start -->
+| Name | Description |
+| --- | --- |
+| `anti-pattern-detection` | Detects 8 specification anti-patterns in capabilities and requirements. Acts as a quality gate before finalization. |
+| `business-model-canvas` | Parses Business Model Canvas and Lean Canvas inputs into structured product capabilities, personas, and revenue-critical features. |
+| `capability-prioritization` | Scores and ranks capabilities using RICE, MoSCoW, Value vs Complexity, and Kano frameworks. Produces prioritization matrix and wave plan. |
+| `documentation-and-adrs` | Documents decisions and rationale (ADRs, inline why-comments, README, changelogs, agent context)—not obvious code. Use when making architectural choices, changing public APIs or user-facing behavior, onboarding, or when the same explanation keeps recurring. Loads references/architecture-documentation.md for arc42/C4/layout detail via progressive disclosure. |
+| `domain-language-extraction` | Extracts domain-specific terminology from business documents into a ubiquitous language dictionary. Seeds the domain slice. |
+| `open-code-review` | Defect review on Git diffs via Alibaba open-code-review (`ocr` CLI). Default in this repo: Delegation Mode (OCR selects files/rules; the host agent reviews with its own model — no OCR LLM endpoint). Use after implementing a feature (before Harness `passing`), during QA Spec Coverage (Mode B), or when Refactor consumes CRITICAL/HIGH security findings. Not for Discovery–Design phases. Complements TDD and spec coverage — does not replace them. Never invent a fake review. |
+| `product-delivery` | Consumes Shape Up pitch artifacts and transforms them into validated, traceable delivery artifacts across epics, user stories, technical specifications, tasks, relationships, dependencies, and sprint planning. |
+| `shape-up` | Shape work using the Shape Up methodology (Ryan Singer, Basecamp). Walk through the 4-step shaping process to create pitches ready for betting. Distinguishes between established product mode (fixed time, variable scope) and new product mode (looser constraints). Use when planning cycle work, writing pitches, or coaching PMs on shaping. |
+| `test-driven-development` | Drives development with tests using the red-green-refactor loop. Use when implementing any logic, fixing any bug, or changing any behavior. Use when you need to prove that code works, when a bug report arrives, or when you're about to modify existing functionality. Combine with browser-testing-with-devtools for UI runtime verification. |
+| `user-story-decomposition` | Decomposes epics and large user stories into atomic, testable capabilities using 8 splitting patterns. |
+<!-- skills-index:end -->

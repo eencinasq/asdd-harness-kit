@@ -11,25 +11,22 @@ mode: subagent
 This file is the **same ASDD role as** `.agents/agents/asdd-discovery-agent.md` (responsibilities, inputs, outputs, gates). Adapt only the runtime:
 
 1. **Steering:** `Read` files under `.harness/steering/` directly (SoT). Do not use `.kiro/steering`.
-2. **Skills:** `Read` `.agents/skills/<name>/SKILL.md` for each required skill below and apply its workflow. Skip a skill if that file is absent. List loaded skills in the final message. Index: `.harness/steering/skills.md`.
+2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
 3. **Edits:** Use `Write` / `StrReplace` / `Shell` (not Kiro `fsWrite`).
 4. **Codegraph:** Use Cursor MCP (`GetDynamicTools` / `CallDynamicTool` or equivalent). Primary tool: `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`. List tools used in the final message.
 5. **State:** Read `.harness/PROGRESS.md` and global `.harness/state/manifest.json` (index only) at start; resolve the slice; **write** `.harness/state/slices/<slice-id>/manifest.json` at end of a completed phase and **sync that slice's registry row** in the global index per `.harness/steering/manifest.md`. Never treat the global file as the phase machine. For implementation, also update features + PROGRESS per `.harness/steering/session-loop.md`.
 6. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via Task.
 7. **Parallel work:** Prefer the `Task` tool for context-fresh sub-agents / waves (instead of Kiro `invokeSubAgent`).
 
-## Project skills (Cursor — mandatory `Read`)
+## Project skills
 
-**Always `Read`:**
-- `.agents/skills/domain-language-extraction/SKILL.md`
-- `.agents/skills/anti-pattern-detection/SKILL.md`
+Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts.
 
-**Conditional `Read`:**
-- Epic / compound intent: `.agents/skills/user-story-decomposition/SKILL.md`
-- BMC / Lean Canvas in intent: `.agents/skills/business-model-canvas/SKILL.md`
-- 2+ capabilities: `.agents/skills/capability-prioritization/SKILL.md`
-
-List loaded skills in the final message.
+- When you start ubiquitous-language extraction: `Read` `.agents/skills/domain-language-extraction/SKILL.md`
+- When you start the anti-pattern gate: `Read` `.agents/skills/anti-pattern-detection/SKILL.md`
+- When you start splitting an epic or compound intent: `Read` `.agents/skills/user-story-decomposition/SKILL.md`
+- When you start BMC or Lean Canvas intake: `Read` `.agents/skills/business-model-canvas/SKILL.md`
+- When you start ranking two or more capabilities: `Read` `.agents/skills/capability-prioritization/SKILL.md`
 
 ---
 

@@ -11,22 +11,19 @@ mode: subagent
 This file is the **same ASDD role as** `.agents/agents/asdd-validation-agent.md` (responsibilities, inputs, outputs, gates). Adapt only the runtime:
 
 1. **Steering:** `Read` files under `.harness/steering/` directly (SoT). Do not use `.kiro/steering`.
-2. **Skills:** `Read` `.agents/skills/<name>/SKILL.md` for each required skill below and apply its workflow. Skip a skill if that file is absent. List loaded skills in the final message. Index: `.harness/steering/skills.md`.
+2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
 3. **Edits:** Use `fsWrite` (not Cursor `Write` / `StrReplace`).
 4. **Codegraph:** Use Codegraph MCP or CLI (`codegraph query`, `codegraph status`). Primary tool: `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`. List tools used in the final message.
 5. **State:** Read `.harness/PROGRESS.md` and global `.harness/state/manifest.json` (index only) at start; resolve the slice; **write** `.harness/state/slices/<slice-id>/manifest.json` at end of a completed phase and **sync that slice's registry row** in the global index per `.harness/steering/manifest.md`. Never treat the global file as the phase machine. For implementation, also update features + PROGRESS per `.harness/steering/session-loop.md`.
 6. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via `invokeSubAgent`.
 7. **Parallel work:** Prefer `invokeSubAgent` for context-fresh sub-agents / waves.
 
-## Project skills (Kiro — mandatory `Read`)
+## Project skills
 
-**Always `Read`:**
-- `.agents/skills/anti-pattern-detection/SKILL.md`
+Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts.
 
-**Conditional `Read` (skip if absent):**
-- HTTP / REST / GraphQL requirements under review: `.agents/skills/api-and-interface-design/SKILL.md`
-
-List loaded skills in the final message.
+- When you start the anti-pattern gate: `Read` `.agents/skills/anti-pattern-detection/SKILL.md`
+- When you start review of HTTP, REST, or GraphQL requirements, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
 
 ---
 
@@ -115,9 +112,9 @@ Generate `spec-validation-report.md` with these sections:
 ## Confidence and Cascade Guardrails
 
 1. **Validation Confidence Score** (0.0–1.0): ≥0.90 = high quality, 0.75–0.89 = acceptable, <0.75 = substantial revision needed.
-2. **CCS** = (Spec Confidence) × (Validation Confidence). If CCS < 0.65: BLOCKED with CASCADING_FAILURE_RISK.
+2. **CCS** = (Spec Confidence) × (Validation Confidence). Apply `QG-CCS-01`, `QG-CCS-02`, and `QG-CCS-03` in `.harness/steering/quality-gates.md`. Do not treat the 0.50–0.65 band as BLOCK.
 3. **Uncertainty Factors:** If confidence < 0.95, list 1-3 specific reasons.
-4. **Dynamic Threshold:** If Spec Agent Confidence < 0.90, your passing threshold raises to 0.95.
+4. **Dynamic Threshold:** If Spec Agent Confidence < 0.90, your own confidence target raises to 0.95. This does not replace `quality-gates.md`.
 
 ## Hard Rules
 

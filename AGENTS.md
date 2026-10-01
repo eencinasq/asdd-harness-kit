@@ -12,7 +12,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 2. **Check the lock** — `.harness/state/locks/<slice-id>.lock`. If free, create `{"agent":"<your-id>","started":"<ISO-8601>","slice":"<slice-id>"}`.
 3. Read [`.harness/state/slices/<slice-id>/manifest.json`](.harness/state/slices/).
 4. Read features when `paths.features` is set.
-5. Read steering for the phase (`structure`, `product`, `codegraph`, `manifest`, `session-loop`, plus phase-specific). Small work → [`asdd-lite.md`](.harness/steering/asdd-lite.md).
+5. Read steering for the phase (`structure`, `product`, `codegraph`, `manifest`, `session-loop`, `controls`, plus phase-specific). Small work → [`asdd-lite.md`](.harness/steering/asdd-lite.md).
 6. Pick work:
    - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.
    - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners, disjoint file scopes, and coordinator-held slice lock; otherwise work serially.
@@ -37,6 +37,8 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 3. Update per-slice manifest at end of each ASDD phase ([manifest.md](.harness/steering/manifest.md)).
 4. Codegraph first ([codegraph.md](.harness/steering/codegraph.md)).
 5. On failure: leave `in_progress`/`blocked`; log per path in `structure.md`.
+6. Before session end or `passing`, `node .harness/scripts/check-invariants.mjs` must exit 0. On Cursor, the Verify-on-Stop hook injects FAIL output back into the prompt ([session-loop.md](.harness/steering/session-loop.md)).
+7. Modify only the files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors. Mapping and the lite `spec.md` exception: [session-loop.md](.harness/steering/session-loop.md).
 
 ## Non-negotiables
 
@@ -48,4 +50,4 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 
 ## Baseline steering reads
 
-See [`.harness/steering/README.md`](.harness/steering/README.md).
+See [`.harness/steering/README.md`](.harness/steering/README.md). Guides and sensors: [`.harness/steering/controls.md`](.harness/steering/controls.md). On a conflict, that file's precedence wins.

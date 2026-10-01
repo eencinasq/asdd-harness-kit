@@ -41,6 +41,7 @@ Rule of thumb: if the work touches ≤3 files and introduces ≤1 new domain con
 4. **Codegraph first** — before edits in unfamiliar modules.
 5. **Lock protocol** — one writer per slice (`.harness/state/locks/<slice-id>.lock`).
 6. **Serial execution** — ASDD-Lite allows at most one `in_progress` feature in `.features.json`; the parallel task contract is for fully planned slices only.
+7. **No gold-plating** — modify only files mapped to `.harness/specs/<slice>/spec.md`, as in [session-loop.md](./session-loop.md). Do not perform unrequested refactors.
 
 ## Dropped from full ASDD
 

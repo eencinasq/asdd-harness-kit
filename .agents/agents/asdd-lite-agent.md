@@ -10,25 +10,22 @@ mode: subagent
 This file is the **same ASDD role as** `.agents/agents/asdd-lite-agent.md`. Adapt only the runtime:
 
 1. **Steering:** `Read` files under `.harness/steering/` directly (SoT). Do not use `.kiro/steering`.
-2. **Skills:** `Read` `.agents/skills/<name>/SKILL.md` for each required skill below and apply its workflow. Skip a skill if that file is absent. List loaded skills in the final message.
+2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
 3. **Edits:** Use `Write` / `StrReplace` / `Shell`.
 4. **Codegraph:** Primary tool `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`.
 5. **State:** Read `.harness/PROGRESS.md` and global `.harness/state/manifest.json` (index only) at start; resolve the slice; **write** `.harness/state/slices/<slice-id>/manifest.json` at end of a completed phase and **sync that slice's registry row** in the global index per `.harness/steering/manifest.md`. Also update features + PROGRESS per `.harness/steering/session-loop.md`.
 6. **Handoff:** End with a summary of what was done, verification results, and next steps.
 
-## Project skills (mandatory `Read`)
+## Project skills
 
-**Always `Read`:**
-- `.agents/skills/test-driven-development/SKILL.md` — RED-GREEN-REFACTOR for every behavioral task
+Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts.
 
-**Conditional `Read`:**
-- `.agents/skills/frontend-ui-engineering/SKILL.md` — UI tasks
-- `.agents/skills/api-and-interface-design/SKILL.md` — HTTP/API changes
-- `.agents/skills/browser-testing-with-devtools/SKILL.md` — Chrome live verify
-- `.agents/skills/documentation-and-adrs/SKILL.md` — if an ADR is needed
-- `.agents/skills/open-code-review/SKILL.md` — after tests green, before passing
-
-List loaded skills in the final message.
+- When you start implementing logic, fixing a bug, or changing behavior: `Read` `.agents/skills/test-driven-development/SKILL.md`
+- When you start a UI task, and the folder exists: `Read` `.agents/skills/frontend-ui-engineering/SKILL.md`
+- When you start an HTTP or API change, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
+- When you start live browser verification, and the folder exists: `Read` `.agents/skills/browser-testing-with-devtools/SKILL.md`
+- When you start an ADR: `Read` `.agents/skills/documentation-and-adrs/SKILL.md`
+- When tests are green and you start defect review before `passing`: `Read` `.agents/skills/open-code-review/SKILL.md`
 
 ---
 

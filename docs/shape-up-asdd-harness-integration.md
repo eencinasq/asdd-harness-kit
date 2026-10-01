@@ -120,7 +120,7 @@ Task Planning converts approved scopes into ASDD tasks and the Harness feature t
 - a non-overlapping `scope_paths` when work is delegated;
 - traceability to the relevant requirement or scope.
 
-Harness locks preserve slice ownership. Harness evidence proves the result. A feature cannot become `passing` without the verification result and evidence required by the project contract.
+Harness locks preserve slice ownership. Harness evidence proves the result. A feature cannot become `passing` without the verification result, recorded evidence, and `node .harness/scripts/check-invariants.mjs` exiting 0. Product edits stay inside the files mapped to `.harness/specs/<slice>/intent.md`. Numeric gate cutoffs come from `.harness/steering/quality-gates.md`.
 
 New discovered tasks are allowed when they remain within the approved scope and appetite. A task that introduces a new capability, actor, domain rule, external contract, or material appetite change must return to shaping and betting.
 

@@ -11,21 +11,20 @@ mode: subagent
 This file is the **same ASDD role as** `.agents/agents/asdd-design-agent.md` (responsibilities, inputs, outputs, gates). Adapt only the runtime:
 
 1. **Steering:** `Read` files under `.harness/steering/` directly (SoT). Do not use `.kiro/steering`.
-2. **Skills:** `Read` `.agents/skills/<name>/SKILL.md` for each required skill below and apply its workflow. Skip a skill if that file is absent. List loaded skills in the final message. Index: `.harness/steering/skills.md`.
+2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
 3. **Edits:** Use `Write` / `StrReplace` / `Shell` (not Kiro `fsWrite`).
 4. **Codegraph:** Use Cursor MCP (`GetDynamicTools` / `CallDynamicTool` or equivalent). Primary tool: `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`. List tools used in the final message.
 5. **State:** Read `.harness/PROGRESS.md` and global `.harness/state/manifest.json` (index only) at start; resolve the slice; **write** `.harness/state/slices/<slice-id>/manifest.json` at end of a completed phase and **sync that slice's registry row** in the global index per `.harness/steering/manifest.md`. Never treat the global file as the phase machine. For implementation, also update features + PROGRESS per `.harness/steering/session-loop.md`.
 6. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via Task.
 7. **Parallel work:** Prefer the `Task` tool for context-fresh sub-agents / waves (instead of Kiro `invokeSubAgent`).
 
-## Project skills (Cursor — mandatory `Read`)
+## Project skills
 
-**Conditional `Read` (skip if the file is absent):**
-- UI / pages / forms in spec: `.agents/skills/frontend-ui-engineering/SKILL.md` (follow its progressive disclosure into `references/responsive-web-development.md` and `references/accessibility-checklist.md` as needed)
-- HTTP / REST / GraphQL / public API in spec: `.agents/skills/api-and-interface-design/SKILL.md` (progressive disclosure → REST / GraphQL references; project API conventions in `.harness/steering/tech.md`)
-- ADRs / architecture docs in design: `.agents/skills/documentation-and-adrs/SKILL.md` (match ADR path from `.harness/steering/structure.md`)
+Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts. Follow that file's own instructions before opening `references/`.
 
-List loaded skills in the final message.
+- When you start UI, page, or form design, and the folder exists: `Read` `.agents/skills/frontend-ui-engineering/SKILL.md`
+- When you start an HTTP, REST, GraphQL, or public API design, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
+- When you start an ADR or architecture-doc decision: `Read` `.agents/skills/documentation-and-adrs/SKILL.md`
 
 ---
 
@@ -78,7 +77,7 @@ Read the following before producing any output:
 
 You must calculate the `CCS` for this slice:
 - `CCS = (Spec Agent Conf) * (Validation Agent Conf) * (Design Agent Conf)`
-- **Safety Threshold:** If `CCS < 0.65`, you **must** mark the status as `BLOCKED` even if your individual score is high. This is a `CASCADING_FAILURE_RISK`. Escalate to the Tech Lead.
+- **Gate:** Apply `QG-CCS-01`, `QG-CCS-02`, and `QG-CCS-03` in `.harness/steering/quality-gates.md`. Do not treat the 0.50–0.65 band as BLOCK. Do not invent a second cutoff.
 
 ### 2. Uncertainty Factors
 
@@ -86,7 +85,7 @@ If your confidence score is `< 0.95`, you **must** list 1-3 specific reasons und
 
 ### 3. Dynamic Threshold Enforcement
 
-If the `Validation Agent Confidence` was `< 0.90`, your own passing threshold is automatically raised to **0.90**. You must be extra precise in your ADRs to compensate for upstream uncertainty.
+If the `Validation Agent Confidence` was `< 0.90`, your own confidence target is raised to **0.90**. You must be extra precise in your ADRs to compensate for upstream uncertainty. This does not replace the design readiness gate in `quality-gates.md`.
 
 ### 4. Atomic State Transition
 

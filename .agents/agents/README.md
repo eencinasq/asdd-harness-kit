@@ -24,8 +24,8 @@ Ask the parent agent to delegate, or reference by name, e.g. `@asdd-spec-agent` 
 |------|-----------------|
 | Same ASDD body (responsibilities / tasks) | Same body + **Cursor runtime** section at top |
 | `.harness/steering/` via explicit Read in agent prompts | **`Read` explicit files** (see Cursor runtime + Project skills) |
-| Skills | **`Read`** [`.agents/skills/<name>/SKILL.md`](../skills/) |
-| Auto-chained hooks after `agentStop` | **`.cursor/hooks.json`** `subagentStop` → next `@asdd-*` via Task (see [hooks README](../hooks/README.md)) |
+| Skills | Read [`.harness/steering/skills.md`](../../.harness/steering/skills.md) (name and description). `Read` [`.agents/skills/<name>/SKILL.md`](../skills/) only when that task starts |
+| Verify-on-Stop | **`.cursor/hooks.json`** `stop` → `node .harness/scripts/verify-on-stop.mjs`. FAIL output from `check-invariants.mjs` is the next prompt |
 | Per-slice manifest / heartbeats | **Write** `.harness/state/slices/<id>/manifest.json` + sync global registry row every run — see `manifest.md` |
 | Context-fresh sub-agents | `Task` tool for parallel waves |
 | `fsWrite` | `Write` / `StrReplace` |

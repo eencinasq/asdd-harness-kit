@@ -10,6 +10,7 @@
  * - Orphan slice detection
  * - Stale lock detection
  */
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -371,6 +372,21 @@ if (dirExists('.harness/state/archive')) {
   for (const name of readdirSync(archive)) {
     if (!name.endsWith('.json')) continue;
     readJson(`.harness/state/archive/${name}`);
+  }
+}
+
+// === 7. Skills index is name + description only ===
+
+const skillsIndex = spawnSync(process.execPath, [join(root, '.harness/scripts/check-skills-index.mjs')], {
+  cwd: root,
+  encoding: 'utf8',
+});
+if (skillsIndex.status !== 0) {
+  const text = `${skillsIndex.stdout || ''}\n${skillsIndex.stderr || ''}`.trim();
+  const lines = text.split('\n').map((line) => line.trim()).filter(Boolean);
+  if (lines.length === 0) fail('skills index check failed');
+  for (const line of lines) {
+    fail(line.replace(/^FAIL\s+/, ''));
   }
 }
 

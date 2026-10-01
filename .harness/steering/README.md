@@ -21,9 +21,10 @@ Portability: [docs/asdd-harness-portability.md](../../docs/asdd-harness-portabil
 | `quality-gates.md` | CCS / coverage / readiness |
 | `manifest.md` | Manifest schema v2 |
 | `session-loop.md` | Features + locks + evidence |
+| `controls.md` | Guides, sensors, precedence |
 | `asdd-lite.md` | 4-phase lite path |
 | `codegraph.md` / `codegraph-agents.md` | Codegraph |
-| `skills.md` | Skills index |
+| `skills.md` | Skills index (name + description only) |
 | `security-rules.md` | Security baseline |
 
 ## Project bindings (stubs — rewrite)
@@ -41,5 +42,5 @@ Optional: [`templates/slice-manifest.stub.json`](templates/slice-manifest.stub.j
 
 ## Baseline reads
 
-`structure.md`, `product.md`, `codegraph.md`, `manifest.md`, `session-loop.md`.  
+`structure.md`, `product.md`, `codegraph.md`, `manifest.md`, `session-loop.md`, `controls.md`.  
 Domain/Design/Impl/QA/Refactor: also `domain-layer.md` + `domain-layer.project.md`, and both quality-gates files when judging gates.

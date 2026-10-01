@@ -11,26 +11,23 @@ mode: subagent
 This file is the **same ASDD role as** `.agents/agents/asdd-implementation-agent.md` (responsibilities, inputs, outputs, gates). Adapt only the runtime:
 
 1. **Steering:** `Read` files under `.harness/steering/` directly (SoT). Do not use `.kiro/steering`.
-2. **Skills:** `Read` `.agents/skills/<name>/SKILL.md` for each required skill below and apply its workflow. Skip a skill if that file is absent. List loaded skills in the final message. Index: `.harness/steering/skills.md`.
+2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
 3. **Edits:** Use `Write` / `StrReplace` / `Shell` (not Kiro `fsWrite`).
 4. **Codegraph:** Use Cursor MCP (`GetDynamicTools` / `CallDynamicTool` or equivalent). Primary tool: `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`. List tools used in the final message.
 5. **State:** Read `.harness/PROGRESS.md` and global `.harness/state/manifest.json` (index only) at start; resolve the slice; **write** `.harness/state/slices/<slice-id>/manifest.json` at end of a completed phase and **sync that slice's registry row** in the global index per `.harness/steering/manifest.md`. Never treat the global file as the phase machine. For implementation, also update features + PROGRESS per `.harness/steering/session-loop.md`.
 6. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via Task.
 7. **Parallel work:** Prefer the `Task` tool for context-fresh sub-agents / waves (instead of Kiro `invokeSubAgent`).
 
-## Project skills (Cursor — mandatory `Read`)
+## Project skills
 
-**Always `Read` (skip if absent):**
-- `.agents/skills/test-driven-development/SKILL.md` — RED-GREEN-REFACTOR for every behavioral task; require sub-agents to follow it
+Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts.
 
-**Conditional `Read` (skip if the file is absent):**
-- HTTP / API contracts: `.agents/skills/api-and-interface-design/SKILL.md`
-- After feature tests green, before Harness `passing` — defect review: `.agents/skills/open-code-review/SKILL.md` (requires `ocr` CLI; if missing, ask human to install — do not invent findings; still run `verification`)
-- UI tasks: `.agents/skills/frontend-ui-engineering/SKILL.md` (skill owns responsive + a11y reference loads)
-- UI live verify / debug in browser: `.agents/skills/browser-testing-with-devtools/SKILL.md` — **Chrome DevTools MCP only** (screenshot, DOM, console, network). Do **not** use Playwright MCP for implementation verification; that is reserved for `@asdd-e2e-tester` automation.
-- Significant architectural decision or public API docs: `.agents/skills/documentation-and-adrs/SKILL.md`
-
-List loaded skills in the final message.
+- When you start implementing logic, fixing a bug, or changing behavior: `Read` `.agents/skills/test-driven-development/SKILL.md`
+- When you start an HTTP or API contract change, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
+- When feature tests are green and you start defect review before `passing`: `Read` `.agents/skills/open-code-review/SKILL.md`. If `ocr` is missing, ask a human to install it. Do not invent findings. Still run `verification`.
+- When you start a UI task, and the folder exists: `Read` `.agents/skills/frontend-ui-engineering/SKILL.md`
+- When you start live browser verification of UI, and the folder exists: `Read` `.agents/skills/browser-testing-with-devtools/SKILL.md`. Use Chrome DevTools MCP. Leave Playwright automation to `@asdd-e2e-tester`.
+- When you start an architectural decision or public API documentation: `Read` `.agents/skills/documentation-and-adrs/SKILL.md`
 
 ---
 
@@ -82,7 +79,7 @@ Read the following before executing any task:
 
 You must monitor the `CCS` for this slice:
 - `CCS = (Spec Conf) * (Validation Conf) * (Design Conf) * (Implementation Conf)`
-- **Safety Threshold:** If `CCS < 0.65`, you **must** mark the task as `BLOCKED [!]`. This is a `CASCADING_FAILURE_RISK`. Escalate to the Tech Lead.
+- **Gate:** Apply `QG-CCS-01`, `QG-CCS-02`, and `QG-CCS-03` in `.harness/steering/quality-gates.md`. Do not treat the 0.50–0.65 band as BLOCK. Do not invent a second cutoff.
 
 ### 2. Uncertainty Factors
 
@@ -90,7 +87,7 @@ If your confidence score for a task is `< 0.95`, you **must** write 1-3 specific
 
 ### 3. Dynamic Threshold Enforcement
 
-If the `Design Agent Confidence` was `< 0.85`, your own passing threshold is automatically raised to **0.90**. You must be extra rigorous in your verification.
+If the `Design Agent Confidence` was `< 0.85`, your own confidence target is raised to **0.90**. You must be extra rigorous in your verification. This does not replace the task-planning or spec-coverage gates in `quality-gates.md`.
 
 ### 4. Atomic State Transition
 

@@ -11,11 +11,11 @@ Index: `.harness/steering/README.md` · Skills: `.harness/steering/skills.md` ·
 
 ## When to load steering
 
-**INIT:** Read `.harness/PROGRESS.md` → global `.harness/state/manifest.json` → `.harness/state/slices/<slice-id>/manifest.json` → `paths.features` (if set) → `.harness/steering/` (`structure`, `product`, `manifest`, `codegraph`, `session-loop`). Pick one feature **only** when `phase` is `implementation`. If every slice is `DONE`/`PARKED`/`ABANDONED` and the human named no slice: stop — ask for new intent or explicit unpark.
+**INIT:** Read `.harness/PROGRESS.md` → global `.harness/state/manifest.json` → `.harness/state/slices/<slice-id>/manifest.json` → `paths.features` (if set) → `.harness/steering/` (`structure`, `product`, `manifest`, `codegraph`, `session-loop`, `controls`). Pick one feature **only** when `phase` is `implementation`. If every slice is `DONE`/`PARKED`/`ABANDONED` and the human named no slice: stop — ask for new intent or explicit unpark.
 
 | Work | Read (minimum) |
 |------|----------------|
-| Any ASDD work | `structure.md`, `product.md`, `manifest.md`, `codegraph.md`, `session-loop.md` |
+| Any ASDD work | `structure.md`, `product.md`, `manifest.md`, `codegraph.md`, `session-loop.md`, `controls.md` |
 | Spec, validation | + `quality-gates.md` (+ `quality-gates.project.md` when judging gates); HTTP/API → skill `api-and-interface-design` if installed |
 | Design, tasks, implementation | + `tech.md`, `domain-layer.md` + `domain-layer.project.md`; UI → `design-system.md` if present + frontend skill if installed |
 | QA, refactor | + both quality-gates files, domain-layer + binding |
@@ -27,8 +27,10 @@ Index: `.harness/steering/README.md` · Skills: `.harness/steering/skills.md` ·
 - Business logic: portable `domain-layer.md` + `domain-layer.project.md` (run the binding's gate).
 - Specs: EARS; traceability to `capability.md`.
 - API/UI conventions from project bindings and enabled modules — never hardcode another product's stack.
+- Skills: `.harness/steering/skills.md` is name and description only. `Read` a `SKILL.md` body only when that task starts.
 - Codegraph first (`codegraph_explore`).
-- Quality: CCS ≥ 0.65; see `quality-gates.md` + `.project.md`.
+- Gold-plating: modify only files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors. See `session-loop.md`.
+- Quality: numeric gates come only from `quality-gates.md` + `.project.md`. Do not invent a second CCS cutoff.
 
 ## State
 

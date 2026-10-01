@@ -9,13 +9,13 @@ This document describes a portable delivery pipeline for taking a product idea f
 │                         DELIVERY PIPELINE                                    │
 │                                                                             │
 │  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐ │
-│  │  Shape   │──▶│ Product  │──▶│  Sprint  │──▶│  GitHub  │──▶│   ASDD   │ │
+│  │  Shape   │──▶│ Product  │──▶│  Work  │──▶│  GitHub  │──▶│   ASDD   │ │
 │  │   Up     │   │ Delivery │   │  Plan    │   │  Issues  │   │ +Harness │ │
 │  └──────────┘   └──────────┘   └──────────┘   └──────────┘   └──────────┘ │
 │       │              │              │              │              │         │
 │       ▼              ▼              ▼              ▼              ▼         │
-│    Pitch        Delivery Map     Sprint Plan    Issues        Slices      │
-│    Bundle       Discovery        Tech Spec      Labels        Features    │
+│    Pitch        Delivery Map     Work  Plan    Issues        Slices      │
+│    Bundle       Discovery        Tech  Spec      Labels        Features    │
 │                 Stories          Diagrams       Dependencies   Implementation│
 │                 AF Refinement                                   QA         │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -74,7 +74,7 @@ Raw Idea → Set Boundaries → Find Elements → Address Risks → Write Pitch
 ### Process
 
 ```
-Pitch Bundle → Delivery Map → Discovery → HF Stories → AF Refinement → Tech Spec → Sprint Plan
+Pitch Bundle → Delivery Map → Discovery → HF Stories → AF Refinement → Tech Spec → Work Plan
 ```
 
 ### Output Artifacts
@@ -86,7 +86,7 @@ Pitch Bundle → Delivery Map → Discovery → HF Stories → AF Refinement →
 | **HF User Stories** | `docs/discovery/<name>-stories.md` | Human-First stories with acceptance criteria |
 | **AF Refinement** | `docs/discovery/<name>-af-refinement.md` | Technical precision: contracts, UI states, test strategy |
 | **Tech Spec** | `docs/discovery/<name>-tech-spec.md` | Architecture, contracts, diagrams, rollout |
-| **Sprint Plan** | `docs/discovery/<name>-sprint-plan.md` | Phases, execution order, capacity, blockers |
+| **Work Plan** | `docs/discovery/<name>-work-plan.md` | Phases, execution order, capacity, blockers |
 
 ### Delivery Map Structure
 
@@ -199,7 +199,7 @@ As a **[role]**, I want to **[action]**, so that **[benefit]**.
 | Tasks | Tasks in `tasks.md` |
 | Dependencies | Wave dependencies in `tasks.md` |
 | Tech Spec | Design document |
-| Sprint Plan | Execution phases |
+| Work Plan | Execution phases |
 
 ### ASDD Phases
 
@@ -211,21 +211,29 @@ Discovery → Spec → Validation → Domain → Design → Task Planning → Im
 
 | Artifact | Path | Purpose |
 |----------|------|---------|
+| **Active spec** | `.harness/specs/<slice>/intent.md` | Product intent. Lite uses `spec.md` in the same directory |
 | **Slice Manifest** | `.harness/state/slices/<id>/manifest.json` | Phase machine, gates, confidence |
-| **Features** | `.harness/features/<id>.features.json` | Session feature tracker |
+| **Features** | `.harness/features/<id>.features.json` | Session feature tracker, `scope_paths`, verification, evidence |
 | **Progress** | `.harness/progress/<id>.md` | Session record |
-| **Locks** | `.harness/state/locks/<id>.lock` | Multi-agent mutex |
+| **Locks** | `.harness/state/locks/<id>.lock` | Multi-agent mutex. Deleted on handoff |
 | **PROGRESS.md** | `.harness/PROGRESS.md` | Active slices index |
+| **Controls** | `.harness/steering/controls.md` | Which guide or sensor wins when they disagree |
+| **Quality gates** | `.harness/steering/quality-gates.md` | EARS acceptance criteria for phase gates. Numeric cutoffs live only here |
+| **Gate binding** | `.harness/steering/quality-gates.project.md` | Full-suite command, failure log, active domain findings |
+
+How these fit together: [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md).
 
 ### Execution Flow
 
 ```
 External tracker items (optional) → ASDD Discovery → Spec → Design → Task Planning
      ↓
-Features.json → Implementation → QA → Knowledge
+Features.json → Implementation (mapped files only) → QA → Knowledge
      ↓
-Slice DONE → Lock Released → PROGRESS.md Updated
+Invariants pass → Evidence recorded → Lock released → PROGRESS.md matches the slice manifest
 ```
+
+Implementation edits only the files mapped to the active spec. A skill body is read when that task starts, not from the skills index. Cursor runs `node .harness/scripts/verify-on-stop.mjs` on agent stop; a failing `check-invariants.mjs` is returned as the next prompt. CI repeats the invariants check. The full suite in `quality-gates.project.md` runs before a new spec enters Task Planning.
 
 ---
 
@@ -256,7 +264,7 @@ Slice DONE → Lock Released → PROGRESS.md Updated
 │  │ • HF User Stories (acceptance criteria)                              │   │
 │  │ • AF Refinement (contracts, UI states, test strategy)                │   │
 │  │ • Tech Spec (architecture, diagrams, rollout)                        │   │
-│  │ • Sprint Plan (phases, execution order)                              │   │
+│  │ • Work Plan (phases, execution order)                              │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │    │                                                                        │
 │    ▼                                                                        │
@@ -303,11 +311,11 @@ Slice DONE → Lock Released → PROGRESS.md Updated
 | HF Stories | Stories | Delivery Map, Discovery |
 | AF Refinement | AF Details | Stories |
 | Tech Spec | Tech Spec | AF Refinement, Stories |
-| Sprint Plan | Sprint Plan | Tech Spec, Delivery Map |
+| Work Plan | Work Plan | Tech Spec, Delivery Map |
 | External tracker | Issues or tickets | Stories, Tasks |
 | ASDD | Slice Manifest | Pitch, Issues |
 | ASDD | Features | Stories, Tasks |
-| ASDD | Tasks | Delivery Map, Sprint Plan |
+| ASDD | Tasks | Delivery Map, Work Plan |
 
 ---
 
@@ -316,11 +324,13 @@ Slice DONE → Lock Released → PROGRESS.md Updated
 | Tool | Purpose |
 |------|---------|
 | `shape-up` skill | Pitch creation and review |
-| `product-delivery` skill | Delivery artifacts and sprint planning |
+| `product-delivery` skill | Delivery artifacts and Work planning |
 | Tracker integration | External issue or ticket creation |
 | Codegraph MCP | Code intelligence and impact analysis |
 | ASDD agents | Discovery, spec, validation, domain, design, implementation, QA |
-| Harness | Session loop, locks, features, progress tracking |
+| Harness | Session loop, locks, features, progress, controls, quality gates |
+| Skills index | `.harness/steering/skills.md` — name and description until the task starts |
+| Verify-on-Stop | `node .harness/scripts/check-invariants.mjs` at session end; Cursor injects FAIL output |
 
 ---
 
@@ -332,7 +342,10 @@ Slice DONE → Lock Released → PROGRESS.md Updated
 | **Ambiguity is a defect** | Clarify, label assumptions, or mark `PENDING_DEFINITION` |
 | **Contracts over assumptions** | Every stage consumes and produces explicit artifacts |
 | **AI is a pilot, not an authority** | Humans retain approval authority |
-| **Evidence before completion** | Never fabricate details |
+| **Evidence before completion** | `passing` requires a recorded verification result. A summary is not evidence |
+| **Invariants before handoff** | `check-invariants.mjs` exits 0. The same failure three times updates the guide or sensor that missed it |
+| **Mapped files only** | Product edits stay inside the active spec. Unrequested refactors stay out |
+| **One numeric gate** | CCS and coverage cutoffs come from `quality-gates.md` |
 | **Traceability** | Downstream artifacts link to upstream requirements |
 | **Stable identity** | Every epic, story, task has an identifier |
 | **Explicit graph** | Dependencies control execution order |
@@ -349,7 +362,7 @@ Slice DONE → Lock Released → PROGRESS.md Updated
 | Product Delivery | Stories | `docs/discovery/<capability-slug>-stories.md` |
 | Product Delivery | AF Refinement | `docs/discovery/<capability-slug>-af-refinement.md` |
 | Product Delivery | Tech Spec | `docs/discovery/<capability-slug>-tech-spec.md` |
-| Product Delivery | Sprint Plan | `docs/discovery/<capability-slug>-sprint-plan.md` |
+| Product Delivery | Work Plan | `docs/discovery/<capability-slug>-work-plan.md` |
 | External tracker | Issues or tickets | Optional links carrying the same source IDs |
 | ASDD | Slice | `.harness/state/slices/<slice-id>/manifest.json` |
 
@@ -364,6 +377,6 @@ The pipeline transforms an idea into implementation through four connected stage
 3. **External tracker (optional)** — mirrors approved stories and tasks when the team uses one
 4. **ASDD + Harness** — turns the approved package into a governed slice and executes it with full traceability
 
-The Product Delivery → ASDD + Harness handoff is defined in [`product-delivery/references/asdd-harness-handoff.md`](../.agents/skills/product-delivery/references/asdd-harness-handoff.md). The handoff preserves the chain `TASK → REQ → story → source scope → epic → pitch`, gives each ASDD phase a clear input, and makes Harness the source of truth for live implementation status and evidence.
+The Product Delivery → ASDD + Harness handoff is defined in [`product-delivery/references/asdd-harness-handoff.md`](../.agents/skills/product-delivery/references/asdd-harness-handoff.md). The handoff preserves the chain `TASK → REQ → story → source scope → epic → pitch`, gives each ASDD phase a clear input, and makes Harness the source of truth for live implementation status and evidence. Guides, sensors, and session close are described in [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md).
 
 Each stage produces explicit artifacts that trace back to the source pitch, ensuring no requirement is lost or silently changed.

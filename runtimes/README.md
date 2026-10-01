@@ -16,6 +16,8 @@ ln -sfn ../.agents/mcp/mcp.json .cursor/mcp.json
 cp runtimes/cursor/asdd-steering.mdc .cursor/rules/asdd-steering.mdc
 ```
 
+The Cursor `stop` hook in `.cursor/hooks.json` runs `node .harness/scripts/verify-on-stop.mjs` before the agent session ends. That script runs `node .harness/scripts/check-invariants.mjs` and, on FAIL, submits the error as the next user message. `scripts/install-into.sh --runtime=cursor` installs the hook and keeps an existing `hooks.json` entry for `verify-on-stop.mjs`.
+
 ## Claude Code
 
 ```bash

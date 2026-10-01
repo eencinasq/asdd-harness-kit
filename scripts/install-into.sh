@@ -166,7 +166,7 @@ copy_tree() {
 install_portable_steering() {
   local f
   for f in domain-layer.md quality-gates.md manifest.md session-loop.md asdd-lite.md \
-           codegraph.md codegraph-agents.md skills.md security-rules.md README.md; do
+           codegraph.md codegraph-agents.md skills.md security-rules.md controls.md README.md; do
     copy_file "$KIT_DIR/.harness/steering/$f" "$TARGET/.harness/steering/$f" refresh
   done
   copy_tree "$KIT_DIR/.harness/steering/templates" "$TARGET/.harness/steering/templates" refresh
@@ -189,6 +189,8 @@ install_bindings() {
 
 install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/check-invariants.mjs" "$TARGET/.harness/scripts/check-invariants.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/check-skills-index.mjs" "$TARGET/.harness/scripts/check-skills-index.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/verify-on-stop.mjs" "$TARGET/.harness/scripts/verify-on-stop.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/check-project-config.mjs" "$TARGET/.harness/scripts/check-project-config.mjs" refresh
   copy_file "$KIT_DIR/.harness/config/project.schema.json" "$TARGET/.harness/config/project.schema.json" refresh
   copy_file "$KIT_DIR/.harness/config/README.md" "$TARGET/.harness/config/README.md" refresh
@@ -253,7 +255,8 @@ install_project_adapter() {
     "quality_gates": ".harness/steering/quality-gates.project.md"
   },
   "commands": {
-    "invariants": "node .harness/scripts/check-invariants.mjs"
+    "invariants": "node .harness/scripts/check-invariants.mjs",
+    "verify_on_stop": "node .harness/scripts/verify-on-stop.mjs"
   },
   "modules": {},
   "capabilities": {
@@ -345,6 +348,19 @@ enable_one_module() {
   esac
 }
 
+refresh_skills_index() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    log "SKILLS index name+description"
+    return 0
+  fi
+  if [[ ! -f "$TARGET/.harness/scripts/check-skills-index.mjs" ]]; then
+    log "SKIP skills index (script missing)"
+    return 0
+  fi
+  log "SKILLS index ← .agents/skills name+description"
+  (cd "$TARGET" && node .harness/scripts/check-skills-index.mjs --write)
+}
+
 enable_modules() {
   [[ -n "$MODULES" ]] || return 0
   local list="$MODULES"
@@ -392,6 +408,45 @@ wire_runtime_cursor() {
   else
     log "KEEP $TARGET/.cursor/rules/asdd-steering.mdc"
   fi
+  install_cursor_verify_hook
+}
+
+install_cursor_verify_hook() {
+  local dest="$TARGET/.cursor/hooks.json"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    log "HOOK $dest stop → node .harness/scripts/verify-on-stop.mjs"
+    return 0
+  fi
+  mkdir -p "$TARGET/.cursor"
+  if [[ ! -e "$dest" ]]; then
+    cp "$KIT_DIR/.cursor/hooks.json" "$dest"
+    log "COPY $dest"
+    return 0
+  fi
+  node --input-type=module - "$dest" <<'EOF'
+import { readFileSync, writeFileSync } from 'node:fs';
+
+const dest = process.argv[2];
+const hook = {
+  command: 'node .harness/scripts/verify-on-stop.mjs',
+  timeout: 60,
+  loop_limit: 3,
+  failClosed: true,
+};
+const data = JSON.parse(readFileSync(dest, 'utf8'));
+data.version ??= 1;
+data.hooks ??= {};
+const list = Array.isArray(data.hooks.stop) ? data.hooks.stop : [];
+const has = list.some((entry) => String(entry?.command ?? '').includes('verify-on-stop.mjs'));
+if (!has) {
+  list.push(hook);
+  data.hooks.stop = list;
+  writeFileSync(dest, `${JSON.stringify(data, null, 2)}\n`);
+  console.log(`MERGE ${dest}`);
+} else {
+  console.log(`KEEP ${dest}`);
+}
+EOF
 }
 
 wire_runtime_claude() {
@@ -582,6 +637,7 @@ main() {
   remove_module_sources
   install_docs_root
   enable_modules
+  refresh_skills_index
   wire_runtimes
   verify
 

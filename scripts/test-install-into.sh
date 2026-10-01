@@ -48,6 +48,15 @@ if rg -n 'shape-up-pitch|ai-product-delivery' \
 fi
 test -L "$TMP/existing-app/.cursor/skills"
 test -f "$TMP/existing-app/.harness/scripts/check-invariants.mjs"
+test -f "$TMP/existing-app/.harness/scripts/check-skills-index.mjs"
+test -f "$TMP/existing-app/.harness/steering/controls.md"
+grep -q 'Precedence' "$TMP/existing-app/.harness/steering/controls.md"
+grep -q 'api-and-interface-design' "$TMP/existing-app/.harness/steering/skills.md"
+grep -q 'skills-index:start' "$TMP/existing-app/.harness/steering/skills.md"
+test -f "$TMP/existing-app/.harness/scripts/verify-on-stop.mjs"
+test -f "$TMP/existing-app/.cursor/hooks.json"
+grep -q 'verify-on-stop.mjs' "$TMP/existing-app/.cursor/hooks.json"
+grep -q '"failClosed": true' "$TMP/existing-app/.cursor/hooks.json"
 test -f "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 test -f "$TMP/existing-app/.harness/config/project.schema.json"
 test -f "$TMP/existing-app/scripts/harness-migrate.mjs"
@@ -72,6 +81,12 @@ test -L "$TMP/existing-app/.devin/mcp_config.json"
 test -L "$TMP/existing-app/.kiro/skills"
 test -L "$TMP/existing-app/.kiro/agents/asdd-discovery-agent.md"
 test -L "$TMP/existing-app/.kiro/settings/mcp.json"
+
+# existing hooks.json gains verify-on-stop without dropping other hooks
+printf '%s\n' '{"version":1,"hooks":{"beforeShellExecution":[{"command":"echo keep-me"}]}}' >"$TMP/existing-app/.cursor/hooks.json"
+"$ROOT/scripts/install-into.sh" "$TMP/existing-app" --runtime=cursor >/dev/null
+grep -q 'echo keep-me' "$TMP/existing-app/.cursor/hooks.json"
+grep -q 'verify-on-stop.mjs' "$TMP/existing-app/.cursor/hooks.json"
 
 # second run keeps binding, does not require --force for create-only
 "$ROOT/scripts/install-into.sh" "$TMP/existing-app" >/dev/null
