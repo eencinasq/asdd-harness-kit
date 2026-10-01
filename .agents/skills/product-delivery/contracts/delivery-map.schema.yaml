@@ -1,0 +1,104 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: ShapeUpDeliveryMap
+type: object
+required:
+  - source_pitch
+  - epic
+  - stories
+  - tasks
+  - relationships
+  - dependency_graph
+  - delivery_status
+properties:
+  source_pitch:
+    type: object
+    required: [id, artifact_type, status, appetite]
+    properties:
+      id: {type: string}
+      artifact_type: {enum: [pitch, pitch_bundle, shareable_pitch]}
+      source_path: {type: string}
+      status: {type: string}
+      appetite: {type: string}
+      must_haves: {type: array, items: {type: string}}
+      nice_to_haves: {type: array, items: {type: string}}
+      no_gos: {type: array, items: {type: string}}
+  epic:
+    type: object
+    required: [id, title, outcome, source_pitch_id]
+    properties:
+      id: {type: string}
+      title: {type: string}
+      outcome: {type: string}
+      source_pitch_id: {type: string}
+      source_scope_ids: {type: array, items: {type: string}}
+      must_have_story_ids: {type: array, items: {type: string}}
+      nice_to_have_story_ids: {type: array, items: {type: string}}
+      out_of_scope: {type: array, items: {type: string}}
+      success_signals: {type: array, items: {type: string}}
+      pending_definitions: {type: array, items: {type: string}}
+  stories:
+    type: array
+    items:
+      type: object
+      required: [id, title, epic_id, source_pitch_id, actor, outcome, dependencies]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        epic_id: {type: string}
+        source_pitch_id: {type: string}
+        source_scope_id: {type: string}
+        actor: {type: string}
+        outcome: {type: string}
+        classification: {enum: [must_have, nice_to_have, proposed]}
+        acceptance_criteria: {type: array, items: {type: object, additionalProperties: true}}
+        dependencies: {type: array, items: {type: string}}
+        task_ids: {type: array, items: {type: string}}
+        pending_definitions: {type: array, items: {type: string}}
+        status: {type: string}
+  tasks:
+    type: array
+    items:
+      type: object
+      required: [id, title, type, dependencies]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        type: {enum: [discovery, validation, design, implementation, verification, release]}
+        story_id: {type: string}
+        source_scope_id: {type: string}
+        source_risk_id: {type: string}
+        completion_signal: {type: string}
+        dependencies: {type: array, items: {type: string}}
+        owner: {type: string}
+        status: {type: string}
+        blockers: {type: array, items: {type: string}}
+  relationships:
+    type: array
+    items:
+      type: object
+      required: [from, to, type]
+      properties:
+        from: {type: string}
+        to: {type: string}
+        type:
+          enum: [derived_from, contains, refines, validates, duplicates, relates_to, depends_on, blocks, conflicts_with]
+        reason: {type: string}
+  dependency_graph:
+    type: object
+    required: [nodes, edges, cycles]
+    properties:
+      nodes: {type: array, items: {type: string}}
+      edges:
+        type: array
+        items:
+          type: object
+          required: [from, to, reason]
+          properties:
+            from: {type: string}
+            to: {type: string}
+            reason: {type: string}
+      cycles: {type: array, items: {type: array, items: {type: string}}}
+  delivery_status:
+    enum: [DRAFT, PARTIALLY_READY, READY, BLOCKED]
+  orphan_artifacts: {type: array, items: {type: string}}
+  pending_definitions: {type: array, items: {type: string}}

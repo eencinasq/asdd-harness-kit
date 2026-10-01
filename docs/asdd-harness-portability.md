@@ -7,7 +7,7 @@ How this template maps to product repos.
 | Layer | Here |
 |-------|------|
 | **A. Kit core** | This repository |
-| **B. Modules** | `.agents/modules/` — `scripts/enable-module.sh <name>` |
+| **B. Modules** | Optional modules remain in the kit and are copied only when enabled |
 | **C. Bindings** | `.harness/steering/{product,structure,tech,*.project}.md` stubs |
 | **D. Runtimes** | Runtime adapters maintained in this kit under runtimes/ |
 
@@ -16,7 +16,7 @@ How this template maps to product repos.
 1. Use this template (GitHub "Use this template" or clone).
 2. Fill all required bindings.
 3. Install the runtime links you use with scripts/install-into.sh. Runtime recipes stay in this kit and are not copied into product repos.
-4. Enable modules you need.
+4. Enable modules with `scripts/install-into.sh --modules=<list>` from this kit, or with the GitHub `--from-git` form.
 5. Validate the generated adapter: `node .harness/scripts/check-project-config.mjs`.
 6. Validate Harness state: `node .harness/scripts/check-invariants.mjs`.
 7. Create first slice via Discovery or ASDD-Lite.

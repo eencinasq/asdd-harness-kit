@@ -10,6 +10,14 @@ required:
   - description
   - acceptance_criteria
 properties:
+  id:
+    type: string
+  source_pitch_id:
+    type: string
+  epic_id:
+    type: string
+  source_scope_id:
+    type: string
   title:
     type: string
   business_value:
@@ -39,6 +47,26 @@ properties:
   pending_definitions:
     type: array
     items: {type: string}
+  classification:
+    enum: [must_have, nice_to_have, proposed]
+  dependencies:
+    type: array
+    items: {type: string}
+  relations:
+    type: array
+    items:
+      type: object
+      required: [from, to, type]
+      properties:
+        from: {type: string}
+        to: {type: string}
+        type: {type: string}
+        reason: {type: string}
+  task_ids:
+    type: array
+    items: {type: string}
+  status:
+    type: string
   af_details:
     type: object
     additionalProperties: true

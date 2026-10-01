@@ -62,4 +62,9 @@ node .agents/mcp/sync-runtime-mcp.cjs.
 
 ## Enabling modules
 
-Copy module agent/skill into `.agents/agents` / `.agents/skills`, then re-run the symlink loops above. See [`.agents/modules/README.md`](../.agents/modules/README.md).
+Enable modules from the kit, not from a consuming repository:
+
+    ./scripts/install-into.sh /path/to/repo --modules=web-ui
+
+Or use scripts/enable-module.sh from this kit. The module sources stay under
+the kit repository and selected skills or agents are copied into the project.

@@ -1,0 +1,108 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: TechnicalSpecification
+type: object
+required:
+  - overview
+  - source_requirements
+  - functional_requirements
+  - testing_strategy
+properties:
+  overview: {type: string}
+  source_requirements:
+    type: array
+    items: {type: string}
+  functional_requirements:
+    type: array
+    items: {type: string}
+  non_functional_requirements:
+    type: array
+    items: {type: string}
+  domain_model:
+    type: array
+    items: {type: string}
+  system_changes:
+    type: object
+    properties:
+      frontend: {type: array, items: {type: string}}
+      backend: {type: array, items: {type: string}}
+      data: {type: array, items: {type: string}}
+      integrations: {type: array, items: {type: string}}
+  contracts:
+    type: array
+    items: {type: object, additionalProperties: true}
+  error_handling:
+    type: array
+    items: {type: string}
+  security_considerations:
+    type: array
+    items: {type: string}
+  observability:
+    type: array
+    items: {type: string}
+  testing_strategy:
+    type: object
+    additionalProperties: true
+  rollout:
+    type: array
+    items: {type: string}
+  risks:
+    type: array
+    items: {type: string}
+  pending_decisions:
+    type: array
+    items: {type: string}
+  source_pitch_id:
+    type: string
+  epic_id:
+    type: string
+  source_story_ids:
+    type: array
+    items: {type: string}
+  source_task_ids:
+    type: array
+    items: {type: string}
+  dependencies:
+    type: array
+    items: {type: object, additionalProperties: true}
+  relations:
+    type: array
+    items: {type: object, additionalProperties: true}
+  architecture_proposal:
+    type: object
+    properties:
+      style: {type: string}
+      status: {type: string}
+      rationale: {type: string}
+      alternatives: {type: array, items: {type: string}}
+      risks: {type: array, items: {type: string}}
+      validation_tasks: {type: array, items: {type: string}}
+  diagrams:
+    type: array
+    items:
+      type: object
+      required: [id, type, title, status, source_ids, mermaid]
+      properties:
+        id: {type: string}
+        type: {enum: [c4_context, c4_container, c4_component, use_case, sequence]}
+        title: {type: string}
+        purpose: {type: string}
+        status: {enum: [VERIFIED, "PROPOSED — TECHNICAL VALIDATION REQUIRED", PENDING_DEFINITION]}
+        source_ids: {type: array, items: {type: string}}
+        assumptions: {type: array, items: {type: string}}
+        decisions: {type: array, items: {type: string}}
+        validation_tasks: {type: array, items: {type: string}}
+        mermaid: {type: string, minLength: 1}
+  use_cases:
+    type: array
+    items:
+      type: object
+      required: [id, actor, goal, source_story_ids, outcome]
+      properties:
+        id: {type: string}
+        actor: {type: string}
+        goal: {type: string}
+        source_story_ids: {type: array, items: {type: string}}
+        preconditions: {type: array, items: {type: string}}
+        main_flow: {type: array, items: {type: string}}
+        alternate_flows: {type: array, items: {type: string}}
+        outcome: {type: string}

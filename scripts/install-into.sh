@@ -274,7 +274,6 @@ EOF
 install_agents_core() {
   copy_tree "$KIT_DIR/.agents/agents" "$TARGET/.agents/agents" refresh
   copy_tree "$KIT_DIR/.agents/skills" "$TARGET/.agents/skills" refresh
-  copy_tree "$KIT_DIR/.agents/modules" "$TARGET/.agents/modules" refresh
   copy_tree "$KIT_DIR/.agents/mcp/bin" "$TARGET/.agents/mcp/bin" refresh
   copy_file "$KIT_DIR/.agents/mcp/sync-runtime-mcp.cjs" "$TARGET/.agents/mcp/sync-runtime-mcp.cjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/README.md" "$TARGET/.agents/mcp/README.md" refresh
@@ -293,10 +292,11 @@ install_docs_root() {
   copy_file "$KIT_DIR/AGENTS.md" "$TARGET/AGENTS.md" create
   copy_file "$KIT_DIR/docs/asdd-harness-portability.md" "$TARGET/docs/asdd-harness-portability.md" create
   copy_file "$KIT_DIR/docs/asdd-and-harness-engineering.md" "$TARGET/docs/asdd-and-harness-engineering.md" create
-  copy_file "$KIT_DIR/scripts/enable-module.sh" "$TARGET/scripts/enable-module.sh" refresh
+  copy_file "$KIT_DIR/docs/pipeline-documentation.md" "$TARGET/docs/pipeline-documentation.md" refresh
+  copy_file "$KIT_DIR/docs/shape-up-asdd-harness-integration.md" "$TARGET/docs/shape-up-asdd-harness-integration.md" create
   copy_file "$KIT_DIR/scripts/install-into.sh" "$TARGET/scripts/install-into.sh" refresh
   if [[ "$DRY_RUN" -eq 0 ]]; then
-    chmod +x "$TARGET/scripts/enable-module.sh" "$TARGET/scripts/install-into.sh" 2>/dev/null || true
+    chmod +x "$TARGET/scripts/install-into.sh" 2>/dev/null || true
   fi
 }
 
@@ -307,6 +307,21 @@ remove_runtime_docs() {
   log "REMOVE $TARGET/runtimes (runtime recipes remain in asdd-harness-kit)"
   [[ "$DRY_RUN" -eq 1 ]] && return 0
   rm -rf "$TARGET/runtimes"
+}
+
+remove_module_sources() {
+  if [[ -e "$TARGET/.agents/modules" ]]; then
+    log "REMOVE $TARGET/.agents/modules (modules remain in asdd-harness-kit)"
+    if [[ "$DRY_RUN" -eq 0 ]]; then
+      rm -rf "$TARGET/.agents/modules"
+    fi
+  fi
+  if [[ -e "$TARGET/scripts/enable-module.sh" ]]; then
+    log "REMOVE $TARGET/scripts/enable-module.sh (use the kit installer to enable modules)"
+    if [[ "$DRY_RUN" -eq 0 ]]; then
+      rm -f "$TARGET/scripts/enable-module.sh"
+    fi
+  fi
 }
 
 enable_one_module() {
@@ -564,6 +579,7 @@ main() {
   install_project_adapter
   install_agents_core
   remove_runtime_docs
+  remove_module_sources
   install_docs_root
   enable_modules
   wire_runtimes

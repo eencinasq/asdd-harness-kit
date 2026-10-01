@@ -1,6 +1,6 @@
 # ASDD skills index (kit)
 
-Skill **files** live in `.agents/skills/` once installed. Optional UI/API skills ship under `.agents/modules/` until copied — see [`.agents/modules/README.md`](../../.agents/modules/README.md).
+Skill **files** live in `.agents/skills/` once installed. Optional UI/API skills remain in the kit and are copied only when enabled with the kit installer.
 
 Skip a skill if the file is absent.
 
@@ -13,8 +13,9 @@ Skip a skill if the file is absent.
 | `user-story-decomposition` | Split epics |
 | `business-model-canvas` | BMC → capabilities |
 | `capability-prioritization` | RICE / MoSCoW |
-| `ai-product-delivery` | Discovery / stories / sprint |
+| `product-delivery` | Pitch intake / epics / stories / dependencies / sprint |
 | `documentation-and-adrs` | ADRs / docs |
+| `shape-up` | Shape Up pitches, appetite, boundaries, conversions, and betting readiness |
 | `test-driven-development` | RED-GREEN-REFACTOR |
 | `open-code-review` | Defect review via `ocr` |
 

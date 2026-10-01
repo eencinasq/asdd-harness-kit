@@ -25,6 +25,10 @@ Do not:
 
 Unknown information must be marked `PENDING_DEFINITION`.
 
+When the source is a Shape Up pitch, consume the delivery map and its parent epic. Preserve `source_pitch_id`, `epic_id`, `source_scope_id`, classification, relations, and dependencies.
+
+Each story must represent one actor and one coherent outcome. If a pitch scope contains several independent outcomes, create related stories under the same epic instead of expanding one story.
+
 ## HF Template
 # User Story
 
@@ -44,6 +48,13 @@ As a **[role]**, I want to **[action]**, so that **[benefit]**.
 ## Out of Scope
 ## Pending Definitions
 ## Definition of Done
+
+## Traceability
+- Source pitch ID
+- Parent epic ID
+- Source scope ID
+- Direct story dependencies
+- Related stories or tasks
 
 ## HF Validation Gate
 - Business value is clear

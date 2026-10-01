@@ -36,7 +36,9 @@ node .harness/scripts/check-invariants.mjs
 # 5. Start Discovery — create .harness/specs/<slice>/intent.md
 ```
 
-Read [AGENTS.md](AGENTS.md) every session. Portability model: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md). Orca same-slice task orchestration: [docs/orca-task-orchestration.md](docs/orca-task-orchestration.md).
+Read [AGENTS.md](AGENTS.md) every session. The complete product-to-implementation flow is documented in [docs/pipeline-documentation.md](docs/pipeline-documentation.md). The Product Delivery → ASDD + Harness handoff is defined in [.agents/skills/product-delivery/references/asdd-harness-handoff.md](.agents/skills/product-delivery/references/asdd-harness-handoff.md). Portability model: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md). Orca same-slice task orchestration: [docs/orca-task-orchestration.md](docs/orca-task-orchestration.md).
+
+For teams using Shape Up practices with ASDD and Harness, read [docs/shape-up-asdd-harness-integration.md](docs/shape-up-asdd-harness-integration.md) and use the core [`shape-up`](.agents/skills/shape-up/SKILL.md) skill before betting a slice.
 
 
 ## Add to an existing project
@@ -85,7 +87,7 @@ selected runtime links and configuration are still installed in the project.
 
 - Product history (specs, progress, features of another app)
 - Framework-specific boundary scripts (e.g. Nx `layer:*`) — add your own in `domain-layer.project.md`
-- Draftly / Nest / Slack content
+- Product-specific history, bindings, and external integrations
 
 ## Requirements
 

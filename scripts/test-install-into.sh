@@ -23,13 +23,40 @@ grep -q 'KEEP ME' "$TMP/existing-app/.harness/steering/product.md"
 # core present
 test -f "$TMP/existing-app/.agents/agents/asdd-discovery-agent.md"
 test -f "$TMP/existing-app/.agents/skills/api-and-interface-design/SKILL.md"
+test -f "$TMP/existing-app/.agents/skills/shape-up/SKILL.md"
+test -f "$TMP/existing-app/.agents/skills/shape-up/references/methodology.md"
+test -f "$TMP/existing-app/.agents/skills/shape-up/references/conversions.md"
+test -f "$TMP/existing-app/.agents/skills/product-delivery/references/shape-up-input.md"
+test -f "$TMP/existing-app/.agents/skills/product-delivery/references/asdd-harness-handoff.md"
+test -f "$TMP/existing-app/.agents/skills/product-delivery/references/technical-diagrams.md"
+test -f "$TMP/existing-app/.agents/skills/product-delivery/contracts/delivery-map.schema.yaml"
+test -f "$TMP/existing-app/docs/pipeline-documentation.md"
+
+# Shape Up -> Product Delivery integration contract.
+grep -q '^name: shape-up$' "$TMP/existing-app/.agents/skills/shape-up/SKILL.md"
+grep -q '^name: product-delivery$' "$TMP/existing-app/.agents/skills/product-delivery/SKILL.md"
+grep -q 'references/conversions.md' "$TMP/existing-app/.agents/skills/product-delivery/SKILL.md"
+grep -q 'bundle_type: shape_up_pitch_bundle' "$TMP/existing-app/.agents/skills/shape-up/references/conversions.md"
+grep -q 'source_pitch_id:' "$TMP/existing-app/.agents/skills/shape-up/references/conversions.md"
+grep -q 'pitch_bundle' "$TMP/existing-app/.agents/skills/product-delivery/contracts/delivery-map.schema.yaml"
+
+if rg -n 'shape-up-pitch|ai-product-delivery' \
+  "$TMP/existing-app/.agents/skills/shape-up" \
+  "$TMP/existing-app/.agents/skills/product-delivery"; then
+  echo "stale skill name found in Shape Up/Product Delivery integration" >&2
+  exit 1
+fi
 test -L "$TMP/existing-app/.cursor/skills"
 test -f "$TMP/existing-app/.harness/scripts/check-invariants.mjs"
 test -f "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 test -f "$TMP/existing-app/.harness/config/project.schema.json"
 test -f "$TMP/existing-app/scripts/harness-migrate.mjs"
+test -f "$TMP/existing-app/docs/shape-up-asdd-harness-integration.md"
 node "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 test ! -e "$TMP/existing-app/runtimes"
+test ! -e "$TMP/existing-app/.agents/modules"
+test ! -e "$TMP/existing-app/scripts/enable-module.sh"
+test -f "$TMP/existing-app/.agents/skills/api-and-interface-design/SKILL.md"
 test -L "$TMP/existing-app/.opencode/skills"
 test -L "$TMP/existing-app/.opencode/agents/asdd-discovery-agent.md"
 test -f "$TMP/existing-app/opencode.json"

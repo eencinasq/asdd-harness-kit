@@ -54,3 +54,31 @@ properties:
     type: array
     items:
       type: string
+  source_pitch_id:
+    type: string
+  pitch_status:
+    type: string
+  appetite:
+    type: string
+  epic_id:
+    type: string
+  source_scope_ids:
+    type: array
+    items:
+      type: string
+  relations:
+    type: array
+    items:
+      type: object
+      required: [from, to, type]
+      properties:
+        from: {type: string}
+        to: {type: string}
+        type: {type: string}
+        reason: {type: string}
+  dependency_graph:
+    type: object
+    properties:
+      nodes: {type: array, items: {type: string}}
+      edges: {type: array, items: {type: object, additionalProperties: true}}
+      cycles: {type: array, items: {type: array, items: {type: string}}}

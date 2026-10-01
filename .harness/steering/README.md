@@ -2,16 +2,16 @@
 
 **SoT** for line-base rules. Agents **Read** files here directly.
 
-Portability: [docs/asdd-harness-portability.md](../../docs/asdd-harness-portability.md) · Modules: [`.agents/modules/README.md`](../../.agents/modules/README.md)
+Portability: [docs/asdd-harness-portability.md](../../docs/asdd-harness-portability.md) · Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit)
 
 ## Layers
 
 | Layer | Role |
 |-------|------|
 | **A. Kit core** | Portable contracts below |
-| **B. Modules** | Opt-in under `.agents/modules/` |
+| **B. Modules** | Opt-in from the kit installer |
 | **C. Bindings** | `product.md`, `structure.md`, `tech.md`, `*.project.md` — **fill before Discovery** |
-| **D. Runtimes** | `runtimes/` recipes |
+| **D. Runtimes** | Runtime links installed by the kit; recipes remain in the kit source |
 
 ## Portable contracts
 

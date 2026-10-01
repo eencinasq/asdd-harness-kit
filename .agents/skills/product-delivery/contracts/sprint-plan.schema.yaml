@@ -6,6 +6,10 @@ required:
   - included_work
   - planning_status
 properties:
+  source_pitch_id:
+    type: string
+  epic_id:
+    type: string
   sprint_goal:
     type: string
   included_work:
@@ -42,5 +46,17 @@ properties:
   planning_status:
     enum: [READY, PARTIALLY_READY, CAPACITY_VALIDATION_REQUIRED, BLOCKED]
   sprint_success_criteria:
+    type: array
+    items: {type: string}
+  relations:
+    type: array
+    items: {type: object, additionalProperties: true}
+  dependency_graph:
+    type: object
+    properties:
+      nodes: {type: array, items: {type: string}}
+      edges: {type: array, items: {type: object, additionalProperties: true}}
+      cycles: {type: array, items: {type: array, items: {type: string}}}
+  orphan_artifacts:
     type: array
     items: {type: string}

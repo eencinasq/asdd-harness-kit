@@ -4,6 +4,18 @@
 
 A product team wants users to reset a forgotten password.
 
+This example uses a direct raw idea. In the primary workflow, shape it first and add the delivery map before Product Discovery:
+
+```text
+Pitch → EPIC-001 → US-001, US-002 → TASK-001… → dependency graph → sprint plan
+```
+
+This example uses a direct raw idea. When the source is a Shape Up pitch, add the pitch intake and delivery map before Product Discovery:
+
+```text
+Pitch → EPIC-001 → US-001, US-002 → TASK-001… → dependency graph → sprint plan
+```
+
 ---
 
 # 1. Product Discovery

@@ -4,7 +4,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 
 - Process: [docs/asdd-and-harness-engineering.md](docs/asdd-and-harness-engineering.md)
 - Portability: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md)
-- Modules: [`.agents/modules/README.md`](.agents/modules/README.md)
+- Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit); enable them with the kit installer.
 
 ## INIT (every session)
 
