@@ -27,7 +27,7 @@ Also: [`.harness/PROGRESS.md`](../PROGRESS.md) index row · [`.harness/progress/
 | `ccs` / `confidence_chain` | Cumulative score + append-only phase scores |
 | `phase_data` | Paths and phase-specific metadata |
 | `paths` | `spec_dir`, `domain_model`, `knowledge_base`, `features`, `progress` |
-| `mode` | Optional — `"full"` (default) or `"lite"`. Lite slices skip CCS/gates per [asdd-lite.md](./asdd-lite.md). |
+| `mode` | Optional — `"full"` (default), `"lite"`, or `"escalated"`. Lite slices skip CCS/gates per [asdd-lite.md](./asdd-lite.md). Escalated means a Lite slice grew in scope and is transitioning to full ASDD. |
 | `agent_heartbeats` | Last-run timestamps per agent |
 
 Historical pre-v2 stubs may omit `gates` / `ccs` — do not invent scores; invariants WARN only.

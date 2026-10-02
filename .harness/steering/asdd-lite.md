@@ -1,5 +1,7 @@
 ---
-inclusion: always
+inclusion: auto
+tags:
+  - lite
 ---
 
 # ASDD-Lite — Lightweight Path for Small Features & Bugs

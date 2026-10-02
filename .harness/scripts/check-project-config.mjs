@@ -43,8 +43,8 @@ if (config) {
 			requireString(config.kit, key, configPath + '.kit');
 		}
 	}
-	if (!['full', 'lite'].includes(config.mode)) {
-		errors.push(`${configPath}.mode must be "full" or "lite"`);
+	if (!['full', 'lite', 'escalated'].includes(config.mode)) {
+		errors.push(`${configPath}.mode must be "full", "lite", or "escalated"`);
 	}
 
 	const requiredPaths = [

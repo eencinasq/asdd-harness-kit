@@ -1,5 +1,10 @@
 ---
-inclusion: always
+inclusion: auto
+tags:
+  - validation
+  - qa
+  - implementation
+  - task-planning
 ---
 
 # Quality Gates

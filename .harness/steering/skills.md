@@ -1,3 +1,7 @@
+---
+inclusion: always
+---
+
 # ASDD skills index (kit)
 
 Initial catalog for folders under `.agents/skills/`. Each folder exposes only its name and description here. The skill body stays in `SKILL.md` until the matching task starts.

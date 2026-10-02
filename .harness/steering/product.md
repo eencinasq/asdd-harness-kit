@@ -1,3 +1,9 @@
+---
+inclusion: auto
+tags:
+  - discovery
+---
+
 # Product overview (stub)
 
 > **Project binding** — replace this stub with your product. Agents treat `product.md` as SoT for actors and business rules.

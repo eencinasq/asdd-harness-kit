@@ -8,15 +8,8 @@ mode: subagent
 
 ## Agent runtime (mandatory)
 
-This file is the **same ASDD role as** `.agents/agents/asdd-qa-agent.md` (responsibilities, inputs, outputs, gates). Adapt only the runtime:
-
-1. **Steering:** `Read` files under `.harness/steering/` directly (SoT). Do not use `.kiro/steering`.
-2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
-3. **Edits:** Use `Write` / `StrReplace` / `Shell` (not Kiro `fsWrite`).
-4. **Codegraph:** Use Cursor MCP (`GetDynamicTools` / `CallDynamicTool` or equivalent). Primary tool: `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`. List tools used in the final message.
-5. **State:** Read `.harness/PROGRESS.md` and global `.harness/state/manifest.json` (index only) at start; resolve the slice; **write** `.harness/state/slices/<slice-id>/manifest.json` at end of a completed phase and **sync that slice's registry row** in the global index per `.harness/steering/manifest.md`. Never treat the global file as the phase machine. For implementation, also update features + PROGRESS per `.harness/steering/session-loop.md`.
-6. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via Task.
-7. **Parallel work:** Prefer the `Task` tool for context-fresh sub-agents / waves (instead of Kiro `invokeSubAgent`).
+This file is the **same ASDD role as** `.agents/agents/asdd-qa-agent.md` (responsibilities, inputs, outputs, gates).  
+The portable runtime contract is defined in `.agents/agents/_runtime-template.md` (Steering, Skills, Edits, Codegraph, State, Handoff, Parallel work). Adapt only the runtime.
 
 ## Project skills
 
@@ -78,10 +71,11 @@ Read the following before producing any output:
 
 # Governance Fidelity
 
-### 1. Gate Decision Rules (Agile Governance)
-- **PASSED:** Test Coverage ≥ 80% AND Spec Coverage ≥ 95% AND 100% `MUST` covered AND 0 failing tests.
-- **PASSED_WITH_WARNINGS:** Test Coverage ≥ 80% AND all `MUST` covered AND only `SHOULD/COULD` partial. TL sign-off required.
-- **BLOCKED:** Coverage < 80% OR any `MUST` uncovered OR any test failing. Pipeline halts.
+### 1. Gate Decision Rules (from `quality-gates.md`)
+Apply the canonical EARS criteria in `.harness/steering/quality-gates.md` (QG-SPEC-*). Do not invent thresholds.
+- **PASSED:** Spec-related test pass rate = 100% AND MUST requirement coverage = 100% AND EARS criteria coverage (MUST) = 100% AND zero failing tests AND no HIGH domain-placement findings open.
+- **PASSED_WITH_WARNINGS:** Spec-related test pass rate = 100% AND MUST requirement coverage = 100% AND zero failing tests; only SHOULD/COULD partial or minor observations remain. TL sign-off required.
+- **BLOCKED:** Any spec-related test failing OR any MUST requirement uncovered OR EARS criteria coverage (MUST) < 100% OR design status not READY. Pipeline halts.
 
 ### 2. Coverage Metric Definitions
 - **Test Coverage:** % of production code lines executed.

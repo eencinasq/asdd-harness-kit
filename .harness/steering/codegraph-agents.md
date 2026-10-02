@@ -1,3 +1,10 @@
+---
+inclusion: auto
+tags:
+  - implementation
+  - refactor
+---
+
 # Codegraph — per-agent checklist
 
 Copy into Task / subagent prompts. Follow in **parent chat** and **every `asdd-*` subagent**.

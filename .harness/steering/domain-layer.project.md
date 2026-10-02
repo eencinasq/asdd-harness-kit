@@ -1,3 +1,9 @@
+---
+inclusion: auto
+tags:
+  - domain
+---
+
 # Domain layer — project binding (stub)
 
 > Implements the portable contract in [../domain-layer.md](../domain-layer.md). Fill before Domain / Design / Implementation.

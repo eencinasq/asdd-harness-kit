@@ -1,3 +1,10 @@
+---
+inclusion: auto
+tags:
+  - design
+  - ui
+---
+
 # Design system (stub)
 
 > **Optional (module: web-ui).** Delete or leave empty if the project has no shared UI kit.

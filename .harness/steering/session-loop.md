@@ -54,6 +54,7 @@ Each item in `.features.json`:
 - `evidence` — filled only when passing (what ran + result)
 - `notes` — optional; link REQs / blockers
 - `req_ids` — optional traceability
+- `source_tasks` — repository-relative path to the `tasks.md` that produced these features (required; must exist)
 - `owner` — required for concurrent work; unique runtime/worker id
 - `scope_paths` — required for concurrent work; non-empty repo-relative files/directories this task may edit
 - `depends_on` — optional task ids; all listed dependencies must be `passing` before dispatch

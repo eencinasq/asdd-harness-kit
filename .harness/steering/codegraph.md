@@ -1,5 +1,8 @@
 ---
-inclusion: always
+inclusion: auto
+tags:
+  - implementation
+  - refactor
 ---
 
 # Codegraph — code intelligence (mandatory)

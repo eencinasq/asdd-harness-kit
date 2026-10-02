@@ -1,3 +1,10 @@
+---
+inclusion: auto
+tags:
+  - validation
+  - qa
+---
+
 # Quality gates — project binding
 
 Concrete commands, paths, and findings for [quality-gates.md](quality-gates.md). Fill every `…` slot before Discovery. A stub value does not satisfy a gate.

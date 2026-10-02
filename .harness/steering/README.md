@@ -1,3 +1,7 @@
+---
+inclusion: always
+---
+
 # Harness steering (kit)
 
 **SoT** for line-base rules. Agents **Read** files here directly.

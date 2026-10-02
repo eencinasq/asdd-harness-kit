@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://draft-ly.app/schemas/harness-project.json",
+  "$id": "https://asdd-harness-kit.io/schemas/harness-project.json",
   "title": "ASDD Harness project configuration",
   "type": "object",
   "required": ["schema_version", "project_id", "harness_version", "mode", "paths", "bindings", "modules", "capabilities"],
@@ -13,12 +13,13 @@
       "properties": {
         "name": { "type": "string", "minLength": 1 },
         "source": { "type": "string", "minLength": 1 },
-        "ref": { "type": "string", "minLength": 1 }
-      },
-      "additionalProperties": false
+        "ref": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "installed_at": { "type": "string", "format": "date-time" }
+      }
     },
     "harness_version": { "type": "string", "minLength": 1 },
-    "mode": { "enum": ["full", "lite"] },
+    "mode": { "enum": ["full", "lite", "escalated"] },
     "bindings_complete": { "type": "boolean" },
     "paths": {
       "type": "object",

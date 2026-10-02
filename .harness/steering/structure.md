@@ -1,3 +1,10 @@
+---
+inclusion: auto
+tags:
+  - discovery
+  - design
+---
+
 # Project structure (stub)
 
 > **Project binding** — replace with this repo's layout. Agents use this file to find code and docs; wrong paths mis-steer every phase.

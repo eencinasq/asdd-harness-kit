@@ -12,7 +12,12 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 2. **Check the lock** — `.harness/state/locks/<slice-id>.lock`. If free, create `{"agent":"<your-id>","started":"<ISO-8601>","slice":"<slice-id>"}`.
 3. Read [`.harness/state/slices/<slice-id>/manifest.json`](.harness/state/slices/).
 4. Read features when `paths.features` is set.
-5. Read steering for the phase (`structure`, `product`, `codegraph`, `manifest`, `session-loop`, `controls`, plus phase-specific). Small work → [`asdd-lite.md`](.harness/steering/asdd-lite.md).
+5. **JIT steering loading:**
+   - Each steering file has YAML frontmatter with `inclusion` and `tags`.
+   - Load all `inclusion: "always"` files (controls, session-loop, manifest, skills, security-rules, README).
+   - Load `inclusion: "auto"` files **only when their tags match the current phase** (e.g., `quality-gates.md` for validation/qa/implementation, `domain-layer.md` for discovery/domain).
+   - Skip auto files whose tags do not intersect the current phase — this saves context window.
+   - Small work → [`asdd-lite.md`](.harness/steering/asdd-lite.md).
 6. Pick work:
    - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.
    - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners, disjoint file scopes, and coordinator-held slice lock; otherwise work serially.

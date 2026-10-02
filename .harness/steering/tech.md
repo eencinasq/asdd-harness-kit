@@ -1,3 +1,10 @@
+---
+inclusion: auto
+tags:
+  - discovery
+  - design
+---
+
 # Technology stack (stub)
 
 > **Project binding** — replace with this repo's stack. Do not leave Nest/Nx/Draftly defaults from another project.

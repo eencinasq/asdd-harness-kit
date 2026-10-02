@@ -1,3 +1,10 @@
+---
+inclusion: auto
+tags:
+  - discovery
+  - domain
+---
+
 # Domain logic placement contract
 
 This is the portable contract for deciding where business rules belong. It is mandatory for every project using this harness. The project binding named in [README.md](README.md#project-bindings) defines the concrete layers, paths, exceptions, and checks. Agents must apply both this contract and that binding; they must not infer project architecture from this file.

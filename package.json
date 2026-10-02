@@ -1,0 +1,40 @@
+{
+  "name": "asdd-harness-kit",
+  "version": "2.0.0",
+  "description": "Portable process layer for Agent Specification-Driven Development (ASDD) and Harness Engineering",
+  "bin": {
+    "asdd-harness-kit": "scripts/npx-install.cjs"
+  },
+  "files": [
+    ".agents/**/*",
+    ".cursor/**/*",
+    ".harness/**/*",
+    "docs/**/*",
+    "runtimes/**/*",
+    "scripts/**/*",
+    "AGENTS.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "bash scripts/test-install-into.sh"
+  },
+  "keywords": [
+    "asdd",
+    "harness",
+    "ai-agents",
+    "cursor",
+    "spec-driven",
+    "agent-engineering",
+    "shape-up",
+    "product-delivery"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eencinasq/asdd-harness-kit.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
