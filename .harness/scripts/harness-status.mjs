@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * harness-status.mjs — compact project health dashboard.
+ * harness-status.mjs — compact project health dashboard (v3.0).
+ * Reads generated registry.json and per-slice manifests.
  * Usage: node .harness/scripts/harness-status.mjs
  */
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.cwd();
@@ -24,79 +25,61 @@ function fmtDate(iso) {
   return Number.isNaN(d.getTime()) ? iso : d.toISOString().slice(0, 16).replace('T', ' ');
 }
 
-function ageHours(iso) {
-  if (!iso) return Infinity;
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return Infinity;
-  return (Date.now() - d.getTime()) / 36e5;
-}
-
 function pad(s, w) {
   return String(s).padEnd(w);
 }
 
-const manifest = readJson('.harness/state/manifest.json');
-const slices = Array.isArray(manifest?.active_slices) ? manifest.active_slices : [];
+const registry = readJson('.harness/state/registry.json');
+const slices = Array.isArray(registry?.slices) ? registry.slices : [];
 
 console.log('');
 console.log('== Active Slices ==');
 if (slices.length === 0) {
   console.log('  (none)');
 } else {
-  console.log(`  ${pad('Slice', 18)} ${pad('Phase', 16)} ${pad('Status', 12)} Features`);
+  console.log(`  ${pad('Slice', 18)} ${pad('Phase', 16)} ${pad('Status', 12)} ${pad('Features', 10)} Dissents`);
   for (const s of slices) {
-    let featCount = 0;
-    let inProg = 0;
-    const featPath = s.features || `.harness/features/${s.slice_id}.features.json`;
-    if (existsSync(join(root, featPath))) {
-      const fd = readJson(featPath);
-      const list = Array.isArray(fd?.features) ? fd.features : [];
-      featCount = list.length;
-      inProg = list.filter((f) => f.status === 'in_progress').length;
-    }
-    const featStr = featCount ? `${featCount} (${inProg} in_progress)` : '—';
-    console.log(`  ${pad(s.slice_id, 18)} ${pad(s.phase || '—', 16)} ${pad(s.status || '—', 12)} ${featStr}`);
+    const dissents = s.open_dissents ? `${s.open_dissents}` : '—';
+    console.log(`  ${pad(s.slice_id, 18)} ${pad(s.phase || '—', 16)} ${pad(s.status || '—', 12)} ${pad(String(s.active_features || 0), 10)} ${dissents}`);
   }
 }
 
 console.log('');
-console.log('== Locks ==');
-const locksDir = join(root, '.harness/state/locks');
-if (!existsSync(locksDir)) {
-  console.log('  (no locks directory)');
-} else {
-  const files = readdirSync(locksDir).filter((n) => n.endsWith('.lock'));
-  if (files.length === 0) {
-    console.log('  (none held)');
-  } else {
-    console.log(`  ${pad('Lock', 22)} ${pad('Agent', 16)} ${pad('Started', 18)} Stale?`);
-    for (const name of files) {
-      const lock = readJson(`.harness/state/locks/${name}`);
-      const sliceId = lock?.slice || name.replace('.lock', '');
-      const slice = slices.find((s) => s.slice_id === sliceId);
-      const stale = slice?.status === 'DONE' ? 'YES (slice DONE)' : ageHours(lock?.started) > 24 ? 'YES (>24h)' : 'no';
-      console.log(`  ${pad(name, 22)} ${pad(lock?.agent || '—', 16)} ${pad(fmtDate(lock?.started), 18)} ${stale}`);
-    }
-  }
-}
-
-console.log('');
-console.log('== Features (in_progress) ==');
-let anyInProgress = false;
+console.log('== Active Work (derived from sessions) ==');
+let anyActive = false;
 for (const s of slices) {
-  const featPath = s.features || `.harness/features/${s.slice_id}.features.json`;
-  if (!existsSync(join(root, featPath))) continue;
-  const fd = readJson(featPath);
-  const active = (fd?.features || []).filter((f) => f.status === 'in_progress');
-  if (active.length) {
-    anyInProgress = true;
-    console.log(`  [${s.slice_id}]`);
-    for (const f of active) {
-      const owner = f.owner ? ` @${f.owner}` : '';
-      console.log(`    • ${f.id}${owner}: ${f.title}`);
-    }
+  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+  const active = manifest?.active_features || [];
+  if (active.length === 0) continue;
+  anyActive = true;
+  console.log(`  [${s.slice_id}]`);
+  for (const f of active) {
+    const handoff = f.handoff_from ? ` (from ${f.handoff_from})` : '';
+    console.log(`    • ${f.id} @${f.human || f.owner}${handoff}`);
   }
 }
-if (!anyInProgress) console.log('  (none)');
+if (!anyActive) console.log('  (none)');
+
+console.log('');
+console.log('== Contributors ==');
+for (const s of slices) {
+  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+  const contributors = manifest?.contributors || [];
+  if (contributors.length === 0) continue;
+  console.log(`  [${s.slice_id}] ${contributors.join(', ')}`);
+}
+
+console.log('');
+console.log('== Gate Summary ==');
+for (const s of slices) {
+  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+  const gates = manifest?.gates || {};
+  const gateStr = Object.entries(gates)
+    .map(([phase, g]) => `${phase}:${g.status}`)
+    .join(' ');
+  if (gateStr) {
+    console.log(`  [${s.slice_id}] ${gateStr}`);
+  }
+}
 
 console.log('');

@@ -5,17 +5,17 @@
  *
  * Supports:
  * - Global manifest schema v2.0 (active_slices array)
- * - Per-slice manifests (state/slices/<id>/manifest.json)
+ * - Per-slice manifests v2.0 (state/slices/<id>/manifest.json)
+ * - Per-slice sessions v3.0 (state/slices/<id>/sessions/*.json)
  * - Feature tracker invariants (dependencies, concurrent ownership/scope, evidence)
  * - Orphan slice detection
- * - Stale lock detection
+ * - Registry consistency
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import validatePaths from './validators/paths.mjs';
 import validateManifest from './validators/manifest.mjs';
 import validateFeatures from './validators/features.mjs';
-import validateLocks from './validators/locks.mjs';
 import validateSkills from './validators/skills.mjs';
 
 const root = process.cwd();
@@ -55,7 +55,6 @@ const ctx = { root, fail, warn, readJson, dirExists, manifest };
 validatePaths(ctx);
 validateManifest(ctx);
 validateFeatures(ctx);
-validateLocks(ctx);
 validateSkills(ctx);
 
 if (warnings.length) {

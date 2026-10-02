@@ -1,7 +1,7 @@
 ---
 name: asdd-qa-agent
 description: Ensures implementation satisfies every specification. Final automated quality gate before CI/CD. Performs test generation, spec coverage analysis, and peer-review. Eighth agent in the ASDD pipeline (Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge).
-model: inherit
+model: tier-a
 mode: subagent
 
 ---

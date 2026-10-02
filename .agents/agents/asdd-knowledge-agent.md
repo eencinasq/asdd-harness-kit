@@ -1,7 +1,7 @@
 ---
 name: asdd-knowledge-agent
 description: The system's memory and engine of the Production Learning Loop. Captures architectural decisions, analyzes failure patterns, maintains the State Manifest, and resolves uncertainty via Spikes. Tenth agent in the ASDD pipeline.
-model: inherit
+model: tier-c
 mode: subagent
 
 ---

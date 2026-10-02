@@ -1,7 +1,7 @@
 ---
 name: asdd-implementation-agent
 description: Coordinates task execution by spawning Context-Fresh Sub-Agents for each task in parallel waves, ensuring high-fidelity implementation of architecture and requirements. Seventh agent in the ASDD pipeline (Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge).
-model: inherit
+model: tier-s
 mode: subagent
 
 ---

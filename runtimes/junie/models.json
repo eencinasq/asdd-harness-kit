@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "runtime": "junie",
+  "note": "Junie uses JetBrains AI service. Model availability depends on the team's JetBrains AI subscription tier. Higher tiers unlock stronger models. Per-agent model selection is limited.",
+  "tier_models": {
+    "tier-s": {
+      "primary": "GPT-4o (JetBrains AI Pro)",
+      "fallback": "Claude 3.5 Sonnet (JetBrains AI Pro)",
+      "rationale": "Junie's strongest available models. Required for architecture and complex implementation. If the team is on a lower tier, consider running tier-s agents outside Junie."
+    },
+    "tier-a": {
+      "primary": "GPT-4o (JetBrains AI Pro)",
+      "fallback": "Claude 3.5 Sonnet (JetBrains AI Pro)",
+      "rationale": "Spec and validation require Pro-tier models. Do not attempt spec validation with lighter models — gate failures will cascade."
+    },
+    "tier-b": {
+      "primary": "GPT-4o-mini (JetBrains AI)",
+      "fallback": "GPT-4o (if mini is unavailable)",
+      "rationale": "Discovery and domain modeling work well with mid-tier models. Junie's 4o-mini equivalent is cost-effective for these phases."
+    },
+    "tier-c": {
+      "primary": "GPT-4o-mini (JetBrains AI)",
+      "fallback": "GPT-4o",
+      "rationale": "Lite agent tasks are small scope. Use the cheapest available model. If Junie does not expose model choice, accept the default and monitor cost."
+    }
+  },
+  "cost_note": "JetBrains AI pricing is subscription-based rather than per-token. Tier optimization matters less for Junie than for API-based runtimes. Focus on using the default model efficiently via JIT steering and skill lazy-loading."
+}

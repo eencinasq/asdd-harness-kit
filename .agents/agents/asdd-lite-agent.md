@@ -1,7 +1,7 @@
 ---
 name: asdd-lite-agent
 description: Lightweight ASDD agent for small features and bugs. Combines Spec → Design → Tasks → Implementation → QA-Lite into a single-agent flow. Use when work touches ≤3 files, introduces ≤1 new domain concept, and does not cross architectural boundaries.
-model: inherit
+model: tier-c
 mode: subagent
 ---
 

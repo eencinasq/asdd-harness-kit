@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "description": "ASDD agent model tier mapping. Assigns each agent to a capability tier based on its reasoning requirements, then maps tiers to runtime-specific model recommendations. Goal: minimize token spend without compromising gate quality.",
+  "tier_definitions": {
+    "tier-s": {
+      "label": "Architect",
+      "reasoning_profile": "Deep system design, multi-file coordination, complex trade-off analysis, spawning parallel sub-agents",
+      "context_window": "Large (128k–200k tokens)",
+      "cost_priority": "Quality over cost — errors here cascade through entire pipeline",
+      "agent_count": 2,
+      "estimated_call_ratio": "~15% of total agent invocations"
+    },
+    "tier-a": {
+      "label": "Precision",
+      "reasoning_profile": "Structured output, precise requirements, cross-reference validation, test generation, peer review",
+      "context_window": "Large (128k tokens)",
+      "cost_priority": "High quality required; use strong model but avoid over-provisioning context",
+      "agent_count": 3,
+      "estimated_call_ratio": "~25% of total agent invocations"
+    },
+    "tier-b": {
+      "label": "Analysis",
+      "reasoning_profile": "Exploration, domain modeling, terminology extraction, task decomposition, capability parsing",
+      "context_window": "Medium (32k–128k tokens)",
+      "cost_priority": "Balance capability and cost; good instruction following matters more than deep reasoning",
+      "agent_count": 3,
+      "estimated_call_ratio": "~35% of total agent invocations"
+    },
+    "tier-c": {
+      "label": "Light",
+      "reasoning_profile": "Small features (≤3 files), summarization, pattern detection, state tracking, failure log analysis",
+      "context_window": "Small–medium (8k–32k tokens)",
+      "cost_priority": "Optimize for throughput and low latency; cheapest viable model",
+      "agent_count": 3,
+      "estimated_call_ratio": "~25% of total agent invocations"
+    }
+  },
+  "agent_tiers": {
+    "asdd-design-agent": "tier-s",
+    "asdd-implementation-agent": "tier-s",
+    "asdd-spec-agent": "tier-a",
+    "asdd-validation-agent": "tier-a",
+    "asdd-qa-agent": "tier-a",
+    "asdd-discovery-agent": "tier-b",
+    "asdd-domain-agent": "tier-b",
+    "asdd-task-planning-agent": "tier-b",
+    "asdd-lite-agent": "tier-c",
+    "asdd-knowledge-agent": "tier-c",
+    "asdd-refactor-agent": "tier-c"
+  },
+  "module_agent_tiers": {
+    "asdd-e2e-tester": "tier-a",
+    "asdd-integration-tester": "tier-b"
+  },
+  "cost_optimization_rules": [
+    "Always use the cheapest tier that can reliably pass the phase gate. Escalate tier only after a gate failure.",
+    "For tier-s agents, do NOT split work across cheaper models — architectural errors are exponentially more expensive to fix downstream.",
+    "For tier-c agents, prefer fast models even if they occasionally need a retry; throughput matters more than first-pass accuracy.",
+    "When a tier-b agent is re-running on the same slice with no new inputs, consider demoting to tier-c if the task is purely summarization.",
+    "The Tech Lead owns tier escalation decisions. A formal Dissent Notice is required to upgrade an agent's tier permanently."
+  ],
+  "token_optimization_rules": [
+    "Load steering JIT (Just-In-Time) per phase — do not preload all steering files. See session-loop.md.",
+    "Skills: read only the SKILL.md name/description at startup; read the full body only when that skill's task activates.",
+    "Codegraph first: use codegraph_explore instead of reading large source files directly when exploring unknown code.",
+    "For tier-s and tier-a agents, compact context aggressively before the final output — remove intermediate reasoning from the response if it is not required by the gate.",
+    "Use the Task tool for context-fresh sub-agents instead of maintaining large context windows across unrelated work."
+  ]
+}

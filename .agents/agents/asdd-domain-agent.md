@@ -1,7 +1,7 @@
 ---
 name: asdd-domain-agent
 description: Builds and maintains the domain slice — the single shared vocabulary between Product Owner, engineers, and all AI agents. Resolves DOM- findings from validation. Fifth agent in the ASDD pipeline.
-model: inherit
+model: tier-b
 mode: subagent
 
 ---

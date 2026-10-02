@@ -8,19 +8,18 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 
 ## INIT (every session)
 
-1. Read [`.harness/PROGRESS.md`](.harness/PROGRESS.md).
-2. **Check the lock** — `.harness/state/locks/<slice-id>.lock`. If free, create `{"agent":"<your-id>","started":"<ISO-8601>","slice":"<slice-id>"}`.
-3. Read [`.harness/state/slices/<slice-id>/manifest.json`](.harness/state/slices/).
-4. Read features when `paths.features` is set.
-5. **JIT steering loading:**
+1. Read generated `.harness/state/registry.json` for squad state.
+2. Read generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice.
+3. Read features when `paths.features` is set.
+4. **JIT steering loading:**
    - Each steering file has YAML frontmatter with `inclusion` and `tags`.
    - Load all `inclusion: "always"` files (controls, session-loop, manifest, skills, security-rules, README).
-   - Load `inclusion: "auto"` files **only when their tags match the current phase** (e.g., `quality-gates.md` for validation/qa/implementation, `domain-layer.md` for discovery/domain).
+   - Load `inclusion: "auto"` files **only when their tags match the current phase**.
    - Skip auto files whose tags do not intersect the current phase — this saves context window.
    - Small work → [`asdd-lite.md`](.harness/steering/asdd-lite.md).
-6. Pick work:
+5. Pick work:
    - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.
-   - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners, disjoint file scopes, and coordinator-held slice lock; otherwise work serially.
+   - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners and disjoint file scopes; otherwise work serially.
 
 ## System of record
 

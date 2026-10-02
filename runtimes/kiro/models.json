@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "runtime": "kiro",
+  "note": "Kiro uses the Kiro.dev model configuration. Models are set in .kiro/settings.json or via the Kiro CLI. Kiro supports model-per-agent via frontmatter or settings.",
+  "tier_models": {
+    "tier-s": {
+      "primary": "claude-3-5-sonnet-20241022",
+      "fallback": "gpt-4o",
+      "rationale": "Kiro's agent system can bind different models to different agents. Use Sonnet for design and implementation — best code reasoning available."
+    },
+    "tier-a": {
+      "primary": "claude-3-5-sonnet-20241022",
+      "fallback": "gpt-4o",
+      "rationale": "Spec and validation agents benefit from the same model as tier-s. Kiro allows per-agent binding, so no need to downgrade."
+    },
+    "tier-b": {
+      "primary": "gpt-4o-mini",
+      "fallback": "claude-3-haiku-20240307",
+      "rationale": "Kiro's frontmatter supports 'model' field. Set tier-b agents to gpt-4o-mini for discovery, domain, and task planning."
+    },
+    "tier-c": {
+      "primary": "gpt-4o-mini",
+      "fallback": "claude-3-haiku-20240307",
+      "rationale": "Lite and knowledge agents run most frequently. gpt-4o-mini provides the best throughput at the lowest cost."
+    }
+  },
+  "kiro_settings_example": {
+    "agents": {
+      "asdd-design-agent": { "model": "claude-3-5-sonnet-20241022" },
+      "asdd-implementation-agent": { "model": "claude-3-5-sonnet-20241022" },
+      "asdd-spec-agent": { "model": "claude-3-5-sonnet-20241022" },
+      "asdd-validation-agent": { "model": "claude-3-5-sonnet-20241022" },
+      "asdd-qa-agent": { "model": "claude-3-5-sonnet-20241022" },
+      "asdd-discovery-agent": { "model": "gpt-4o-mini" },
+      "asdd-domain-agent": { "model": "gpt-4o-mini" },
+      "asdd-task-planning-agent": { "model": "gpt-4o-mini" },
+      "asdd-lite-agent": { "model": "gpt-4o-mini" },
+      "asdd-knowledge-agent": { "model": "gpt-4o-mini" },
+      "asdd-refactor-agent": { "model": "gpt-4o-mini" }
+    }
+  }
+}

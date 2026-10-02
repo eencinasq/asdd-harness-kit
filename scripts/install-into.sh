@@ -473,13 +473,16 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/check-project-config.mjs" "$TARGET/.harness/scripts/check-project-config.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/harness-status.mjs" "$TARGET/.harness/scripts/harness-status.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/init-slice.mjs" "$TARGET/.harness/scripts/init-slice.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/sync-state.mjs" "$TARGET/.harness/scripts/sync-state.mjs" refresh
   copy_file "$KIT_DIR/.harness/config/project.schema.json" "$TARGET/.harness/config/project.schema.json" refresh
   copy_file "$KIT_DIR/.harness/config/README.md" "$TARGET/.harness/config/README.md" refresh
   copy_file "$KIT_DIR/.harness/features/feature_list.schema.json" "$TARGET/.harness/features/feature_list.schema.json" refresh
   copy_file "$KIT_DIR/.harness/features/feature.schema.json" "$TARGET/.harness/features/feature.schema.json" refresh
   copy_file "$KIT_DIR/scripts/harness-migrate.mjs" "$TARGET/scripts/harness-migrate.mjs" refresh
+  copy_file "$KIT_DIR/scripts/migrate-v2-v3.mjs" "$TARGET/scripts/migrate-v2-v3.mjs" refresh
   copy_tree "$KIT_DIR/.harness/scripts/validators" "$TARGET/.harness/scripts/validators" refresh
   copy_file "$KIT_DIR/.harness/config/versions.json" "$TARGET/.harness/config/versions.json" refresh
+  copy_file "$KIT_DIR/.harness/config/models.json" "$TARGET/.harness/config/models.json" refresh
   copy_file "$KIT_DIR/.harness/PROGRESS.md" "$TARGET/.harness/PROGRESS.md" create
   copy_file "$KIT_DIR/.harness/state/manifest.json" "$TARGET/.harness/state/manifest.json" create
   copy_file "$KIT_DIR/.harness/state/locks/README.md" "$TARGET/.harness/state/locks/README.md" create
@@ -500,9 +503,9 @@ install_harness_scaffold() {
 
 kit_version() {
   if command -v node >/dev/null 2>&1; then
-    node -e "try { const p=require('$KIT_DIR/package.json'); process.stdout.write(p.version||'2.0.0'); } catch { process.stdout.write('2.0.0'); }"
+    node -e "try { const p=require('$KIT_DIR/package.json'); process.stdout.write(p.version||'3.0.0'); } catch { process.stdout.write('3.0.0'); }"
   else
-    echo "2.0.0"
+    echo "3.0.0"
   fi
 }
 
@@ -549,7 +552,7 @@ EOF
     "version": "$kit_ver",
     "installed_at": "$installed_at"
   },
-  "harness_version": "2.0",
+  "harness_version": "3.0.0",
   "mode": "full",
   "bindings_complete": false,
   "paths": {
@@ -745,6 +748,7 @@ wire_runtime_cursor() {
     log "${C_DIM}KEEP${C_RESET}  $TARGET/.cursor/mcp.json"
   fi
   copy_file "$KIT_DIR/runtimes/cursor/asdd-steering.mdc" "$TARGET/.cursor/rules/asdd-steering.mdc" refresh
+  copy_runtime_models "cursor" "$TARGET/.cursor"
   install_cursor_verify_hook
 }
 
@@ -824,6 +828,7 @@ wire_runtime_claude() {
   else
     log "${C_DIM}KEEP${C_RESET}  $TARGET/CLAUDE.md"
   fi
+  copy_runtime_models "claude" "$TARGET/.claude"
 }
 
 link_runtime_agent_files() {
@@ -876,6 +881,14 @@ link_runtime_dir() {
   fi
 }
 
+copy_runtime_models() {
+  local runtime="$1"
+  local target_dir="$2"
+  if [[ -f "$KIT_DIR/runtimes/$runtime/models.json" ]]; then
+    copy_file "$KIT_DIR/runtimes/$runtime/models.json" "$target_dir/models.json" refresh
+  fi
+}
+
 wire_runtime_opencode() {
   log "${C_BOLD}RUNTIME${C_RESET} opencode"
   [[ "$DRY_RUN" -eq 1 ]] && return 0
@@ -897,6 +910,7 @@ EOF
   else
     warn "Node or MCP projection script unavailable — skip OpenCode MCP projection"
   fi
+  copy_runtime_models "opencode" "$TARGET/.opencode"
 }
 
 wire_runtime_kimi() {
@@ -906,6 +920,7 @@ wire_runtime_kimi() {
   link_runtime_dir "$TARGET/.kimi-code/agents" "../.agents/agents"
   link_runtime_skills ".kimi-code"
   link_runtime_mcp "$TARGET/.kimi-code/mcp.json" "../.agents/mcp/mcp.json"
+  copy_runtime_models "kimi" "$TARGET/.kimi-code"
 }
 
 wire_runtime_junie() {
@@ -914,6 +929,7 @@ wire_runtime_junie() {
   link_runtime_agent_files ".junie"
   link_runtime_skills ".junie"
   link_runtime_mcp "$TARGET/.junie/mcp/mcp.json" "../../.agents/mcp/mcp.json"
+  copy_runtime_models "junie" "$TARGET/.junie"
 }
 
 wire_runtime_devin() {
@@ -922,6 +938,7 @@ wire_runtime_devin() {
   link_runtime_agent_files ".devin"
   link_runtime_skills ".devin"
   link_runtime_mcp "$TARGET/.devin/mcp_config.json" "../.agents/mcp/mcp.json"
+  copy_runtime_models "devin" "$TARGET/.devin"
 }
 
 wire_runtime_kiro() {
@@ -930,6 +947,7 @@ wire_runtime_kiro() {
   link_runtime_agent_files ".kiro"
   link_runtime_skills ".kiro"
   link_runtime_mcp "$TARGET/.kiro/settings/mcp.json" "../../.agents/mcp/mcp.json"
+  copy_runtime_models "kiro" "$TARGET/.kiro"
 }
 
 wire_runtimes() {
@@ -1000,6 +1018,7 @@ print_summary() {
   log "  • Skills catalog               → .agents/skills/"
   log "  • Harness scripts              → .harness/scripts/"
   log "  • Project adapter              → .harness/config/project.json"
+  log "  • Model tier mapping           → .harness/config/models.json"
 
   if [[ -n "$RUNTIMES" && "$RUNTIMES" != "none" ]]; then
     log "  • Runtime wiring               → $RUNTIMES"
@@ -1022,6 +1041,8 @@ print_summary() {
   if [[ -n "$RUNTIMES" && "$RUNTIMES" != "none" ]]; then
     log ""
     log "${C_DIM}Runtime-specific notes:${C_RESET}"
+    log "  Model configs copied to each runtime directory."
+    log "  Review .harness/config/models.json for tier rationale."
     if [[ "$RUNTIMES" == *cursor* ]]; then
       log "  Cursor:  verify-on-stop hook active in .cursor/hooks.json"
     fi

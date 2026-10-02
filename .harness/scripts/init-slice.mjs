@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * init-slice.mjs — scaffold a new slice with all required files.
+ * init-slice.mjs — scaffold a new slice with v3.0 append-only session structure.
  * Usage: node .harness/scripts/init-slice.mjs <slice-id>
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -36,60 +36,38 @@ const nowIso = new Date().toISOString();
 
 // Paths
 const sliceDir = join(root, '.harness/state/slices', sliceId);
-const sliceManifestPath = join(sliceDir, 'manifest.json');
+const sessionsDir = join(sliceDir, 'sessions');
 const specDir = join(root, '.harness/specs', sliceId);
-const progressPath = join(root, '.harness/progress', `${sliceId}.md`);
 const featuresPath = join(root, '.harness/features', `${sliceId}.features.json`);
 const progressIndexPath = join(root, '.harness/PROGRESS.md');
 
-// 1. Slice manifest from stub
-const stubPath = join(root, '.harness/steering/templates/slice-manifest.stub.json');
-let sliceManifest;
-if (existsSync(stubPath)) {
-  sliceManifest = JSON.parse(readFileSync(stubPath, 'utf8'));
-} else {
-  sliceManifest = {
-    schema_version: '2.0',
-    slice_id: sliceId,
-    phase: 'discovery',
-    status: 'in_progress',
-    mode: 'full',
-    created_at: nowIso,
-    updated_at: nowIso,
-    agent_heartbeats: {},
-    gates: {},
-    confidence_chain: {},
-    ccs: 0,
-    paths: {
-      specs: `.harness/specs/${sliceId}`,
-      features: `.harness/features/${sliceId}.features.json`,
-      progress: `.harness/progress/${sliceId}.md`,
-    },
-  };
-}
-sliceManifest.slice_id = sliceId;
-sliceManifest.created_at = sliceManifest.created_at || nowIso;
-sliceManifest.updated_at = nowIso;
-
-mkdirSync(sliceDir, { recursive: true });
-writeFileSync(sliceManifestPath, `${JSON.stringify(sliceManifest, null, 2)}\n`);
-console.log(`CREATE ${sliceManifestPath.replace(root + '/', '')}`);
+// 1. Create session directory and initial session
+mkdirSync(sessionsDir, { recursive: true });
+const initialSession = {
+  schema_version: '1.0',
+  session_id: `sess-${sliceId}-001`,
+  timestamp: nowIso,
+  agent: 'human',
+  human: 'squad',
+  slice_id: sliceId,
+  event_type: 'phase_started',
+  phase: 'discovery',
+  evidence: 'Slice initialized',
+  concerns: [],
+};
+writeFileSync(join(sessionsDir, '001-initial.json'), `${JSON.stringify(initialSession, null, 2)}\n`);
+console.log(`CREATE .harness/state/slices/${sliceId}/sessions/001-initial.json`);
 
 // 2. Spec directory
 mkdirSync(specDir, { recursive: true });
 console.log(`DIR    .harness/specs/${sliceId}`);
 
-// 3. Progress file
-const progressBody = `# ${sliceId}\n\n**Phase:** discovery\n**Status:** in_progress\n**Created:** ${nowIso}\n\n## Session Log\n\n`;
-writeFileSync(progressPath, progressBody);
-console.log(`CREATE ${progressPath.replace(root + '/', '')}`);
-
-// 4. Stub tasks.md (source_tasks target must exist for invariants)
+// 3. Stub tasks.md (source_tasks target must exist for invariants)
 const tasksStub = `# ${sliceId} — Tasks\n\n> Planned during Task Planning phase.\n\n`;
 writeFileSync(join(specDir, 'tasks.md'), tasksStub);
 console.log(`CREATE .harness/specs/${sliceId}/tasks.md`);
 
-// 5. Features file
+// 4. Features file
 const featuresDoc = {
   schema_version: '1.0',
   slice_id: sliceId,
@@ -99,27 +77,37 @@ const featuresDoc = {
 writeFileSync(featuresPath, `${JSON.stringify(featuresDoc, null, 2)}\n`);
 console.log(`CREATE ${featuresPath.replace(root + '/', '')}`);
 
-// 6. Update global manifest
+// 5. Generate v3.0 manifest from sessions
+const { spawnSync } = await import('node:child_process');
+const syncResult = spawnSync(process.execPath, ['.harness/scripts/sync-state.mjs', '--slice', sliceId], {
+  cwd: root,
+  encoding: 'utf8',
+});
+if (syncResult.status !== 0) {
+  console.error('WARN  sync-state failed:', syncResult.stderr);
+} else {
+  console.log(`SYNC   .harness/state/slices/${sliceId}/manifest.json`);
+}
+
+// 6. Update global manifest (v2 compat)
 active.push({
   slice_id: sliceId,
-  phase: sliceManifest.phase,
-  status: sliceManifest.status,
+  phase: 'discovery',
+  status: 'in_progress',
   manifest: `.harness/state/slices/${sliceId}/manifest.json`,
-  progress: `.harness/progress/${sliceId}.md`,
   features: `.harness/features/${sliceId}.features.json`,
 });
 globalManifest.active_slices = active;
 writeFileSync(globalManifestPath, `${JSON.stringify(globalManifest, null, 2)}\n`);
 console.log(`UPDATE .harness/state/manifest.json`);
 
-// 7. Update PROGRESS.md index
+// 7. Update PROGRESS.md index (v2 compat)
 let progressIndex = '';
 if (existsSync(progressIndexPath)) {
   progressIndex = readFileSync(progressIndexPath, 'utf8');
 }
-const row = `| ${sliceId} | ${sliceManifest.status} | ${sliceManifest.phase} | — | — |`;
+const row = `| ${sliceId} | in_progress | discovery | — | — |`;
 if (progressIndex.includes('| Slice |')) {
-  // Append after header separator
   const lines = progressIndex.split('\n');
   const sepIdx = lines.findIndex((l) => l.trim().startsWith('|---'));
   if (sepIdx >= 0) {

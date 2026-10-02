@@ -1,7 +1,7 @@
 ---
 name: asdd-task-planning-agent
 description: Decomposes approved architecture designs or behavioral slices into precise, parallelizable Execution Waves for the Implementation Agent. Produces tasks.md with atomic implementation steps grouped into Parallel Waves. Sixth agent in the ASDD pipeline (Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge).
-model: inherit
+model: tier-b
 mode: subagent
 
 ---

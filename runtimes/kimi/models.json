@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "runtime": "kimi-code",
+  "note": "Kimi Code uses Moonshot models. Model selection is controlled via ~/.kimi-code/config.toml [model] section. Per-agent model switching is not yet supported; the squad should use the workspace default and accept the trade-off.",
+  "tier_models": {
+    "tier-s": {
+      "primary": "kimi-k1.5",
+      "fallback": "moonshot-v1-128k",
+      "rationale": "k1.5 has the strongest reasoning for architecture and complex implementation. 128k context handles large codebases."
+    },
+    "tier-a": {
+      "primary": "kimi-k1.5",
+      "fallback": "moonshot-v1-128k",
+      "rationale": "Spec and QA require the same reasoning strength as design. k1.5 provides excellent structured output for EARS requirements."
+    },
+    "tier-b": {
+      "primary": "moonshot-v1-32k",
+      "fallback": "moonshot-v1-128k",
+      "rationale": "32k context is sufficient for discovery and domain modeling in most slices. ~3x cheaper than 128k."
+    },
+    "tier-c": {
+      "primary": "moonshot-v1-8k",
+      "fallback": "moonshot-v1-32k",
+      "rationale": "8k is adequate for lite agent tasks (≤3 files) and knowledge summarization. Lowest cost per token."
+    }
+  },
+  "config_toml_example": "[model]\nprovider = 'moonshot'\nmodel = 'kimi-k1.5'\n# For cost-saving runs, temporarily switch to:\n# model = 'moonshot-v1-32k'",
+  "context_window": "8k / 32k / 128k depending on model variant"
+}

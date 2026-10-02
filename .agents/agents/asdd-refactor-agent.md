@@ -1,7 +1,7 @@
 ---
 name: asdd-refactor-agent
 description: Maintains long-term architecture quality by identifying and correcting structural degradation without changing system behavior. Operates post-implementation or via Self-Healing PRs. Ninth agent in the ASDD pipeline (Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge).
-model: inherit
+model: tier-c
 mode: subagent
 
 ---

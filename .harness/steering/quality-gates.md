@@ -69,15 +69,23 @@ The QA Agent evaluates this gate against tests that verify the current spec.
 
 Unrelated failures excluded here remain in force for the Tech Debt Cleanup Gate.
 
-## Cumulative Confidence Score (CCS)
+## Gate States
 
-CCS is the score recorded for the slice at the phase under evaluation. Bounds partition every value: below 0.50, from 0.50 through 0.65 inclusive, and above 0.65.
+Each phase gate resolves to one of three states. The agent reports; the Tech Lead decides.
+
+| State | Meaning | Agent Action | TL Action |
+|-------|---------|--------------|-----------|
+| **PASS** | All criteria met, evidence recorded | Proceed to next phase | Review and acknowledge |
+| **WARN** | Criteria met, but concerns remain | Proceed with documented concerns | Decide if concerns are acceptable |
+| **BLOCK** | One or more criteria failed | Stop. Do not proceed. | Review and direct remediation |
 
 ### Acceptance criteria
 
-- **QG-CCS-01.** When CCS is less than 0.50, the agent shall return BLOCK and shall send the spec back for rework.
-- **QG-CCS-02.** When CCS is greater than or equal to 0.50 and less than or equal to 0.65, the agent shall return WARN and shall list each uncertainty factor that produced the score.
-- **QG-CCS-03.** When CCS is greater than 0.65, the agent shall return PASS for this gate.
+- **QG-GATE-01.** An agent shall return PASS only when every criterion of the gate is satisfied and evidence is recorded.
+- **QG-GATE-02.** An agent shall return WARN when every BLOCK criterion is satisfied but at least one concern remains undocumented or unresolved.
+- **QG-GATE-03.** An agent shall return BLOCK when any criterion of the gate fails.
+- **QG-GATE-04.** A WARN with non-empty concerns requires TL acknowledgment before the phase advances.
+- **QG-GATE-05.** A BLOCK requires remediation and re-evaluation before the phase advances.
 
 ## Design Readiness Gate
 

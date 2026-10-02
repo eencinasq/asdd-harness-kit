@@ -1,7 +1,7 @@
 ---
 name: asdd-discovery-agent
 description: Interactively refines product intent into structured capability documents using current implementation evidence, Assumptions-First discovery, and Behavioral Slicing. First agent in the ASDD pipeline (Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge).
-model: inherit
+model: tier-b
 mode: subagent
 
 ---

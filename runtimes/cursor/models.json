@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "runtime": "cursor",
+  "note": "Cursor models are selected via the UI (Cmd+L / Ctrl+L → model dropdown). This file provides squad recommendations. The Tech Lead should set the workspace default and communicate tier expectations to the team.",
+  "tier_models": {
+    "tier-s": {
+      "primary": "Claude 3.5 Sonnet",
+      "fallback": "GPT-4o",
+      "rationale": "Both have excellent code reasoning and large context. Claude 3.5 Sonnet is preferred for architecture; GPT-4o for implementation when code generation speed matters."
+    },
+    "tier-a": {
+      "primary": "Claude 3.5 Sonnet",
+      "fallback": "GPT-4o",
+      "rationale": "Spec precision and validation require the same strength as design. Do not downgrade here — spec errors propagate."
+    },
+    "tier-b": {
+      "primary": "GPT-4o-mini",
+      "fallback": "Claude 3.5 Sonnet (if 4o-mini lacks context)",
+      "rationale": "Discovery and domain modeling need good instruction following but less deep reasoning. 4o-mini is ~15x cheaper than 4o with adequate capability for these tasks."
+    },
+    "tier-c": {
+      "primary": "GPT-4o-mini",
+      "fallback": "Claude 3.5 Sonnet (for complex small features)",
+      "rationale": "Lite agent and knowledge accumulation are high-volume, low-complexity. 4o-mini provides the best cost/throughput ratio."
+    }
+  },
+  "ui_settings": {
+    "recommended_workspace_default": "Claude 3.5 Sonnet",
+    "agent_specific_switching": "Cursor does not support per-agent model selection in rules. The human operator must manually switch models when delegating to tier-c agents to save cost, or accept the workspace default.",
+    "context_window": "200k tokens (Claude 3.5 Sonnet), 128k tokens (GPT-4o / GPT-4o-mini)"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "runtime": "opencode",
+  "note": "OpenCode uses opencode.json for configuration. Model selection is per-agent via the agent frontmatter 'model' field or global defaults in opencode.json.",
+  "tier_models": {
+    "tier-s": {
+      "primary": "gpt-4o",
+      "fallback": "claude-3-5-sonnet-20241022",
+      "rationale": "OpenCode supports multiple providers. gpt-4o is the primary for design/implementation due to strong tool-use and code generation."
+    },
+    "tier-a": {
+      "primary": "gpt-4o",
+      "fallback": "claude-3-5-sonnet-20241022",
+      "rationale": "Spec and QA need the same strength. gpt-4o's structured JSON mode is excellent for EARS requirements output."
+    },
+    "tier-b": {
+      "primary": "gpt-4o-mini",
+      "fallback": "gpt-4o",
+      "rationale": "gpt-4o-mini is ~15x cheaper than gpt-4o. Handles discovery, domain modeling, and task planning with adequate quality."
+    },
+    "tier-c": {
+      "primary": "gpt-4o-mini",
+      "fallback": "gpt-4o",
+      "rationale": "Lite agent and knowledge accumulation are high-volume. gpt-4o-mini is the clear cost winner."
+    }
+  },
+  "opencode_json_example": {
+    "model": "gpt-4o-mini",
+    "agents": {
+      "asdd-design-agent": { "model": "gpt-4o" },
+      "asdd-implementation-agent": { "model": "gpt-4o" },
+      "asdd-spec-agent": { "model": "gpt-4o" },
+      "asdd-validation-agent": { "model": "gpt-4o" },
+      "asdd-qa-agent": { "model": "gpt-4o" }
+    }
+  }
+}

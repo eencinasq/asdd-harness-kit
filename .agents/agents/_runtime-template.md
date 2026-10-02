@@ -17,6 +17,13 @@ This file is the **same ASDD role as** the corresponding `.agents/agents/asdd-*-
 2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
 3. **Edits:** Use `Write` / `StrReplace` / `Shell` (not Kiro `fsWrite`).
 4. **Codegraph:** Use Cursor MCP (`GetDynamicTools` / `CallDynamicTool` or equivalent). Primary tool: `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`. List tools used in the final message.
-5. **State:** Read `.harness/PROGRESS.md` and global `.harness/state/manifest.json` (index only) at start; resolve the slice; **write** `.harness/state/slices/<slice-id>/manifest.json` at end of a completed phase and **sync that slice's registry row** in the global index per `.harness/steering/manifest.md`. Never treat the global file as the phase machine. For implementation, also update features + PROGRESS per `.harness/steering/session-loop.md`.
+5. **State (v3.0 session logs):**
+   - Read generated `.harness/state/registry.json` at start to see squad state.
+   - Read generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice.
+   - At the end of every significant action (phase complete, feature start, dissent, override), **write a session file** to `.harness/state/slices/<slice-id>/sessions/`. Session files are append-only — never edit an existing session.
+   - After writing sessions, run `node .harness/scripts/sync-state.mjs --slice <slice-id>` to regenerate the manifest and registry.
+   - For implementation, also update features per `.harness/steering/session-loop.md`.
+   - No CCS scores. No confidence chains. No lock files. Gates are PASS / WARN / BLOCK.
 6. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via Task.
 7. **Parallel work:** Prefer the `Task` tool for context-fresh sub-agents / waves (instead of Kiro `invokeSubAgent`).
+8. **Model tier:** Each agent frontmatter declares `model: tier-{s|a|b|c}`. Read `.harness/config/models.json` to understand the tier rationale. If your runtime supports per-agent model selection, bind the agent to the model recommended by the runtime's `models.json`. If not, use the workspace default and accept the trade-off. Do not override a tier without a Dissent Notice logged in the slice session.

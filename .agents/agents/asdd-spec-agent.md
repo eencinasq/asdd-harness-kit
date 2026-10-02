@@ -1,7 +1,7 @@
 ---
 name: asdd-spec-agent
 description: Transforms capability documents into precise, machine-interpretable EARS requirements organized by Behavioral Slices. Second agent in the ASDD pipeline (Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge).
-model: inherit
+model: tier-a
 mode: subagent
 
 ---

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "runtime": "devin",
+  "note": "Devin uses a configurable model backend. The Devin workspace admin sets the default model. Devin supports per-session model selection via environment variables or workspace settings.",
+  "tier_models": {
+    "tier-s": {
+      "primary": "claude-3-5-sonnet-20241022",
+      "fallback": "gpt-4o",
+      "rationale": "Devin's long-running sessions benefit from Sonnet's large context window and code reasoning. Use for architecture design and multi-wave implementation."
+    },
+    "tier-a": {
+      "primary": "claude-3-5-sonnet-20241022",
+      "fallback": "gpt-4o",
+      "rationale": "Spec validation and QA analysis require the same model strength. Devin's ability to run tests and iterate makes Sonnet ideal."
+    },
+    "tier-b": {
+      "primary": "claude-3-haiku-20240307",
+      "fallback": "claude-3-5-sonnet-20241022",
+      "rationale": "Discovery and task planning are shorter sessions. Haiku reduces cost without sacrificing quality for these analytical tasks."
+    },
+    "tier-c": {
+      "primary": "claude-3-haiku-20240307",
+      "fallback": "claude-3-5-sonnet-20241022",
+      "rationale": "Knowledge agent runs on a schedule (summarization, state manifest updates). Haiku is optimal for these repetitive, low-complexity tasks."
+    }
+  },
+  "workspace_config": {
+    "recommended_default": "claude-3-5-sonnet-20241022",
+    "cost_saving_mode": "Set default to claude-3-haiku-20240307 and manually upgrade sessions for tier-s/a agents via Devin's model override.",
+    "per_session_override": "Devin allows model selection at session start. The squad should document which model to use for each agent type in their runbook."
+  }
+}

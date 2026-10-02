@@ -1,7 +1,7 @@
 ---
 name: asdd-e2e-tester
 description: Interactive Playwright engineer that drives a real browser inside the editor, records user flows, and generates production-ready .spec.ts files — all in one session. Invoke this agent when you need to: - Run or verify an E2E test scenario interactively (browser opens in editor) - Record a user flow and convert it to a .spec.ts file - Write new Playwright tests for a feature, page, or user flow ...
-model: inherit
+model: tier-a
 mode: subagent
 
 ---

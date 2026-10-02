@@ -1,7 +1,7 @@
 ---
 name: asdd-integration-tester
 description: Expert REST API test engineer that generates, organises, and runs Bruno collections for end-to-end API testing. Invoke this agent when you need to: - Write new .bru request files with tests for an endpoint or flow - Design a full Bruno collection from an OpenAPI spec or endpoint description - Add pre-request scripts, post-response tests, or environment variables - Set up auth flows (token login...
-model: inherit
+model: tier-b
 mode: subagent
 
 ---

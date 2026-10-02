@@ -1,7 +1,7 @@
 ---
 name: asdd-design-agent
 description: Transforms validated specifications and domain contracts into clear, maintainable software architecture. Produces design.md with ADRs, component maps, sequence diagrams, and requirements traceability. Fourth agent in the ASDD pipeline (Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge).
-model: inherit
+model: tier-s
 mode: subagent
 
 ---

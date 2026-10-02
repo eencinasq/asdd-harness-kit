@@ -1,6 +1,6 @@
 {
   "name": "asdd-harness-kit",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Portable process layer for Agent Specification-Driven Development (ASDD) and Harness Engineering",
   "bin": {
     "asdd-harness-kit": "scripts/npx-install.cjs"
