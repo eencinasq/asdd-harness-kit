@@ -1,6 +1,6 @@
 {
-  "schema_version": "2.0",
-  "_note": "Global manifest",
+  "schema_version": "3.0",
+  "_note": "Global manifest — use sync-state.mjs to regenerate from session logs",
   "domain_model_version": "0.0.0",
   "active_slices": []
 }

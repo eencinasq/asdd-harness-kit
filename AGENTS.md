@@ -27,18 +27,17 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 |------|------|
 | `.harness/steering/` | Line-base (portable + bindings) |
 | `.harness/specs/` | ASDD artifacts |
-| `.harness/state/manifest.json` | Global slice index only |
-| `.harness/state/slices/<id>/manifest.json` | Per-slice phase machine |
-| `.harness/state/locks/` | Multi-agent mutex |
+| `.harness/state/registry.json` | **Generated global index** — all slices, phases, contributors |
+| `.harness/state/slices/<id>/manifest.json` | **Generated** per-slice phase machine |
+| `.harness/state/slices/<id>/sessions/*.json` | Append-only session logs (one writer per file) |
 | `.harness/features/` | Session feature tracker |
-| `.harness/PROGRESS.md` | Active slices index |
-| `.harness/progress/<id>.md` | Session record |
+| `.harness/PROGRESS.md` | Active slices index (human-curated or generated) |
 
 ## Working rules
 
-1. One `in_progress` by default. Same-slice concurrency must follow ownership, dependency, scope, and coordinator-lock rules in `.harness/steering/session-loop.md`.
+1. One `in_progress` by default. Same-slice concurrency must follow ownership, dependency, and scope rules in `.harness/steering/session-loop.md`.
 2. Never `passing` without `verification` + `evidence`.
-3. Update per-slice manifest at end of each ASDD phase ([manifest.md](.harness/steering/manifest.md)).
+3. Write a session file at the end of every significant action, then run `sync-state` to regenerate the manifest ([manifest.md](.harness/steering/manifest.md)).
 4. Codegraph first ([codegraph.md](.harness/steering/codegraph.md)).
 5. On failure: leave `in_progress`/`blocked`; log per path in `structure.md`.
 6. Before session end or `passing`, `node .harness/scripts/check-invariants.mjs` must exit 0. On Cursor, the Verify-on-Stop hook injects FAIL output back into the prompt ([session-loop.md](.harness/steering/session-loop.md)).

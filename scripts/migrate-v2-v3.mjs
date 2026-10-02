@@ -104,6 +104,8 @@ function migrateSlice(sliceId, sliceEntry) {
   }
 
   // Current phase session
+  const finalStatus = v2Manifest.status;
+  const isTerminal = finalStatus === 'DONE' || finalStatus === 'PARKED' || finalStatus === 'ABANDONED';
   sessions.push({
     schema_version: '1.0',
     session_id: `sess-${sliceId}-${String(seq++).padStart(3, '0')}`,
@@ -111,7 +113,7 @@ function migrateSlice(sliceId, sliceEntry) {
     agent: 'asdd-' + currentPhase.replace('_', '-'),
     human: 'squad',
     slice_id: sliceId,
-    event_type: 'phase_started',
+    event_type: isTerminal ? 'phase_completed' : 'phase_started',
     phase: currentPhase,
     evidence: 'Migrated from v2.0 manifest',
     concerns: v2Manifest.confidence_chain ? [`Legacy confidence_chain: ${JSON.stringify(v2Manifest.confidence_chain)}`] : [],
@@ -175,13 +177,14 @@ function main() {
 
   // Generate registry
   if (!dryRun) {
-    const { spawnSync } = await import('node:child_process');
     const result = spawnSync(process.execPath, ['.harness/scripts/sync-state.mjs'], {
       cwd: root,
       encoding: 'utf8',
     });
     if (result.status === 0) {
       console.log('SYNC  registry.json generated');
+    } else {
+      console.error('FAIL  sync-state:', result.stderr);
     }
   }
 

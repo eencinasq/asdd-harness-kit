@@ -33,7 +33,7 @@ export function validateFeatureDocument(data, rel, fail, root) {
   }
 }
 
-export function validateFeatureExecution(data, rel, sliceId, fail, readJson, root, requireLock = true) {
+export function validateFeatureExecution(data, rel, sliceId, fail, readJson, root) {
   const list = Array.isArray(data?.features) ? data.features : [];
   const byId = new Map(list.map((feature) => [feature.id, feature]));
   const active = list.filter((feature) => feature.status === 'in_progress');
@@ -55,21 +55,6 @@ export function validateFeatureExecution(data, rel, sliceId, fail, readJson, roo
   }
 
   if (active.length <= 1) return;
-
-  if (requireLock) {
-    const lockPath = `.harness/state/locks/${sliceId}.lock`;
-    if (!existsSync(join(root, lockPath))) {
-      fail(`${rel}: concurrent tasks require the slice coordinator lock ${lockPath}`);
-    } else {
-      const lock = readJson(lockPath);
-      if (lock && lock.slice !== sliceId) {
-        fail(`${rel}: coordinator lock ${lockPath} identifies slice "${lock.slice}"`);
-      }
-      if (lock && (typeof lock.agent !== 'string' || !lock.agent.trim())) {
-        fail(`${rel}: coordinator lock ${lockPath} needs a non-empty agent identity`);
-      }
-    }
-  }
 
   const owners = new Set();
   const scopedTasks = [];

@@ -146,6 +146,23 @@ function deriveContributors(sessions) {
   return Array.from(set);
 }
 
+function deriveSource(sessions) {
+  // Find the first session with source metadata (typically the initial/phase_started event)
+  for (const s of sessions) {
+    if (s.source && typeof s.source === 'object') {
+      return {
+        tracker_type: s.source.tracker_type || null,
+        tracker_url: s.source.tracker_url || null,
+        pitch_id: s.source.pitch_id || null,
+        epic_id: s.source.epic_id || null,
+        assigned_by: s.source.assigned_by || null,
+        timebox_weeks: s.source.timebox_weeks || null,
+      };
+    }
+  }
+  return null;
+}
+
 function deriveOpenDissents(sessions) {
   const dissents = sessions.filter((s) => s.event_type === 'dissent');
   const overrides = sessions.filter((s) => s.event_type === 'override');
@@ -169,6 +186,7 @@ function generateSliceManifest(sliceId, sessions) {
     gates: deriveGates(sessions),
     active_features: deriveActiveFeatures(sessions),
     open_dissents: deriveOpenDissents(sessions),
+    source: deriveSource(sessions),
     session_log: deriveSessionLog(sessions),
     contributors: deriveContributors(sessions),
   };

@@ -1,17 +1,11 @@
 # Progress
 
-| Slice | Status | Phase | Lock | Progress |
-|-------|--------|-------|------|----------|
-| payments-v1 | in_progress | discovery | — | — |
-| auth-v2 | in_progress | discovery | — | — |
-| payments-v1 | in_progress | discovery | — | — |
-| auth-v2 | in_progress | discovery | — | — |
-| payments-v1 | in_progress | discovery | — | — |
-| auth-v2 | in_progress | discovery | — | — |
-| auth-v2-test | in_progress | discovery | — | — |
-| payments-v1 | in_progress | discovery | — | — |
-| auth-v2 | in_progress | discovery | — | — |
-| payments-v1 | in_progress | discovery | — | — |
-| auth-v2 | in_progress | discovery | — | — |
-| payments-v1 | in_progress | discovery | — | — |
-| auth-v2 | in_progress | discovery | — | — |
+> **v3.0:** This file is a human-curated index. For the generated source of truth, run:
+> ```bash
+> node .harness/scripts/sync-state.mjs
+> ```
+> Then read `.harness/state/registry.json` and `.harness/state/slices/<id>/manifest.json`.
+
+| Slice | Status | Phase | Last Session | Progress |
+|-------|--------|-------|--------------|----------|
+

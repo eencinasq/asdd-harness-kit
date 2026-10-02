@@ -11,7 +11,7 @@ It gives AI agents a governed pipeline — from product discovery through implem
 | Concern | What the kit provides | What you provide |
 |---|---|---|
 | **Process** | 9-phase ASDD pipeline, agent definitions, skills catalog, steering contracts | Product intent, domain language, technology choices |
-| **Execution control** | Session locks, feature trackers, progress records, invariant checks | Mapped file scopes, verification commands |
+| **Execution control** | Append-only sessions, feature trackers, generated manifests, invariant checks | Mapped file scopes, verification commands |
 | **Quality gates** | EARS criteria templates, CCS cutoffs, gate definitions | Test suites, failure logs, active findings |
 | **Runtime adapters** | Symlinks and configs for Cursor, Claude, OpenCode, Kimi, Junie, Devin, Kiro | Your IDE/editor |
 
@@ -60,7 +60,7 @@ curl -fsSL https://raw.githubusercontent.com/eencinasq/asdd-harness-kit/main/scr
   | bash -s -- /path/to/repo --from-git --modules=http-api --runtime=cursor
 ```
 
-**Safe by default:** never overwrites existing bindings, `PROGRESS.md`, slice state, specs, or `mcp.json`.
+**Safe by default:** never overwrites existing bindings, slice state, specs, or `mcp.json`.
 
 | Flag | Effect |
 |------|--------|
@@ -146,10 +146,10 @@ Reusable capabilities: Shape Up, Product Delivery, Test-Driven Development, API 
 - `scripts/` — invariant checks, project config validation, skills index sync, verify-on-stop, status dashboard, slice initializer
 - `scripts/validators/` — modular validators consumed by `check-invariants.mjs`
 - `steering/templates/` — artifact templates for every ASDD phase (intent, capability, requirements, design, tasks, reports)
-- `state/` — global manifest, per-slice manifests, locks
+- `state/` — global registry, per-slice manifests (generated), append-only session logs
 - `specs/` — slice specifications
 - `features/` — session feature trackers (with JSON schema)
-- `progress/` — session records
+- `progress/` — legacy session records (v2; deprecated in v3)
 - `PROGRESS.md` — active slices index
 
 ### Modules (`.agents/modules/` — opt-in)
@@ -165,17 +165,20 @@ Configuration for Cursor, Claude Code, OpenCode, Kimi Code, Junie, Devin, and Ki
 
 ## How a session works
 
-1. **Read** `.harness/PROGRESS.md` and the slice manifest
-2. **Check the lock** — `.harness/state/locks/<slice-id>.lock`
+1. **Read** generated `.harness/state/registry.json` for squad state
+2. **Read** generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice
 3. **Read steering** for the current phase
 4. **Pick work** — dependency-ready features
 5. **Edit only mapped files** — scope defined by the active spec
-6. **Verify before close** — `node .harness/scripts/check-invariants.mjs` must exit 0
-7. **Record evidence** — no feature is `passing` without verification + evidence
+6. **Write session file** — append-only log of every significant action
+7. **Run sync-state** — regenerate manifest and registry
+8. **Verify before close** — `node .harness/scripts/check-invariants.mjs` must exit 0
+9. **Record evidence** — no feature is `passing` without verification + evidence
 
 Operational CLIs:
-- `node .harness/scripts/harness-status.mjs` — active slices, locks, features in progress
-- `node .harness/scripts/init-slice.mjs <slice-id>` — scaffold a new slice with manifest, specs, features, and progress tracking
+- `node .harness/scripts/harness-status.mjs` — active slices, features in progress
+- `node .harness/scripts/init-slice.mjs <slice-id>` — scaffold a new slice with specs, features, and session tracking
+- `node .harness/scripts/sync-state.mjs` — regenerate manifests and registry from append-only session logs
 - `node .harness/scripts/check-invariants.mjs` — full harness invariant validation
 
 Read [`AGENTS.md`](AGENTS.md) every session for the full operational map.
@@ -192,7 +195,7 @@ Idea → Pitch → Bet → ASDD Discovery → … → Harness Implementation →
 
 - **Shape Up** decides *which work* deserves a fixed appetite
 - **ASDD** provides the specification pipeline and phase gates
-- **Harness** enforces execution scope, locks, and evidence
+- **Harness** enforces execution scope, session logging, and evidence
 
 See [`docs/shape-up-asdd-harness-integration.md`](docs/shape-up-asdd-harness-integration.md) and the Product Delivery → ASDD handoff in [`.agents/skills/product-delivery/references/asdd-harness-handoff.md`](.agents/skills/product-delivery/references/asdd-harness-handoff.md).
 

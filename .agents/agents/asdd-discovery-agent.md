@@ -209,7 +209,8 @@ You have access to specialized skills that MUST be activated and applied during 
 ## Execution Flow
 
 1. **Discover:** Load manifest, domain model, intent, current implementation, and Harness state required by the request.
-2. **Audit:** Review the current behavior and the ASDD/Harness phase before proposing a new capability or change. Use CodeGraph first for code structure and flow questions.
+2. **Tracker Intake (if applicable):** If `intent.md` has a `Tracker URL` and `Pitch ID`, read `.agents/skills/external-trackers/SKILL.md` and fetch the tracker content. The tracker is the canonical source — do not re-shape or expand scope. If the betting state is not `bet`, stop and ask the human. If the tracker content is missing or inaccessible, use the acceptance criteria copied into `intent.md`.
+3. **Audit:** Review the current behavior and the ASDD/Harness phase before proposing a new capability or change. Use CodeGraph first for code structure and flow questions.
 3. **Refine:** Present evidence, assumptions, and up to five blocking questions. Stop with `REFINEMENT_REQUIRED` until the user answers or explicitly accepts the stated assumptions.
 4. **Extract Language:** Activate `domain-language-extraction` skill. Extract domain terms, entities, and relationships from the intent. Cross-reference with `domain-model.md`. Flag new terms.
 5. **Decompose (if needed):** If input is an epic or compound story, activate `user-story-decomposition` skill. Split into atomic capabilities.

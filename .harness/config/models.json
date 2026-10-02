@@ -52,6 +52,22 @@
     "asdd-e2e-tester": "tier-a",
     "asdd-integration-tester": "tier-b"
   },
+  "human_driven_stages": {
+    "shape_up": {
+      "owner": "Product Owner + Tech Lead + Architect (humans)",
+      "description": "Shape raw ideas into bounded, bettable pitches. Fixed time, variable scope.",
+      "output": "Pitch document with appetite, boundaries, must-haves, nice-to-haves, no-gos",
+      "agent_role": "None — agents do NOT run shape-up during ASDD sessions",
+      "model": "N/A"
+    },
+    "product_delivery": {
+      "owner": "Product Owner + Tech Lead (humans)",
+      "description": "Transform betted pitch into delivery artifacts: epic, user stories, tech spec, sprint plan",
+      "output": "Tracker issue (Linear/Jira/GitHub) or manual pitch doc with acceptance criteria and dependencies",
+      "agent_role": "None — agents do NOT re-run product delivery during ASDD sessions",
+      "model": "N/A"
+    }
+  },
   "cost_optimization_rules": [
     "Always use the cheapest tier that can reliably pass the phase gate. Escalate tier only after a gate failure.",
     "For tier-s agents, do NOT split work across cheaper models — architectural errors are exponentially more expensive to fix downstream.",

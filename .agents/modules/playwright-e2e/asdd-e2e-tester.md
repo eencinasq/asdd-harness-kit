@@ -8,7 +8,7 @@ mode: subagent
 
 ## Agent runtime (mandatory)
 
-This file is the **same ASDD role as** `.agents/agents/asdd-e2e-tester.md` (responsibilities, inputs, outputs, gates).  
+This module file defines the **ASDD role** (responsibilities, inputs, outputs, gates).  
 The portable runtime contract is defined in `.agents/agents/_runtime-template.md` (Steering, Skills, Edits, Codegraph, State, Handoff, Parallel work). Adapt only the runtime.
 
 ## Project skills
