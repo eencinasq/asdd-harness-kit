@@ -22,9 +22,10 @@ Portability: [docs/asdd-harness-portability.md](../../docs/asdd-harness-portabil
 | File | Contents |
 |------|----------|
 | `domain-layer.md` | Domain placement contract |
-| `quality-gates.md` | CCS / coverage / readiness |
-| `manifest.md` | Manifest schema v2 |
-| `session-loop.md` | Features + locks + evidence |
+| `quality-gates.md` | Coverage / readiness (Lite skips CCS) |
+| `jev.md` | Required Jev thresholds |
+| `manifest.md` | Manifest schema v3 (generated from sessions) |
+| `session-loop.md` | Features + evidence (no v2 locks) |
 | `controls.md` | Guides, sensors, precedence |
 | `asdd-lite.md` | 4-phase lite path |
 | `codegraph.md` / `codegraph-agents.md` | Codegraph |
@@ -46,5 +47,5 @@ Optional: [`templates/slice-manifest.stub.json`](templates/slice-manifest.stub.j
 
 ## Baseline reads
 
-`structure.md`, `product.md`, `codegraph.md`, `manifest.md`, `session-loop.md`, `controls.md`.  
+`structure.md`, `product.md`, `codegraph.md`, `manifest.md`, `session-loop.md`, `controls.md`, `jev.md`.  
 Domain/Design/Impl/QA/Refactor: also `domain-layer.md` + `domain-layer.project.md`, and both quality-gates files when judging gates.

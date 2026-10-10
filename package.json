@@ -1,6 +1,6 @@
 {
   "name": "asdd-harness-kit",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Portable process layer for Agent Specification-Driven Development (ASDD) and Harness Engineering",
   "bin": {
     "asdd-harness-kit": "scripts/npx-install.cjs"
@@ -17,7 +17,8 @@
     "README.md"
   ],
   "scripts": {
-    "test": "bash scripts/test-install-into.sh"
+    "test": "bash scripts/test-install-into.sh && bash scripts/test-lifecycle.sh && node --test .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .agents/mcp/jev-gate-server.test.mjs",
+    "test:full-flow": "bash scripts/test-full-flow.sh"
   },
   "keywords": [
     "asdd",

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes a portable delivery pipeline for taking a product idea from shaping through implementation with ASDD + Harness Engineering. Product repositories provide their own bindings, domain language, technology choices, and delivery system integrations.
+This document describes a portable delivery pipeline for taking a product idea from shaping through implementation with ASDD + Harness Engineering. **Jev System One is required** on Shape Up, Product Delivery, and Harness execution ([jev-integration.md](jev-integration.md)). Product repositories provide their own bindings, domain language, technology choices, `JEV_API_KEY`, and tracker integrations.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -25,8 +25,8 @@ This document describes a portable delivery pipeline for taking a product idea f
 
 ## Stage 1: Shape Up
 
-**Skill:** `shape-up`
-**Purpose:** Shape an idea into a bounded, bettable pitch.
+**Skill:** `shape-up`  
+**Jev (required):** `shapeUpGates` in `.harness/scripts/jev-gates.mjs` before betting.
 
 ### Process
 
@@ -68,8 +68,8 @@ Raw Idea → Set Boundaries → Find Elements → Address Risks → Write Pitch
 
 ## Stage 2: Product Delivery
 
-**Skill:** `product-delivery`
-**Purpose:** Transform the pitch into validated, traceable delivery artifacts.
+**Skill:** `product-delivery`  
+**Jev (required):** `earsGate` + `sliceChoice` in `.harness/scripts/jev-gates.mjs` before freezing REQ-*.
 
 ### Process
 
@@ -203,9 +203,39 @@ As a **[role]**, I want to **[action]**, so that **[benefit]**.
 
 ### ASDD Phases
 
+Full path:
 ```
 Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge
 ```
+
+**Lite-first:** slices start in `lite` mode by default (`init-slice.mjs <id>`), which runs
+`Spec → Design → Tasks → Implementation → QA-Lite` with four artifacts (`spec.md`, `design.md`,
+`tasks.md`, `features.json`). `full` is opt-in (`init-slice.mjs <id> --full`) for work known
+upfront to be cross-cutting or architectural. Mode is derived from session events, never
+hand-edited — see `.harness/steering/asdd-lite.md`.
+
+### Escalating a lite slice (evidence-based)
+
+Growth in a lite slice is detected from sessions, not judged:
+
+| Trigger | Evidence | Consequence |
+|---------|----------|-------------|
+| E2 serial violation | >1 `in_progress` feature | FAIL invariants (lite is serial) |
+| E1 scope spread | scope spans ≥2 top-level modules | signal → blocks `DONE` |
+| E3 domain growth | >1 new domain term on checkpoints | signal → blocks `DONE` |
+| E4 dissent | any dissent session | signal → blocks `DONE` |
+| E5 implementation blockage | `phase_blocked` in implementation | signal → blocks `DONE` |
+
+While signals are open they appear as WARNs in `check-invariants` and in
+`harness-status.mjs`; completing `qa`/`knowledge` with signals open is a FAIL and
+`sync-state` will not derive `DONE`. Resolve with:
+
+```bash
+node .harness/scripts/escalate-slice.mjs <slice-id> --reasons "E1-scope-spread,E4-dissent"
+```
+
+then backfill `capability.md` + `requirements.md` from `spec.md` and continue at the
+Validation phase of the full path.
 
 ### Harness Artifacts
 
@@ -214,12 +244,12 @@ Discovery → Spec → Validation → Domain → Design → Task Planning → Im
 | **Active spec** | `.harness/specs/<slice>/intent.md` | Product intent. Lite uses `spec.md` in the same directory |
 | **Slice Manifest** | `.harness/state/slices/<id>/manifest.json` | Phase machine, gates, confidence |
 | **Features** | `.harness/features/<id>.features.json` | Session feature tracker, `scope_paths`, verification, evidence |
-| **Progress** | `.harness/progress/<id>.md` | Session record |
-| **Locks** | `.harness/state/locks/<id>.lock` | Multi-agent mutex. Deleted on handoff |
+| **Sessions** | `.harness/state/slices/<id>/sessions/*.json` | Append-only log; `sync-state.mjs` generates the manifest |
 | **PROGRESS.md** | `.harness/PROGRESS.md` | Active slices index |
 | **Controls** | `.harness/steering/controls.md` | Which guide or sensor wins when they disagree |
 | **Quality gates** | `.harness/steering/quality-gates.md` | EARS acceptance criteria for phase gates. Numeric cutoffs live only here |
 | **Gate binding** | `.harness/steering/quality-gates.project.md` | Full-suite command, failure log, active domain findings |
+| **Jev** | `.harness/steering/jev.md` | Required System One thresholds; client `jev-client.mjs` |
 
 How these fit together: [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md).
 
@@ -230,10 +260,13 @@ External tracker items (optional) → ASDD Discovery → Spec → Design → Tas
      ↓
 Features.json → Implementation (mapped files only) → QA → Knowledge
      ↓
-Invariants pass → Evidence recorded → Lock released → PROGRESS.md matches the slice manifest
+Invariants pass → Evidence recorded → PROGRESS.md matches the slice manifest
 ```
 
-Implementation edits only the files mapped to the active spec. A skill body is read when that task starts, not from the skills index. Cursor runs `node .harness/scripts/verify-on-stop.mjs` on agent stop; a failing `check-invariants.mjs` is returned as the next prompt. CI repeats the invariants check. The full suite in `quality-gates.project.md` runs before a new spec enters Task Planning.
+Implementation edits only the files mapped to the active spec. A skill body is read when that task starts, not from the skills index. On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecution` (fail-closed) and `verify-on-stop.mjs` on `stop`; on **Claude Code**, `.claude/settings.json` wires the same two scripts to `PreToolUse` (Bash) and `Stop`. Both stop-gates run `check-invariants.mjs --live` — a missing `JEV_API_KEY` blocks session close — and a failing check is returned as the next prompt. Other runtimes are advisory (see the enforcement matrix in [asdd-harness-portability.md](asdd-harness-portability.md)). CI reruns these exact suites (`.github/workflows/harness-invariants.yml`):
+unit tests (`node --test`), installer smoke test, lifecycle e2e with negative invariant cases, project config and skills index, and a `sync-state` + invariants pass.
+
+The full suite in `quality-gates.project.md` runs before a new spec enters Task Planning.
 
 ---
 
@@ -247,9 +280,9 @@ Implementation edits only the files mapped to the active spec. A skill body is r
 │    ▼                                                                        │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │ SHAPE UP                                                             │   │
-│  │ • Set boundaries (appetite)                                          │   │
+│  │ • Set boundaries (appetite) + Jev score                             │   │
 │  │ • Find elements (rough solution)                                     │   │
-│  │ • Address risks (rabbit holes)                                       │   │
+│  │ • Address risks (rabbit holes) + Jev noul                            │   │
 │  │ • Write pitch                                                        │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │    │                                                                        │
@@ -260,8 +293,7 @@ Implementation edits only the files mapped to the active spec. A skill body is r
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │ PRODUCT DELIVERY                                                     │   │
 │  │ • Delivery Map (epic, stories, tasks, dependencies)                 │   │
-│  │ • Product Discovery (problem, users, scope)                          │   │
-│  │ • HF User Stories (acceptance criteria)                              │   │
+│  │ • HF User Stories + Jev EARS noul + slice choice                     │   │
 │  │ • AF Refinement (contracts, UI states, test strategy)                │   │
 │  │ • Tech Spec (architecture, diagrams, rollout)                        │   │
 │  │ • Work Plan (phases, execution order)                              │   │
@@ -285,12 +317,9 @@ Implementation edits only the files mapped to the active spec. A skill body is r
 │    ▼                                                                        │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │ ASDD + HARNESS                                                       │   │
-│  │ • Discovery (slice manifest, spec)                                   │   │
-│  │ • Design (domain model, architecture)                                 │   │
-│  │ • Task Planning (tasks.md, features.json)                             │   │
-│  │ • Implementation (TDD, codegraph)                                    │   │
-│  │ • QA (spec coverage, verification)                                   │   │
-│  │ • Knowledge (completion, archive)                                    │   │
+│  │ • Discovery → Design → Task Planning                                 │   │
+│  │ • Implementation (TDD, command gate, mapped files)                   │   │
+│  │ • Invariants + gold-plating noul + evidence                          │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │    │                                                                        │
 │    ▼                                                                        │
@@ -323,14 +352,17 @@ Implementation edits only the files mapped to the active spec. A skill body is r
 
 | Tool | Purpose |
 |------|---------|
-| `shape-up` skill | Pitch creation and review |
-| `product-delivery` skill | Delivery artifacts and Work planning |
-| Tracker integration | External issue or ticket creation |
-| Codegraph MCP | Code intelligence and impact analysis |
-| ASDD agents | Discovery, spec, validation, domain, design, implementation, QA |
-| Harness | Session loop, locks, features, progress, controls, quality gates |
+| `shape-up` skill | Pitch creation; required Jev appetite + rabbit hole |
+| `product-delivery` skill | Delivery artifacts; required Jev EARS + slice class |
+| Tracker integration | Optional issue projection; collisions via `scope_paths` |
+| Codegraph MCP | Code intelligence |
+| ASDD agents | Discovery through QA |
+| Harness | Sessions, features, invariants, command gate, gold-plating |
+| `init-slice.mjs [--full]` | Scaffold a slice; lite by default |
+| `escalate-slice.mjs` | Lite → escalated transition on detected evidence |
+| Jev | `jev-client.mjs` / `jev-gates.mjs` / `jev-command-gate.mjs` |
 | Skills index | `.harness/steering/skills.md` — name and description until the task starts |
-| Verify-on-Stop | `node .harness/scripts/check-invariants.mjs` at session end; Cursor injects FAIL output |
+| Verify-on-Stop | `check-invariants.mjs --live` at session end (Cursor + Claude Code hooks) |
 
 ---
 
@@ -339,6 +371,7 @@ Implementation edits only the files mapped to the active spec. A skill body is r
 | Principle | Description |
 |-----------|-------------|
 | **Fixed time, variable scope** | Appetite is a boundary, not an estimate |
+| **Lite-first, escalate on evidence** | Slices start lite; growth measured from sessions forces escalation — ceremony is earned, not presumed |
 | **Ambiguity is a defect** | Clarify, label assumptions, or mark `PENDING_DEFINITION` |
 | **Contracts over assumptions** | Every stage consumes and produces explicit artifacts |
 | **AI is a pilot, not an authority** | Humans retain approval authority |
@@ -370,12 +403,12 @@ Implementation edits only the files mapped to the active spec. A skill body is r
 
 ## Summary
 
-The pipeline transforms an idea into implementation through four connected stages and one optional integration:
+The pipeline transforms an idea into implementation through four stages. **Jev is required** on Shape Up, Product Delivery, and Harness execution ([jev-integration.md](jev-integration.md)).
 
-1. **Shape Up** — shapes the idea into a bounded, bettable pitch
-2. **Product Delivery** — transforms the pitch into delivery artifacts
-3. **External tracker (optional)** — mirrors approved stories and tasks when the team uses one
-4. **ASDD + Harness** — turns the approved package into a governed slice and executes it with full traceability
+1. **Shape Up** — bounded pitch; Jev appetite score and rabbit-hole noul before betting
+2. **Product Delivery** — delivery artifacts; Jev EARS noul and slice choice
+3. **External tracker (optional)** — mirrors approved stories; file collisions are Harness `scope_paths`, not Jev
+4. **ASDD + Harness** — governed slice, TDD, command gate, gold-plating, evidence
 
 The Product Delivery → ASDD + Harness handoff is defined in [`product-delivery/references/asdd-harness-handoff.md`](../.agents/skills/product-delivery/references/asdd-harness-handoff.md). The handoff preserves the chain `TASK → REQ → story → source scope → epic → pitch`, gives each ASDD phase a clear input, and makes Harness the source of truth for live implementation status and evidence. Guides, sensors, and session close are described in [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md).
 

@@ -1,6 +1,17 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { normalizeScopePath, pathsOverlap } from './paths.mjs';
+import { deriveMode, readSessions } from '../sync-state.mjs';
+
+// Lite-first: a lite slice is serial by design (one in_progress feature).
+// Mode is derived from the slice's sessions; slices without v3 sessions
+// (legacy v2) are unaffected.
+function isLiteSlice(root, sliceId) {
+  if (typeof sliceId !== 'string' || !sliceId.trim()) return false;
+  const sessions = readSessions(join(root, '.harness/state/slices', sliceId));
+  if (sessions.length === 0) return false;
+  return deriveMode(sessions) === 'lite';
+}
 
 export function validateFeatureDocument(data, rel, fail, root) {
   if (data?.schema_version !== '1.0') {
@@ -55,6 +66,10 @@ export function validateFeatureExecution(data, rel, sliceId, fail, readJson, roo
   }
 
   if (active.length <= 1) return;
+
+  if (isLiteSlice(root, sliceId)) {
+    fail(`${rel}: lite slice "${sliceId}" allows at most one in_progress feature (found ${active.length}) — complete one first, or escalate: node .harness/scripts/escalate-slice.mjs ${sliceId} --reasons "<triggers>"`);
+  }
 
   const owners = new Set();
   const scopedTasks = [];

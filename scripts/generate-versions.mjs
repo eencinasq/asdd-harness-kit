@@ -72,6 +72,9 @@ function collectArtifacts() {
   for (const f of [
     'check-invariants.mjs', 'check-skills-index.mjs', 'verify-on-stop.mjs',
     'check-project-config.mjs', 'harness-status.mjs', 'init-slice.mjs',
+    'escalate-slice.mjs', 'sync-state.mjs',
+    'jev-client.mjs', 'jev-gates.mjs', 'jev-command-gate.mjs',
+    'jev-client.test.mjs', 'jev-command-gate.test.mjs',
   ]) {
     record(`.harness/scripts/${f}`);
   }
@@ -123,6 +126,9 @@ function collectArtifacts() {
   record('AGENTS.md');
   record('scripts/install-into.sh');
   record('scripts/harness-migrate.mjs');
+  record('scripts/test-install-into.sh');
+  record('scripts/test-lifecycle.sh');
+  record('scripts/test-full-flow.sh');
 
   // Runtime recipes (only files that get copied, not symlinked)
   for (const f of ['asdd-steering.mdc']) {

@@ -14,7 +14,7 @@ The portable runtime contract is defined in `.agents/agents/_runtime-template.md
 
 Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts.
 
-- When you start implementing logic, fixing a bug, or changing behavior: `Read` `.agents/skills/test-driven-development/SKILL.md`
+- When you start Shape Up or EARS: `Read` `.agents/skills/shape-up/SKILL.md` or `.agents/skills/product-delivery/SKILL.md` and run `.harness/scripts/jev-gates.mjs`
 - When you start a UI task, and the folder exists: `Read` `.agents/skills/frontend-ui-engineering/SKILL.md`
 - When you start an HTTP or API change, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
 - When you start live browser verification, and the folder exists: `Read` `.agents/skills/browser-testing-with-devtools/SKILL.md`
@@ -102,18 +102,24 @@ After all tasks pass:
 
 ## Escalation
 
-If scope grows during implementation (new modules, multiple user surfaces, architectural decisions):
+If scope grows during implementation (new modules, multiple user surfaces, architectural decisions), do **not** hand-edit the manifest — manifests are generated. Run:
 
-1. Set `mode: "escalated"` in the per-slice manifest.
-2. Backfill `capability.md` and `requirements.md` from `spec.md`.
-3. Hand off to the full ASDD pipeline starting at Validation.
+```bash
+node .harness/scripts/escalate-slice.mjs <slice-id> --reasons "<triggers>" --by <owner>
+```
+
+Then:
+
+1. Backfill `capability.md` and `requirements.md` from `spec.md`.
+2. Hand off to the full ASDD pipeline starting at Validation.
+
+Note: the harness already detects scope spread, domain growth, dissent, and implementation blockage from session events and blocks `DONE` while those signals are open — escalation acknowledges them explicitly.
 
 ## Definition of Done
 
 - [ ] All tasks have passing tests with evidence in `.features.json`.
 - [ ] Full test suite green (no regressions).
-- [ ] Per-slice manifest updated with `mode: "lite"`, `phase: "knowledge"`, `status: "DONE"`.
+- [ ] Manifest synced with `sync-state.mjs` (never hand-edited): `status: "DONE"`, and no open `escalation_signals` (escalate first if present).
 - [ ] Global registry row synced.
 - [ ] `PROGRESS.md` slice row updated.
-- [ ] Progress file (`.harness/progress/<slice-id>.md`) updated.
-- [ ] Lock file deleted.
+- [ ] `node .harness/scripts/check-invariants.mjs --live` exits 0.

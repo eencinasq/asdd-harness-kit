@@ -2,7 +2,7 @@
 
 A portable process layer for **Agent Specification-Driven Development (ASDD)** and **Harness Engineering**.
 
-It gives AI agents a governed pipeline — from product discovery through implementation, QA, and knowledge capture — with session locks, file-scope enforcement, verification gates, and traceability. You bring your own stack (Python, Go, Rails, Next.js, Nest, …). The kit brings the process.
+It gives AI agents a governed pipeline — from Shape Up through implementation, QA, and knowledge capture — with Jev System One gates, feature trackers, file-scope enforcement, verification evidence, and traceability. You bring your own stack (Python, Go, Rails, Next.js, Nest, …). The kit brings the process.
 
 ---
 
@@ -12,15 +12,37 @@ It gives AI agents a governed pipeline — from product discovery through implem
 |---|---|---|
 | **Process** | 9-phase ASDD pipeline, agent definitions, skills catalog, steering contracts | Product intent, domain language, technology choices |
 | **Execution control** | Append-only sessions, feature trackers, generated manifests, invariant checks | Mapped file scopes, verification commands |
-| **Quality gates** | EARS criteria templates, CCS cutoffs, gate definitions | Test suites, failure logs, active findings |
+| **Quality gates** | EARS templates, Jev System One, Harness invariants | Test suites, failure logs, `JEV_API_KEY` |
 | **Runtime adapters** | Symlinks and configs for Cursor, Claude, OpenCode, Kimi, Junie, Devin, Kiro | Your IDE/editor |
 
 **ASDD** answers *which phase* and *which spec artifact*.  
 **Harness** answers *which feature* is under test now, which files may change, and what evidence is required before work is called done.
 
-Pipeline phases: `Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge`
+Full ASDD phases: `Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge`
 
-For small work, use **ASDD-Lite**: `Spec → Design → Tasks → Implementation → QA-Lite`.
+**Slices are Lite-first.** Every slice starts in `lite` mode (Spec → Design → Tasks → Implementation → QA-Lite). `full` is opt-in (`init-slice.mjs --full`) for work known upfront to be cross-cutting or architectural. Growth in a lite slice is detected from session evidence — scope spread, domain growth, dissent, blockage — and **blocks completion until the slice is escalated**. See [`.harness/steering/asdd-lite.md`](.harness/steering/asdd-lite.md).
+
+---
+
+## Jev (required)
+
+Idea → production is gated by TypeSafe System One. Do not commit the key.
+
+```text
+Shape Up          jevScore appetite (≥ 4) + jevNoul rabbit hole (≥ 0.80)
+Product Delivery  jevNoul EARS (≥ 0.85) + jevChoice slice (mvp|v1|v2|backlog)
+Trackers          overlapping scope_paths → features.mjs (not a Jev call)
+Harness           command gate + gold-plating noul + hill-chart score
+```
+
+```bash
+export JEV_API_KEY="…"   # never commit; project.json apiKey must stay empty
+node .harness/scripts/jev-client.mjs status   # enabled true, required true
+node .harness/scripts/jev-gates.mjs health    # required before betting
+node .harness/scripts/check-invariants.mjs
+```
+
+`capabilities.jev.enabled` and `required` must be `true`. `_unavailable` is never a pass. Session-loop gates (`verify-on-stop` on Cursor and Claude Code) run `check-invariants.mjs --live`: a missing key blocks session close. CI runs non-live and skips live calls with a WARN. Steering: [`.harness/steering/jev.md`](.harness/steering/jev.md). Guide: [`docs/jev-integration.md`](docs/jev-integration.md).
 
 ---
 
@@ -72,7 +94,8 @@ curl -fsSL https://raw.githubusercontent.com/eencinasq/asdd-harness-kit/main/scr
 | `--force-bindings` | Overwrite binding stubs (**dangerous**) |
 | `--dry-run` | Preview actions without applying |
 
-Smoke test: `./scripts/test-install-into.sh` or `npm test`
+Test suite: `npm test` — installer smoke test (all runtimes and modules), lifecycle e2e (slice state machine incl. negative invariant cases), and unit tests for the Jev client, command gate, and MCP gate server.
+Full pipeline e2e: `npm run test:full-flow` — Shape Up → Product Delivery → lite slice → evidence → gold-plating → escalation → DONE → verify-on-stop. With `JEV_API_KEY` set, Jev gates run **live**; without it, live stages are skipped (deterministic stages still run).
 
 ### Version-aware updates
 
@@ -98,24 +121,26 @@ Then re-run the installer in dependent projects.
 git clone https://github.com/eencinasq/asdd-harness-kit.git my-project
 cd my-project
 
-# 1. Fill project bindings (required — stubs are not product truth)
+# 1. Fill project bindings (stubs are not product truth)
 $EDITOR .harness/steering/product.md
 $EDITOR .harness/steering/structure.md
 $EDITOR .harness/steering/tech.md
 $EDITOR .harness/steering/domain-layer.project.md
 $EDITOR .harness/steering/quality-gates.project.md
 
-# 2. Verify
+# 2. Jev (required)
+export JEV_API_KEY="…"
+node .harness/scripts/jev-gates.mjs health
+
+# 3. Verify
 node .harness/scripts/check-project-config.mjs
 node .harness/scripts/check-invariants.mjs
 
-# 3. Scaffold your first slice
+# 4. First slice (lite by default; --full for cross-cutting/architectural work)
 node .harness/scripts/init-slice.mjs my-first-slice
-
-# 4. Check project status at any time
 node .harness/scripts/harness-status.mjs
 
-# 5. Start Discovery — write .harness/specs/<slice>/intent.md
+# 5. Write .harness/specs/<slice>/intent.md (Lite: spec.md)
 ```
 
 ---
@@ -136,14 +161,15 @@ Reusable capabilities: Shape Up, Product Delivery, Test-Driven Development, API 
 | `tech.md` | Technology stack and conventions |
 | `domain-layer.md` / `domain-layer.project.md` | Domain boundaries and ubiquitous language |
 | `quality-gates.md` / `quality-gates.project.md` | EARS criteria, test commands, active findings |
+| `jev.md` | Required Jev thresholds and gate map |
 | `controls.md` | Precedence order when guides conflict |
-| `session-loop.md` | Session open/close rules, file scope, locks |
+| `session-loop.md` | Session open/close, file scope, evidence (no v2 locks) |
 | `manifest.md` | Per-slice phase machine definition |
 | `codegraph.md` | Code intelligence conventions |
 | `templates/` | Standard artifact templates for consistent cross-agent handoffs |
 
 ### Harness scaffold (`.harness/`)
-- `scripts/` — invariant checks, project config validation, skills index sync, verify-on-stop, status dashboard, slice initializer
+- `scripts/` — invariants, Jev client/gates/command-gate, project config, skills index, verify-on-stop, status, init-slice, escalate-slice, sync-state
 - `scripts/validators/` — modular validators consumed by `check-invariants.mjs`
 - `steering/templates/` — artifact templates for every ASDD phase (intent, capability, requirements, design, tasks, reports)
 - `state/` — global registry, per-slice manifests (generated), append-only session logs
@@ -166,31 +192,37 @@ Configuration for Cursor, Claude Code, OpenCode, Kimi Code, Junie, Devin, and Ki
 ## How a session works
 
 1. **Read** generated `.harness/state/registry.json` for squad state
-2. **Read** generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice
+2. **Read** generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice (mode, phase, escalation signals)
 3. **Read steering** for the current phase
-4. **Pick work** — dependency-ready features
+4. **Pick work** — dependency-ready features; lite slices are serial (one `in_progress` at a time)
 5. **Edit only mapped files** — scope defined by the active spec
 6. **Write session file** — append-only log of every significant action
 7. **Run sync-state** — regenerate manifest and registry
 8. **Verify before close** — `node .harness/scripts/check-invariants.mjs` must exit 0
 9. **Record evidence** — no feature is `passing` without verification + evidence
+10. **Escalate when evidence demands it** — open escalation signals on a lite slice block `DONE` until `escalate-slice.mjs` acknowledges them
 
 Operational CLIs:
-- `node .harness/scripts/harness-status.mjs` — active slices, features in progress
-- `node .harness/scripts/init-slice.mjs <slice-id>` — scaffold a new slice with specs, features, and session tracking
-- `node .harness/scripts/sync-state.mjs` — regenerate manifests and registry from append-only session logs
-- `node .harness/scripts/check-invariants.mjs` — full harness invariant validation
+- `node .harness/scripts/harness-status.mjs` — active slices, modes, features in progress, escalation signals
+- `node .harness/scripts/init-slice.mjs <slice-id> [--full]` — scaffold a new slice (lite by default)
+- `node .harness/scripts/escalate-slice.mjs <slice-id> --reasons "<triggers>"` — transition lite → escalated
+- `node .harness/scripts/sync-state.mjs [--slice <id>]` — regenerate manifests and registry from append-only session logs (`--slice` merges into the registry)
+- `node .harness/scripts/check-invariants.mjs [--live]` — harness invariants + Jev config (`--live`: missing `JEV_API_KEY` is a FAIL; session gates always run live)
+- `node .harness/scripts/jev-client.mjs status|health` — Jev client
+- `node .harness/scripts/jev-gates.mjs health` — live System One probe
+- `node .harness/scripts/jev-command-gate.mjs` — command gate hook entrypoint (wired automatically on Cursor and Claude Code installs)
 
 Read [`AGENTS.md`](AGENTS.md) every session for the full operational map.
 
 ---
 
-## Shape Up integration (optional)
+## Shape Up + Product Delivery
 
-For teams using Basecamp's Shape Up methodology, the kit includes a [`shape-up`](.agents/skills/shape-up/SKILL.md) skill and a full integration guide:
+Shape Up and Product Delivery are the intake for this kit, not an optional extra. Jev gates on those skills are required (see [`.harness/steering/jev.md`](.harness/steering/jev.md)).
 
 ```
-Idea → Pitch → Bet → ASDD Discovery → … → Harness Implementation → QA → Knowledge
+Idea → Pitch (Jev appetite + rabbit hole) → Bet → Product Delivery (Jev EARS + slice)
+    → ASDD Discovery → … → Harness Implementation (command gate, gold-plating) → QA → Knowledge
 ```
 
 - **Shape Up** decides *which work* deserves a fixed appetite
@@ -203,9 +235,10 @@ See [`docs/shape-up-asdd-harness-integration.md`](docs/shape-up-asdd-harness-int
 
 ## Requirements
 
-- **Node.js** — for invariant checks, project config validation, and MCP launchers
-- **git** — for the installer when using `--from-git`
-- **[codegraph](https://www.npmjs.com/package/codegraph)** — recommended for code intelligence (`npm i -g codegraph`)
+- **Node.js 18+** — harness scripts and Jev client
+- **`JEV_API_KEY`** — required for live gates (`jev-gates.mjs health`)
+- **git** — installer `--from-git` and gold-plating diffs
+- **[codegraph](https://www.npmjs.com/package/codegraph)** — recommended (`npm i -g codegraph`)
 - An IDE that can load agents from `.agents/` or via runtime symlinks
 
 ---
@@ -217,7 +250,8 @@ See [`docs/shape-up-asdd-harness-integration.md`](docs/shape-up-asdd-harness-int
 | [`AGENTS.md`](AGENTS.md) | Operational map — read every session |
 | [`docs/asdd-and-harness-engineering.md`](docs/asdd-and-harness-engineering.md) | Guides, sensors, session close, what "done" means |
 | [`docs/asdd-harness-portability.md`](docs/asdd-harness-portability.md) | How the kit maps to product repos, adopter checklist |
-| [`docs/pipeline-documentation.md`](docs/pipeline-documentation.md) | Full delivery pipeline: Shape Up → Product Delivery → ASDD + Harness |
+| [`docs/jev-integration.md`](docs/jev-integration.md) | Required Jev wiring, commands, thresholds |
+| [`docs/pipeline-documentation.md`](docs/pipeline-documentation.md) | Idea → Shape Up → Product Delivery → ASDD + Harness |
 | [`docs/shape-up-asdd-harness-integration.md`](docs/shape-up-asdd-harness-integration.md) | Using Shape Up pitches with ASDD slices |
 | [`runtimes/README.md`](runtimes/README.md) | Per-IDE wiring instructions |
 

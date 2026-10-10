@@ -12,5 +12,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check harness invariants
-        run: node .harness/scripts/check-invariants.mjs
+
+      - name: Unit tests (Jev client, command gate, MCP gate server)
+        run: node --test .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .agents/mcp/jev-gate-server.test.mjs
+
+      - name: Installer smoke test (runtimes + modules)
+        run: bash scripts/test-install-into.sh
+
+      - name: Lifecycle e2e + negative invariant tests
+        run: bash scripts/test-lifecycle.sh
+
+      - name: Project config and skills index
+        run: |
+          node .harness/scripts/check-project-config.mjs
+          node .harness/scripts/check-skills-index.mjs
+
+      - name: Check harness invariants (registry exercised via sync-state)
+        run: |
+          node .harness/scripts/sync-state.mjs
+          node .harness/scripts/check-invariants.mjs

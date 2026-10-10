@@ -98,6 +98,24 @@ if (config) {
 	if (config.bindings_complete === false) {
 		warnings.push('project bindings are scaffolded but still require project-specific content');
 	}
+
+	const jev = config.capabilities?.jev;
+	if (!jev || typeof jev !== 'object') {
+		errors.push(`${configPath}.capabilities.jev is required`);
+	} else {
+		if (jev.enabled !== true) {
+			errors.push(`${configPath}.capabilities.jev.enabled must be true`);
+		}
+		if (jev.required !== true) {
+			errors.push(`${configPath}.capabilities.jev.required must be true`);
+		}
+		if (typeof jev.apiKey === 'string' && jev.apiKey.trim()) {
+			errors.push(`${configPath}.capabilities.jev.apiKey must be empty; use JEV_API_KEY`);
+		}
+		if (typeof jev.endpoint !== 'string' || !jev.endpoint.trim()) {
+			errors.push(`${configPath}.capabilities.jev.endpoint must be a non-empty string`);
+		}
+	}
 }
 
 for (const warning of warnings) console.warn(`WARN  ${warning}`);

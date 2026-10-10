@@ -22,6 +22,18 @@ Shape Up inverts traditional estimation:
 
 **See:** [`references/methodology.md`](./references/methodology.md) for the full philosophy.
 
+## Required Jev gates
+
+Jev is required. After the pitch draft, before betting:
+
+```bash
+node --input-type=module -e "import { shapeUpGates } from './.harness/scripts/jev-gates.mjs'; console.log(await shapeUpGates({ pitch: process.argv[1], appetite: '2 weeks' }))"
+```
+
+- Appetite `jevScore` < 4 → refine or reject. Do not bet.
+- Rabbit-hole `jevNoul` < 0.80 → patch no-gos or stop.
+- If `_unavailable` → stop. Set `JEV_API_KEY`. Do not fake a pass.
+
 ---
 
 ## Entry Point

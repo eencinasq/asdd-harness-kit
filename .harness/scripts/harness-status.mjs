@@ -37,10 +37,11 @@ console.log('== Active Slices ==');
 if (slices.length === 0) {
   console.log('  (none)');
 } else {
-  console.log(`  ${pad('Slice', 18)} ${pad('Phase', 16)} ${pad('Status', 12)} ${pad('Features', 10)} Dissents`);
+console.log(`  ${pad('Slice', 18)} ${pad('Mode', 10)} ${pad('Phase', 16)} ${pad('Status', 12)} ${pad('Features', 10)} ${pad('Dissents', 10)} Escalation`);
   for (const s of slices) {
     const dissents = s.open_dissents ? `${s.open_dissents}` : '—';
-    console.log(`  ${pad(s.slice_id, 18)} ${pad(s.phase || '—', 16)} ${pad(s.status || '—', 12)} ${pad(String(s.active_features || 0), 10)} ${dissents}`);
+    const esc = s.escalation_required ? `${s.escalation_signals} signal(s) — escalate required` : '—';
+    console.log(`  ${pad(s.slice_id, 18)} ${pad(s.mode || '—', 10)} ${pad(s.phase || '—', 16)} ${pad(s.status || '—', 12)} ${pad(String(s.active_features || 0), 10)} ${pad(dissents, 10)} ${esc}`);
   }
 }
 
@@ -68,6 +69,21 @@ for (const s of slices) {
   if (contributors.length === 0) continue;
   console.log(`  [${s.slice_id}] ${contributors.join(', ')}`);
 }
+
+console.log('');
+console.log('== Escalation Signals ==');
+let anySignal = false;
+for (const s of slices) {
+  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+  const signals = manifest?.escalation_signals || [];
+  if (signals.length === 0) continue;
+  anySignal = true;
+  console.log(`  [${s.slice_id}] mode:${manifest.mode}${manifest.escalation_required ? ' (escalation required)' : ''}`);
+  for (const sig of signals) {
+    console.log(`    • ${sig.type} — ${sig.evidence}`);
+  }
+}
+if (!anySignal) console.log('  (none)');
 
 console.log('');
 console.log('== Gate Summary ==');

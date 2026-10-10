@@ -1,6 +1,6 @@
 # Shape Up + ASDD + Harness
 
-This document defines an optional adapter for combining the framework-agnostic Shape Up pitch practice with the ASDD specification pipeline and Harness execution controls.
+This document defines how this kit combines Shape Up pitches with ASDD and Harness. **Jev System One is required** on Shape Up and Product Delivery gates ([jev-integration.md](jev-integration.md)).
 
 It is a portable framework guide. Product repositories keep their own product bindings, domain model, quality commands, and slice history under `.harness/`.
 
@@ -35,7 +35,7 @@ Shape Up terminology in this document follows the concepts described by Basecamp
 | Select work | Pitch and betting decision | Intent and capability context | Slice registry remains the execution index |
 | Control uncertainty | Appetite, boundaries, rabbit holes | Discovery, Validation, Domain, Design | Blocked state and evidence expose unresolved work |
 | Define the solution | Rough solution and no-gos | Requirements, contracts, design, domain rules | Feature tracker records the executable projection |
-| Control time and scope | Fixed appetite, variable scope | Scope and acceptance boundaries | Tasks, dependencies, locks, and ownership |
+| Control time and scope | Fixed appetite, variable scope | Scope and acceptance boundaries | Tasks, dependencies, `scope_paths`, and ownership |
 | Demonstrate completion | Ship or make a closure decision | QA and Knowledge artifacts | Verification command and evidence are required for `passing` |
 
 The layers complement each other. A pitch is a commitment proposal, an ASDD slice is the specification source of truth, and a Harness feature is the current execution projection.
@@ -61,7 +61,7 @@ Do not turn an unvalidated idea into a capability or implementation task.
 
 ### 2. Pitch and shaping
 
-The framework-agnostic `shape-up` skill creates the pitch. This kit's Discovery agent acts as an optional adapter when the pitch must enter ASDD. Shaping makes the proposal concrete enough for a betting decision while preserving uncertainty where the team does not have evidence.
+The `shape-up` skill creates the pitch. Before betting, run `shapeUpGates` (`jevScore` ≥ 4, rabbit-hole `jevNoul` ≥ 0.80). `_unavailable` stops the bet.
 
 Every pitch should contain:
 
@@ -185,21 +185,21 @@ A rabbit hole should become one of:
 
 Do not hide a rabbit hole inside an implementation task or report false confidence.
 
-## Full ASDD and ASDD-Lite
+## Full ASDD and ASDD-Lite (Lite-First)
 
-### Full ASDD
+### ASDD-Lite (default)
 
-Use the complete flow for cross-cutting, new product capabilities, architectural decisions, or work involving multiple domains. The pitch precedes Discovery and feeds every later phase.
-
-### ASDD-Lite
-
-For small work, use:
+Every slice starts lite:
 
 ```text
 Pitch → Spec → Design → Tasks → Implementation → QA-Lite
 ```
 
-The pitch can be short, but it still needs appetite, outcome, boundaries, and open risks. Escalate to full ASDD if the work introduces new domain concepts, multiple actors, new external contracts, or architectural decisions.
+The pitch can be short, but it still needs appetite, outcome, boundaries, and open risks. Growth is not a judgment call — the harness detects it from session evidence (scope spread across modules, new domain terms, dissent, implementation blockage, concurrent features) and blocks slice completion until it is escalated with `escalate-slice.mjs`. See `.harness/steering/asdd-lite.md`.
+
+### Full ASDD
+
+Opt in upfront (`init-slice.mjs <slice-id> --full`) for cross-cutting, new product capabilities, architectural decisions, or work involving multiple domains. An escalated lite slice continues here at the Validation phase, backfilling `capability.md` and `requirements.md` from its `spec.md`.
 
 ## Recommended adapter artifacts
 

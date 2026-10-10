@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 /**
  * Harness Engineering invariants (cheap, no Nx).
- * Run from repo root: node .harness/scripts/check-invariants.mjs
+ * Run from repo root: node .harness/scripts/check-invariants.mjs [--live]
+ *
+ * --live (or HARNESS_JEV_LIVE=1): Jev must be usable — a missing JEV_API_KEY
+ * is a FAIL, not a WARN. Session-loop gates (verify-on-stop) always run live;
+ * CI and ad-hoc structural checks run non-live by default.
  *
  * Supports:
  * - Global manifest schema v2.0 (active_slices array)
@@ -17,6 +21,9 @@ import validatePaths from './validators/paths.mjs';
 import validateManifest from './validators/manifest.mjs';
 import validateFeatures from './validators/features.mjs';
 import validateSkills from './validators/skills.mjs';
+import validateLiteEscalation from './validators/lite-escalation.mjs';
+import { validateJevGoldPlating } from './validators/jev-gold-plating.mjs';
+import { assertJevConfigured } from './jev-gates.mjs';
 
 const root = process.cwd();
 const errors = [];
@@ -56,6 +63,21 @@ validatePaths(ctx);
 validateManifest(ctx);
 validateFeatures(ctx);
 validateSkills(ctx);
+validateLiteEscalation(ctx);
+
+const jevLive = process.argv.includes('--live') || process.env.HARNESS_JEV_LIVE === '1';
+const jevReady = assertJevConfigured({ live: jevLive });
+if (!jevReady.ok) {
+  fail(jevReady.error);
+} else if (jevReady.skipped) {
+  warn(jevReady.skipped);
+}
+
+try {
+  await validateJevGoldPlating(ctx);
+} catch (error) {
+  fail(`Jev gold-plating: ${error.message}`);
+}
 
 if (warnings.length) {
   for (const w of warnings) console.warn(`WARN  ${w}`);

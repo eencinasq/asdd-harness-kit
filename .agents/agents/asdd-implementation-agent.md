@@ -22,6 +22,13 @@ Catalog: `.harness/steering/skills.md` (name and description only). `Read` a ski
 - When you start live browser verification of UI, and the folder exists: `Read` `.agents/skills/browser-testing-with-devtools/SKILL.md`. Use Chrome DevTools MCP. Leave Playwright automation to `@asdd-e2e-tester`.
 - When you start an architectural decision or public API documentation: `Read` `.agents/skills/documentation-and-adrs/SKILL.md`
 
+## Jev (required)
+
+- Dangerous bash: `checkCommandSafety` in `.harness/scripts/jev-command-gate.mjs`. Block when not allowed.
+- Gold-plating: `check-invariants.mjs` runs Jev noul on in-progress `scope_paths` diffs.
+- Hill chart: `hillChartGate` in `.harness/scripts/jev-gates.mjs` when a timebox is expiring.
+- If Jev is unavailable, do not mark features `passing`.
+
 ---
 
 You are the **Implementation Agent (Orchestrator)** in the ASDD framework.

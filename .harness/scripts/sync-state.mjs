@@ -53,6 +53,8 @@ function readSessions(sliceDir) {
   return sessions;
 }
 
+export { readSessions };
+
 function derivePhase(sessions) {
   const phaseEvents = sessions.filter((s) =>
     s.event_type === 'phase_started' || s.event_type === 'phase_completed'
@@ -65,6 +67,76 @@ function derivePhase(sessions) {
     return idx >= 0 && idx + 1 < phases.length ? phases[idx + 1] : latest.phase;
   }
   return latest.phase;
+}
+
+export const SLICE_MODES = ['lite', 'full', 'escalated'];
+
+// Lite-first: slices are lite by default. The latest session declaring a mode
+// (init-slice --full, or an escalation checkpoint) wins. An already-generated
+// manifest mode is honored for back-compat with pre-lite-first state.
+export function deriveMode(sessions, existingMode) {
+  let mode = SLICE_MODES.includes(existingMode) ? existingMode : 'lite';
+  for (const s of sessions) {
+    if (typeof s.mode === 'string' && SLICE_MODES.includes(s.mode)) mode = s.mode;
+  }
+  return mode;
+}
+
+// Evidence-based escalation signals (deterministic, sessions-only).
+// E2 (concurrent lite features) is a hard rule enforced by features.mjs; the
+// remaining signals mark a lite slice as escalation_required.
+export function deriveEscalationSignals(sessions) {
+  const signals = [];
+
+  const modules = new Set();
+  for (const s of sessions) {
+    if (s.event_type !== 'feature_started' || !Array.isArray(s.scope_paths)) continue;
+    for (const p of s.scope_paths) {
+      const first = String(p).replace(/^\/+|\/+$/g, '').split('/')[0];
+      if (first) modules.add(first);
+    }
+  }
+  if (modules.size > 1) {
+    signals.push({
+      type: 'E1-scope-spread',
+      evidence: `scope touches ${modules.size} top-level modules: ${Array.from(modules).sort().join(', ')}`,
+    });
+  }
+
+  const domainTerms = [];
+  for (const s of sessions) {
+    if (s.event_type === 'checkpoint' && Array.isArray(s.new_domain_terms)) {
+      domainTerms.push(...s.new_domain_terms.filter((t) => typeof t === 'string' && t.trim()));
+    }
+  }
+  if (domainTerms.length > 1) {
+    signals.push({
+      type: 'E3-domain-growth',
+      evidence: `${domainTerms.length} new domain terms declared: ${domainTerms.join(', ')}`,
+    });
+  }
+
+  for (const s of sessions) {
+    if (s.event_type === 'dissent') {
+      signals.push({
+        type: 'E4-dissent',
+        evidence: `architectural dissent (${s.session_id || s.timestamp || 'session'})`,
+      });
+      break;
+    }
+  }
+
+  for (const s of sessions) {
+    if (s.event_type === 'phase_blocked' && s.phase === 'implementation') {
+      signals.push({
+        type: 'E5-implementation-blocked',
+        evidence: `implementation blocked (${s.session_id || s.timestamp || 'session'})`,
+      });
+      break;
+    }
+  }
+
+  return signals;
 }
 
 function deriveStatus(sessions) {
@@ -173,13 +245,26 @@ function deriveOpenDissents(sessions) {
 function generateSliceManifest(sliceId, sessions) {
   const sliceDir = join(slicesDir, sliceId);
   const existing = readJson(join(sliceDir, 'manifest.json')) || {};
+  const mode = deriveMode(sessions, existing.mode);
+  const escalationSignals = deriveEscalationSignals(sessions);
+  const escalationRequired = mode === 'lite' && escalationSignals.length > 0;
+  const escalatedFromLite = mode === 'escalated' && sessions.some((s) => s.mode === 'lite');
+  let status = deriveStatus(sessions);
+  if (status === 'DONE' && escalationRequired) {
+    // Lite-first closure gate: a lite slice cannot complete with unaddressed
+    // escalation signals. Escalate (checkpoint mode=escalated) first.
+    status = 'in_progress';
+  }
 
   return {
     schema_version: '3.0',
     slice_id: sliceId,
     phase: derivePhase(sessions),
-    status: deriveStatus(sessions),
-    mode: existing.mode || 'full',
+    status,
+    mode,
+    escalation_signals: escalationSignals,
+    escalation_required: escalationRequired,
+    escalated_from_lite: escalatedFromLite,
     created_at: existing.created_at || new Date().toISOString(),
     updated_at: new Date().toISOString(),
     paths: existing.paths || {},
@@ -202,6 +287,9 @@ function generateRegistry(sliceManifests) {
       status: m.status,
       mode: m.mode,
       active_features: m.active_features.length,
+      escalation_signals: m.escalation_signals.length,
+      escalation_required: m.escalation_required,
+      escalated_from_lite: m.escalated_from_lite,
       open_dissents: m.open_dissents,
       last_activity: m.updated_at,
       contributors: m.contributors,
@@ -236,13 +324,34 @@ function main() {
 
   if (targetSlice) {
     const manifest = syncSlice(targetSlice);
-    if (manifest) sliceManifests.push(manifest);
-  } else {
-    for (const entry of readdirSync(slicesDir, { withFileTypes: true })) {
-      if (!entry.isDirectory() || entry.name.startsWith('.')) continue;
-      const manifest = syncSlice(entry.name);
-      if (manifest) sliceManifests.push(manifest);
+    if (manifest) {
+      // Partial sync: merge the target into the existing registry instead of
+      // overwriting it with a single-slice view.
+      const existing = readJson(join(stateDir, 'registry.json'));
+      const ids = new Set(
+        (Array.isArray(existing?.slices) ? existing.slices : [])
+          .map((s) => s?.slice_id)
+          .filter(Boolean)
+      );
+      ids.add(targetSlice);
+      const sliceManifests = [];
+      for (const id of Array.from(ids).sort()) {
+        const m = id === targetSlice ? manifest : readJson(join(slicesDir, id, 'manifest.json'));
+        if (m) sliceManifests.push(m);
+      }
+      if (sliceManifests.length > 0) {
+        const registry = generateRegistry(sliceManifests);
+        writeJson(join(stateDir, 'registry.json'), registry);
+        console.log(`SYNC  registry → ${registry.slices.length} slices`);
+      }
     }
+    return;
+  }
+
+  for (const entry of readdirSync(slicesDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name.startsWith('.')) continue;
+    const manifest = syncSlice(entry.name);
+    if (manifest) sliceManifests.push(manifest);
   }
 
   if (sliceManifests.length > 0) {
@@ -252,4 +361,6 @@ function main() {
   }
 }
 
-main();
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
+}

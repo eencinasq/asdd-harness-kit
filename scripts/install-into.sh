@@ -432,7 +432,7 @@ copy_tree() {
   local rel local_src local_dest
   while IFS= read -r -d '' rel; do
     rel="${rel#./}"
-    [[ "$rel" == .DS_Store ]] && continue
+    case "${rel##*/}" in .DS_Store|._*) continue ;; esac
     local_src="$src/$rel"
     local_dest="$dest/$rel"
     copy_file "$local_src" "$local_dest" "$policy"
@@ -445,7 +445,7 @@ copy_tree() {
 install_portable_steering() {
   local f
   for f in domain-layer.md quality-gates.md manifest.md session-loop.md asdd-lite.md \
-           codegraph.md codegraph-agents.md skills.md security-rules.md controls.md README.md; do
+           codegraph.md codegraph-agents.md skills.md security-rules.md controls.md jev.md README.md; do
     copy_file "$KIT_DIR/.harness/steering/$f" "$TARGET/.harness/steering/$f" refresh
   done
   copy_tree "$KIT_DIR/.harness/steering/templates" "$TARGET/.harness/steering/templates" refresh
@@ -473,7 +473,13 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/check-project-config.mjs" "$TARGET/.harness/scripts/check-project-config.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/harness-status.mjs" "$TARGET/.harness/scripts/harness-status.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/init-slice.mjs" "$TARGET/.harness/scripts/init-slice.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/escalate-slice.mjs" "$TARGET/.harness/scripts/escalate-slice.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/sync-state.mjs" "$TARGET/.harness/scripts/sync-state.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/jev-client.mjs" "$TARGET/.harness/scripts/jev-client.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/jev-client.test.mjs" "$TARGET/.harness/scripts/jev-client.test.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/jev-gates.mjs" "$TARGET/.harness/scripts/jev-gates.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/jev-command-gate.mjs" "$TARGET/.harness/scripts/jev-command-gate.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/jev-command-gate.test.mjs" "$TARGET/.harness/scripts/jev-command-gate.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/config/project.schema.json" "$TARGET/.harness/config/project.schema.json" refresh
   copy_file "$KIT_DIR/.harness/config/README.md" "$TARGET/.harness/config/README.md" refresh
   copy_file "$KIT_DIR/.harness/features/feature_list.schema.json" "$TARGET/.harness/features/feature_list.schema.json" refresh
@@ -502,11 +508,15 @@ install_harness_scaffold() {
 }
 
 kit_version() {
+  local v=""
   if command -v node >/dev/null 2>&1; then
-    node -e "try { const p=require('$KIT_DIR/package.json'); process.stdout.write(p.version||'3.0.0'); } catch { process.stdout.write('3.0.0'); }"
-  else
-    echo "3.0.0"
+    v="$(node -e "try { process.stdout.write(require('$KIT_DIR/package.json').version || '') } catch {}")"
   fi
+  if [[ -z "$v" && -f "$KIT_DIR/package.json" ]]; then
+    v="$(sed -n 's/^.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$KIT_DIR/package.json" | head -1)"
+  fi
+  [[ -n "$v" ]] || v="0.0.0-dev"
+  printf '%s' "$v"
 }
 
 install_project_adapter() {
@@ -527,6 +537,17 @@ const data = JSON.parse(readFileSync(dest, 'utf8'));
 data.kit ??= {};
 data.kit.version = kitVer;
 data.kit.installed_at = installedAt;
+// Seed required capability keys missing from older installs — never overwrite
+data.capabilities ??= {};
+data.capabilities.codegraph ??= { enabled: false, required: false };
+data.capabilities.orca ??= { enabled: false, experimental: true };
+data.capabilities.jev ??= {
+  enabled: true,
+  required: true,
+  apiKey: '',
+  endpoint: 'https://api.typesafe.ai/v1',
+  fallbackPolicy: 'fail-closed',
+};
 writeFileSync(dest, `${JSON.stringify(data, null, 2)}\n`);
 EOF
       return 0
@@ -552,7 +573,7 @@ EOF
     "version": "$kit_ver",
     "installed_at": "$installed_at"
   },
-  "harness_version": "3.0.0",
+  "harness_version": "$kit_ver",
   "mode": "full",
   "bindings_complete": false,
   "paths": {
@@ -584,6 +605,13 @@ EOF
     "orca": {
       "enabled": false,
       "experimental": true
+    },
+    "jev": {
+      "enabled": true,
+      "required": true,
+      "apiKey": "",
+      "endpoint": "https://api.typesafe.ai/v1",
+      "fallbackPolicy": "fail-closed"
     }
   },
   "runtimes": []
@@ -597,6 +625,8 @@ install_agents_core() {
   copy_tree "$KIT_DIR/.agents/mcp/bin" "$TARGET/.agents/mcp/bin" refresh
   copy_file "$KIT_DIR/.agents/mcp/sync-runtime-mcp.cjs" "$TARGET/.agents/mcp/sync-runtime-mcp.cjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/README.md" "$TARGET/.agents/mcp/README.md" refresh
+  copy_file "$KIT_DIR/.agents/mcp/jev-gate-server.mjs" "$TARGET/.agents/mcp/jev-gate-server.mjs" refresh
+  copy_file "$KIT_DIR/.agents/mcp/jev-gate-server.test.mjs" "$TARGET/.agents/mcp/jev-gate-server.test.mjs" refresh
   if [[ "$FORCE_MCP" -eq 1 ]]; then
     local old_force=$FORCE
     FORCE=1
@@ -614,6 +644,7 @@ install_docs_root() {
   copy_file "$KIT_DIR/docs/asdd-and-harness-engineering.md" "$TARGET/docs/asdd-and-harness-engineering.md" create
   copy_file "$KIT_DIR/docs/pipeline-documentation.md" "$TARGET/docs/pipeline-documentation.md" refresh
   copy_file "$KIT_DIR/docs/shape-up-asdd-harness-integration.md" "$TARGET/docs/shape-up-asdd-harness-integration.md" create
+  copy_file "$KIT_DIR/docs/jev-integration.md" "$TARGET/docs/jev-integration.md" refresh
   copy_file "$KIT_DIR/scripts/install-into.sh" "$TARGET/scripts/install-into.sh" refresh
   if [[ "$DRY_RUN" -eq 0 ]]; then
     chmod +x "$TARGET/scripts/install-into.sh" 2>/dev/null || true
@@ -726,6 +757,10 @@ EOF
 wire_runtime_cursor() {
   log "${C_BOLD}RUNTIME${C_RESET} cursor"
   [[ "$DRY_RUN" -eq 1 ]] && return 0
+  if [[ -L "$TARGET/.cursor/agents" ]]; then
+    rm -f "$TARGET/.cursor/agents"
+    log "${C_YELLOW}FIX${C_RESET}   $TARGET/.cursor/agents (dir symlink → real dir)"
+  fi
   mkdir -p "$TARGET/.cursor/agents" "$TARGET/.cursor/rules"
   if [[ -L "$TARGET/.cursor/skills" || ! -e "$TARGET/.cursor/skills" ]]; then
     rm -f "$TARGET/.cursor/skills" 2>/dev/null || true
@@ -776,31 +811,88 @@ install_cursor_verify_hook() {
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dest = process.argv[2];
-const hook = {
+const stopHook = {
   command: 'node .harness/scripts/verify-on-stop.mjs',
   timeout: 60,
   loop_limit: 3,
   failClosed: true,
 };
+const shellGateHook = {
+  command: 'node .harness/scripts/jev-command-gate.mjs',
+  timeout: 30,
+  failClosed: true,
+};
 const data = JSON.parse(readFileSync(dest, 'utf8'));
 data.version ??= 1;
 data.hooks ??= {};
-const list = Array.isArray(data.hooks.stop) ? data.hooks.stop : [];
-const has = list.some((entry) => String(entry?.command ?? '').includes('verify-on-stop.mjs'));
-if (!has) {
-  list.push(hook);
-  data.hooks.stop = list;
-  writeFileSync(dest, `${JSON.stringify(data, null, 2)}\n`);
-  console.log(`MERGE ${dest}`);
-} else {
-  console.log(`KEEP ${dest}`);
+
+const stopList = Array.isArray(data.hooks.stop) ? data.hooks.stop : [];
+if (!stopList.some((entry) => String(entry?.command ?? '').includes('verify-on-stop.mjs'))) {
+  stopList.push(stopHook);
+  data.hooks.stop = stopList;
+  console.log(`MERGE ${dest} (stop → verify-on-stop)`);
 }
+
+const gateList = Array.isArray(data.hooks.beforeShellExecution) ? data.hooks.beforeShellExecution : [];
+if (!gateList.some((entry) => String(entry?.command ?? '').includes('jev-command-gate.mjs'))) {
+  gateList.push(shellGateHook);
+  data.hooks.beforeShellExecution = gateList;
+  console.log(`MERGE ${dest} (beforeShellExecution → jev-command-gate)`);
+}
+
+writeFileSync(dest, `${JSON.stringify(data, null, 2)}\n`);
+EOF
+}
+
+install_claude_hooks() {
+  local dest="$TARGET/.claude/settings.json"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    log "${C_DIM}HOOK${C_RESET}  $dest PreToolUse(Bash) → jev-command-gate, Stop → verify-on-stop"
+    return 0
+  fi
+  if ! command -v node >/dev/null 2>&1; then
+    warn "Node.js not found — skipping Claude Code hook merge"
+    return 0
+  fi
+  mkdir -p "$TARGET/.claude"
+  node --input-type=module - "$dest" <<'EOF'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+
+const dest = process.argv[2];
+const gateCmd = 'node .harness/scripts/jev-command-gate.mjs';
+const stopCmd = 'node .harness/scripts/verify-on-stop.mjs';
+const data = existsSync(dest) ? JSON.parse(readFileSync(dest, 'utf8')) : {};
+data.hooks ??= {};
+
+const preList = Array.isArray(data.hooks.PreToolUse) ? data.hooks.PreToolUse : [];
+const hasGate = preList.some((entry) =>
+  (entry?.hooks ?? []).some((h) => String(h?.command ?? '').includes('jev-command-gate.mjs')));
+if (!hasGate) {
+  preList.push({ matcher: 'Bash', hooks: [{ type: 'command', command: gateCmd }] });
+  data.hooks.PreToolUse = preList;
+  console.log(`MERGE ${dest} (PreToolUse/Bash → jev-command-gate)`);
+}
+
+const stopList = Array.isArray(data.hooks.Stop) ? data.hooks.Stop : [];
+const hasStop = stopList.some((entry) =>
+  (entry?.hooks ?? []).some((h) => String(h?.command ?? '').includes('verify-on-stop.mjs')));
+if (!hasStop) {
+  stopList.push({ hooks: [{ type: 'command', command: stopCmd }] });
+  data.hooks.Stop = stopList;
+  console.log(`MERGE ${dest} (Stop → verify-on-stop)`);
+}
+
+writeFileSync(dest, `${JSON.stringify(data, null, 2)}\n`);
 EOF
 }
 
 wire_runtime_claude() {
   log "${C_BOLD}RUNTIME${C_RESET} claude"
   [[ "$DRY_RUN" -eq 1 ]] && return 0
+  if [[ -L "$TARGET/.claude/agents" ]]; then
+    rm -f "$TARGET/.claude/agents"
+    log "${C_YELLOW}FIX${C_RESET}   $TARGET/.claude/agents (dir symlink → real dir)"
+  fi
   mkdir -p "$TARGET/.claude/agents"
   if [[ -L "$TARGET/.claude/skills" || ! -e "$TARGET/.claude/skills" ]]; then
     rm -f "$TARGET/.claude/skills" 2>/dev/null || true
@@ -829,10 +921,17 @@ wire_runtime_claude() {
     log "${C_DIM}KEEP${C_RESET}  $TARGET/CLAUDE.md"
   fi
   copy_runtime_models "claude" "$TARGET/.claude"
+  install_claude_hooks
 }
 
 link_runtime_agent_files() {
   local runtime_dir="$1"
+  # A dir-level agents symlink (legacy installs) must become a real dir —
+  # otherwise per-file ln -sfn writes through it and self-loops .agents/agents
+  if [[ -L "$TARGET/$runtime_dir/agents" ]]; then
+    rm -f "$TARGET/$runtime_dir/agents"
+    log "${C_YELLOW}FIX${C_RESET}   $TARGET/$runtime_dir/agents (dir symlink → real dir)"
+  fi
   mkdir -p "$TARGET/$runtime_dir/agents"
   local f base
   for f in "$TARGET/.agents/agents"/asdd-*.md; do
@@ -1044,9 +1143,10 @@ print_summary() {
     log "  Model configs copied to each runtime directory."
     log "  Review .harness/config/models.json for tier rationale."
     if [[ "$RUNTIMES" == *cursor* ]]; then
-      log "  Cursor:  verify-on-stop hook active in .cursor/hooks.json"
+      log "  Cursor:  verify-on-stop + jev-command-gate hooks active in .cursor/hooks.json"
     fi
     if [[ "$RUNTIMES" == *claude* ]]; then
+      log "  Claude:  .claude/settings.json PreToolUse(Bash)+Stop hooks"
       log "  Claude:  read CLAUDE.md for session instructions"
     fi
     if [[ "$RUNTIMES" == *opencode* ]]; then

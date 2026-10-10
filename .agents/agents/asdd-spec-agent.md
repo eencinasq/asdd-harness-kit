@@ -18,6 +18,7 @@ Catalog: `.harness/steering/skills.md` (name and description only). `Read` a ski
 - When you start terminology checks against the domain model: `Read` `.agents/skills/domain-language-extraction/SKILL.md`
 - When you start the anti-pattern gate on drafted requirements: `Read` `.agents/skills/anti-pattern-detection/SKILL.md`
 - When you start an HTTP, REST, GraphQL, or public API contract, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
+- When you start EARS or slice classification: `Read` `.agents/skills/product-delivery/SKILL.md` (required Jev `earsGate` / `sliceChoice`)
 
 ---
 

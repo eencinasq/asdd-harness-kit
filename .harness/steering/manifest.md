@@ -24,7 +24,9 @@ Also: [`.harness/features/<slice>.features.json`](../features/) feature tracker 
 | `slice_id` | Stable id (matches folder name) |
 | `phase` | Current ASDD phase (derived from latest session) |
 | `status` | `in_progress` \| `DONE` \| `PARKED` \| `ABANDONED` |
-| `mode` | `"full"`, `"lite"`, or `"escalated"` |
+| `mode` | `"lite"` (default), `"full"`, or `"escalated"` — derived from session events (`init-slice --full`, escalation `checkpoint`), never hand-edited |
+| `escalation_signals` | Detected growth evidence on lite slices (`E1-scope-spread`, `E3-domain-growth`, `E4-dissent`, `E5-implementation-blocked`) |
+| `escalation_required` | `true` when mode is `lite` and signals are open — `sync-state` will not derive `DONE` in this state |
 | `gates` | Per-phase gate status: `PASS` / `WARN` / `BLOCK` |
 | `active_features` | Features currently `in_progress` with owner and scope |
 | `session_log` | Chronological summary of all sessions |

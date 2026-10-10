@@ -1,6 +1,13 @@
 {
   "version": 1,
   "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "node .harness/scripts/jev-command-gate.mjs",
+        "timeout": 30,
+        "failClosed": true
+      }
+    ],
     "stop": [
       {
         "command": "node .harness/scripts/verify-on-stop.mjs",

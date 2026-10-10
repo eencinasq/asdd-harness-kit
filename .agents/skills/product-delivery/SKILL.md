@@ -67,6 +67,7 @@ Harness Implementation → QA → Knowledge
 - **Traceability:** downstream artifacts must link to upstream requirements.
 - **Stable identity:** every epic, story, task, relation, and dependency has an identifier.
 - **Explicit graph:** dependencies control execution order; other relations explain meaning without blocking work.
+- **Required Jev:** after EARS drafts, run `earsGate` and `sliceChoice` from `.harness/scripts/jev-gates.mjs`. Ambiguous EARS (`prob_yes` < 0.85) must be rewritten or recorded with `# jev-override: accept`. `_unavailable` blocks delivery. Overlapping file scopes are enforced by `.harness/scripts/validators/features.mjs`, not a second Jev call.
 
 ## Shape Up pitch input
 

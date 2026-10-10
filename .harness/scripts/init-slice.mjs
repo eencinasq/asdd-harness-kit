@@ -1,16 +1,23 @@
 #!/usr/bin/env node
 /**
  * init-slice.mjs — scaffold a new slice with v3.0 append-only session structure.
- * Usage: node .harness/scripts/init-slice.mjs <slice-id>
+ *
+ * Lite-first: slices start in lite mode by default. Pass --full only for work
+ * known upfront to be cross-cutting/architectural (new user-facing capability
+ * spanning modules). Evidence can later escalate lite → escalated on its own.
+ *
+ * Usage: node .harness/scripts/init-slice.mjs <slice-id> [--full]
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.cwd();
-const sliceId = process.argv[2];
+const args = process.argv.slice(2);
+const sliceId = args.find((a) => !a.startsWith('-'));
+const fullMode = args.includes('--full');
 
 if (!sliceId || sliceId.startsWith('-')) {
-  console.error('Usage: node .harness/scripts/init-slice.mjs <slice-id>');
+  console.error('Usage: node .harness/scripts/init-slice.mjs <slice-id> [--full]');
   process.exit(1);
 }
 
@@ -52,6 +59,7 @@ const initialSession = {
   slice_id: sliceId,
   event_type: 'phase_started',
   phase: 'discovery',
+  mode: fullMode ? 'full' : 'lite',
   evidence: 'Slice initialized',
   concerns: [],
 };
@@ -94,6 +102,7 @@ active.push({
   slice_id: sliceId,
   phase: 'discovery',
   status: 'in_progress',
+  mode: fullMode ? 'full' : 'lite',
   manifest: `.harness/state/slices/${sliceId}/manifest.json`,
   features: `.harness/features/${sliceId}.features.json`,
 });

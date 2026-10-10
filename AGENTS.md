@@ -5,6 +5,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 - Process: [docs/asdd-and-harness-engineering.md](docs/asdd-and-harness-engineering.md)
 - Portability: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md)
 - Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit); enable them with the kit installer.
+- Jev (required): [docs/jev-integration.md](docs/jev-integration.md) · [`.harness/steering/jev.md`](.harness/steering/jev.md)
 
 ## INIT (every session)
 
@@ -13,10 +14,10 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 3. Read features when `paths.features` is set.
 4. **JIT steering loading:**
    - Each steering file has YAML frontmatter with `inclusion` and `tags`.
-   - Load all `inclusion: "always"` files (controls, session-loop, manifest, skills, security-rules, README).
+   - Load all `inclusion: "always"` files (controls, session-loop, manifest, skills, security-rules, jev, README).
    - Load `inclusion: "auto"` files **only when their tags match the current phase**.
    - Skip auto files whose tags do not intersect the current phase — this saves context window.
-   - Small work → [`asdd-lite.md`](.harness/steering/asdd-lite.md).
+   - **Lite-first:** all slices start in `lite` mode (default in `init-slice.mjs`). Use `--full` only for work known upfront to be cross-cutting/architectural. Growth in a lite slice triggers evidence-based escalation — see [`asdd-lite.md`](.harness/steering/asdd-lite.md).
 5. Pick work:
    - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.
    - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners and disjoint file scopes; otherwise work serially.
@@ -50,6 +51,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 3. Domain: [domain-layer.md](.harness/steering/domain-layer.md) + [domain-layer.project.md](.harness/steering/domain-layer.project.md).
 4. Gates: [quality-gates.md](.harness/steering/quality-gates.md) + [quality-gates.project.md](.harness/steering/quality-gates.project.md).
 5. Fill project bindings before Discovery — stubs are not product truth.
+6. Jev is required. `export JEV_API_KEY` and do not treat `_unavailable` as a pass.
 
 ## Baseline steering reads
 

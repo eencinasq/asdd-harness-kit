@@ -20,8 +20,20 @@ How this template maps to product repos.
 5. Validate the generated adapter: `node .harness/scripts/check-project-config.mjs`.
 6. Validate Harness state: `node .harness/scripts/check-invariants.mjs`. This also checks that `.harness/steering/skills.md` lists only the name and description of each folder under `.agents/skills/`.
 7. Fill `quality-gates.project.md` before Discovery: the full-suite command, the failure-log path, and `Active findings` (`none` or real rows). A stub blocks the gate that needs it.
-8. With `--runtime=cursor`, confirm `.cursor/hooks.json` runs `node .harness/scripts/verify-on-stop.mjs` on `stop`.
-9. Create the first slice via Discovery or ASDD-Lite. Read [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md) for how guides and sensors fit.
+8. With `--runtime=cursor`, confirm `.cursor/hooks.json` runs `node .harness/scripts/verify-on-stop.mjs` on `stop` and `node .harness/scripts/jev-command-gate.mjs` on `beforeShellExecution`. With `--runtime=claude`, confirm `.claude/settings.json` registers the same two scripts on `Stop` and `PreToolUse` (Bash).
+9. Set `JEV_API_KEY`, keep `capabilities.jev.apiKey` empty, and run `node .harness/scripts/jev-gates.mjs health`.
+10. Create the first slice via Discovery or ASDD-Lite. Read [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md) and [jev-integration.md](jev-integration.md).
+
+## Enforcement coverage per runtime
+
+Session-loop gates are **hook-enforced** on runtimes with a hook mechanism and
+**advisory** (steering + `check-invariants.mjs`) everywhere else:
+
+| Runtime | Command gate (Jev) | Verify-on-stop |
+|---------|--------------------|----------------|
+| Cursor | `beforeShellExecution` hook (fail-closed) | `stop` hook (fail-closed) |
+| Claude Code | `PreToolUse`/`Bash` hook | `Stop` hook (loop-safe) |
+| OpenCode, Kimi, Junie, Devin, Kiro | advisory — run `node .harness/scripts/jev-command-gate.mjs` before dangerous commands, or expose the `check_command_safety` MCP tool | run `node .harness/scripts/check-invariants.mjs --live` before marking `passing` |
 
 ## Do not copy from a product monorepo
 

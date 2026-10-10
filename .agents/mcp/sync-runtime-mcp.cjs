@@ -13,6 +13,7 @@ const mcp = JSON.parse(readFileSync(mcpJson, 'utf8'));
 // OpenCode
 const servers = {};
 for (const [name, cfg] of Object.entries(mcp.mcpServers)) {
+  if (cfg.enabled === false) continue;
   if (cfg.url) {
     const e = { type: 'remote', url: cfg.url };
     if (cfg.headers) e.headers = cfg.headers;
@@ -38,6 +39,7 @@ writeFileSync(ocPath, JSON.stringify(oc, null, 2) + '\n');
 // Codex TOML fragment
 const lines = ['# Auto-generated from .agents/mcp/mcp.json — do not edit by hand\n'];
 for (const [name, cfg] of Object.entries(mcp.mcpServers)) {
+  if (cfg.enabled === false) continue;
   lines.push(`[mcp_servers.${name}]\n`);
   if (cfg.url) {
     lines.push(`url = "${cfg.url}"\n`);

@@ -13,7 +13,8 @@ Create an ASDD slice only when all of the following are true:
 - the delivery map has one parent epic and traceable stories or explicit pending definitions;
 - dependencies, cycles, orphan artifacts, and blockers have been checked;
 - the Product Delivery package is `READY` or the project has explicitly accepted a documented partial handoff;
-- the project bindings and quality gates under `.harness/steering/` are available.
+- the project bindings and quality gates under `.harness/steering/` are available;
+- Jev `shapeUpGates` and EARS/slice gates have run (`jev-gates.mjs`); `_unavailable` blocks handoff.
 
 `needs_shaping`, `proposed`, `no_bet`, `parked`, and `abandoned` pitches do not enter implementation planning. Preserve them for product traceability and return to Shape Up when appropriate.
 
@@ -59,7 +60,6 @@ Use the project binding for the concrete specification directory. A typical slic
 .harness/state/slices/<slice-id>/manifest.json
 .harness/features/<slice-id>.features.json
 .harness/progress/<slice-id>.md
-.harness/state/locks/<slice-id>.lock
 ```
 
 Keep a snapshot under `delivery/` only when the project needs an immutable handoff record. Otherwise use source paths or artifact IDs in `intent.md` and the traceability sections.
@@ -73,7 +73,7 @@ Keep a snapshot under `delivery/` only when the project needs an immutable hando
 5. **Run Domain and Design.** Validate terminology, boundaries, contracts, diagrams, security, and architecture against project steering. A Product Delivery tech proposal is input, not an approval.
 6. **Run Task Planning.** Convert approved design into atomic `TASK-*` entries, waves, dependencies, writable scopes, and verification commands.
 7. **Create the Harness feature projection.** Create one `TASK-*` feature per task with `status: not_started`, `depends_on`, `scope_paths`, `req_ids`, and a real verification command. Do not mark features `passing` during planning.
-8. **Start Implementation.** The coordinator claims the slice lock, selects dependency-ready features, assigns owners and scopes, and delegates implementation. Workers edit only their assigned scopes.
+8. **Start Implementation.** Select dependency-ready features, assign unique owners and disjoint `scope_paths`, write a session file, and run `sync-state`. Workers edit only their assigned scopes. Check dangerous bash with `jev-command-gate.mjs`.
 9. **Verify and close.** Run feature verification, required boundary and quality checks, and defect review. Record command and result evidence before `passing`. QA and Knowledge decide whether the slice ships, is re-shaped, parked, or abandoned.
 
 ## Traceability minimum

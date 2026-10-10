@@ -3,7 +3,10 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-install-test.XXXXXX")"
-trap 'rm -rf "$TMP"' EXIT
+# Nested junk file fixture: must never be copied into the target
+DSSTORE_FIXTURE="$ROOT/.agents/skills/shape-up/.DS_Store"
+touch "$DSSTORE_FIXTURE"
+trap 'rm -rf "$TMP" "${RTMP:-}" "${MTMP:-}"; rm -f "$DSSTORE_FIXTURE"' EXIT
 
 mkdir -p "$TMP/existing-app"
 echo '# my product' >"$TMP/existing-app/README.md"
@@ -44,6 +47,19 @@ test -f "$TMP/existing-app/docs/pipeline-documentation.md"
 
 # project.json derives name from directory
 grep -q '"project_id": "existing-app"' "$TMP/existing-app/.harness/config/project.json"
+# harness/kit version tracks package.json, never a hardcoded value
+KIT_VER="$(node -e "process.stdout.write(require('$ROOT/package.json').version)")"
+grep -q "\"harness_version\": \"$KIT_VER\"" "$TMP/existing-app/.harness/config/project.json"
+grep -q "\"version\": \"$KIT_VER\"" "$TMP/existing-app/.harness/config/project.json"
+# Jev is required in scaffolded project config (key via env only)
+grep -q '"jev"' "$TMP/existing-app/.harness/config/project.json"
+grep -q '"required": true' "$TMP/existing-app/.harness/config/project.json"
+grep -q '"apiKey": ""' "$TMP/existing-app/.harness/config/project.json"
+test -f "$TMP/existing-app/.harness/scripts/jev-client.mjs"
+test -f "$TMP/existing-app/.harness/scripts/jev-gates.mjs"
+test -f "$TMP/existing-app/.harness/scripts/jev-command-gate.mjs"
+test -f "$TMP/existing-app/.agents/mcp/jev-gate-server.mjs"
+test -f "$TMP/existing-app/.harness/steering/jev.md"
 
 # Shape Up -> Product Delivery integration contract.
 grep -q '^name: shape-up$' "$TMP/existing-app/.agents/skills/shape-up/SKILL.md"
@@ -61,6 +77,8 @@ if rg -n 'shape-up-pitch|ai-product-delivery' \
 fi
 test -L "$TMP/existing-app/.cursor/skills"
 test -f "$TMP/existing-app/.harness/scripts/check-invariants.mjs"
+test -f "$TMP/existing-app/.harness/scripts/escalate-slice.mjs"
+test -f "$TMP/existing-app/.harness/scripts/validators/lite-escalation.mjs"
 test -f "$TMP/existing-app/.harness/scripts/check-skills-index.mjs"
 test -f "$TMP/existing-app/.harness/steering/controls.md"
 grep -q 'Precedence' "$TMP/existing-app/.harness/steering/controls.md"
@@ -69,7 +87,15 @@ grep -q 'skills-index:start' "$TMP/existing-app/.harness/steering/skills.md"
 test -f "$TMP/existing-app/.harness/scripts/verify-on-stop.mjs"
 test -f "$TMP/existing-app/.cursor/hooks.json"
 grep -q 'verify-on-stop.mjs' "$TMP/existing-app/.cursor/hooks.json"
+grep -q 'jev-command-gate.mjs' "$TMP/existing-app/.cursor/hooks.json"
+grep -q 'beforeShellExecution' "$TMP/existing-app/.cursor/hooks.json"
 grep -q '"failClosed": true' "$TMP/existing-app/.cursor/hooks.json"
+# command gate speaks the Cursor beforeShellExecution contract
+(cd "$TMP/existing-app" && echo '{"command":"git status"}' | env -u JEV_API_KEY node .harness/scripts/jev-command-gate.mjs) | grep -q '"permission": *"allow"'
+(cd "$TMP/existing-app" && echo '{"command":"rm -rf /tmp/anything"}' | env -u JEV_API_KEY node .harness/scripts/jev-command-gate.mjs) | grep -q '"permission": *"deny"'
+# command gate speaks the Claude Code PreToolUse contract
+(cd "$TMP/existing-app" && echo '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"git status"}}' | env -u JEV_API_KEY node .harness/scripts/jev-command-gate.mjs) | grep -q '"permissionDecision": *"allow"'
+(cd "$TMP/existing-app" && echo '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"rm -rf /tmp/anything"}}' | env -u JEV_API_KEY node .harness/scripts/jev-command-gate.mjs) | grep -q '"permissionDecision": *"deny"'
 test -f "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 test -f "$TMP/existing-app/.harness/config/project.schema.json"
 test -f "$TMP/existing-app/scripts/harness-migrate.mjs"
@@ -78,6 +104,24 @@ node "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 test ! -e "$TMP/existing-app/runtimes"
 test ! -e "$TMP/existing-app/.agents/modules"
 test ! -e "$TMP/existing-app/scripts/enable-module.sh"
+test -f "$TMP/existing-app/.agents/mcp/jev-gate-server.test.mjs"
+
+# Kit-internal / dev-only files must never be installed
+test ! -e "$TMP/existing-app/scripts/generate-versions.mjs"
+test ! -e "$TMP/existing-app/scripts/npx-install.cjs"
+test ! -e "$TMP/existing-app/scripts/test-install-into.sh"
+test ! -e "$TMP/existing-app/scripts/test-lifecycle.sh"
+test ! -e "$TMP/existing-app/scripts/test-full-flow.sh"
+test ! -e "$TMP/existing-app/package.json"
+test ! -e "$TMP/existing-app/.npmignore"
+test ! -e "$TMP/existing-app/.github"
+test ! -e "$TMP/existing-app/.idea"
+test ! -e "$TMP/existing-app/LICENSE"
+test ! -e "$TMP/existing-app/.harness/state/registry.json"
+test ! -e "$TMP/existing-app/.harness/progress/agent-audit-2026-10-01.md"
+test -z "$(find "$TMP/existing-app" \( -name '.DS_Store' -o -name '._*' \) -print -quit)"
+# target's own files are never clobbered
+grep -q 'my product' "$TMP/existing-app/README.md"
 test -f "$TMP/existing-app/.agents/skills/api-and-interface-design/SKILL.md"
 test -L "$TMP/existing-app/.opencode/skills"
 test -L "$TMP/existing-app/.opencode/agents/asdd-discovery-agent.md"
@@ -100,10 +144,13 @@ printf '%s\n' '{"version":1,"hooks":{"beforeShellExecution":[{"command":"echo ke
 "$ROOT/scripts/install-into.sh" "$TMP/existing-app" --runtime=cursor >/dev/null
 grep -q 'echo keep-me' "$TMP/existing-app/.cursor/hooks.json"
 grep -q 'verify-on-stop.mjs' "$TMP/existing-app/.cursor/hooks.json"
+grep -q 'jev-command-gate.mjs' "$TMP/existing-app/.cursor/hooks.json"
 
-# second run keeps binding, does not require --force for create-only
+# second run keeps binding, does not require --force for create-only, stays hook-idempotent
 "$ROOT/scripts/install-into.sh" "$TMP/existing-app" >/dev/null
 grep -q 'KEEP ME' "$TMP/existing-app/.harness/steering/product.md"
+GATE_COUNT="$(node -e "const h=JSON.parse(require('fs').readFileSync('$TMP/existing-app/.cursor/hooks.json','utf8')); process.stdout.write(String((h.hooks.beforeShellExecution||[]).filter((e)=>String(e?.command??'').includes('jev-command-gate')).length))")"
+[[ "$GATE_COUNT" == "1" ]]
 
 # ------------------------------------------------------------------
 # Per-runtime MCP validation
@@ -123,7 +170,6 @@ validate_runtime_mcp() {
 }
 
 RTMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-rt-test.XXXXXX")"
-trap 'rm -rf "$RTMP"' EXIT
 
 for rt in cursor claude opencode kimi junie devin kiro; do
   echo "== runtime $rt =="
@@ -140,6 +186,9 @@ for rt in cursor claude opencode kimi junie devin kiro; do
       test -L "$RTMP/$rt-app/.mcp.json"
       validate_runtime_mcp "$RTMP/$rt-app" "$rt" ".mcp.json"
       test -f "$RTMP/$rt-app/CLAUDE.md"
+      test -f "$RTMP/$rt-app/.claude/settings.json"
+      grep -q 'jev-command-gate.mjs' "$RTMP/$rt-app/.claude/settings.json"
+      grep -q 'verify-on-stop.mjs' "$RTMP/$rt-app/.claude/settings.json"
       ;;
     opencode)
       test -L "$RTMP/$rt-app/.opencode/skills"
@@ -176,7 +225,6 @@ done
 # Per-module validation
 # ------------------------------------------------------------------
 MTMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-mod-test.XXXXXX")"
-trap 'rm -rf "$MTMP"' EXIT
 
 for mod in bruno playwright-e2e web-ui http-api; do
   echo "== module $mod =="

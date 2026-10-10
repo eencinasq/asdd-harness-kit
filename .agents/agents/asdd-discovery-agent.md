@@ -20,6 +20,7 @@ Catalog: `.harness/steering/skills.md` (name and description only). `Read` a ski
 - When you start splitting an epic or compound intent: `Read` `.agents/skills/user-story-decomposition/SKILL.md`
 - When you start BMC or Lean Canvas intake: `Read` `.agents/skills/business-model-canvas/SKILL.md`
 - When you start ranking two or more capabilities: `Read` `.agents/skills/capability-prioritization/SKILL.md`
+- When you start Shape Up: `Read` `.agents/skills/shape-up/SKILL.md` (required Jev appetite + rabbit-hole gates)
 
 ---
 

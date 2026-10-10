@@ -4,19 +4,47 @@ tags:
   - lite
 ---
 
-# ASDD-Lite — Lightweight Path for Small Features & Bugs
+# ASDD-Lite — Default Path (Lite-First)
 
-A streamlined alternative to the full 9-phase ASDD pipeline for **small, well-scoped work** (bug fixes, UI tweaks, config changes, single-module features). Cuts ceremony while preserving non-negotiables: TDD, verification, traceability, and Codegraph-first exploration.
+Lite is the **default entry mode for every slice**. The full 9-phase pipeline is
+opt-in (`init-slice.mjs --full`) for work known upfront to be cross-cutting or
+architectural. Growth in a lite slice is not a judgment call: the harness
+detects escalation evidence from sessions and blocks the slice from completing
+until it is acknowledged.
 
 ## When to use
 
-| Signal | Path |
-|--------|------|
-| New user-facing capability, cross-cutting, architectural | **Full ASDD** |
-| Small feature, bug fix, UI tweak, config change | **ASDD-Lite** |
-| Uncertain — start Lite, escalate if scope grows | **ASDD-Lite** |
+Lite is the default. Choose **full only upfront** when the work is provably a
+new user-facing capability spanning modules, cross-cutting, or architectural.
+Rule of thumb for what keeps a slice lite: single module scope, ≤1 new domain
+concept, serial work (one `in_progress` feature).
 
-Rule of thumb: if the work touches ≤3 files and introduces ≤1 new domain concept, use Lite.
+## Escalation triggers (machine-enforced)
+
+| # | Evidence | Source | Effect |
+|---|----------|--------|--------|
+| E1 | Scope spans ≥2 top-level modules | `scope_paths` on `feature_started` sessions | signal → blocks DONE |
+| E2 | >1 `in_progress` feature | `.features.json` + lite mode | **FAIL invariants** (lite is serial) |
+| E3 | >1 new domain term declared | `new_domain_terms` on `checkpoint` sessions | signal → blocks DONE |
+| E4 | Architectural contention | any `dissent` session | signal → blocks DONE |
+| E5 | Implementation blockage | `phase_blocked` in `implementation` | signal → blocks DONE |
+
+Open signals are WARN during work (`harness-status.mjs` lists them). A
+`phase_completed` for `qa`/`knowledge` while signals are open is a FAIL:
+`sync-state` also refuses to derive `DONE` for such a slice.
+
+## How to escalate
+
+```bash
+node .harness/scripts/escalate-slice.mjs <slice-id> --reasons "E1-scope-spread,E4-dissent" [--by <owner>]
+```
+
+This appends a `checkpoint` session with `mode: "escalated"`. Then:
+
+1. Backfill `.harness/specs/<slice>/capability.md` and `requirements.md` from `spec.md`.
+2. Continue from the appropriate full-ASDD phase (Validation → Domain → Design → …).
+
+The slice's `spec.md`, `design.md`, `tasks.md` remain — full artifacts are additive.
 
 ## Phase mapping
 
@@ -43,6 +71,7 @@ Rule of thumb: if the work touches ≤3 files and introduces ≤1 new domain con
 4. **Codegraph first** — before edits in unfamiliar modules.
 5. **Serial execution** — ASDD-Lite allows at most one `in_progress` feature in `.features.json`; the parallel task contract is for fully planned slices only.
 6. **No gold-plating** — modify only files mapped to `.harness/specs/<slice>/spec.md`, as in [session-loop.md](./session-loop.md). Do not perform unrequested refactors.
+7. **Jev** — required gates in [jev.md](./jev.md). `_unavailable` is not a pass.
 
 ## Dropped from full ASDD
 
@@ -67,6 +96,8 @@ ASDD-Lite slices do **not** populate `gates` in the per-slice manifest. Use sess
   "phase": "implementation",
   "status": "in_progress",
   "mode": "lite",
+  "escalation_signals": [],
+  "escalation_required": false,
   "gates": {},
   "active_features": [],
   "session_log": [],
@@ -82,11 +113,10 @@ ASDD-Lite slices do **not** populate `gates` in the per-slice manifest. Use sess
 
 ## Escalation
 
-If during implementation the scope grows (new modules, multiple user surfaces, architectural decisions), escalate to full ASDD:
-
-1. Write a `checkpoint` session with `mode: "escalated"`.
-2. Backfill `capability.md` and `requirements.md` from `spec.md`.
-3. Continue from the appropriate full-ASDD phase (Validation → Domain → Design → …).
+See [Escalation triggers](#escalation-triggers-machine-enforced) and
+[How to escalate](#how-to-escalate) above — the transition is triggered by
+session evidence and performed with `escalate-slice.mjs`, not by hand-editing
+sessions or manifests.
 
 ## Agent
 

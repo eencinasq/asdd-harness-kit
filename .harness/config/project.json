@@ -38,8 +38,14 @@
     "orca": {
       "enabled": false,
       "experimental": true
+    },
+    "jev": {
+      "enabled": true,
+      "required": true,
+      "apiKey": "",
+      "endpoint": "https://api.typesafe.ai/v1",
+      "fallbackPolicy": "fail-closed"
     }
   },
   "runtimes": []
 }
-
