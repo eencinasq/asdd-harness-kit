@@ -5,7 +5,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 - Process: [docs/asdd-and-harness-engineering.md](docs/asdd-and-harness-engineering.md)
 - Portability: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md)
 - Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit); enable them with the kit installer.
-- Jev (required): [docs/jev-integration.md](docs/jev-integration.md) · [`.harness/steering/jev.md`](.harness/steering/jev.md)
+- Jev (shape-up / product-delivery only): [docs/jev-integration.md](docs/jev-integration.md) · [`.harness/steering/jev.md`](.harness/steering/jev.md)
 
 ## INIT (every session)
 
@@ -33,6 +33,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 | `.harness/state/slices/<id>/sessions/*.json` | Append-only session logs (one writer per file) |
 | `.harness/features/` | Session feature tracker |
 | `.harness/PROGRESS.md` | Active slices index (human-curated or generated) |
+| `.harness/knowledge/` | **Generated** knowledge index (graph + chunks via `sync-knowledge.mjs`; `knowledge` MCP server queries it) |
 
 ## Working rules
 
@@ -51,7 +52,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 3. Domain: [domain-layer.md](.harness/steering/domain-layer.md) + [domain-layer.project.md](.harness/steering/domain-layer.project.md).
 4. Gates: [quality-gates.md](.harness/steering/quality-gates.md) + [quality-gates.project.md](.harness/steering/quality-gates.project.md).
 5. Fill project bindings before Discovery — stubs are not product truth.
-6. Jev is required. `export JEV_API_KEY` and do not treat `_unavailable` as a pass.
+6. Jev is required **only** inside `shape-up` and `product-delivery` (prefer `jev-gate` MCP). Set `JEV_API_KEY` for those skills; do not treat `unavailable` as a pass. Harness ASDD must not call Jev.
 
 ## Baseline steering reads
 

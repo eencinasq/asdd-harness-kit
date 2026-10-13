@@ -281,9 +281,9 @@ The full suite in `quality-gates.project.md` runs before a new spec enters Task 
 │    ▼                                                                        │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │ SHAPE UP                                                             │   │
-│  │ • Set boundaries (appetite) + Jev score                             │   │
+│  │ • Set boundaries (appetite) + MCP jev_shape_up_gates                │   │
 │  │ • Find elements (rough solution)                                     │   │
-│  │ • Address risks (rabbit holes) + Jev noul                            │   │
+│  │ • Address risks (rabbit holes) via MCP                              │   │
 │  │ • Write pitch                                                        │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │    │                                                                        │
@@ -294,7 +294,7 @@ The full suite in `quality-gates.project.md` runs before a new spec enters Task 
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │ PRODUCT DELIVERY                                                     │   │
 │  │ • Delivery Map (epic, stories, tasks, dependencies)                 │   │
-│  │ • HF User Stories + Jev EARS noul + slice choice                     │   │
+│  │ • HF User Stories + MCP jev_ears_gate + jev_slice_choice              │   │
 │  │ • AF Refinement (contracts, UI states, test strategy)                │   │
 │  │ • Tech Spec (architecture, diagrams, rollout)                        │   │
 │  │ • Work Plan (phases, execution order)                              │   │
@@ -320,7 +320,7 @@ The full suite in `quality-gates.project.md` runs before a new spec enters Task 
 │  │ ASDD + HARNESS                                                       │   │
 │  │ • Discovery → Design → Task Planning                                 │   │
 │  │ • Implementation (TDD, command gate, mapped files)                   │   │
-│  │ • Invariants + gold-plating noul + evidence                          │   │
+│  │ • Invariants + evidence (no Jev)                                     │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │    │                                                                        │
 │    ▼                                                                        │

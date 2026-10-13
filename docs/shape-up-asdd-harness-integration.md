@@ -1,6 +1,6 @@
 # Shape Up + ASDD + Harness
 
-This document defines how this kit combines Shape Up pitches with ASDD and Harness. **Jev System One is required** on Shape Up and Product Delivery gates ([jev-integration.md](jev-integration.md)).
+This document defines how this kit combines Shape Up pitches with ASDD and Harness. **Jev System One is required via MCP** on Shape Up and Product Delivery only ([jev-integration.md](jev-integration.md)); harness ASDD does not call Jev.
 
 It is a portable framework guide. Product repositories keep their own product bindings, domain model, quality commands, and slice history under `.harness/`.
 
@@ -61,7 +61,7 @@ Do not turn an unvalidated idea into a capability or implementation task.
 
 ### 2. Pitch and shaping
 
-The `shape-up` skill creates the pitch. Before betting, run `shapeUpGates` (`jevScore` ≥ 4, rabbit-hole `jevNoul` ≥ 0.80). `_unavailable` stops the bet.
+The `shape-up` skill creates the pitch. Before betting, call MCP `jev_status` then `jev_shape_up_gates` (appetite score ≥ 4, rabbit-hole noul ≥ 0.80). Shell fallback: `shapeUpGates` in `jev-gates.mjs`. `unavailable` stops the bet.
 
 Every pitch should contain:
 
