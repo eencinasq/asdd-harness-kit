@@ -3,9 +3,9 @@
  * Harness Engineering invariants (cheap, no Nx).
  * Run from repo root: node .harness/scripts/check-invariants.mjs [--live]
  *
- * --live (or HARNESS_JEV_LIVE=1): Jev must be usable — a missing JEV_API_KEY
- * is a FAIL, not a WARN. Session-loop gates (verify-on-stop) always run live;
- * CI and ad-hoc structural checks run non-live by default.
+ * --live (or HARNESS_JEV_LIVE=1): structural live path for verify-on-stop.
+ * Jev is skill-scoped (shape-up / product-delivery only) and is not invoked
+ * from harness invariants.
  *
  * Supports:
  * - Global manifest schema v2.0 (active_slices array)
@@ -22,7 +22,6 @@ import validateManifest from './validators/manifest.mjs';
 import validateFeatures from './validators/features.mjs';
 import validateSkills from './validators/skills.mjs';
 import validateLiteEscalation from './validators/lite-escalation.mjs';
-import { validateJevGoldPlating } from './validators/jev-gold-plating.mjs';
 import { assertJevConfigured } from './jev-gates.mjs';
 
 const root = process.cwd();
@@ -65,18 +64,10 @@ validateFeatures(ctx);
 validateSkills(ctx);
 validateLiteEscalation(ctx);
 
-const jevLive = process.argv.includes('--live') || process.env.HARNESS_JEV_LIVE === '1';
-const jevReady = assertJevConfigured({ live: jevLive });
+// Jev is skill-scoped (shape-up / product-delivery). Harness invariants never invoke System One.
+const jevReady = assertJevConfigured();
 if (!jevReady.ok) {
   fail(jevReady.error);
-} else if (jevReady.skipped) {
-  warn(jevReady.skipped);
-}
-
-try {
-  await validateJevGoldPlating(ctx);
-} catch (error) {
-  fail(`Jev gold-plating: ${error.message}`);
 }
 
 if (warnings.length) {

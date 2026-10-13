@@ -103,7 +103,7 @@ Session file format (one JSON file per action, never edited):
 
 `tasks.md` waves define dependency barriers; task dependencies determine which DAG nodes are ready. Same-wave tasks may run concurrently only when every task has an explicit owner and a non-empty `scope_paths`, scopes do not overlap (including parent/child directory paths), and the coordinator has written a session file for the slice. Tasks without these declarations run serially.
 
-The coordinator alone writes `.features.json`, session files, and updates shared state via `sync-state`. Workers edit only their owned task scope and report changed files, verification commands/results, blockers, and relevant requirement coverage. The coordinator reconciles results and marks a task `passing` only after evidence review. Shared-state changes happen at wave barriers. See [Orca task orchestration](../../docs/orca-task-orchestration.md) for a supervised DAG workflow.
+The coordinator alone writes `.features.json`, session files, and updates shared state via `sync-state`. Workers edit only their owned task scope and report changed files, verification commands/results, blockers, and relevant requirement coverage. The coordinator reconciles results and marks a task `passing` only after evidence review. Shared-state changes happen at wave barriers. For supervised DAG orchestration across agents, use the `orchestration` skill if installed.
 
 ASDD-Lite remains single-worker and serial (machine-enforced: a lite slice with more than one `in_progress` feature fails invariants). Lite slices are the default; growth evidence forces escalation — see [asdd-lite.md](./asdd-lite.md).
 
@@ -113,7 +113,7 @@ Modify only the files mapped to the active specification `.harness/specs/<slice>
 
 Mapped files are the paths named by that `intent.md` and by the slice `design.md` and `tasks.md` that trace to it, plus `scope_paths` on the in-progress feature. Slice harness records (session files, features) stay writable. Any other product file is out of scope. A refactor inside a mapped file is in scope only when that spec, the current task, or the slice phase `refactor` requests it.
 
-Invariants also run a Jev noul on `git diff` of in-progress `scope_paths` when `JEV_API_KEY` is set ([jev.md](./jev.md)).
+Harness invariants do not call Jev. Scope control is deterministic (this file's mapping + `features.mjs`). Jev is skill-scoped to `shape-up` / `product-delivery` only ([jev.md](./jev.md)).
 
 ## Verify-on-Stop
 
@@ -123,7 +123,7 @@ Before the session ends, and before a feature is marked `passing`, the agent sha
 node .harness/scripts/check-invariants.mjs --live
 ```
 
-Exit 0 is required. WARN lines do not block. Any FAIL blocks completion — including a missing `JEV_API_KEY` in live mode (Jev is required). The agent shall fix every FAIL and shall not mark the feature `passing` while the command exits non-zero. Ad-hoc structural checks may drop `--live` (missing key then WARNs).
+Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The agent shall fix every FAIL and shall not mark the feature `passing` while the command exits non-zero. Live mode does not require `JEV_API_KEY` (Jev is not a harness gate).
 
 Both Cursor and Claude Code run this automatically. `.cursor/hooks.json` binds `stop` to `node .harness/scripts/verify-on-stop.mjs` (`loop_limit` 3, `failClosed` true); `.claude/settings.json` binds `Stop` to the same script. When the invariants run exits non-zero, the hook submits the FAIL output as the next prompt (Cursor) or a `decision: block` reason (Claude, respecting `stop_hook_active`) so the agent corrects the harness state before the session ends. When the command exits 0, the hook returns `{}` and the session may end. The hook does not inject a follow-up when `status` is `aborted` or `error`. After `loop_limit`, a remaining FAIL still means the feature is not `passing`.
 

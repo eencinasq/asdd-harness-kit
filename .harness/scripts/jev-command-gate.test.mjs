@@ -19,3 +19,9 @@ test('override allows a dangerous command without calling Jev', async () => {
   assert.equal(result.allowed, true);
   assert.equal(result.method, 'override');
 });
+
+test('dangerous command is denied by pattern without calling Jev', async () => {
+  const result = await checkCommandSafety('rm -rf .');
+  assert.equal(result.allowed, false);
+  assert.equal(result.method, 'pattern-deny');
+});

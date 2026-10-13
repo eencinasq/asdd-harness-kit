@@ -1,6 +1,9 @@
-# Jev wiring (required)
+# Jev wiring (skill-scoped)
 
-TypeSafe **System One** is a required control in this kit. Steering and thresholds: [`.harness/steering/jev.md`](../.harness/steering/jev.md).
+TypeSafe **System One** is required only for **`shape-up`** and **`product-delivery`**.
+Harness ASDD phases, invariants, and other skills must **not** call Jev.
+
+Steering and thresholds: [`.harness/steering/jev.md`](../.harness/steering/jev.md).
 
 ## Pipeline
 
@@ -8,15 +11,16 @@ TypeSafe **System One** is a required control in this kit. Steering and threshol
 [ idea ]
     │
     ▼
-1. SHAPE UP
-   jevScore  → appetite fit (pass ≥ 4)
-   jevNoul   → rabbit-hole guard (pass ≥ 0.80)
+1. SHAPE UP  (Jev MCP required)
+   jev_status
+   jev_shape_up_gates  → appetite score (≥ 4) + rabbit-hole noul (≥ 0.80)
     │
     ▼
-2. PRODUCT DELIVERY
+2. PRODUCT DELIVERY  (Jev MCP required)
    EARS REQ-* drafts
-   jevNoul   → ambiguity (pass ≥ 0.85, or `# jev-override: accept`)
-   jevChoice → slice class (mvp | v1 | v2 | backlog)
+   jev_status
+   jev_ears_gate       → ambiguity (pass ≥ 0.85, or `# jev-override: accept`)
+   jev_slice_choice    → slice class (mvp | v1 | v2 | backlog)
     │
     ▼
 3. EXTERNAL TRACKERS (optional projection)
@@ -25,63 +29,58 @@ TypeSafe **System One** is a required control in this kit. Steering and threshol
    (not a Jev call)
     │
     ▼
-4. ASDD + HARNESS
-   jev-command-gate.mjs → dangerous bash (whitelist, else noul ≥ 0.80)
+4. ASDD + HARNESS  (no Jev)
+   jev-command-gate.mjs → dangerous bash (pattern allow/deny only)
    Hook-wired:          Cursor beforeShellExecution / Claude Code PreToolUse (fail-closed)
    Agent loop            → code, tests, session files, sync-state
-   check-invariants.mjs  → harness state + gold-plating noul on in-progress diffs
-   verify-on-stop.mjs    → check-invariants --live at session end (missing key = FAIL)
-   hillChartGate         → circuit break if score < 2 and timebox < 20%
+   check-invariants.mjs  → harness state (no System One)
+   verify-on-stop.mjs    → check-invariants --live (does not require JEV_API_KEY)
     │
     ▼
 [ verified code ]
 ```
 
-`_unavailable` is never a pass. Do not invent fallback scores that look like success.
+Inside shape-up / product-delivery, `unavailable` is never a pass. Do not invent fallback scores that look like success.
 
-## Commands
+## MCP first
+
+Prefer the **`jev-gate` MCP** (`.agents/mcp/jev-gate-server.mjs`):
+
+| Tool | Skill |
+|------|--------|
+| `jev_status` | both |
+| `jev_shape_up_gates` | shape-up |
+| `jev_ears_gate` | product-delivery |
+| `jev_slice_choice` | product-delivery |
+| `check_command_safety` | hooks (pattern only; no System One) |
+
+Shell fallback only when MCP is unavailable:
 
 ```bash
-export JEV_API_KEY="…"                 # never commit; project.json apiKey stays ""
+export JEV_API_KEY="…"                 # or .env / .env.local — never commit; project.json apiKey stays ""
 node .harness/scripts/jev-client.mjs status
 node .harness/scripts/jev-gates.mjs health
-node .harness/scripts/check-invariants.mjs          # structural (non-live) mode
-node .harness/scripts/check-invariants.mjs --live   # session-gate mode: missing key = FAIL
 node --test .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .agents/mcp/jev-gate-server.test.mjs
 ```
 
 | Script | Role |
 |--------|------|
 | `jev-client.mjs` | Only HTTP client: `POST {endpoint}/systemone` |
-| `jev-gates.mjs` | Shape Up, EARS, slice, hill, gold-plating |
-| `jev-command-gate.mjs` | Command safety policy + runtime hook entrypoint (Cursor `beforeShellExecution`, Claude Code `PreToolUse`; protocol auto-detected from the stdin payload) |
-| `jev-gate-server.mjs` (.agents/mcp) | Optional zero-dependency MCP stdio adapter exposing the same policy as the `check_command_safety` tool |
+| `jev-gates.mjs` | Shape Up, EARS, slice, hill (library behind MCP) |
+| `jev-command-gate.mjs` | Pattern command safety + runtime hook entrypoint |
+| `jev-gate-server.mjs` (.agents/mcp) | MCP tools for skills + `check_command_safety` |
 
 ## Config
 
-`.harness/config/project.json`:
-
 ```json
-"jev": {
+{
   "enabled": true,
-  "required": true,
+  "required": false,
+  "required_by": ["shape-up", "product-delivery"],
   "apiKey": "",
   "endpoint": "https://api.typesafe.ai/v1",
   "fallbackPolicy": "fail-closed"
 }
 ```
 
-`check-project-config.mjs` fails if `enabled`/`required` are not true, or if `apiKey` is stored in the file.
-
-**Live vs non-live mode.** Session-loop gates (`verify-on-stop` on Cursor and Claude Code) always run `check-invariants.mjs --live`: without `JEV_API_KEY` the run FAILs and the session cannot close — this is the "Jev is required" non-negotiable, enforced. Ad-hoc structural checks and CI run non-live by default: without a key they WARN (`JEV_API_KEY not set; live Jev skipped`) and skip live calls so CI can pass with `enabled`/`required` structurally true. Override the default with `--live` or `HARNESS_JEV_LIVE=1`.
-
-## MCP
-
-`.agents/mcp/jev-gate-server.mjs` is a stdio MCP adapter around the same policy module (`jev-command-gate.mjs`). It is implemented dependency-free (hand-rolled JSON-RPC over stdio) — no `@modelcontextprotocol/sdk` required — and is registered enabled in `.agents/mcp/mcp.json`. Servers with `"enabled": false` are skipped by `sync-runtime-mcp.cjs` projections. Hook enforcement (Cursor/Claude) calls `jev-command-gate.mjs` directly; the MCP tool serves runtimes that prefer native MCP gating. Protocol tests: `node --test .agents/mcp/jev-gate-server.test.mjs`.
-
-## Skills
-
-There are no separate `jev-*` skills. Required gates are sections in:
-
-- [`.agents/skills/shape-up/SKILL.md`](../.agents/skills/shape-up/SKILL.md)
-- [`.agents/skills/product-delivery/SKILL.md`](../.agents/skills/product-delivery/SKILL.md)
+`check-invariants.mjs --live` does **not** require `JEV_API_KEY`. Set the key when running shape-up or product-delivery.

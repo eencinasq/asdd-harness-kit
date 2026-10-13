@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes a portable delivery pipeline for taking a product idea from shaping through implementation with ASDD + Harness Engineering. **Jev System One is required** on Shape Up, Product Delivery, and Harness execution ([jev-integration.md](jev-integration.md)). Product repositories provide their own bindings, domain language, technology choices, `JEV_API_KEY`, and tracker integrations.
+This document describes a portable delivery pipeline for taking a product idea from shaping through implementation with ASDD + Harness Engineering. **Jev System One is required on Shape Up and Product Delivery only** ([jev-integration.md](jev-integration.md)); harness ASDD does not call Jev. Product repositories provide their own bindings, domain language, technology choices, `JEV_API_KEY` (for those skills), and tracker integrations.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -26,7 +26,7 @@ This document describes a portable delivery pipeline for taking a product idea f
 ## Stage 1: Shape Up
 
 **Skill:** `shape-up`  
-**Jev (required):** `shapeUpGates` in `.harness/scripts/jev-gates.mjs` before betting.
+**Jev (required via MCP):** `jev_shape_up_gates` before betting (shell fallback: `jev-gates.mjs`).
 
 ### Process
 
@@ -69,7 +69,7 @@ Raw Idea → Set Boundaries → Find Elements → Address Risks → Write Pitch
 ## Stage 2: Product Delivery
 
 **Skill:** `product-delivery`  
-**Jev (required):** `earsGate` + `sliceChoice` in `.harness/scripts/jev-gates.mjs` before freezing REQ-*.
+**Jev (required via MCP):** `jev_ears_gate` + `jev_slice_choice` before freezing REQ-* (shell fallback: `jev-gates.mjs`).
 
 ### Process
 
@@ -249,7 +249,8 @@ Validation phase of the full path.
 | **Controls** | `.harness/steering/controls.md` | Which guide or sensor wins when they disagree |
 | **Quality gates** | `.harness/steering/quality-gates.md` | EARS acceptance criteria for phase gates. Numeric cutoffs live only here |
 | **Gate binding** | `.harness/steering/quality-gates.project.md` | Full-suite command, failure log, active domain findings |
-| **Jev** | `.harness/steering/jev.md` | Required System One thresholds; client `jev-client.mjs` |
+| **Jev** | `.harness/steering/jev.md` | Skill-scoped System One (shape-up / product-delivery MCP); client `jev-client.mjs` |
+| **Knowledge index** | `.harness/knowledge/*.jsonl` | Generated graph+chunk projection of specs/state/features (`sync-knowledge.mjs`); queried via the `knowledge` MCP server. Regenerable — never SoT. Growth path: [architecture/knowledge-scaling.md](architecture/knowledge-scaling.md) |
 
 How these fit together: [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md).
 
@@ -263,7 +264,7 @@ Features.json → Implementation (mapped files only) → QA → Knowledge
 Invariants pass → Evidence recorded → PROGRESS.md matches the slice manifest
 ```
 
-Implementation edits only the files mapped to the active spec. A skill body is read when that task starts, not from the skills index. On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecution` (fail-closed) and `verify-on-stop.mjs` on `stop`; on **Claude Code**, `.claude/settings.json` wires the same two scripts to `PreToolUse` (Bash) and `Stop`. Both stop-gates run `check-invariants.mjs --live` — a missing `JEV_API_KEY` blocks session close — and a failing check is returned as the next prompt. Other runtimes are advisory (see the enforcement matrix in [asdd-harness-portability.md](asdd-harness-portability.md)). CI reruns these exact suites (`.github/workflows/harness-invariants.yml`):
+Implementation edits only the files mapped to the active spec. A skill body is read when that task starts, not from the skills index. On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecution` (fail-closed) and `verify-on-stop.mjs` on `stop`; on **Claude Code**, `.claude/settings.json` wires the same two scripts to `PreToolUse` (Bash) and `Stop`. Both stop-gates run `check-invariants.mjs --live` (Jev is not required for this gate) — a failing check is returned as the next prompt. Other runtimes are advisory (see the enforcement matrix in [asdd-harness-portability.md](asdd-harness-portability.md)). CI reruns these exact suites (`.github/workflows/harness-invariants.yml`):
 unit tests (`node --test`), installer smoke test, lifecycle e2e with negative invariant cases, project config and skills index, and a `sync-state` + invariants pass.
 
 The full suite in `quality-gates.project.md` runs before a new spec enters Task Planning.
@@ -352,15 +353,17 @@ The full suite in `quality-gates.project.md` runs before a new spec enters Task 
 
 | Tool | Purpose |
 |------|---------|
-| `shape-up` skill | Pitch creation; required Jev appetite + rabbit hole |
-| `product-delivery` skill | Delivery artifacts; required Jev EARS + slice class |
+| `shape-up` skill | Pitch creation; required Jev MCP appetite + rabbit hole |
+| `product-delivery` skill | Delivery artifacts; required Jev MCP EARS + slice class |
 | Tracker integration | Optional issue projection; collisions via `scope_paths` |
 | Codegraph MCP | Code intelligence |
+| Knowledge MCP (`knowledge-server.mjs`) | Process intelligence — `knowledge_search` / `knowledge_trace` / `knowledge_slice` / `knowledge_status` over the generated index |
+| `sync-knowledge.mjs` | Rebuild `.harness/knowledge/` (nodes/edges/chunks); `--embed` adds vectors via `KNOWLEDGE_EMBEDDINGS_URL` |
 | ASDD agents | Discovery through QA |
-| Harness | Sessions, features, invariants, command gate, gold-plating |
+| Harness | Sessions, features, invariants, pattern command gate |
 | `init-slice.mjs [--full]` | Scaffold a slice; lite by default |
 | `escalate-slice.mjs` | Lite → escalated transition on detected evidence |
-| Jev | `jev-client.mjs` / `jev-gates.mjs` / `jev-command-gate.mjs` |
+| Jev | MCP `jev-gate` + `jev-client.mjs` / `jev-gates.mjs` (shape-up / product-delivery only) |
 | Skills index | `.harness/steering/skills.md` — name and description until the task starts |
 | Verify-on-Stop | `check-invariants.mjs --live` at session end (Cursor + Claude Code hooks) |
 
@@ -403,12 +406,12 @@ The full suite in `quality-gates.project.md` runs before a new spec enters Task 
 
 ## Summary
 
-The pipeline transforms an idea into implementation through four stages. **Jev is required** on Shape Up, Product Delivery, and Harness execution ([jev-integration.md](jev-integration.md)).
+The pipeline transforms an idea into implementation through four stages. **Jev is required on Shape Up and Product Delivery only** ([jev-integration.md](jev-integration.md)).
 
-1. **Shape Up** — bounded pitch; Jev appetite score and rabbit-hole noul before betting
-2. **Product Delivery** — delivery artifacts; Jev EARS noul and slice choice
+1. **Shape Up** — bounded pitch; Jev MCP appetite + rabbit-hole before betting
+2. **Product Delivery** — delivery artifacts; Jev MCP EARS + slice choice
 3. **External tracker (optional)** — mirrors approved stories; file collisions are Harness `scope_paths`, not Jev
-4. **ASDD + Harness** — governed slice, TDD, command gate, gold-plating, evidence
+4. **ASDD + Harness** — governed slice, TDD, pattern command gate, evidence (no Jev)
 
 The Product Delivery → ASDD + Harness handoff is defined in [`product-delivery/references/asdd-harness-handoff.md`](../.agents/skills/product-delivery/references/asdd-harness-handoff.md). The handoff preserves the chain `TASK → REQ → story → source scope → epic → pitch`, gives each ASDD phase a clear input, and makes Harness the source of truth for live implementation status and evidence. Guides, sensors, and session close are described in [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md).
 

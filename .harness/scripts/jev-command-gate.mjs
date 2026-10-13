@@ -1,5 +1,6 @@
 /**
- * Command safety gate. Pattern whitelist/deny first; Jev noul only for dangerous commands.
+ * Command safety gate — pattern whitelist/deny only.
+ * Jev is skill-scoped (shape-up / product-delivery) and is NOT used here.
  *
  * Library use:
  *   import { checkCommandSafety } from './jev-command-gate.mjs';
@@ -13,7 +14,6 @@
  *   so a gate crash blocks the command instead of letting it through.
  */
 import { readFileSync } from 'node:fs';
-import { jevNoul } from './jev-client.mjs';
 
 const DANGEROUS_PATTERNS = [
   /^rm\s+-rf/,
@@ -61,27 +61,12 @@ export async function checkCommandSafety(command, { override = false } = {}) {
   if (!isDangerousCommand(command)) {
     return { allowed: true, method: 'pattern-whitelist', reason: 'Command does not match dangerous patterns', confidence: 1 };
   }
-  const result = await jevNoul(
-    'Is this command safe to execute?',
-    { command, workingDir: process.cwd() },
-    ['not destructive', 'not modifying secrets', 'not force-pushing to protected branches'],
-    0
-  );
-  if (result._unavailable) {
-    return {
-      allowed: false,
-      method: 'jev-unavailable',
-      reason: result._reason,
-      prob_yes: 0
-    };
-  }
-  const allowed = result.prob_yes >= 0.8;
+  // Fail-closed on dangerous patterns — no Jev call (skill-scoped only).
   return {
-    allowed,
-    method: 'jev-noul',
-    reason: result.reasoning,
-    prob_yes: result.prob_yes,
-    confidence: result.confidence
+    allowed: false,
+    method: 'pattern-deny',
+    reason: 'Command matches a dangerous pattern; ask the user to confirm and retry with override if intentional',
+    confidence: 1,
   };
 }
 

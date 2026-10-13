@@ -23,12 +23,13 @@ Portability: [docs/asdd-harness-portability.md](../../docs/asdd-harness-portabil
 |------|----------|
 | `domain-layer.md` | Domain placement contract |
 | `quality-gates.md` | Coverage / readiness (Lite skips CCS) |
-| `jev.md` | Required Jev thresholds |
+| `jev.md` | Jev skill-scoped to shape-up / product-delivery |
 | `manifest.md` | Manifest schema v3 (generated from sessions) |
 | `session-loop.md` | Features + evidence (no v2 locks) |
 | `controls.md` | Guides, sensors, precedence |
 | `asdd-lite.md` | 4-phase lite path |
 | `codegraph.md` / `codegraph-agents.md` | Codegraph |
+| `knowledge.md` | Knowledge index (spec/session/feature graph + search) |
 | `skills.md` | Skills index (name + description only) |
 | `security-rules.md` | Security baseline |
 

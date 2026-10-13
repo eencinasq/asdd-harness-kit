@@ -8,7 +8,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 function startServer(extraEnv = {}) {
   const env = { ...process.env };
-  delete env.JEV_API_KEY; // tests must not depend on a live Jev key
+  // Empty string keeps the key present so env-loader will not refill from .env
+  env.JEV_API_KEY = '';
   const child = spawn(process.execPath, [join(root, '.agents/mcp/jev-gate-server.mjs')], {
     cwd: root,
     env: { ...env, ...extraEnv },
@@ -38,20 +39,29 @@ function startServer(extraEnv = {}) {
   });
   child.stderr.resume();
   let nextId = 1;
-  const request = (method, params) => new Promise((resolve, reject) => {
-    const id = nextId++;
-    const timer = setTimeout(() => reject(new Error(`timeout waiting for ${method} response`)), 5000);
-    pending.set(id, (message) => {
-      clearTimeout(timer);
-      resolve(message);
+  const request = (method, params) =>
+    new Promise((resolve, reject) => {
+      const id = nextId++;
+      const timer = setTimeout(() => reject(new Error(`timeout waiting for ${method} response`)), 5000);
+      pending.set(id, (message) => {
+        clearTimeout(timer);
+        resolve(message);
+      });
+      child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id, method, params })}\n`);
     });
-    child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id, method, params })}\n`);
-  });
   const close = () => {
     child.kill('SIGTERM');
     assert.deepEqual(errors, [], 'server wrote non-JSON lines on stdout');
   };
   return { request, close };
+}
+
+function parseToolPayload(response) {
+  assert.equal(response.result.content[0].type, 'text');
+  return {
+    isError: response.result.isError === true,
+    payload: JSON.parse(response.result.content[0].text),
+  };
 }
 
 test('initialize handshake returns server info and echoes protocol version', async (t) => {
@@ -63,19 +73,19 @@ test('initialize handshake returns server info and echoes protocol version', asy
   assert.ok(response.result.capabilities.tools);
 });
 
-test('tools/list exposes check_command_safety', async (t) => {
+test('tools/list exposes skill gates and command safety', async (t) => {
   const server = startServer();
   t.after(() => server.close());
   const response = await server.request('tools/list');
-  const names = response.result.tools.map((tool) => tool.name);
-  assert.deepEqual(names, ['check_command_safety']);
+  const names = response.result.tools.map((tool) => tool.name).sort();
+  assert.deepEqual(names, [
+    'check_command_safety',
+    'jev_ears_gate',
+    'jev_shape_up_gates',
+    'jev_slice_choice',
+    'jev_status',
+  ]);
 });
-
-function parseToolPayload(response) {
-  assert.notEqual(response.result.isError, true);
-  assert.equal(response.result.content[0].type, 'text');
-  return JSON.parse(response.result.content[0].text);
-}
 
 test('safe command is allowed by pattern whitelist (no Jev call)', async (t) => {
   const server = startServer();
@@ -84,21 +94,23 @@ test('safe command is allowed by pattern whitelist (no Jev call)', async (t) => 
     name: 'check_command_safety',
     arguments: { command: 'ls -la' },
   });
-  const payload = parseToolPayload(response);
+  const { isError, payload } = parseToolPayload(response);
+  assert.equal(isError, false);
   assert.equal(payload.allowed, true);
   assert.equal(payload.method, 'pattern-whitelist');
 });
 
-test('dangerous command is denied fail-closed when Jev is unavailable', async (t) => {
+test('dangerous command is denied by pattern (no Jev call)', async (t) => {
   const server = startServer();
   t.after(() => server.close());
   const response = await server.request('tools/call', {
     name: 'check_command_safety',
     arguments: { command: 'rm -rf /tmp/anything' },
   });
-  const payload = parseToolPayload(response);
+  const { isError, payload } = parseToolPayload(response);
+  assert.equal(isError, false);
   assert.equal(payload.allowed, false);
-  assert.equal(payload.method, 'jev-unavailable');
+  assert.equal(payload.method, 'pattern-deny');
 });
 
 test('override allows a dangerous command without calling Jev', async (t) => {
@@ -108,9 +120,34 @@ test('override allows a dangerous command without calling Jev', async (t) => {
     name: 'check_command_safety',
     arguments: { command: 'rm -rf /tmp/anything', override: true },
   });
-  const payload = parseToolPayload(response);
+  const { payload } = parseToolPayload(response);
   assert.equal(payload.allowed, true);
   assert.equal(payload.method, 'override');
+});
+
+test('jev_status fails closed without JEV_API_KEY', async (t) => {
+  const server = startServer();
+  t.after(() => server.close());
+  const response = await server.request('tools/call', {
+    name: 'jev_status',
+    arguments: {},
+  });
+  const { isError, payload } = parseToolPayload(response);
+  assert.equal(isError, true);
+  assert.equal(payload.unavailable, true);
+  assert.match(payload.error, /JEV_API_KEY/);
+});
+
+test('jev_shape_up_gates fails closed without JEV_API_KEY', async (t) => {
+  const server = startServer();
+  t.after(() => server.close());
+  const response = await server.request('tools/call', {
+    name: 'jev_shape_up_gates',
+    arguments: { pitch: { problem: 'x', appetite: '2 weeks' } },
+  });
+  const { isError, payload } = parseToolPayload(response);
+  assert.equal(isError, true);
+  assert.equal(payload.unavailable, true);
 });
 
 test('unknown method with id returns JSON-RPC method-not-found', async (t) => {

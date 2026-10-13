@@ -22,17 +22,24 @@ Shape Up inverts traditional estimation:
 
 **See:** [`references/methodology.md`](./references/methodology.md) for the full philosophy.
 
-## Required Jev gates
+## Required Jev gates (MCP)
 
-Jev is required. After the pitch draft, before betting:
+Jev is **required for this skill** (and `product-delivery`). Other skills and harness ASDD must not call Jev.
+
+Use the **`jev-gate` MCP** (`project-*-jev-gate` in Cursor). Do not shell out to `jev-gates.mjs` when MCP is available.
+
+1. **`jev_status`** — confirm `JEV_API_KEY` is usable (`health: true` optional).
+2. After the pitch draft, before betting: **`jev_shape_up_gates`** with `{ pitch, appetite? }`.
+
+- `acceptPitch` false / appetite score &lt; 4 → refine or reject. Do not bet.
+- `noRabbitHole` false / rabbit-hole noul &lt; 0.80 → patch no-gos or stop.
+- `unavailable` / `isError` → stop. Set `JEV_API_KEY`. Do not fake a pass.
+
+Fallback only if MCP is unavailable:
 
 ```bash
-node --input-type=module -e "import { shapeUpGates } from './.harness/scripts/jev-gates.mjs'; console.log(await shapeUpGates({ pitch: process.argv[1], appetite: '2 weeks' }))"
+node --input-type=module -e "import { assertJevConfigured, shapeUpGates } from './.harness/scripts/jev-gates.mjs'; console.log(assertJevConfigured({ skillRequired: true })); console.log(await shapeUpGates({ pitch: { text: '...' }, appetite: '2 weeks' }))"
 ```
-
-- Appetite `jevScore` < 4 → refine or reject. Do not bet.
-- Rabbit-hole `jevNoul` < 0.80 → patch no-gos or stop.
-- If `_unavailable` → stop. Set `JEV_API_KEY`. Do not fake a pass.
 
 ---
 

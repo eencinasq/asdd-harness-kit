@@ -1,10 +1,17 @@
 #!/usr/bin/env node
 /**
- * Jev System One client (required capability).
+ * Jev System One client — used by shape-up + product-delivery skills only.
  * POST {endpoint}/systemone  —  node jev-client.mjs [health|status]
+ *
+ * Harness ASDD / invariants / command gates must not call this client.
+ * Cursor/Claude hooks do not inherit shell-exported env. Load
+ * gitignored .env / .env.local when JEV_API_KEY is unset (never log values).
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { loadEnv } from './env-loader.mjs';
+
+loadEnv();
 
 const JEV_API_ENDPOINT = 'https://api.typesafe.ai/v1';
 const SCORE_LEVELS = [

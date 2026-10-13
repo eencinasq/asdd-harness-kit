@@ -103,17 +103,24 @@ if (config) {
 	if (!jev || typeof jev !== 'object') {
 		errors.push(`${configPath}.capabilities.jev is required`);
 	} else {
-		if (jev.enabled !== true) {
-			errors.push(`${configPath}.capabilities.jev.enabled must be true`);
-		}
-		if (jev.required !== true) {
-			errors.push(`${configPath}.capabilities.jev.required must be true`);
+		// Jev is skill-scoped: required only for shape-up + product-delivery.
+		// Harness ASDD phases must not treat global required=true as a gate.
+		if (jev.required === true) {
+			warnings.push(
+				`${configPath}.capabilities.jev.required is true globally; prefer required=false with required_by=["shape-up","product-delivery"]`
+			);
 		}
 		if (typeof jev.apiKey === 'string' && jev.apiKey.trim()) {
 			errors.push(`${configPath}.capabilities.jev.apiKey must be empty; use JEV_API_KEY`);
 		}
-		if (typeof jev.endpoint !== 'string' || !jev.endpoint.trim()) {
-			errors.push(`${configPath}.capabilities.jev.endpoint must be a non-empty string`);
+		if (jev.enabled === true && (typeof jev.endpoint !== 'string' || !jev.endpoint.trim())) {
+			errors.push(`${configPath}.capabilities.jev.endpoint must be a non-empty string when enabled`);
+		}
+		const requiredBy = jev.required_by;
+		if (requiredBy !== undefined) {
+			if (!Array.isArray(requiredBy) || requiredBy.some((s) => typeof s !== 'string' || !s.trim())) {
+				errors.push(`${configPath}.capabilities.jev.required_by must be an array of skill names`);
+			}
 		}
 	}
 }

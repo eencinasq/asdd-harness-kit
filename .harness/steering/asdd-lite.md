@@ -71,7 +71,7 @@ The slice's `spec.md`, `design.md`, `tasks.md` remain — full artifacts are add
 4. **Codegraph first** — before edits in unfamiliar modules.
 5. **Serial execution** — ASDD-Lite allows at most one `in_progress` feature in `.features.json`; the parallel task contract is for fully planned slices only.
 6. **No gold-plating** — modify only files mapped to `.harness/specs/<slice>/spec.md`, as in [session-loop.md](./session-loop.md). Do not perform unrequested refactors.
-7. **Jev** — required gates in [jev.md](./jev.md). `_unavailable` is not a pass.
+7. **Jev** — not used in ASDD-Lite. Jev is required only inside `shape-up` and `product-delivery` ([jev.md](./jev.md)).
 
 ## Dropped from full ASDD
 

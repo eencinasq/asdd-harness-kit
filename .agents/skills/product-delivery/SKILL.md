@@ -67,7 +67,7 @@ Harness Implementation → QA → Knowledge
 - **Traceability:** downstream artifacts must link to upstream requirements.
 - **Stable identity:** every epic, story, task, relation, and dependency has an identifier.
 - **Explicit graph:** dependencies control execution order; other relations explain meaning without blocking work.
-- **Required Jev:** after EARS drafts, run `earsGate` and `sliceChoice` from `.harness/scripts/jev-gates.mjs`. Ambiguous EARS (`prob_yes` < 0.85) must be rewritten or recorded with `# jev-override: accept`. `_unavailable` blocks delivery. Overlapping file scopes are enforced by `.harness/scripts/validators/features.mjs`, not a second Jev call.
+- **Required Jev via MCP (this skill + shape-up only):** use the **`jev-gate` MCP**. After EARS drafts: `jev_status` → `jev_ears_gate` `{ requirement }` → `jev_slice_choice` `{ story }`. Ambiguous EARS (`ok=false` / `prob_yes` &lt; 0.85) must be rewritten or recorded with `# jev-override: accept`. `unavailable` / `isError` blocks delivery. Do not call Jev from other skills or harness ASDD. Shell fallback to `.harness/scripts/jev-gates.mjs` only if MCP is down. Overlapping file scopes are enforced by `.harness/scripts/validators/features.mjs`, not a second Jev call.
 
 ## Shape Up pitch input
 

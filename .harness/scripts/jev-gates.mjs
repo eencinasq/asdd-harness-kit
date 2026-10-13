@@ -20,19 +20,24 @@ function gateFail(result, extra = {}) {
   return { ok: false, unavailable: Boolean(result._unavailable), result, ...extra };
 }
 
-export function assertJevConfigured({ live = false } = {}) {
+/**
+ * Assert Jev readiness.
+ * - Harness (invariants / verify-on-stop): never fail — Jev is not a harness gate.
+ * - shape-up / product-delivery: pass `{ skillRequired: true }` to enforce the key.
+ */
+export function assertJevConfigured({ skillRequired = false } = {}) {
   const config = loadConfig();
-  if (config.enabled !== true) {
-    return { ok: false, error: 'capabilities.jev.enabled must be true' };
+  if (!skillRequired) {
+    return { ok: true, skipped: 'Jev not used outside shape-up / product-delivery' };
   }
-  if (config.required !== true) {
-    return { ok: false, error: 'capabilities.jev.required must be true' };
+  if (config.enabled !== true) {
+    return { ok: false, error: 'capabilities.jev.enabled must be true for shape-up / product-delivery' };
   }
   if (!apiKeyFrom(config)) {
-    if (live) {
-      return { ok: false, error: 'Jev is required for this command. Set JEV_API_KEY (do not commit the key).' };
-    }
-    return { ok: true, skipped: 'JEV_API_KEY not set; live Jev skipped' };
+    return {
+      ok: false,
+      error: 'Jev is required for shape-up / product-delivery. Set JEV_API_KEY (do not commit the key).',
+    };
   }
   if (!isJevEnabled(config)) {
     return { ok: false, error: 'Jev is enabled in config but not usable' };
@@ -114,14 +119,10 @@ export async function goldPlatingGate({ intent, diff, sliceId }) {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const command = process.argv[2] || 'health';
   if (command === 'health') {
-    const cfg = assertJevConfigured({ live: true });
+    const cfg = assertJevConfigured({ skillRequired: true });
     if (!cfg.ok) {
       console.error(cfg.error);
       process.exit(1);
-    }
-    if (cfg.skipped) {
-      console.log(JSON.stringify(cfg, null, 2));
-      process.exit(0);
     }
     const health = await jevHealthCheck();
     console.log(JSON.stringify(health, null, 2));

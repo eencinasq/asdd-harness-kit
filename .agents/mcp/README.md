@@ -2,10 +2,12 @@
 
 **Canonical:** [`mcp.json`](mcp.json) — codegraph + Jev stdio adapter (zero dependencies, no SDK required).
 
-Harness command safety policy lives in `.harness/scripts/jev-command-gate.mjs` (single source of truth).
-The `jev-gate` MCP server is a thin stdio adapter over that same policy, exposed as the
-`check_command_safety` tool. Hook enforcement (Cursor `beforeShellExecution`, Claude `PreToolUse`)
-calls `jev-command-gate.mjs` directly; the MCP tool serves runtimes that prefer native MCP gating.
+The `jev-gate` MCP server (`.agents/mcp/jev-gate-server.mjs`) exposes:
+
+- **Skill gates (System One):** `jev_status`, `jev_shape_up_gates`, `jev_ears_gate`, `jev_slice_choice` — for `shape-up` and `product-delivery` only.
+- **Command safety (no Jev):** `check_command_safety` — pattern allow/deny. Hooks call `.harness/scripts/jev-command-gate.mjs` directly; MCP serves runtimes that prefer a tool call.
+
+See `.harness/steering/jev.md`.
 Servers with `"enabled": false` are skipped by `sync-runtime-mcp.cjs` projections.
 
 ```bash

@@ -65,6 +65,7 @@ Options:
   --force-mcp             Replace .agents/mcp/mcp.json with kit baseline
   --skip-bindings         Do not create binding stubs
   --skip-docs             Skip AGENTS.md / docs copy
+  --skip-deps             Do not npm-install knowledge engine deps (kuzu, sqlite-vec)
   --dry-run               Print actions only
   -h, --help              Show help
 
@@ -85,6 +86,7 @@ FORCE_BINDINGS=0
 FORCE_MCP=0
 SKIP_BINDINGS=0
 SKIP_DOCS=0
+SKIP_DEPS=0
 INTERACTIVE=0
 NO_INTERACTIVE=0
 MODULES=""
@@ -173,6 +175,7 @@ while [[ $# -gt 0 ]]; do
     --force-mcp) FORCE_MCP=1; shift ;;
     --skip-bindings) SKIP_BINDINGS=1; shift ;;
     --skip-docs) SKIP_DOCS=1; shift ;;
+    --skip-deps) SKIP_DEPS=1; shift ;;
     --kit-dir)
       KIT_DIR="${2:-}"; [[ -n "$KIT_DIR" ]] || die "--kit-dir needs a path"
       shift 2
@@ -445,7 +448,7 @@ copy_tree() {
 install_portable_steering() {
   local f
   for f in domain-layer.md quality-gates.md manifest.md session-loop.md asdd-lite.md \
-           codegraph.md codegraph-agents.md skills.md security-rules.md controls.md jev.md README.md; do
+           codegraph.md codegraph-agents.md knowledge.md skills.md security-rules.md controls.md jev.md README.md; do
     copy_file "$KIT_DIR/.harness/steering/$f" "$TARGET/.harness/steering/$f" refresh
   done
   copy_tree "$KIT_DIR/.harness/steering/templates" "$TARGET/.harness/steering/templates" refresh
@@ -477,12 +480,19 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/sync-state.mjs" "$TARGET/.harness/scripts/sync-state.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-client.mjs" "$TARGET/.harness/scripts/jev-client.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-client.test.mjs" "$TARGET/.harness/scripts/jev-client.test.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/env-loader.mjs" "$TARGET/.harness/scripts/env-loader.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/knowledge-lib.mjs" "$TARGET/.harness/scripts/knowledge-lib.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/knowledge-store.mjs" "$TARGET/.harness/scripts/knowledge-store.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/knowledge-store-sqlite.mjs" "$TARGET/.harness/scripts/knowledge-store-sqlite.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/knowledge-store-kuzu.mjs" "$TARGET/.harness/scripts/knowledge-store-kuzu.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/sync-knowledge.mjs" "$TARGET/.harness/scripts/sync-knowledge.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/sync-knowledge.test.mjs" "$TARGET/.harness/scripts/sync-knowledge.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-gates.mjs" "$TARGET/.harness/scripts/jev-gates.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-command-gate.mjs" "$TARGET/.harness/scripts/jev-command-gate.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-command-gate.test.mjs" "$TARGET/.harness/scripts/jev-command-gate.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/config/project.schema.json" "$TARGET/.harness/config/project.schema.json" refresh
   copy_file "$KIT_DIR/.harness/config/README.md" "$TARGET/.harness/config/README.md" refresh
-  copy_file "$KIT_DIR/.harness/features/feature_list.schema.json" "$TARGET/.harness/features/feature_list.schema.json" refresh
+
   copy_file "$KIT_DIR/.harness/features/feature.schema.json" "$TARGET/.harness/features/feature.schema.json" refresh
   copy_file "$KIT_DIR/scripts/harness-migrate.mjs" "$TARGET/scripts/harness-migrate.mjs" refresh
   copy_file "$KIT_DIR/scripts/migrate-v2-v3.mjs" "$TARGET/scripts/migrate-v2-v3.mjs" refresh
@@ -543,11 +553,17 @@ data.capabilities.codegraph ??= { enabled: false, required: false };
 data.capabilities.orca ??= { enabled: false, experimental: true };
 data.capabilities.jev ??= {
   enabled: true,
-  required: true,
+  required: false,
+  required_by: ['shape-up', 'product-delivery'],
   apiKey: '',
   endpoint: 'https://api.typesafe.ai/v1',
   fallbackPolicy: 'fail-closed',
 };
+// Migrate older installs that forced global required=true
+if (data.capabilities.jev && data.capabilities.jev.required === true && !data.capabilities.jev.required_by) {
+  data.capabilities.jev.required = false;
+  data.capabilities.jev.required_by = ['shape-up', 'product-delivery'];
+}
 writeFileSync(dest, `${JSON.stringify(data, null, 2)}\n`);
 EOF
       return 0
@@ -608,7 +624,8 @@ EOF
     },
     "jev": {
       "enabled": true,
-      "required": true,
+      "required": false,
+      "required_by": ["shape-up", "product-delivery"],
       "apiKey": "",
       "endpoint": "https://api.typesafe.ai/v1",
       "fallbackPolicy": "fail-closed"
@@ -627,6 +644,7 @@ install_agents_core() {
   copy_file "$KIT_DIR/.agents/mcp/README.md" "$TARGET/.agents/mcp/README.md" refresh
   copy_file "$KIT_DIR/.agents/mcp/jev-gate-server.mjs" "$TARGET/.agents/mcp/jev-gate-server.mjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/jev-gate-server.test.mjs" "$TARGET/.agents/mcp/jev-gate-server.test.mjs" refresh
+  copy_file "$KIT_DIR/.agents/mcp/knowledge-server.mjs" "$TARGET/.agents/mcp/knowledge-server.mjs" refresh
   if [[ "$FORCE_MCP" -eq 1 ]]; then
     local old_force=$FORCE
     FORCE=1
@@ -651,8 +669,11 @@ install_docs_root() {
   fi
   # Scaffold domain model and operational logs
   copy_file "$KIT_DIR/docs/architecture/domain-model.md" "$TARGET/docs/architecture/domain-model.md" create
+  copy_file "$KIT_DIR/docs/architecture/knowledge-scaling.md" "$TARGET/docs/architecture/knowledge-scaling.md" refresh
   copy_file "$KIT_DIR/docs/agent-failure-log.md" "$TARGET/docs/agent-failure-log.md" create
   copy_file "$KIT_DIR/docs/dissent-log.md" "$TARGET/docs/dissent-log.md" create
+  copy_file "$KIT_DIR/docs/self-healing-log.md" "$TARGET/docs/self-healing-log.md" create
+  copy_file "$KIT_DIR/docs/knowledge-base/README.md" "$TARGET/docs/knowledge-base/README.md" create
 }
 
 remove_runtime_docs() {
@@ -1070,6 +1091,62 @@ wire_runtimes() {
 }
 
 # ------------------------------------------------------------------
+# Knowledge engine deps (kuzu graph/vector + sqlite-vec ANN ext)
+# ------------------------------------------------------------------
+ensure_gitignore() {
+  local line="$1" gi="$TARGET/.gitignore"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    if [[ -f "$gi" ]] && grep -qxF "$line" "$gi" 2>/dev/null; then :; else log "${C_DIM}GITIGNORE${C_RESET}  $line"; fi
+    return 0
+  fi
+  [[ -f "$gi" ]] && grep -qxF "$line" "$gi" 2>/dev/null && return 0
+  echo "$line" >> "$gi"
+  log "${C_BLUE}GITIGNORE${C_RESET}  $line"
+}
+
+# Deps live in .harness/node_modules via a standalone package.json — isolated
+# from the consumer's dependency tree and lockfile (no pnpm/npm workspace
+# interference). createRequire anchored at .harness/scripts/ resolves it.
+install_knowledge_deps() {
+  local hpkg="$TARGET/.harness/package.json"
+  if [[ ! -f "$hpkg" ]]; then
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      log "${C_DIM}COPY${C_RESET}  .harness/package.json (kuzu, sqlite-vec)"
+    else
+      cat > "$hpkg" <<'PKGEOF'
+{
+  "name": "asdd-harness-deps",
+  "private": true,
+  "description": "Isolated deps for harness knowledge engine (kuzu graph + sqlite-vec ANN). Do not merge into project deps.",
+  "dependencies": {
+    "kuzu": "0.11.3",
+    "sqlite-vec": "0.1.10-alpha.4"
+  }
+}
+PKGEOF
+      log "${C_BLUE}COPY${C_RESET}  .harness/package.json (kuzu, sqlite-vec)"
+    fi
+  fi
+  ensure_gitignore ".harness/node_modules"
+  ensure_gitignore ".harness/knowledge"
+  # integration keys (Jev, embeddings) are loaded from these files — never commit
+  ensure_gitignore ".env.local"
+  [[ "$SKIP_DEPS" -eq 1 ]] && { info "Skipping knowledge deps install"; return 0; }
+  if [[ -d "$TARGET/.harness/node_modules/kuzu" ]]; then
+    log "${C_DIM}KEEP${C_RESET}  .harness/node_modules (kuzu present)"
+    return 0
+  fi
+  log "${C_BLUE}DEPS${C_RESET}  npm i --prefix .harness (isolated knowledge engine)"
+  [[ "$DRY_RUN" -eq 1 ]] && return 0
+  if command -v npm >/dev/null 2>&1; then
+    (cd "$TARGET/.harness" && npm install --no-audit --no-fund) >/dev/null 2>&1 \
+      || warn "npm install failed — index stays on JSONL; run: cd .harness && npm install"
+  else
+    warn "npm not found — knowledge engine stays on JSONL (run: cd .harness && npm install)"
+  fi
+}
+
+# ------------------------------------------------------------------
 # Version manifest
 # ------------------------------------------------------------------
 install_version_manifest() {
@@ -1199,6 +1276,7 @@ main() {
   enable_modules
   refresh_skills_index
   wire_runtimes
+  install_knowledge_deps
   install_version_manifest
   verify
 
