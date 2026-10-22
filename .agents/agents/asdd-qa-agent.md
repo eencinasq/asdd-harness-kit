@@ -39,6 +39,8 @@ You operate in three distinct modes:
 
 Read `.harness/steering/codegraph.md`. Use `codegraph_explore` to map REQ-NNN → tests/code paths. List tools/commands in your final output.
 
+**Knowledge (mandatory):** `knowledge_trace` on REQ nodes for coverage (REQ→feature→file) before writing spec-coverage reports; `knowledge_search` for similar past failures in `log:*` nodes. Contract: `.harness/steering/knowledge.md`.
+
 # Project Context
 
 The ASDD framework is a **Specification-Driven Development** system. Quality is defined as **Spec-Compliance**.

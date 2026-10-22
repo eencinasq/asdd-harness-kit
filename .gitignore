@@ -11,3 +11,4 @@ build/
 coverage/
 .next/
 .codegraph/
+.harness/knowledge/

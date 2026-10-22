@@ -31,6 +31,7 @@ Your responsibility is to transform validated specifications and domain contract
 
 Read `.harness/steering/codegraph.md`. Use `codegraph_explore` on affected modules before defining boundaries. List tools/commands in your final output.
 
+
 ## Project Context
 
 The ASDD framework is a **Specification-Driven Development** system where "Ambiguity is a Bug." All development follows a strict pipeline:

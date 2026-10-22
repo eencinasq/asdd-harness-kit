@@ -42,6 +42,8 @@ The layers complement each other. A pitch is a commitment proposal, an ASDD slic
 
 When a product team uses the Product Delivery skill between shaping and ASDD, follow [`product-delivery/references/asdd-harness-handoff.md`](../.agents/skills/product-delivery/references/asdd-harness-handoff.md). Product Delivery creates the epic, stories, dependencies, technical proposal, and sprint context; the handoff then maps those artifacts into the ASDD slice and Harness feature tracker without changing the approved pitch silently.
 
+After EARS drafts in Product Delivery, call MCP `jev_status` → `jev_ears_gate` → `jev_slice_choice` before freezing REQ-* (shell fallback: `earsGate` / `sliceChoice` in `jev-gates.mjs`). Harness ASDD phases after handoff do not call Jev.
+
 ## Lifecycle integration
 
 ### 1. Idea and intent

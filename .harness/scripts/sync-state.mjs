@@ -310,13 +310,26 @@ function syncSlice(sliceId) {
   return manifest;
 }
 
-function main() {
+// Knowledge index is a derived projection — regenerate it after every state
+// sync, but never let its failure break the state sync itself.
+async function syncKnowledgeIndex() {
+  try {
+    const { writeKnowledgeIndex } = await import('./sync-knowledge.mjs');
+    const meta = await writeKnowledgeIndex(root);
+    console.log(`SYNC  knowledge → ${meta.nodes} nodes / ${meta.chunks} chunks`);
+  } catch (error) {
+    console.warn(`WARN  knowledge index not regenerated: ${error?.message ?? error}`);
+  }
+}
+
+async function main() {
   const args = process.argv.slice(2);
   const sliceArg = args.indexOf('--slice');
   const targetSlice = sliceArg >= 0 ? args[sliceArg + 1] : null;
 
   if (!existsSync(slicesDir)) {
     console.warn('WARN  no slices directory found');
+    await syncKnowledgeIndex();
     return;
   }
 
@@ -345,6 +358,7 @@ function main() {
         console.log(`SYNC  registry → ${registry.slices.length} slices`);
       }
     }
+    await syncKnowledgeIndex();
     return;
   }
 
@@ -359,8 +373,9 @@ function main() {
     writeJson(join(stateDir, 'registry.json'), registry);
     console.log(`SYNC  registry → ${registry.slices.length} slices`);
   }
+  await syncKnowledgeIndex();
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main();
+  await main();
 }

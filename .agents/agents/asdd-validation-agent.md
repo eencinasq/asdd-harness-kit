@@ -32,6 +32,8 @@ You are the framework's primary defense against garbage-in-garbage-out failures 
 
 Read `.harness/steering/codegraph.md`. Use Codegraph (`codegraph query`, `codegraph status`) to verify DOM-/API claims against the indexed codebase before finalizing the report. List tools/commands in your final output.
 
+**Knowledge (mandatory):** `knowledge_trace` to verify REQ↔feature traceability claims and `knowledge_search` for prior validation findings. Contract: `.harness/steering/knowledge.md`.
+
 ## Inputs
 
 Read the following before producing any output:

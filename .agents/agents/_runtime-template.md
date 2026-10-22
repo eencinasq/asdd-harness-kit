@@ -17,7 +17,8 @@ This file is the **same ASDD role as** the corresponding `.agents/agents/asdd-*-
 2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
 3. **Edits:** Use `Write` / `StrReplace` / `Shell` (not Kiro `fsWrite`).
 4. **Codegraph:** Use Cursor MCP (`GetDynamicTools` / `CallDynamicTool` or equivalent). Primary tool: `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`. List tools used in the final message.
-5. **State (v3.0 session logs):**
+5. **Knowledge:** Use the `knowledge` MCP (`knowledge_search`, `knowledge_trace`, `knowledge_slice`, `knowledge_status`) for process memory — prior specs, REQs, features, sessions, failure logs. Read `.harness/steering/knowledge.md` for per-role usage. If `knowledge_status` reports no index, run `node .harness/scripts/sync-knowledge.mjs` once.
+6. **State (v3.0 session logs):**
    - Read generated `.harness/state/registry.json` at start to see squad state.
    - Read generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice.
    - At the end of every significant action (phase complete, feature start, dissent, override), **write a session file** to `.harness/state/slices/<slice-id>/sessions/`. Session files are append-only — never edit an existing session.

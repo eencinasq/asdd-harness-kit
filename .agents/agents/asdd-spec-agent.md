@@ -32,6 +32,8 @@ Your primary objective is to eliminate ambiguity. A requirement that can be inte
 
 Read `.harness/steering/codegraph.md`. Use `codegraph_explore` to align terms with code and `domain-model.md` before writing REQs. List tools/commands in your final output.
 
+**Knowledge (mandatory):** `knowledge_search` for duplicate REQs and prior AC wording across slices; `knowledge_slice` for prior-slice context packs. Contract: `.harness/steering/knowledge.md`.
+
 ## Project Context
 
 Before producing any output, you MUST discover the project state and constraints:

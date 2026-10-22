@@ -29,7 +29,7 @@ echo "== dry-run =="
 head -20 /tmp/asdd-install-dry.log
 
 echo "== install =="
-"$ROOT/scripts/install-into.sh" "$TMP/existing-app" --modules=http-api --runtime=cursor,opencode,kimi,junie,devin,kiro
+"$ROOT/scripts/install-into.sh" "$TMP/existing-app" --modules=http-api --runtime=cursor,opencode,kimi,junie,devin,kiro --skip-deps
 
 # binding preserved
 grep -q 'KEEP ME' "$TMP/existing-app/.harness/steering/product.md"
@@ -60,6 +60,20 @@ test -f "$TMP/existing-app/.harness/scripts/jev-gates.mjs"
 test -f "$TMP/existing-app/.harness/scripts/jev-command-gate.mjs"
 test -f "$TMP/existing-app/.agents/mcp/jev-gate-server.mjs"
 test -f "$TMP/existing-app/.harness/steering/jev.md"
+# Knowledge index (vector/graph-lite projection of specs + state)
+test -f "$TMP/existing-app/.harness/scripts/knowledge-lib.mjs"
+test -f "$TMP/existing-app/.harness/scripts/knowledge-store.mjs"
+test -f "$TMP/existing-app/.harness/scripts/knowledge-store-sqlite.mjs"
+test -f "$TMP/existing-app/.harness/scripts/knowledge-store-kuzu.mjs"
+test -f "$TMP/existing-app/.harness/scripts/sync-knowledge.mjs"
+test -f "$TMP/existing-app/.harness/scripts/sync-knowledge.test.mjs"
+test -f "$TMP/existing-app/.agents/mcp/knowledge-server.mjs"
+grep -q '"knowledge"' "$TMP/existing-app/.agents/mcp/mcp.json"
+# Isolated knowledge deps manifest (installed via .harness/package.json)
+grep -q '"kuzu"' "$TMP/existing-app/.harness/package.json"
+grep -q '"sqlite-vec"' "$TMP/existing-app/.harness/package.json"
+grep -qxF '.harness/node_modules' "$TMP/existing-app/.gitignore"
+grep -qxF '.harness/knowledge' "$TMP/existing-app/.gitignore"
 
 # Shape Up -> Product Delivery integration contract.
 grep -q '^name: shape-up$' "$TMP/existing-app/.agents/skills/shape-up/SKILL.md"
@@ -141,13 +155,13 @@ test -L "$TMP/existing-app/.kiro/settings/mcp.json"
 
 # existing hooks.json gains verify-on-stop without dropping other hooks
 printf '%s\n' '{"version":1,"hooks":{"beforeShellExecution":[{"command":"echo keep-me"}]}}' >"$TMP/existing-app/.cursor/hooks.json"
-"$ROOT/scripts/install-into.sh" "$TMP/existing-app" --runtime=cursor >/dev/null
+"$ROOT/scripts/install-into.sh" "$TMP/existing-app" --runtime=cursor --skip-deps >/dev/null
 grep -q 'echo keep-me' "$TMP/existing-app/.cursor/hooks.json"
 grep -q 'verify-on-stop.mjs' "$TMP/existing-app/.cursor/hooks.json"
 grep -q 'jev-command-gate.mjs' "$TMP/existing-app/.cursor/hooks.json"
 
 # second run keeps binding, does not require --force for create-only, stays hook-idempotent
-"$ROOT/scripts/install-into.sh" "$TMP/existing-app" >/dev/null
+"$ROOT/scripts/install-into.sh" "$TMP/existing-app" --skip-deps >/dev/null
 grep -q 'KEEP ME' "$TMP/existing-app/.harness/steering/product.md"
 GATE_COUNT="$(node -e "const h=JSON.parse(require('fs').readFileSync('$TMP/existing-app/.cursor/hooks.json','utf8')); process.stdout.write(String((h.hooks.beforeShellExecution||[]).filter((e)=>String(e?.command??'').includes('jev-command-gate')).length))")"
 [[ "$GATE_COUNT" == "1" ]]
@@ -174,7 +188,7 @@ RTMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-rt-test.XXXXXX")"
 for rt in cursor claude opencode kimi junie devin kiro; do
   echo "== runtime $rt =="
   mkdir -p "$RTMP/$rt-app"
-  "$ROOT/scripts/install-into.sh" "$RTMP/$rt-app" --runtime="$rt" --no-interactive >/dev/null 2>&1
+  "$ROOT/scripts/install-into.sh" "$RTMP/$rt-app" --runtime="$rt" --no-interactive --skip-deps >/dev/null 2>&1
   case "$rt" in
     cursor)
       test -L "$RTMP/$rt-app/.cursor/skills"
@@ -229,7 +243,7 @@ MTMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-mod-test.XXXXXX")"
 for mod in bruno playwright-e2e web-ui http-api; do
   echo "== module $mod =="
   mkdir -p "$MTMP/$mod-app"
-  "$ROOT/scripts/install-into.sh" "$MTMP/$mod-app" --modules="$mod" --no-interactive >/dev/null 2>&1
+  "$ROOT/scripts/install-into.sh" "$MTMP/$mod-app" --modules="$mod" --no-interactive --skip-deps >/dev/null 2>&1
   case "$mod" in
     bruno)
       test -f "$MTMP/$mod-app/.agents/agents/asdd-integration-tester.md"
@@ -250,7 +264,7 @@ done
 # all modules together
 echo "== module all =="
 mkdir -p "$MTMP/all-app"
-"$ROOT/scripts/install-into.sh" "$MTMP/all-app" --modules=all --no-interactive >/dev/null 2>&1
+"$ROOT/scripts/install-into.sh" "$MTMP/all-app" --modules=all --no-interactive --skip-deps >/dev/null 2>&1
 test -f "$MTMP/all-app/.agents/agents/asdd-integration-tester.md"
 test -f "$MTMP/all-app/.agents/agents/asdd-e2e-tester.md"
 test -d "$MTMP/all-app/.agents/skills/frontend-ui-engineering"

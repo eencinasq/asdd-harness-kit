@@ -31,6 +31,8 @@ Ambiguity in your output causes the Implementation Agent to make architectural d
 
 Read `.harness/steering/codegraph.md`. Use `codegraph_explore` for real file paths and dependencies before assigning tasks. List tools/commands in your final output.
 
+**Knowledge (mandatory):** `knowledge_trace` on DEPENDS_ON edges to order waves correctly; `knowledge_search` for scope collisions with prior features. Contract: `.harness/steering/knowledge.md`.
+
 ## Project Context
 
 The ASDD framework is a **Specification-Driven Development** system. All development follows a strict pipeline:
@@ -149,7 +151,7 @@ Last updated: [ISO date]
 
 After writing `tasks.md`, also create or refresh `.harness/features/[spec-name].features.json` per `.harness/steering/session-loop.md`:
 
-- Follow the tracker shape in `.harness/features/feature_list.schema.json`.
+- Follow the tracker shape in `.harness/features/feature.schema.json`.
 - Project `Depends on` as `depends_on` and declared writable paths as `scope_paths`. Tasks with overlapping scopes must be serialized or replanned. Assign `owner` at dispatch time; leave it unset during planning.
 
 - One feature object per `TASK-NNN` (`id`, `priority`, `title`, `user_visible_behavior` from Acceptance, `verification` commands, `status: not_started`, `req_ids`).

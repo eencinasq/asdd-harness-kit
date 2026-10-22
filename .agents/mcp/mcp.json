@@ -14,6 +14,14 @@
         ".agents/mcp/jev-gate-server.mjs"
       ],
       "enabled": true
+    },
+    "knowledge": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        ".agents/mcp/knowledge-server.mjs"
+      ],
+      "enabled": true
     }
   }
 }

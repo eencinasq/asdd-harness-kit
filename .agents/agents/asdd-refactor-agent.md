@@ -36,6 +36,8 @@ You operate after implementation tasks complete or when triggered by the Knowled
 
 Read `.harness/steering/codegraph.md`. Use `codegraph_explore` before proposing moves. List tools/commands in your final output.
 
+**Knowledge (mandatory):** `knowledge_trace` for blast radius (which features/specs own a path) before moves; `knowledge_search` for prior refactor findings. Contract: `.harness/steering/knowledge.md`.
+
 ## Project Context
 
 The ASDD framework is a **Specification-Driven Development** system. Refactoring ensures that the codebase does not drift from the original **Architecture Design** and **Steering Rules**.

@@ -36,6 +36,8 @@ Read `.harness/steering/codegraph.md`. Use Codegraph **before** grep/Read when e
 - **Primary:** `codegraph_explore` on the spec domain before inventing scope.
 - List tools/commands in your final output.
 
+- **Knowledge:** `knowledge_search` before scoping — a matching prior REQ/feature may mean extend-instead-of-new-slice. Contract: `.harness/steering/knowledge.md`.
+
 ## Project Context
 
 Before producing any output, you MUST discover the project state and constraints:

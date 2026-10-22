@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "kit_version": "3.3.0",
-  "generated_at": "2026-10-13T13:06:52.412Z",
+  "generated_at": "2026-10-13T15:05:25.722Z",
   "artifacts": {
     ".harness/steering/domain-layer.md": "3.0.0",
     ".harness/steering/quality-gates.md": "3.0.0",
@@ -49,7 +49,7 @@
     ".harness/scripts/knowledge-lib.mjs": "3.1.1",
     ".harness/scripts/knowledge-store.mjs": "3.1.1",
     ".harness/scripts/knowledge-store-sqlite.mjs": "3.2.0",
-    ".harness/scripts/knowledge-store-kuzu.mjs": "3.1.1",
+    ".harness/scripts/knowledge-store-kuzu.mjs": "3.2.0",
     ".harness/scripts/sync-knowledge.mjs": "3.2.0",
     ".harness/scripts/sync-knowledge.test.mjs": "3.1.1",
     ".harness/scripts/validators/features.mjs": "3.1.0",

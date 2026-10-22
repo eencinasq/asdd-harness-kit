@@ -29,6 +29,7 @@ You operate after the Validation Gate passes. The Validation Agent's report will
 
 Read `.harness/steering/codegraph.md`. Use `codegraph_explore` before adding entities — align with real code. List tools/commands in your final output.
 
+
 ## Project Context
 
 Pipeline: Discovery → Spec → Validation → **Domain Model Update** → Design → Task Planning → Implementation → QA → Knowledge.

@@ -33,6 +33,8 @@ You are the engine of the **Production Learning Loop**. You manage the **State M
 
 Read `.harness/steering/codegraph.md`. Use `codegraph_explore` for spikes and dependency analysis. List tools/commands in your final output.
 
+**Knowledge (mandatory):** You own the knowledge index's consumers — `knowledge_status` for freshness (regenerate via `node .harness/scripts/sync-knowledge.mjs`), `knowledge_search` for dedupe + failure mining (`log:*` nodes), `knowledge_trace` for blast radius and cross-slice conflicts, `knowledge_slice` for bundle capture. Contract: `.harness/steering/knowledge.md`.
+
 </role>
 
 # <project_context>

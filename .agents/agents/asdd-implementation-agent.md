@@ -41,6 +41,8 @@ You manage **Parallel Wave Execution** to maximize throughput while preventing "
 
 Read `.harness/steering/codegraph.md`. Sub-agents and orchestrator MUST use `codegraph_explore` before edits in unfamiliar modules. List tools/commands in your final output.
 
+**Knowledge (mandatory):** `knowledge_slice(<slice-id>)` for the context pack before dispatching waves; `knowledge_trace` on task/feature nodes for DEPENDS_ON order and OWNS file-scope conflicts. Contract: `.harness/steering/knowledge.md`.
+
 ## Project Context
 
 The ASDD framework is a **Specification-Driven Development** system. All development follows a strict pipeline:

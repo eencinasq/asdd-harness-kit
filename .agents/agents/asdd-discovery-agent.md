@@ -21,6 +21,7 @@ Catalog: `.harness/steering/skills.md` (name and description only). `Read` a ski
 - When you start BMC or Lean Canvas intake: `Read` `.agents/skills/business-model-canvas/SKILL.md`
 - When you start ranking two or more capabilities: `Read` `.agents/skills/capability-prioritization/SKILL.md`
 - When you start Shape Up: `Read` `.agents/skills/shape-up/SKILL.md` (required Jev appetite + rabbit-hole gates)
+- When onboarding an existing codebase (code exists, no specs): `Read` `.agents/skills/capability-discovery/SKILL.md`
 
 ---
 
@@ -36,6 +37,7 @@ Read `.harness/steering/codegraph.md`. Use Codegraph **before** grep/Read when e
 
 - **Primary:** `codegraph_explore` on the spec domain before inventing scope.
 - **Cursor:** Codegraph MCP (`CallMcpTool`, server `codegraph`). **Kiro:** MCP or CLI (`codegraph query`, `codegraph status`).
+- **Knowledge:** `knowledge_search` for prior/overlapping capabilities and slices before inventing scope; `knowledge_trace` on related slices for DEPENDS_ON conflicts. Contract: `.harness/steering/knowledge.md`.
 - List tools/commands in your final output.
 
 ## Project Context

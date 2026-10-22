@@ -34,8 +34,8 @@ function* walk(dir) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
       yield* walk(path);
-    } else if (entry.isFile()) {
-      yield path;
+    } else if (entry.isFile() && !entry.name.startsWith('.')) {
+      yield path; // skip .DS_Store, ._*, dotfiles — never shippable artifacts
     }
   }
 }
@@ -49,7 +49,8 @@ function collectArtifacts() {
   // Portable steering (individual files)
   for (const f of [
     'domain-layer.md', 'quality-gates.md', 'manifest.md', 'session-loop.md',
-    'asdd-lite.md', 'codegraph.md', 'codegraph-agents.md', 'skills.md',
+    'asdd-lite.md', 'codegraph.md', 'codegraph-agents.md', 'knowledge.md',
+    'jev.md', 'skills.md',
     'security-rules.md', 'controls.md', 'README.md',
   ]) {
     record(`.harness/steering/${f}`);
@@ -75,6 +76,9 @@ function collectArtifacts() {
     'escalate-slice.mjs', 'sync-state.mjs',
     'jev-client.mjs', 'jev-gates.mjs', 'jev-command-gate.mjs',
     'jev-client.test.mjs', 'jev-command-gate.test.mjs',
+    'env-loader.mjs',
+    'knowledge-lib.mjs', 'knowledge-store.mjs', 'knowledge-store-sqlite.mjs',
+    'knowledge-store-kuzu.mjs', 'sync-knowledge.mjs', 'sync-knowledge.test.mjs',
   ]) {
     record(`.harness/scripts/${f}`);
   }
@@ -85,14 +89,12 @@ function collectArtifacts() {
   }
 
   // Config
-  for (const f of ['project.schema.json', 'README.md', 'versions.json']) {
+  for (const f of ['project.schema.json', 'README.md', 'versions.json', 'models.json']) {
     record(`.harness/config/${f}`);
   }
 
-  // Features schemas
-  for (const f of ['feature_list.schema.json', 'feature.schema.json']) {
-    record(`.harness/features/${f}`);
-  }
+  // Features schema
+  record('.harness/features/feature.schema.json');
 
   // Agents
   for (const path of walk(join(root, '.agents/agents'))) {
@@ -113,11 +115,14 @@ function collectArtifacts() {
   for (const f of [
     'asdd-harness-portability.md', 'asdd-and-harness-engineering.md',
     'pipeline-documentation.md', 'shape-up-asdd-harness-integration.md',
+    'jev-integration.md', 'self-healing-log.md',
+    'knowledge-base/README.md',
   ]) {
     record(`docs/${f}`);
   }
   for (const f of [
-    'architecture/domain-model.md', 'agent-failure-log.md', 'dissent-log.md',
+    'architecture/domain-model.md', 'architecture/knowledge-scaling.md',
+    'agent-failure-log.md', 'dissent-log.md',
   ]) {
     record(`docs/${f}`);
   }
