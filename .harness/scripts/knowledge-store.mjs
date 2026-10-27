@@ -4,7 +4,8 @@
  * openStore(root) returns the best available backend:
  *   1. sqlite  — .harness/knowledge/knowledge.db when node:sqlite exists
  *                (Node >= 22.5) AND the DB is fresh (generated_at == meta.json)
- *   2. jsonl   — the always-written nodes/edges/chunks/meta projection
+ *   2. jsonl   — the always-written nodes/edges/chunks/meta projection;
+ *                `fallback_reason` says why sqlite was not served
  *   3. null    — no index yet (run sync-knowledge.mjs)
  *
  * Both backends expose the same adapter interface:
@@ -20,7 +21,6 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { KNOWLEDGE_DIR } from './knowledge-lib.mjs';
 import { openSqliteIndex } from './knowledge-store-sqlite.mjs';
-import { kuzuAvailable, openKuzuIndex } from './knowledge-store-kuzu.mjs';
 
 function readJsonl(path) {
   if (!existsSync(path)) return [];
@@ -82,26 +82,21 @@ function openJsonlIndex(root) {
 
 /**
  * Open the best available knowledge index backend for `root`.
- * Precedence: kuzu (graph+vector engine) → sqlite sidecar → JSONL.
+ * Precedence: sqlite sidecar → JSONL. A JSONL adapter carries
+ * `fallback_reason` so callers can report a degraded index instead of hiding it.
  * @returns {Promise<object|null>} adapter or null when no index exists
  */
 export async function openStore(root = process.cwd()) {
-  if (kuzuAvailable()) {
-    try {
-      const k = await openKuzuIndex(root);
-      if (k) return k;
-    } catch {
-      // kuzu store broken/missing — fall through
-    }
-  }
+  let reason;
   try {
-    const s = openSqliteIndex(root);
-    if (s) return s;
-  } catch {
-    // sqlite sidecar broken/missing — fall back to JSONL
+    const { store, reason: why } = openSqliteIndex(root);
+    if (store) return store;
+    reason = why;
+  } catch (error) {
+    reason = `sqlite sidecar unreadable: ${error?.message ?? error}`;
   }
-  return openJsonlIndex(root);
+  const jsonl = openJsonlIndex(root);
+  return jsonl ? { ...jsonl, fallback_reason: reason } : null;
 }
 
 export { sqliteSupported } from './knowledge-store-sqlite.mjs';
-export { kuzuAvailable } from './knowledge-store-kuzu.mjs';

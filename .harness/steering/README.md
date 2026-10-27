@@ -30,6 +30,7 @@ Portability: [docs/asdd-harness-portability.md](../../docs/asdd-harness-portabil
 | `asdd-lite.md` | 4-phase lite path |
 | `codegraph.md` / `codegraph-agents.md` | Codegraph |
 | `knowledge.md` | Knowledge index (spec/session/feature graph + search) |
+| `spec-drift.md` | Spec drift and audit: entry points and usage by role (engineers, Tech Lead) |
 | `skills.md` | Skills index (name + description only) |
 | `security-rules.md` | Security baseline |
 

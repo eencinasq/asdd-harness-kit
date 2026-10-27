@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "unified-versioning",
+  "source_tasks": ".harness/specs/unified-versioning/tasks.md",
+  "features": [
+    {
+      "id": "f1",
+      "title": "Every installed artifact carries the project version",
+      "user_visible_behavior": "A kit upgrade refreshes every kit-owned file; generate-versions bump <version> sets package.json, package-lock.json and all 171 artifacts",
+      "status": "in_progress",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": ["REQ-001", "REQ-002", "REQ-003"],
+      "verification": ["npm test"],
+      "evidence": "Project and all 171 artifacts at 3.6.0; 12 refreshed-but-unversioned files found via HARNESS_TRACE_REFRESH and added; install test fails on a hand-edited artifact version; ai-messager clone upgraded 3.3.0 -> 3.6.0 with every artifact at 3.6.0 and client files kept. Awaiting commit for evidence_commit.",
+      "scope_paths": [
+        "scripts/generate-versions.mjs",
+        "scripts/install-into.sh",
+        "scripts/test-install-into.sh",
+        ".harness/config/versions.json",
+        "package.json",
+        "package-lock.json"
+      ]
+    }
+  ]
+}

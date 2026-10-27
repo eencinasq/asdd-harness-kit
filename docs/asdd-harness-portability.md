@@ -22,7 +22,8 @@ How this template maps to product repos.
 7. Fill `quality-gates.project.md` before Discovery: the full-suite command, the failure-log path, and `Active findings` (`none` or real rows). A stub blocks the gate that needs it.
 8. With `--runtime=cursor`, confirm `.cursor/hooks.json` runs `node .harness/scripts/verify-on-stop.mjs` on `stop` and `node .harness/scripts/jev-command-gate.mjs` on `beforeShellExecution`. With `--runtime=claude`, confirm `.claude/settings.json` registers the same two scripts on `Stop` and `PreToolUse` (Bash).
 9. For shape-up / product-delivery: set `JEV_API_KEY`, keep `capabilities.jev.apiKey` empty, prefer `jev-gate` MCP (`jev_status`), shell fallback `node .harness/scripts/jev-gates.mjs health`. Confirm `required: false` and `required_by: ["shape-up","product-delivery"]`.
-10. Create the first slice via Discovery or ASDD-Lite. Read [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md) and [jev-integration.md](jev-integration.md).
+10. Optional spec drift and audit bindings in `quality-gates.project.md` (`Test file globs`, `Drift base branch`, `Audit commands`, `Contract command`, `OpenAPI spec`) and the `Gate command` in `domain-layer.project.md`. Unfilled ones report `unconfigured`. Keep `drift.contract: "warn"` in `project.json` until every feature has `scope_paths` and `passing` features have `evidence_commit`, then set `"fail"`. See [`.harness/steering/spec-drift.md`](../.harness/steering/spec-drift.md).
+11. Create the first slice via Discovery or ASDD-Lite. Read [asdd-and-harness-engineering.md](asdd-and-harness-engineering.md) and [jev-integration.md](jev-integration.md).
 
 Optional: the knowledge index (spec/session/feature graph + searchable chunks)
 regenerates automatically at the end of every `sync-state.mjs` run — or manually

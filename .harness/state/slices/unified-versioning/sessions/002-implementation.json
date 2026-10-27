@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-unified-versioning-002",
+  "timestamp": "2026-10-27T01:00:27Z",
+  "agent": "claude",
+  "human": "squad",
+  "slice_id": "unified-versioning",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "f1",
+  "evidence": "generate-versions stamps all artifacts with package.json version; bump <version> sets the project version; install test guards versions and refresh coverage; removed Kuzu store stays managed so its deletion is not DRIFT-01",
+  "scope_paths": ["scripts", ".harness/config"]
+}

@@ -2,5 +2,30 @@
   "schema_version": "3.0",
   "_note": "Global manifest — use sync-state.mjs to regenerate from session logs",
   "domain_model_version": "0.0.0",
-  "active_slices": []
+  "active_slices": [
+    {
+      "slice_id": "knowledge-simplify",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/knowledge-simplify/manifest.json",
+      "features": ".harness/features/knowledge-simplify.features.json"
+    },
+    {
+      "slice_id": "drift-consistency",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/drift-consistency/manifest.json",
+      "features": ".harness/features/drift-consistency.features.json"
+    },
+    {
+      "slice_id": "unified-versioning",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/unified-versioning/manifest.json",
+      "features": ".harness/features/unified-versioning.features.json"
+    }
+  ]
 }

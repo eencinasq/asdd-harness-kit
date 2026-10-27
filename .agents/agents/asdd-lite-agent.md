@@ -92,7 +92,7 @@ Execute tasks one at a time:
 2. **GREEN** — implement minimal code to pass.
 3. **REFACTOR** — clean up, keep tests green.
 4. **Verify** — run the verification command; record evidence.
-5. **Update** — flip feature to `passing` with evidence in `.features.json`.
+5. **Update** — commit the verified code, then flip the feature to `passing` with `evidence` and `evidence_commit` (that commit's SHA) in `.features.json`. Every feature carries `scope_paths` from `spec.md`.
 
 After all tasks pass:
 

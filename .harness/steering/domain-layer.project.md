@@ -26,7 +26,17 @@ tags:
 
 **Gate command:** `…` (non-zero exit = not passing)
 
+**Semgrep rules:** `…` (optional path to a YAML config such as `.semgrep.yml`; if unfilled, `.semgrep.yml` at the repo root is used when it exists)
+
 **CI / lint:** …
+
+## Semgrep boundaries
+
+Used when `Semgrep rules` is unfilled and the repo has no `.semgrep.yml`. The architecture check generates a temporary config from these rows and the `Language` row in [tech.md](tech.md). It runs `semgrep scan --json` and does not write `.semgrep.yml`.
+
+| Paths | Must not import |
+|-------|-----------------|
+| `…` | `…` |
 
 ## Exceptions
 

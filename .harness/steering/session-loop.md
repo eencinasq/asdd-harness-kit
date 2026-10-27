@@ -49,14 +49,17 @@ Each item in `.features.json`:
 - `status` — `not_started` | `in_progress` | `blocked` | `passing`
 - `verification` — shell/Nx commands or steps to prove it
 - `evidence` — filled only when passing (what ran + result)
+- `evidence_commit` — required when passing; SHA of the commit that contains the verified code
 - `notes` — optional; link REQs / blockers
 - `req_ids` — optional traceability
 - `source_tasks` — repository-relative path to the `tasks.md` that produced these features (required; must exist)
 - `owner` — required for concurrent work; unique runtime/worker id
-- `scope_paths` — required for concurrent work; non-empty repo-relative files/directories this task may edit
+- `scope_paths` — required on every feature; non-empty repo-relative files/directories this task may edit (planned paths may not exist yet)
 - `depends_on` — optional task ids; all listed dependencies must be `passing` before dispatch
 
-**Rules:** one `in_progress` by default. Multiple tasks may be `in_progress` only when each has a unique `owner`, non-empty non-overlapping `scope_paths`, and the coordinator has written a session file for the slice. Scope overlap includes a file and its ancestor directory. Workers must not edit shared Harness state, registry, manifests, or session files of other agents. `passing` requires non-empty `evidence` and a passing Verify-on-Stop check in the same session; on repeated verify fail → `blocked` + [agent-failure-log](../../docs/agent-failure-log.md).
+**Rules:** one `in_progress` by default. Multiple tasks may be `in_progress` only when each has a unique `owner`, non-empty non-overlapping `scope_paths`, and the coordinator has written a session file for the slice. Scope overlap includes a file and its ancestor directory. Workers must not edit shared Harness state, registry, manifests, or session files of other agents. `passing` requires non-empty `evidence`, an `evidence_commit`, and a passing Verify-on-Stop check in the same session; on repeated verify fail → `blocked` + [agent-failure-log](../../docs/agent-failure-log.md).
+
+**Evidence commit:** run the verification, commit the verified code, then record that commit's SHA as `evidence_commit` (the features file itself is a harness record and may change afterwards). Spec drift check `DRIFT-02` reopens the feature when any file under its `scope_paths` changes after that commit. Missing `scope_paths` or `evidence_commit` is reported as `DRIFT-06`, at the severity set by `drift.contract` in `.harness/config/project.json` (`warn` by default, `fail` once slices are migrated).
 
 ## When to create / update features.json
 
@@ -111,7 +114,7 @@ ASDD-Lite remains single-worker and serial (machine-enforced: a lite slice with 
 
 Modify only the files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors.
 
-Mapped files are the paths named by that `intent.md` and by the slice `design.md` and `tasks.md` that trace to it, plus `scope_paths` on the in-progress feature. Slice harness records (session files, features) stay writable. Any other product file is out of scope. A refactor inside a mapped file is in scope only when that spec, the current task, or the slice phase `refactor` requests it.
+Mapped files are the paths named by that `intent.md` and by the slice `design.md` and `tasks.md` that trace to it, plus `scope_paths` on the in-progress feature, plus any test file (per the `Test file globs` binding) that names a REQ of that slice. Slice harness records (session files, features) stay writable. Any other product file is out of scope. A refactor inside a mapped file is in scope only when that spec, the current task, or the slice phase `refactor` requests it.
 
 Harness invariants do not call Jev. Scope control is deterministic (this file's mapping + `features.mjs`). Jev is skill-scoped to `shape-up` / `product-delivery` only ([jev.md](./jev.md)).
 

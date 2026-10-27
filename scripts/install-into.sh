@@ -65,7 +65,7 @@ Options:
   --force-mcp             Replace .agents/mcp/mcp.json with kit baseline
   --skip-bindings         Do not create binding stubs
   --skip-docs             Skip AGENTS.md / docs copy
-  --skip-deps             Do not npm-install knowledge engine deps (kuzu, sqlite-vec)
+  --skip-deps             Do not npm-install knowledge engine deps (sqlite-vec)
   --dry-run               Print actions only
   -h, --help              Show help
 
@@ -96,6 +96,8 @@ TARGET=""
 TMP_KIT=""
 KIT_VERSIONS=""
 INSTALLED_VERSIONS=""
+MANAGED_FILES=()
+SEEDED_FILES=()
 
 # ------------------------------------------------------------------
 # Interactive helpers
@@ -404,9 +406,17 @@ file_needs_update() {
 # ------------------------------------------------------------------
 # File operations
 # ------------------------------------------------------------------
+# Kit-owned files (refreshed on upgrade); spec drift exempts them via installed-versions.json.
+record_managed() {
+  MANAGED_FILES+=("${1#"$TARGET"/}")
+}
+
 copy_file() {
   local src="$1" dest="$2" policy="${3:-create}"
   [[ -f "$src" ]] || die "missing kit file: $src"
+  [[ "$policy" == "refresh" ]] && record_managed "$dest"
+  # Test hook: list refreshed kit sources (each needs a versions.json entry)
+  [[ "$policy" == "refresh" && -n "${HARNESS_TRACE_REFRESH:-}" ]] && echo "${src#"$KIT_DIR"/}" >> "$HARNESS_TRACE_REFRESH"
 
   local do_copy=0
   if [[ ! -e "$dest" ]]; then
@@ -427,6 +437,9 @@ copy_file() {
   [[ "$DRY_RUN" -eq 1 ]] && return 0
   mkdir -p "$(dirname "$dest")"
   cp "$src" "$dest"
+  # Project-owned seeds: spec drift exempts them only while unedited (sha256 in installed-versions.json).
+  [[ "$policy" == "create" ]] && SEEDED_FILES+=("${dest#"$TARGET"/}")
+  return 0
 }
 
 copy_tree() {
@@ -448,7 +461,8 @@ copy_tree() {
 install_portable_steering() {
   local f
   for f in domain-layer.md quality-gates.md manifest.md session-loop.md asdd-lite.md \
-           codegraph.md codegraph-agents.md knowledge.md skills.md security-rules.md controls.md jev.md README.md; do
+           codegraph.md codegraph-agents.md knowledge.md skills.md security-rules.md controls.md \
+           jev.md spec-drift.md README.md; do
     copy_file "$KIT_DIR/.harness/steering/$f" "$TARGET/.harness/steering/$f" refresh
   done
   copy_tree "$KIT_DIR/.harness/steering/templates" "$TARGET/.harness/steering/templates" refresh
@@ -473,6 +487,19 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/check-invariants.mjs" "$TARGET/.harness/scripts/check-invariants.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/check-skills-index.mjs" "$TARGET/.harness/scripts/check-skills-index.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/verify-on-stop.mjs" "$TARGET/.harness/scripts/verify-on-stop.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/drift-lib.mjs" "$TARGET/.harness/scripts/drift-lib.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/drift-lib.test.mjs" "$TARGET/.harness/scripts/drift-lib.test.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/semgrep-lib.mjs" "$TARGET/.harness/scripts/semgrep-lib.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/semgrep-lib.test.mjs" "$TARGET/.harness/scripts/semgrep-lib.test.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/check-spec-drift.mjs" "$TARGET/.harness/scripts/check-spec-drift.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/audit-lib.mjs" "$TARGET/.harness/scripts/audit-lib.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/audit-codebase.mjs" "$TARGET/.harness/scripts/audit-codebase.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/audit-codebase.test.mjs" "$TARGET/.harness/scripts/audit-codebase.test.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/audit-triage.mjs" "$TARGET/.harness/scripts/audit-triage.mjs" refresh
+  copy_file "$KIT_DIR/.harness/audits/README.md" "$TARGET/.harness/audits/README.md" refresh
+  # Examples only: the target's .github/ is never touched
+  copy_file "$KIT_DIR/.github/CODEOWNERS.harness.example" "$TARGET/.harness/examples/CODEOWNERS.harness.example" refresh
+  copy_file "$KIT_DIR/.github/workflows/harness-audit.yml.example" "$TARGET/.harness/examples/harness-audit.yml.example" refresh
   copy_file "$KIT_DIR/.harness/scripts/check-project-config.mjs" "$TARGET/.harness/scripts/check-project-config.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/harness-status.mjs" "$TARGET/.harness/scripts/harness-status.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/init-slice.mjs" "$TARGET/.harness/scripts/init-slice.mjs" refresh
@@ -484,7 +511,15 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/knowledge-lib.mjs" "$TARGET/.harness/scripts/knowledge-lib.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/knowledge-store.mjs" "$TARGET/.harness/scripts/knowledge-store.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/knowledge-store-sqlite.mjs" "$TARGET/.harness/scripts/knowledge-store-sqlite.mjs" refresh
-  copy_file "$KIT_DIR/.harness/scripts/knowledge-store-kuzu.mjs" "$TARGET/.harness/scripts/knowledge-store-kuzu.mjs" refresh
+  # Kuzu backend removed (upstream archived 2025-10); drop it from older installs.
+  # Still recorded as managed, so deleting a committed copy is not slice drift (DRIFT-01).
+  record_managed "$TARGET/.harness/scripts/knowledge-store-kuzu.mjs"
+  if [[ -e "$TARGET/.harness/scripts/knowledge-store-kuzu.mjs" ]]; then
+    log "${C_YELLOW}REMOVE${C_RESET} .harness/scripts/knowledge-store-kuzu.mjs (Kuzu backend removed)"
+    if [[ "$DRY_RUN" -eq 0 ]]; then
+      rm -f "$TARGET/.harness/scripts/knowledge-store-kuzu.mjs"
+    fi
+  fi
   copy_file "$KIT_DIR/.harness/scripts/sync-knowledge.mjs" "$TARGET/.harness/scripts/sync-knowledge.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/sync-knowledge.test.mjs" "$TARGET/.harness/scripts/sync-knowledge.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-gates.mjs" "$TARGET/.harness/scripts/jev-gates.mjs" refresh
@@ -499,8 +534,8 @@ install_harness_scaffold() {
   copy_tree "$KIT_DIR/.harness/scripts/validators" "$TARGET/.harness/scripts/validators" refresh
   copy_file "$KIT_DIR/.harness/config/versions.json" "$TARGET/.harness/config/versions.json" refresh
   copy_file "$KIT_DIR/.harness/config/models.json" "$TARGET/.harness/config/models.json" refresh
-  copy_file "$KIT_DIR/.harness/PROGRESS.md" "$TARGET/.harness/PROGRESS.md" create
-  copy_file "$KIT_DIR/.harness/state/manifest.json" "$TARGET/.harness/state/manifest.json" create
+  copy_file "$KIT_DIR/scripts/templates/PROGRESS.md" "$TARGET/.harness/PROGRESS.md" create
+  copy_file "$KIT_DIR/scripts/templates/manifest.json" "$TARGET/.harness/state/manifest.json" create
   copy_file "$KIT_DIR/.harness/state/locks/README.md" "$TARGET/.harness/state/locks/README.md" create
 
   local d
@@ -531,6 +566,7 @@ kit_version() {
 
 install_project_adapter() {
   local config="$TARGET/.harness/config/project.json"
+  record_managed "$config"
   local kit_ver
   kit_ver="$(kit_version)"
   local installed_at
@@ -610,9 +646,13 @@ EOF
   },
   "commands": {
     "invariants": "node .harness/scripts/check-invariants.mjs",
-    "verify_on_stop": "node .harness/scripts/verify-on-stop.mjs"
+    "verify_on_stop": "node .harness/scripts/verify-on-stop.mjs",
+    "spec_drift": "node .harness/scripts/check-spec-drift.mjs"
   },
   "modules": {},
+  "drift": {
+    "contract": "warn"
+  },
   "capabilities": {
     "codegraph": {
       "enabled": false,
@@ -645,6 +685,9 @@ install_agents_core() {
   copy_file "$KIT_DIR/.agents/mcp/jev-gate-server.mjs" "$TARGET/.agents/mcp/jev-gate-server.mjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/jev-gate-server.test.mjs" "$TARGET/.agents/mcp/jev-gate-server.test.mjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/knowledge-server.mjs" "$TARGET/.agents/mcp/knowledge-server.mjs" refresh
+  copy_file "$KIT_DIR/.agents/mcp/spec-drift-auditor.mjs" "$TARGET/.agents/mcp/spec-drift-auditor.mjs" refresh
+  copy_file "$KIT_DIR/.agents/mcp/spec-drift-auditor.test.mjs" "$TARGET/.agents/mcp/spec-drift-auditor.test.mjs" refresh
+  copy_tree "$KIT_DIR/.agents/mcp/ui" "$TARGET/.agents/mcp/ui" refresh
   if [[ "$FORCE_MCP" -eq 1 ]]; then
     local old_force=$FORCE
     FORCE=1
@@ -652,7 +695,28 @@ install_agents_core() {
     FORCE=$old_force
   else
     copy_file "$KIT_DIR/.agents/mcp/mcp.json" "$TARGET/.agents/mcp/mcp.json" create
+    register_mcp_server spec-drift-auditor
   fi
+  record_managed "$TARGET/.agents/mcp/mcp.json"
+}
+
+# Add one kit server to an existing mcp.json without touching the others.
+register_mcp_server() {
+  local name="$1" file="$TARGET/.agents/mcp/mcp.json"
+  [[ "$DRY_RUN" -eq 1 || ! -f "$file" ]] && return 0
+  local added
+  added=$(node -e '
+    const fs = require("fs");
+    const [kitFile, file, name] = process.argv.slice(1);
+    const cfg = JSON.parse(fs.readFileSync(file, "utf8"));
+    cfg.mcpServers ??= {};
+    if (cfg.mcpServers[name]) process.exit(0);
+    cfg.mcpServers[name] = JSON.parse(fs.readFileSync(kitFile, "utf8")).mcpServers[name];
+    fs.writeFileSync(file, JSON.stringify(cfg, null, 2) + "\n");
+    console.log("added");
+  ' "$KIT_DIR/.agents/mcp/mcp.json" "$file" "$name" 2>/dev/null) || return 0
+  [[ "$added" == "added" ]] && log "${C_GREEN}ADD${C_RESET}   $file (mcpServers.$name)"
+  return 0
 }
 
 install_docs_root() {
@@ -669,7 +733,7 @@ install_docs_root() {
   fi
   # Scaffold domain model and operational logs
   copy_file "$KIT_DIR/docs/architecture/domain-model.md" "$TARGET/docs/architecture/domain-model.md" create
-  copy_file "$KIT_DIR/docs/architecture/knowledge-scaling.md" "$TARGET/docs/architecture/knowledge-scaling.md" refresh
+  copy_file "$KIT_DIR/docs/architecture/spec-drift-and-audit.md" "$TARGET/docs/architecture/spec-drift-and-audit.md" refresh
   copy_file "$KIT_DIR/docs/agent-failure-log.md" "$TARGET/docs/agent-failure-log.md" create
   copy_file "$KIT_DIR/docs/dissent-log.md" "$TARGET/docs/dissent-log.md" create
   copy_file "$KIT_DIR/docs/self-healing-log.md" "$TARGET/docs/self-healing-log.md" create
@@ -721,6 +785,7 @@ enable_one_module() {
       ;;
     http-api)
       copy_tree "$KIT_DIR/.agents/modules/http-api/skills" "$TARGET/.agents/skills" refresh
+      copy_tree "$KIT_DIR/.agents/modules/http-api/adapters" "$TARGET/.agents/mcp/adapters" refresh
       ;;
     *) die "unknown module: $m (bruno|playwright-e2e|web-ui|http-api)" ;;
   esac
@@ -795,6 +860,7 @@ wire_runtime_cursor() {
     [[ -f "$f" ]] || continue
     base="$(basename "$f")"
     ln -sfn "../../.agents/agents/$base" "$TARGET/.cursor/agents/$base"
+    record_managed "$TARGET/.cursor/agents/$base"
     log "${C_BLUE}LINK${C_RESET}  $TARGET/.cursor/agents/$base"
   done
   if [[ ! -e "$TARGET/.cursor/mcp.json" ]]; then
@@ -927,6 +993,7 @@ wire_runtime_claude() {
     [[ -f "$f" ]] || continue
     base="$(basename "$f")"
     ln -sfn "../../.agents/agents/$base" "$TARGET/.claude/agents/$base"
+    record_managed "$TARGET/.claude/agents/$base"
     log "${C_BLUE}LINK${C_RESET}  $TARGET/.claude/agents/$base"
   done
   if [[ ! -e "$TARGET/.mcp.json" ]]; then
@@ -959,6 +1026,7 @@ link_runtime_agent_files() {
     [[ -f "$f" ]] || continue
     base="$(basename "$f")"
     ln -sfn "../../.agents/agents/$base" "$TARGET/$runtime_dir/agents/$base"
+    record_managed "$TARGET/$runtime_dir/agents/$base"
     log "${C_BLUE}LINK${C_RESET}  $TARGET/$runtime_dir/agents/$base"
   done
 }
@@ -1027,6 +1095,10 @@ EOF
   fi
   if command -v node >/dev/null 2>&1 && [[ -f "$TARGET/.agents/mcp/sync-runtime-mcp.cjs" ]]; then
     (cd "$TARGET" && node .agents/mcp/sync-runtime-mcp.cjs)
+    record_managed "$TARGET/.agents/mcp/mcp.opencode.json"
+    record_managed "$TARGET/.agents/mcp/mcp.codex.toml"
+    record_managed "$TARGET/opencode.json"
+    [[ -f "$TARGET/.codex/config.toml" ]] && record_managed "$TARGET/.codex/config.toml"
   else
     warn "Node or MCP projection script unavailable — skip OpenCode MCP projection"
   fi
@@ -1091,7 +1163,7 @@ wire_runtimes() {
 }
 
 # ------------------------------------------------------------------
-# Knowledge engine deps (kuzu graph/vector + sqlite-vec ANN ext)
+# Knowledge engine deps (sqlite-vec ANN extension for node:sqlite)
 # ------------------------------------------------------------------
 ensure_gitignore() {
   local line="$1" gi="$TARGET/.gitignore"
@@ -1108,23 +1180,39 @@ ensure_gitignore() {
 # from the consumer's dependency tree and lockfile (no pnpm/npm workspace
 # interference). createRequire anchored at .harness/scripts/ resolves it.
 install_knowledge_deps() {
-  local hpkg="$TARGET/.harness/package.json"
+  local hpkg="$TARGET/.harness/package.json" pruned_kuzu=0
+  # Kit-owned (written here, pruned on upgrade): exempt from DRIFT-01 like other managed files
+  record_managed "$hpkg"
+  record_managed "$TARGET/.harness/package-lock.json"
   if [[ ! -f "$hpkg" ]]; then
     if [[ "$DRY_RUN" -eq 1 ]]; then
-      log "${C_DIM}COPY${C_RESET}  .harness/package.json (kuzu, sqlite-vec)"
+      log "${C_DIM}COPY${C_RESET}  .harness/package.json (sqlite-vec)"
     else
       cat > "$hpkg" <<'PKGEOF'
 {
   "name": "asdd-harness-deps",
   "private": true,
-  "description": "Isolated deps for harness knowledge engine (kuzu graph + sqlite-vec ANN). Do not merge into project deps.",
+  "description": "Isolated deps for harness knowledge engine (sqlite-vec ANN). Do not merge into project deps.",
   "dependencies": {
-    "kuzu": "0.11.3",
     "sqlite-vec": "0.1.10-alpha.4"
   }
 }
 PKGEOF
-      log "${C_BLUE}COPY${C_RESET}  .harness/package.json (kuzu, sqlite-vec)"
+      log "${C_BLUE}COPY${C_RESET}  .harness/package.json (sqlite-vec)"
+    fi
+  elif grep -q '"kuzu"' "$hpkg"; then
+    # Kit-owned manifest from an older install: drop the retired Kuzu dep
+    log "${C_YELLOW}UPDATE${C_RESET} .harness/package.json (remove kuzu)"
+    if [[ "$DRY_RUN" -eq 0 ]]; then
+      node -e '
+        const fs = require("fs");
+        const p = process.argv[1];
+        const pkg = JSON.parse(fs.readFileSync(p, "utf8"));
+        delete pkg.dependencies?.kuzu;
+        pkg.description = "Isolated deps for harness knowledge engine (sqlite-vec ANN). Do not merge into project deps.";
+        fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + "\n");
+      ' "$hpkg"
+      pruned_kuzu=1
     fi
   fi
   ensure_gitignore ".harness/node_modules"
@@ -1132,8 +1220,13 @@ PKGEOF
   # integration keys (Jev, embeddings) are loaded from these files — never commit
   ensure_gitignore ".env.local"
   [[ "$SKIP_DEPS" -eq 1 ]] && { info "Skipping knowledge deps install"; return 0; }
-  if [[ -d "$TARGET/.harness/node_modules/kuzu" ]]; then
-    log "${C_DIM}KEEP${C_RESET}  .harness/node_modules (kuzu present)"
+  if [[ "$pruned_kuzu" -eq 1 && -d "$TARGET/.harness/node_modules" ]]; then
+    log "${C_BLUE}DEPS${C_RESET}  npm prune --prefix .harness (drop kuzu and its deps)"
+    (cd "$TARGET/.harness" && npm prune --no-audit --no-fund) >/dev/null 2>&1 \
+      || warn "npm prune failed — remove .harness/node_modules/kuzu manually"
+  fi
+  if [[ -d "$TARGET/.harness/node_modules/sqlite-vec" ]]; then
+    log "${C_DIM}KEEP${C_RESET}  .harness/node_modules (sqlite-vec present)"
     return 0
   fi
   log "${C_BLUE}DEPS${C_RESET}  npm i --prefix .harness (isolated knowledge engine)"
@@ -1156,7 +1249,28 @@ install_version_manifest() {
   fi
   if [[ -f "$KIT_VERSIONS" ]]; then
     mkdir -p "$(dirname "$INSTALLED_VERSIONS")"
-    cp "$KIT_VERSIONS" "$INSTALLED_VERSIONS"
+    if command -v node >/dev/null 2>&1; then
+      printf '%s\n' ${MANAGED_FILES[@]+"${MANAGED_FILES[@]}"} | \
+        HARNESS_SEEDED="$(printf '%s\n' ${SEEDED_FILES[@]+"${SEEDED_FILES[@]}"})" node -e '
+        const fs = require("fs");
+        const path = require("path");
+        const { createHash } = require("crypto");
+        const [kit, out, target] = process.argv.slice(1);
+        let prev = {};
+        try { prev = JSON.parse(fs.readFileSync(out, "utf8")); } catch {}
+        const now = fs.readFileSync(0, "utf8").split("\n").filter(Boolean);
+        const v = JSON.parse(fs.readFileSync(kit, "utf8"));
+        v.managed_files = [...new Set([...(prev.managed_files || []), ...now])].sort();
+        const seeded = { ...(prev.seeded_files || {}) };
+        for (const rel of (process.env.HARNESS_SEEDED || "").split("\n").filter(Boolean)) {
+          try { seeded[rel] = createHash("sha256").update(fs.readFileSync(path.join(target, rel))).digest("hex"); } catch {}
+        }
+        v.seeded_files = Object.fromEntries(Object.entries(seeded).sort(([a], [b]) => a.localeCompare(b)));
+        fs.writeFileSync(out, JSON.stringify(v, null, 2) + "\n");
+      ' "$KIT_VERSIONS" "$INSTALLED_VERSIONS" "$TARGET"
+    else
+      cp "$KIT_VERSIONS" "$INSTALLED_VERSIONS"
+    fi
     log "${C_BLUE}COPY${C_RESET}  $INSTALLED_VERSIONS"
   else
     warn "Kit version manifest not found — skipping version tracking"

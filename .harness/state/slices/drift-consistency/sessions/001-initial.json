@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-drift-consistency-001",
+  "timestamp": "2026-10-27T00:34:19.617Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "drift-consistency",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "lite",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

@@ -31,6 +31,7 @@ Index: `.harness/steering/README.md` · Skills: `.harness/steering/skills.md` ·
 - Codegraph first (`codegraph_explore`).
 - Gold-plating: modify only files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors. See `session-loop.md`.
 - Quality: numeric gates come only from `quality-gates.md` + `.project.md`. Do not invent a second CCS cutoff.
+- Spec drift: before `passing`, `audit_diff` (MCP `spec-drift-auditor`) or `check-spec-drift.mjs` shows no `fail`; Tech Lead reviews use mode `review` (`spec-drift.md`).
 
 ## State
 

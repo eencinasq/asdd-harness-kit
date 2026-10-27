@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "drift-consistency",
+  "source_tasks": ".harness/specs/drift-consistency/tasks.md",
+  "features": [
+    {
+      "id": "f1",
+      "title": "Consistent REQ grammar, real Semgrep snippets, unknown-key warnings, REQ-mapped tests",
+      "user_visible_behavior": "Graph REQs match drift counts; Semgrep findings show code when logged out; mistyped feature keys warn with the intended key; tests for a mapped REQ pass DRIFT-01",
+      "status": "in_progress",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "verification": [
+        "npm test",
+        "node .harness/scripts/check-invariants.mjs"
+      ],
+      "evidence": "npm test pass (REQ grammar parity, Semgrep placeholder, DRIFT-01 test mapping, lifecycle unknown-key warn). Field test on an ai-messager copy (218 features, 42 specs): 0 unknown-key warnings after syncing the schema with documented fields (area, notes, story_ids, not_started); 204/204 drift REQs in the graph. Awaiting commit for evidence_commit.",
+      "scope_paths": [
+        ".harness/scripts/knowledge-lib.mjs",
+        ".harness/scripts/sync-knowledge.test.mjs",
+        ".harness/scripts/semgrep-lib.mjs",
+        ".harness/scripts/semgrep-lib.test.mjs",
+        ".harness/scripts/validators/features.mjs",
+        ".harness/scripts/drift-lib.mjs",
+        ".harness/scripts/drift-lib.test.mjs",
+        ".harness/steering/session-loop.md",
+        "docs/architecture/spec-drift-and-audit.md",
+        "scripts/test-lifecycle.sh",
+        ".harness/config/versions.json",
+        ".harness/features/feature.schema.json"
+      ]
+    }
+  ]
+}

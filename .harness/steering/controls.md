@@ -21,6 +21,8 @@ Practice behind this layout: [Harness engineering for coding agent users](https:
 | Domain placement | Guide, plus the project boundary command | Computational when the binding supplies a command | Architecture fitness | [domain-layer.md](./domain-layer.md), [quality-gates.project.md](./quality-gates.project.md) |
 | Feature `verification` + `evidence` | Sensor | Computational | Behaviour | [session-loop.md](./session-loop.md) |
 | Verify-on-Stop invariants | Sensor | Computational, left (agent stop) | Harness state | `node .harness/scripts/check-invariants.mjs` |
+| Spec drift (`DRIFT-01`…`07`) | Sensor | Computational, left (in invariants) and in CI; on demand via `spec-drift-auditor` MCP | Behaviour scope, spec traceability | [spec-drift.md](./spec-drift.md), `check-spec-drift.mjs` |
+| Codebase audit | Sensor | Computational (`audit-codebase.mjs`) plus inferential (`codebase-audit` skill), scheduled | Drift and health outside the change lifecycle | [spec-drift.md](./spec-drift.md), `.harness/audits/` |
 | Jev (shape-up / product-delivery only) | Sensor | Computational (System One) | Betting + EARS/slice quality | [jev.md](./jev.md), `jev-gates.mjs` |
 | Command pattern gate | Sensor | Pattern allow/deny before dangerous bash (no Jev) | Safety | `jev-command-gate.mjs` |
 | CI invariants | Sensor | Computational, after integration; repeats the left check | Harness state | `.github/workflows/harness-invariants.yml` |

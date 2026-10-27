@@ -27,7 +27,7 @@ Tools (MCP):
 | `knowledge_search(query, k?, slice_id?)` | Semantic/lexical search over every REQ, spec section, feature, session, and log — **"does this already exist?"** |
 | `knowledge_trace(id, depth?)` | Graph BFS from any node: REQ→spec→feature→file, DEPENDS_ON chains, sessions |
 | `knowledge_slice(slice_id)` | JIT bundle: slice node + spec docs + REQs + features + session/log counts — **context pack without opening files** |
-| `knowledge_status()` | Index freshness, counts, active backend (kuzu/sqlite/jsonl) |
+| `knowledge_status()` | Index freshness, counts, active backend (sqlite/jsonl), search mode, and `warnings` when the index is degraded |
 
 Node ids: `slice:<id>`, `req:<slice>:<REQ-…>`, `ac:<slice>:<AC-…>`, `feature:<slice>:<TASK-…>`,
 `spec:<slice>:<doc>`, `file:<path>`, `session:<slice>:<file>`, `log:failure_log`, `log:dissent_log`.
@@ -44,6 +44,9 @@ Node ids: `slice:<id>`, `req:<slice>:<REQ-…>`, `ac:<slice>:<AC-…>`, `feature
 - **QA / Refactor:** `knowledge_trace` for coverage (REQ→feature→file);
   `knowledge_search` for similar past failures (`log:*` nodes).
 - **Knowledge Agent:** all four — dedupe detection, blast radius, failure mining.
+  It also runs the `codebase-audit` skill, which uses `knowledge_trace` on hotspot
+  files; `audit_finding` on the `spec-drift-auditor` server returns the same trace
+  for one finding ([spec-drift.md](./spec-drift.md)). Feature nodes carry `evidence_commit`.
 
 If `knowledge_status` reports no index or a stale `generated_at`, run
 `node .harness/scripts/sync-knowledge.mjs` once before relying on results.

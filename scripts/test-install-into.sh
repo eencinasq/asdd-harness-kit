@@ -51,9 +51,9 @@ grep -q '"project_id": "existing-app"' "$TMP/existing-app/.harness/config/projec
 KIT_VER="$(node -e "process.stdout.write(require('$ROOT/package.json').version)")"
 grep -q "\"harness_version\": \"$KIT_VER\"" "$TMP/existing-app/.harness/config/project.json"
 grep -q "\"version\": \"$KIT_VER\"" "$TMP/existing-app/.harness/config/project.json"
-# Jev is required in scaffolded project config (key via env only)
+# Jev is skill-scoped in scaffolded project config (key via env only)
 grep -q '"jev"' "$TMP/existing-app/.harness/config/project.json"
-grep -q '"required": true' "$TMP/existing-app/.harness/config/project.json"
+node -e 'const j=require(process.argv[1]).capabilities.jev; if (j.required !== false || String(j.required_by) !== "shape-up,product-delivery") process.exit(1)' "$TMP/existing-app/.harness/config/project.json"
 grep -q '"apiKey": ""' "$TMP/existing-app/.harness/config/project.json"
 test -f "$TMP/existing-app/.harness/scripts/jev-client.mjs"
 test -f "$TMP/existing-app/.harness/scripts/jev-gates.mjs"
@@ -64,13 +64,39 @@ test -f "$TMP/existing-app/.harness/steering/jev.md"
 test -f "$TMP/existing-app/.harness/scripts/knowledge-lib.mjs"
 test -f "$TMP/existing-app/.harness/scripts/knowledge-store.mjs"
 test -f "$TMP/existing-app/.harness/scripts/knowledge-store-sqlite.mjs"
-test -f "$TMP/existing-app/.harness/scripts/knowledge-store-kuzu.mjs"
+test ! -e "$TMP/existing-app/.harness/scripts/knowledge-store-kuzu.mjs"
 test -f "$TMP/existing-app/.harness/scripts/sync-knowledge.mjs"
 test -f "$TMP/existing-app/.harness/scripts/sync-knowledge.test.mjs"
 test -f "$TMP/existing-app/.agents/mcp/knowledge-server.mjs"
 grep -q '"knowledge"' "$TMP/existing-app/.agents/mcp/mcp.json"
+# Spec drift sensor + spec-drift-auditor MCP server (REQ-029)
+test -f "$TMP/existing-app/.harness/scripts/drift-lib.mjs"
+test -f "$TMP/existing-app/.harness/scripts/audit-lib.mjs"
+test -f "$TMP/existing-app/.agents/mcp/spec-drift-auditor.mjs"
+test -f "$TMP/existing-app/.agents/mcp/ui/drift-dashboard.html"
+test ! -e "$TMP/existing-app/tools"
+grep -q '"spec-drift-auditor"' "$TMP/existing-app/.agents/mcp/mcp.json"
+test -f "$TMP/existing-app/.harness/scripts/audit-codebase.mjs"
+test -f "$TMP/existing-app/.harness/scripts/audit-triage.mjs"
+test -f "$TMP/existing-app/.harness/audits/README.md"
+test -f "$TMP/existing-app/.harness/examples/CODEOWNERS.harness.example"
+test -f "$TMP/existing-app/.harness/examples/harness-audit.yml.example"
+test -f "$TMP/existing-app/.agents/skills/codebase-audit/SKILL.md"
+(cd "$TMP/existing-app" && node .harness/scripts/audit-codebase.mjs --no-write >/dev/null)
+(cd "$TMP/existing-app" && printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | node .agents/mcp/spec-drift-auditor.mjs 2>/dev/null) | grep -q '"audit_diff"'
+# kit-owned (refresh) files are recorded so spec drift exempts them; project-owned seeds are not
+node -e '
+  const m = require(process.argv[1]).managed_files || [];
+  for (const f of [".harness/scripts/drift-lib.mjs", "scripts/install-into.sh", ".cursor/rules/asdd-steering.mdc", ".cursor/agents/asdd-discovery-agent.md", ".agents/mcp/mcp.json", ".harness/config/project.json", "opencode.json", ".harness/package.json", ".harness/scripts/knowledge-store-kuzu.mjs"])
+    if (!m.includes(f)) throw new Error(`managed_files misses ${f}`);
+  for (const f of ["AGENTS.md", ".harness/steering/product.md", "README.md"])
+    if (m.includes(f)) throw new Error(`managed_files wrongly lists ${f}`);
+  const s = require(process.argv[1]).seeded_files || {};
+  if (!/^[0-9a-f]{64}$/.test(s["docs/asdd-harness-portability.md"] || "")) throw new Error("seeded_files misses docs/asdd-harness-portability.md");
+  if ("README.md" in s) throw new Error("seeded_files wrongly lists the project README.md");
+' "$TMP/existing-app/.harness/config/installed-versions.json"
 # Isolated knowledge deps manifest (installed via .harness/package.json)
-grep -q '"kuzu"' "$TMP/existing-app/.harness/package.json"
+! grep -q '"kuzu"' "$TMP/existing-app/.harness/package.json"
 grep -q '"sqlite-vec"' "$TMP/existing-app/.harness/package.json"
 grep -qxF '.harness/node_modules' "$TMP/existing-app/.gitignore"
 grep -qxF '.harness/knowledge' "$TMP/existing-app/.gitignore"
@@ -159,6 +185,12 @@ printf '%s\n' '{"version":1,"hooks":{"beforeShellExecution":[{"command":"echo ke
 grep -q 'echo keep-me' "$TMP/existing-app/.cursor/hooks.json"
 grep -q 'verify-on-stop.mjs' "$TMP/existing-app/.cursor/hooks.json"
 grep -q 'jev-command-gate.mjs' "$TMP/existing-app/.cursor/hooks.json"
+
+# existing mcp.json gains spec-drift-auditor without dropping other servers
+printf '%s\n' '{"mcpServers":{"mine":{"type":"stdio","command":"echo"}}}' >"$TMP/existing-app/.agents/mcp/mcp.json"
+"$ROOT/scripts/install-into.sh" "$TMP/existing-app" --skip-deps >/dev/null
+grep -q '"mine"' "$TMP/existing-app/.agents/mcp/mcp.json"
+grep -q '"spec-drift-auditor"' "$TMP/existing-app/.agents/mcp/mcp.json"
 
 # second run keeps binding, does not require --force for create-only, stays hook-idempotent
 "$ROOT/scripts/install-into.sh" "$TMP/existing-app" --skip-deps >/dev/null
@@ -256,6 +288,9 @@ for mod in bruno playwright-e2e web-ui http-api; do
       ;;
     http-api)
       test -d "$MTMP/$mod-app/.agents/skills/api-and-interface-design"
+      # spec compliance adapter for the spec-drift-auditor server (REQ-029)
+      test -f "$MTMP/$mod-app/.agents/mcp/adapters/openapi.mjs"
+      (cd "$MTMP/$mod-app" && node --test .agents/mcp/adapters/openapi.test.mjs >/dev/null)
       ;;
   esac
   echo "  OK"
@@ -270,5 +305,24 @@ test -f "$MTMP/all-app/.agents/agents/asdd-e2e-tester.md"
 test -d "$MTMP/all-app/.agents/skills/frontend-ui-engineering"
 test -d "$MTMP/all-app/.agents/skills/api-and-interface-design"
 echo "  OK"
+
+echo "== versions: one project version; every refreshed file has an entry =="
+VTMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-versions-test.XXXXXX")"
+mkdir -p "$VTMP/app"
+HARNESS_TRACE_REFRESH="$VTMP/refresh.log" "$ROOT/scripts/install-into.sh" "$VTMP/app" \
+  --runtime=cursor,claude,opencode,kimi,junie,devin,kiro --modules=all --no-interactive --skip-deps >/dev/null
+node -e '
+  const fs = require("fs");
+  const [pkgPath, versionsPath, tracePath] = process.argv.slice(1);
+  const version = require(pkgPath).version;
+  const v = require(versionsPath);
+  if (v.kit_version !== version) throw new Error(`kit_version ${v.kit_version} != package.json ${version}`);
+  const off = Object.entries(v.artifacts).filter(([, ver]) => ver !== version).map(([f]) => f);
+  if (off.length) throw new Error(`artifacts not at ${version} (run: node scripts/generate-versions.mjs): ${off.join(", ")}`);
+  const traced = [...new Set(fs.readFileSync(tracePath, "utf8").split("\n").filter(Boolean))];
+  const missing = traced.filter((f) => !(f in v.artifacts));
+  if (missing.length) throw new Error(`refreshed but never versioned (add to generate-versions.mjs): ${missing.join(", ")}`);
+' "$ROOT/package.json" "$ROOT/.harness/config/versions.json" "$VTMP/refresh.log"
+rm -rf "$VTMP"
 
 echo "OK install-into smoke test"

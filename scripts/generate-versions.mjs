@@ -3,12 +3,15 @@
  * generate-versions.mjs — scan the kit and produce .harness/config/versions.json
  *
  * Usage:
- *   node scripts/generate-versions.mjs [bump <path> [version]]
+ *   node scripts/generate-versions.mjs                 # restamp at package.json version
+ *   node scripts/generate-versions.mjs bump <version>  # set the project version, then restamp
  *
- * Without args: regenerates the manifest from current disk state.
- * With "bump <path> [version]": bumps the version of a single artifact.
+ * Every artifact installed into client projects carries the project version.
+ * The installer refreshes a client file only when its version changes, so one
+ * version per release means every kit-owned file is refreshed on upgrade —
+ * nothing stays stale because a per-file bump was missed.
  */
-import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const root = process.cwd();
@@ -42,15 +45,16 @@ function* walk(dir) {
 
 function collectArtifacts() {
   const artifacts = {};
+  const version = getKitVersion();
   const record = (rel) => {
-    artifacts[rel] = getKitVersion();
+    if (existsSync(join(root, rel))) artifacts[rel] = version; // listed files may be retired
   };
 
   // Portable steering (individual files)
   for (const f of [
     'domain-layer.md', 'quality-gates.md', 'manifest.md', 'session-loop.md',
     'asdd-lite.md', 'codegraph.md', 'codegraph-agents.md', 'knowledge.md',
-    'jev.md', 'skills.md',
+    'jev.md', 'skills.md', 'spec-drift.md',
     'security-rules.md', 'controls.md', 'README.md',
   ]) {
     record(`.harness/steering/${f}`);
@@ -78,7 +82,10 @@ function collectArtifacts() {
     'jev-client.test.mjs', 'jev-command-gate.test.mjs',
     'env-loader.mjs',
     'knowledge-lib.mjs', 'knowledge-store.mjs', 'knowledge-store-sqlite.mjs',
-    'knowledge-store-kuzu.mjs', 'sync-knowledge.mjs', 'sync-knowledge.test.mjs',
+    'sync-knowledge.mjs', 'sync-knowledge.test.mjs',
+    'drift-lib.mjs', 'drift-lib.test.mjs', 'check-spec-drift.mjs',
+    'audit-lib.mjs', 'audit-codebase.mjs', 'audit-codebase.test.mjs', 'audit-triage.mjs',
+    'semgrep-lib.mjs', 'semgrep-lib.test.mjs',
   ]) {
     record(`.harness/scripts/${f}`);
   }
@@ -122,6 +129,7 @@ function collectArtifacts() {
   }
   for (const f of [
     'architecture/domain-model.md', 'architecture/knowledge-scaling.md',
+    'architecture/spec-drift-and-audit.md',
     'agent-failure-log.md', 'dissent-log.md',
   ]) {
     record(`docs/${f}`);
@@ -134,6 +142,17 @@ function collectArtifacts() {
   record('scripts/test-install-into.sh');
   record('scripts/test-lifecycle.sh');
   record('scripts/test-full-flow.sh');
+  record('scripts/migrate-v2-v3.mjs');
+
+  // Audit + CI examples (copied into .harness/)
+  record('.harness/audits/README.md');
+  record('.github/CODEOWNERS.harness.example');
+  record('.github/workflows/harness-audit.yml.example');
+
+  // Per-runtime model configs
+  for (const entry of readdirSync(join(root, 'runtimes'), { withFileTypes: true })) {
+    if (entry.isDirectory()) record(`runtimes/${entry.name}/models.json`);
+  }
 
   // Runtime recipes (only files that get copied, not symlinked)
   for (const f of ['asdd-steering.mdc']) {
@@ -155,30 +174,40 @@ function collectArtifacts() {
   return artifacts;
 }
 
+const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
+
+/** Set the project version in package.json and the root of package-lock.json. */
+function setProjectVersion(version) {
+  const pkgPath = join(root, 'package.json');
+  const pkg = readJson(pkgPath);
+  pkg.version = version;
+  writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
+  const lockPath = join(root, 'package-lock.json');
+  const lock = readJson(lockPath);
+  if (lock) {
+    lock.version = version;
+    if (lock.packages?.['']) lock.packages[''].version = version;
+    writeFileSync(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
+  }
+}
+
 function main() {
   const args = process.argv.slice(2);
-  const existing = readJson(outPath) || {};
-  const kitVersion = getKitVersion();
 
   if (args[0] === 'bump') {
-    const relPath = args[1];
-    if (!relPath) {
-      console.error('Usage: node scripts/generate-versions.mjs bump <path> [version]');
+    const version = args[1];
+    if (!SEMVER.test(version ?? '')) {
+      console.error('Usage: node scripts/generate-versions.mjs bump <version>   (e.g. 3.6.0)');
       process.exit(1);
     }
-    const newVersion = args[2] || kitVersion;
-    const doc = {
-      schema_version: '1.0',
-      kit_version: existing.kit_version || kitVersion,
-      generated_at: new Date().toISOString(),
-      artifacts: { ...(existing.artifacts || {}) },
-    };
-    doc.artifacts[relPath] = newVersion;
-    writeFileSync(outPath, `${JSON.stringify(doc, null, 2)}\n`);
-    console.log(`BUMP  ${relPath} → ${newVersion}`);
-    return;
+    setProjectVersion(version);
+    console.log(`BUMP  project → ${version}`);
+  } else if (args.length) {
+    console.error('Usage: node scripts/generate-versions.mjs [bump <version>]');
+    process.exit(1);
   }
 
+  const kitVersion = getKitVersion();
   const artifacts = collectArtifacts();
   const doc = {
     schema_version: '1.0',
@@ -186,25 +215,8 @@ function main() {
     generated_at: new Date().toISOString(),
     artifacts,
   };
-
-  // Preserve existing versions for files that haven't changed
-  if (existing.artifacts) {
-    for (const [path, version] of Object.entries(existing.artifacts)) {
-      if (artifacts[path] && version !== kitVersion) {
-        // Keep the older version unless the file content changed
-        const fullPath = join(root, path);
-        if (existsSync(fullPath)) {
-          const mtime = statSync(fullPath).mtime.toISOString();
-          if (mtime <= existing.generated_at) {
-            artifacts[path] = version;
-          }
-        }
-      }
-    }
-  }
-
   writeFileSync(outPath, `${JSON.stringify(doc, null, 2)}\n`);
-  console.log(`WRITE ${outPath} — ${Object.keys(artifacts).length} artifacts @ ${kitVersion}`);
+  console.log(`WRITE ${relative(root, outPath)} — ${Object.keys(artifacts).length} artifacts @ ${kitVersion}`);
 }
 
 main();

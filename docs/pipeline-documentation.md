@@ -248,7 +248,9 @@ Validation phase of the full path.
 | **PROGRESS.md** | `.harness/PROGRESS.md` | Active slices index |
 | **Controls** | `.harness/steering/controls.md` | Which guide or sensor wins when they disagree |
 | **Quality gates** | `.harness/steering/quality-gates.md` | EARS acceptance criteria for phase gates. Numeric cutoffs live only here |
-| **Gate binding** | `.harness/steering/quality-gates.project.md` | Full-suite command, failure log, active domain findings |
+| **Gate binding** | `.harness/steering/quality-gates.project.md` | Full-suite command, failure log, active domain findings, spec drift and audit bindings |
+| **Spec drift** | `.harness/steering/spec-drift.md` | `DRIFT-01`…`07` in the invariants and CI; `check-spec-drift.mjs`; `spec-drift-auditor` MCP server for engineers and the Tech Lead |
+| **Audits** | `.harness/audits/` | `audit-codebase.mjs` reports with stable finding IDs; Tech Lead triage in `triage.json` |
 | **Jev** | `.harness/steering/jev.md` | Skill-scoped System One (shape-up / product-delivery MCP); client `jev-client.mjs` |
 | **Knowledge index** | `.harness/knowledge/*.jsonl` | Generated graph+chunk projection of specs/state/features (`sync-knowledge.mjs`); queried via the `knowledge` MCP server. Regenerable — never SoT. Growth path: [architecture/knowledge-scaling.md](architecture/knowledge-scaling.md) |
 
@@ -365,7 +367,9 @@ The full suite in `quality-gates.project.md` runs before a new spec enters Task 
 | `escalate-slice.mjs` | Lite → escalated transition on detected evidence |
 | Jev | MCP `jev-gate` + `jev-client.mjs` / `jev-gates.mjs` (shape-up / product-delivery only) |
 | Skills index | `.harness/steering/skills.md` — name and description until the task starts |
-| Verify-on-Stop | `check-invariants.mjs --live` at session end (Cursor + Claude Code hooks) |
+| Verify-on-Stop | `check-invariants.mjs --live` at session end (Cursor + Claude Code hooks), including spec drift |
+| Spec drift auditor MCP (`spec-drift-auditor.mjs`) | `audit_diff`, `verify_architecture_rules`, `verify_spec_compliance`, `generate_ci_gate`, `audit_report`, `audit_finding`; MCP App dashboard on hosts that support it |
+| `audit-codebase.mjs` / `codebase-audit` skill | Scheduled computational and inferential audit; `audit-triage.mjs` records Tech Lead dismissals |
 
 ---
 

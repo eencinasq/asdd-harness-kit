@@ -51,13 +51,17 @@
         },
         "status": {
           "type": "string",
-          "enum": ["pending", "in_progress", "passing", "blocked", "abandoned"],
-          "description": "Current lifecycle status of the feature."
+          "enum": ["not_started", "pending", "in_progress", "blocked", "passing", "abandoned"],
+          "description": "Current lifecycle status of the feature (session-loop.md uses not_started | in_progress | blocked | passing; pending and abandoned are accepted)."
         },
         "priority": {
           "type": "integer",
           "minimum": 1,
           "description": "Execution priority (1 = highest)."
+        },
+        "area": {
+          "type": "string",
+          "description": "Slice or module the feature belongs to (session-loop.md)."
         },
         "verification": {
           "type": "array",
@@ -71,6 +75,11 @@
         "evidence": {
           "type": "string",
           "description": "Filled only when status is 'passing'. Describes what ran and the result."
+        },
+        "evidence_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{7,40}$",
+          "description": "SHA of the commit containing the verified code. Required when status is 'passing'. Drift check DRIFT-02 compares scope_paths against it."
         },
         "depends_on": {
           "type": "array",
@@ -86,7 +95,7 @@
         },
         "scope_paths": {
           "type": "array",
-          "description": "Non-empty repo-relative files/directories this feature owns. Required for concurrent in_progress features.",
+          "description": "Non-empty repo-relative files/directories this feature owns. Required on every feature (DRIFT-06); must not overlap between concurrent in_progress features.",
           "items": {
             "type": "string",
             "minLength": 1
@@ -95,6 +104,18 @@
         "req_ids": {
           "type": "array",
           "description": "EARS requirement IDs traced to this feature.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional free text: REQ links, blockers (session-loop.md)."
+        },
+        "story_ids": {
+          "type": "array",
+          "description": "Traceability to upstream tracker stories (external-trackers skill).",
           "items": {
             "type": "string",
             "minLength": 1

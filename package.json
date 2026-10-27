@@ -1,6 +1,6 @@
 {
   "name": "asdd-harness-kit",
-  "version": "3.3.0",
+  "version": "3.6.0",
   "description": "Portable process layer for Agent Specification-Driven Development (ASDD) and Harness Engineering",
   "bin": {
     "asdd-harness-kit": "scripts/npx-install.cjs"
@@ -9,6 +9,7 @@
     ".agents/**/*",
     ".cursor/**/*",
     ".harness/**/*",
+    "!.harness/knowledge/**",
     "docs/**/*",
     "runtimes/**/*",
     "scripts/**/*",
@@ -17,8 +18,9 @@
     "README.md"
   ],
   "scripts": {
-    "test": "bash scripts/test-install-into.sh && bash scripts/test-lifecycle.sh && node --test .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .harness/scripts/sync-knowledge.test.mjs .agents/mcp/jev-gate-server.test.mjs",
-    "test:full-flow": "bash scripts/test-full-flow.sh"
+    "test": "bash scripts/test-install-into.sh && bash scripts/test-lifecycle.sh && node --test .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .harness/scripts/sync-knowledge.test.mjs .agents/mcp/jev-gate-server.test.mjs .harness/scripts/drift-lib.test.mjs .harness/scripts/semgrep-lib.test.mjs .harness/scripts/audit-codebase.test.mjs .agents/mcp/spec-drift-auditor.test.mjs .agents/modules/http-api/adapters/openapi.test.mjs tools/drift-dashboard/src/model.test.mjs",
+    "test:full-flow": "bash scripts/test-full-flow.sh",
+    "build:ui": "vite build --config tools/drift-dashboard/vite.config.mjs"
   },
   "keywords": [
     "asdd",
@@ -39,7 +41,13 @@
     "node": ">=22"
   },
   "dependencies": {
-    "kuzu": "^0.11.3",
     "sqlite-vec": "^0.1.10-alpha.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "vite": "^8.3.5",
+    "vite-plugin-singlefile": "^2.3.4"
   }
 }

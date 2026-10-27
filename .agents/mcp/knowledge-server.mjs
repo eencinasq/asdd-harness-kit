@@ -73,7 +73,7 @@ const TOOLS = [
 ];
 
 // ------------------------------------------------------------------
-// Index access — kuzu → sqlite → JSONL via the store facade
+// Index access — sqlite → JSONL via the store facade
 // ------------------------------------------------------------------
 function loadIndex() {
   return openStore(process.cwd());
@@ -118,10 +118,22 @@ function cosine(a, b) {
   return na && nb ? dot / (Math.sqrt(na) * Math.sqrt(nb)) : 0;
 }
 
+// Degradations are reported in the tool result and on stderr — never hidden.
+function warn(message) {
+  process.stderr.write(`knowledge-server: ${message}\n`);
+  return message;
+}
+
+const embeddingsConfigured = () =>
+  Boolean(process.env.KNOWLEDGE_EMBEDDINGS_URL && process.env.KNOWLEDGE_EMBEDDINGS_MODEL);
+
+/** @returns {Promise<{ vector: number[]|null, error?: string }>} */
 async function embedQuery(text) {
   const url = process.env.KNOWLEDGE_EMBEDDINGS_URL;
   const model = process.env.KNOWLEDGE_EMBEDDINGS_MODEL;
-  if (!url || !model) return null;
+  if (!url || !model) {
+    return { vector: null, error: 'index has embeddings but KNOWLEDGE_EMBEDDINGS_URL/MODEL are not set' };
+  }
   const headers = { 'content-type': 'application/json' };
   if (process.env.KNOWLEDGE_EMBEDDINGS_KEY) {
     headers.authorization = `Bearer ${process.env.KNOWLEDGE_EMBEDDINGS_KEY}`;
@@ -133,43 +145,53 @@ async function embedQuery(text) {
       body: JSON.stringify({ model, input: [text] }),
       signal: AbortSignal.timeout(10000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) return { vector: null, error: `query embedding failed: endpoint returned ${res.status}` };
     const data = await res.json();
-    return Array.isArray(data?.data?.[0]?.embedding) ? data.data[0].embedding : null;
-  } catch {
-    return null;
+    const vector = data?.data?.[0]?.embedding;
+    return Array.isArray(vector)
+      ? { vector }
+      : { vector: null, error: 'query embedding failed: response has no data[0].embedding' };
+  } catch (error) {
+    return { vector: null, error: `query embedding failed: ${error?.message ?? error}` };
   }
 }
 
+/** @returns {Promise<{ results: object[], search_mode: string, warnings: string[] }>} */
 async function searchChunks(index, query, k, sliceId) {
   const pool = await index.chunksForSearch(sliceId);
+  const warnings = [];
+  const strip = (rows) => rows.map(({ embedding, ...rest }) => rest);
 
   // Semantic path: only when the index carries embeddings AND we can embed the query
   const hasVectors = pool.some((c) => c.embedding && c.embedding.length);
-  const qvec = hasVectors ? await embedQuery(query) : null;
+  const { vector: qvec, error } = hasVectors ? await embedQuery(query) : { vector: null };
+  if (error) warnings.push(warn(`${error} — fell back to lexical search`));
   if (qvec) {
-    // Engine-pushed vector search when the backend provides it (Kuzu
-    // array_cosine_similarity / sqlite-vec ANN); else JS cosine over the pool.
+    // sqlite-vec ANN when the backend can serve it; else exact JS cosine.
     if (typeof index.vectorSearch === 'function') {
-      const rows = await index.vectorSearch(qvec, k, sliceId);
-      if (rows) return rows.map(({ embedding, ...rest }) => rest);
+      try {
+        const rows = await index.vectorSearch(qvec, k, sliceId);
+        if (rows) return { results: strip(rows), search_mode: 'semantic-ann', warnings };
+      } catch (err) {
+        warnings.push(warn(`vector index query failed: ${err?.message ?? err} — used JS cosine`));
+      }
     }
-    return pool
+    const results = pool
       .filter((c) => c.embedding && c.embedding.length)
       .map((c) => ({ ...c, score: cosine(qvec, c.embedding) }))
       .sort((a, b) => b.score - a.score)
-      .slice(0, k)
-      .map(({ embedding, ...rest }) => rest);
+      .slice(0, k);
+    return { results: strip(results), search_mode: 'semantic-cosine', warnings };
   }
 
   const queryTokens = tokenize(query);
   const querySet = new Set(queryTokens);
-  return pool
+  const results = pool
     .map((c) => ({ ...c, score: lexicalScore(queryTokens, querySet, c.text) }))
     .filter((c) => c.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, k)
-    .map(({ embedding, ...rest }) => rest);
+    .slice(0, k);
+  return { results: strip(results), search_mode: 'lexical', warnings };
 }
 
 // ------------------------------------------------------------------
@@ -251,6 +273,7 @@ function toolResult(payload, isError = false) {
 
 async function requireIndex(id) {
   const index = await loadIndex();
+  if (index?.fallback_reason) warn(`serving JSONL: ${index.fallback_reason}`);
   if (!index) {
     reply(
       id,
@@ -272,6 +295,11 @@ async function handleToolCall(id, params) {
     const index = await requireIndex(id);
     if (!index) return;
     const counts = await index.counts();
+    const warnings = [];
+    if (index.fallback_reason) warnings.push(`serving JSONL: ${index.fallback_reason}`);
+    if (counts.embedded_chunks > 0 && !embeddingsConfigured()) {
+      warnings.push('index has embeddings but KNOWLEDGE_EMBEDDINGS_URL/MODEL are not set — searches are lexical');
+    }
     reply(
       id,
       toolResult({
@@ -279,7 +307,8 @@ async function handleToolCall(id, params) {
         generated_at: index.meta()?.generated_at ?? null,
         stats: index.meta() ?? {},
         ...counts,
-        search_mode: counts.embedded_chunks > 0 ? 'semantic+lexical-fallback' : 'lexical',
+        search_mode: counts.embedded_chunks > 0 && embeddingsConfigured() ? 'semantic' : 'lexical',
+        warnings,
       })
     );
     return;
@@ -293,13 +322,14 @@ async function handleToolCall(id, params) {
       return;
     }
     try {
-      const results = await searchChunks(
+      const search = await searchChunks(
         index,
         args.query,
         Math.max(1, Math.min(Number(args.k) || 5, 25)),
         typeof args.slice_id === 'string' ? args.slice_id : undefined
       );
-      reply(id, toolResult({ results }));
+      if (index.fallback_reason) search.warnings.unshift(`serving JSONL: ${index.fallback_reason}`);
+      reply(id, toolResult(search));
     } catch (error) {
       replyError(id, -32603, error?.message || 'search failed');
     }
@@ -359,22 +389,28 @@ async function handleMessage(message) {
   }
 }
 
+// Serialize stdio handlers: MCP stdio clients expect in-order responses even
+// when several lines are piped before any reply.
+let messageChain = Promise.resolve();
+
 const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
-rl.on('line', async (line) => {
+rl.on('line', (line) => {
   const trimmed = line.trim();
   if (!trimmed) return;
-  let message;
-  try {
-    message = JSON.parse(trimmed);
-  } catch (error) {
-    replyError(null, -32700, `Parse error: ${error.message}`);
-    return;
-  }
-  try {
-    await handleMessage(message);
-  } catch (error) {
-    replyError(message?.id ?? null, -32603, error?.message || 'internal error');
-  }
+  messageChain = messageChain.then(async () => {
+    let message;
+    try {
+      message = JSON.parse(trimmed);
+    } catch (error) {
+      replyError(null, -32700, `Parse error: ${error.message}`);
+      return;
+    }
+    try {
+      await handleMessage(message);
+    } catch (error) {
+      replyError(message?.id ?? null, -32603, error?.message || 'internal error');
+    }
+  });
 });
 
 process.stderr.write('Knowledge MCP Server started (stdio)\n');

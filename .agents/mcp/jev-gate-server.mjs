@@ -24,6 +24,7 @@ import {
   THRESHOLDS,
 } from '../../.harness/scripts/jev-gates.mjs';
 import { jevHealthCheck } from '../../.harness/scripts/jev-client.mjs';
+import { loadEnv } from '../../.harness/scripts/env-loader.mjs';
 
 const PROTOCOL_VERSION = '2024-11-05';
 const SERVER_INFO = { name: 'jev-gate-server', version: '3.2.0' };
@@ -134,6 +135,9 @@ function toolResult(payload, isError = false) {
 }
 
 function requireSkillJev() {
+  // Re-read gitignored .env / .env.local. The server process starts before
+  // those files exist, and Cursor does not pass shell env into MCP.
+  loadEnv();
   const cfg = assertJevConfigured({ skillRequired: true });
   if (!cfg.ok) {
     return { error: cfg.error, unavailable: true, thresholds: THRESHOLDS };

@@ -36,7 +36,9 @@ A guide steers the agent before it edits. A sensor checks the result and, on fai
 | Lite slice governance | Serial rule (one `in_progress`, FAIL) + escalation signals block `DONE` while open (`validators/lite-escalation.mjs`, `sync-state.mjs`) | `.harness/steering/asdd-lite.md` |
 | Before `passing` or session end | `node .harness/scripts/check-invariants.mjs` must exit 0. WARN does not block. FAIL does | `session-loop.md` |
 | Session end gate | Cursor stop hook and Claude Code Stop hook run `verify-on-stop.mjs` → `check-invariants.mjs --live` (does **not** require `JEV_API_KEY`); a failing check is returned as the next prompt (Cursor `loop_limit` 3; Claude respects `stop_hook_active`). Abort and error statuses do not continue the loop | `.cursor/hooks.json`, `.claude/settings.json` |
-| Pull request | `.github/workflows/harness-invariants.yml` runs unit tests, installer smoke, lifecycle e2e with negative cases, config/skills checks, and `sync-state` + invariants | CI |
+| Before `passing` (engineers) and PR review (Tech Lead) | Spec drift `DRIFT-01`…`07` runs inside the invariants; `audit_diff` on the `spec-drift-auditor` MCP server gives the same findings in chat, in `author` or `review` mode | `.harness/steering/spec-drift.md` |
+| Pull request | `.github/workflows/harness-invariants.yml` runs unit tests, installer smoke, lifecycle e2e with negative cases, config/skills checks, and `sync-state` + invariants (with the PR branch and body for `DRIFT-07`) | CI |
+| On a schedule | `audit-codebase.mjs` (drift over all slices, unowned code, audit commands, hotspots) and the `codebase-audit` skill; the Tech Lead triages | `.harness/audits/` |
 | Before a new spec enters Task Planning | The full-suite command in `quality-gates.project.md` must report zero failures | `QG-DEB-*` |
 | Same failure logged three times | Record which guide or sensor must change. Do not close it as an observation only | `QG-DEB-06` |
 

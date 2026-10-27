@@ -22,6 +22,14 @@
         ".agents/mcp/knowledge-server.mjs"
       ],
       "enabled": true
+    },
+    "spec-drift-auditor": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        ".agents/mcp/spec-drift-auditor.mjs"
+      ],
+      "enabled": true
     }
   }
 }

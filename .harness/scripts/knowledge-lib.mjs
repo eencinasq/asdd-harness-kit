@@ -12,7 +12,7 @@
  * sync-knowledge.mjs to rebuild from scratch.
  *
  * Dependency-free: no graph DB, no vector DB required. Storage is JSONL so it
- * can be grepped, diffed, or loaded into Kuzu/Neo4j/pgvector later.
+ * can be grepped, diffed, or loaded into a graph or vector DB later.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -65,11 +65,18 @@ function slugSliceId(specsDirName) {
 // heading levels ##-#### and separators " — ", " – ", " - ", ":" or none.
 const REQ_HEADING = /^#{2,4}\s+(REQ-[A-Za-z0-9][A-Za-z0-9_-]*)\s*(.*)$/;
 const AC_HEADING = /^#{2,4}\s+(AC-[A-Za-z0-9][A-Za-z0-9_-]*)\s*(.*)$/;
+// Bullet / table-row REQs — the forms drift-lib parseRequirements also counts
+// (requirements.md / spec.md only), e.g. "- REQ-001: …", "| REQ-001 | MUST |".
+const REQ_LINE = /^\s*(?:[-*]|\|)\s*\**\s*(REQ-[A-Za-z0-9-]*\d)\b\**\s*(.*)$/;
+const REQUIREMENT_DOCS = new Set(['requirements.md', 'spec.md']);
 const cleanTitle = (t) => String(t ?? '').replace(/^[—–\-:.\s]+/, '').trim();
+const rowTitle = (rest) => cleanTitle(rest.split('|').map((c) => c.trim()).filter(Boolean)[0] ?? '');
 
 /**
  * Split a markdown doc into sections by `## ` headings, preserving the
- * `### REQ-xxx` / `### AC-xxx` blocks as their own chunks.
+ * `### REQ-xxx` / `### AC-xxx` blocks as their own chunks. In requirement
+ * docs, bullet and table-row REQs become requirements too; a heading
+ * definition wins over a line one, and each REQ is kept once per doc.
  */
 function parseSpecDoc(root, filePath, sliceId) {
   const text = readText(filePath);
@@ -77,20 +84,25 @@ function parseSpecDoc(root, filePath, sliceId) {
 
   const rel = relative(root, filePath).replaceAll('\\', '/');
   const lines = text.split('\n');
-  const requirements = [];
+  const reqLines = REQUIREMENT_DOCS.has(rel.split('/').pop());
+  const requirements = new Map(); // id → { id, title, body }
   const acs = [];
   const sections = [];
   let current = null; // {kind:'section'|'req'|'ac', id, title, lines}
   const flush = () => {
     if (!current) return;
     const body = current.lines.join('\n').trim();
+    if (current.kind === 'req') {
+      // A one-line REQ heading still defines the requirement (drift counts it)
+      requirements.set(current.id, { id: current.id, title: current.title, body: body || current.title });
+      current = null;
+      return;
+    }
     if (!body) {
       current = null;
       return;
     }
-    if (current.kind === 'req') {
-      requirements.push({ id: current.id, title: current.title, body });
-    } else if (current.kind === 'ac') {
+    if (current.kind === 'ac') {
       acs.push({ id: current.id, title: current.title, body });
     } else {
       sections.push({ title: current.title, body });
@@ -116,10 +128,15 @@ function parseSpecDoc(root, filePath, sliceId) {
       current = { kind: 'section', title: line.replace(/^##\s+/, '').trim(), lines: [] };
       continue;
     }
+    const lineReq = reqLines ? line.match(REQ_LINE) : null;
+    if (lineReq && !requirements.has(lineReq[1]) && !(current?.kind === 'req' && current.id === lineReq[1])) {
+      const title = line.trim().startsWith('|') ? rowTitle(lineReq[2]) : cleanTitle(lineReq[2]);
+      requirements.set(lineReq[1], { id: lineReq[1], title, body: line.trim() });
+    }
     if (current) current.lines.push(line);
   }
   flush();
-  return { requirements, acs, sections, rel };
+  return { requirements: [...requirements.values()], acs, sections, rel };
 }
 
 // ------------------------------------------------------------------
@@ -221,6 +238,7 @@ export function scanKnowledge(root = process.cwd()) {
           status: f.status,
           priority: f.priority,
           owner: f.owner ?? null,
+          evidence_commit: f.evidence_commit ?? null,
         });
         edge(`slice:${sliceId}`, featId, 'HAS_FEATURE');
         chunk(

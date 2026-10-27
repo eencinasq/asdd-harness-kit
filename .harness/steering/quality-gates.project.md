@@ -41,6 +41,16 @@ Before Discovery, replace `unfilled` with `none`, or with a table of one row per
 | Boundary gate non-zero | HIGH | BLOCK |
 | Business rule in delivery layer with no ADR | MEDIUM | WARN |
 
+## Spec drift and audit bindings
+
+Read by `drift-lib.mjs`, `audit-codebase.mjs`, and the `spec-drift-auditor` MCP server. A slot left as `…` uses the default in parentheses, or reports `unconfigured`; it never counts as a pass.
+
+- Test file globs: `…` (default: `**/*.test.*`, `**/*.spec.*`, `**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/test-*.sh`)
+- Drift base branch: `…` (default: `origin/HEAD`, then `main`, then `master`)
+- Audit commands: `…` (one `name=command` per backtick, for example `deps=npm audit --omit=dev`; unfilled → `unconfigured`)
+- Contract command: `…` (`http-api` module `openapi` adapter; non-zero exit = contract drift)
+- OpenAPI spec: `…` (JSON file compared against endpoints cited by requirements when no Contract command is set)
+
 ## Related project paths
 
 | Concern | Path |

@@ -27,9 +27,13 @@
   },
   "commands": {
     "invariants": "node .harness/scripts/check-invariants.mjs",
-    "verify_on_stop": "node .harness/scripts/verify-on-stop.mjs"
+    "verify_on_stop": "node .harness/scripts/verify-on-stop.mjs",
+    "spec_drift": "node .harness/scripts/check-spec-drift.mjs"
   },
   "modules": {},
+  "drift": {
+    "contract": "warn"
+  },
   "capabilities": {
     "codegraph": {
       "enabled": true,

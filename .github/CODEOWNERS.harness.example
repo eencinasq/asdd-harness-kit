@@ -1,0 +1,20 @@
+# Example CODEOWNERS for a harness project (2 engineers + 1 Tech Lead).
+# Copy the lines you need into .github/CODEOWNERS and replace @your-org/tech-lead.
+#
+# The Tech Lead owns the rules agents follow and the sensors that check them.
+# Engineers own product code and their slices' specs, features, and sessions.
+
+# Guides: steering and project bindings
+/.harness/steering/                 @your-org/tech-lead
+/AGENTS.md                          @your-org/tech-lead
+
+# Sensors: invariants, drift, audit
+/.harness/scripts/                  @your-org/tech-lead
+/.harness/config/project.json       @your-org/tech-lead
+/.agents/mcp/                       @your-org/tech-lead
+
+# TL triage of audit findings
+/.harness/audits/triage.json        @your-org/tech-lead
+
+# CI gates
+/.github/workflows/                 @your-org/tech-lead

@@ -13,6 +13,7 @@ It gives AI agents a governed pipeline — from Shape Up through implementation,
 | **Process** | 9-phase ASDD pipeline, agent definitions, skills catalog, steering contracts | Product intent, domain language, technology choices |
 | **Execution control** | Append-only sessions, feature trackers, generated manifests, invariant checks | Mapped file scopes, verification commands |
 | **Quality gates** | EARS templates, Jev MCP (shape-up / product-delivery), Harness invariants | Test suites, failure logs, `JEV_API_KEY` when shaping/delivering |
+| **Spec drift and audit** | Drift sensor in the invariants and CI, codebase auditor, `spec-drift-auditor` MCP server with an MCP App dashboard for engineers and the Tech Lead ([spec-drift.md](.harness/steering/spec-drift.md)) | Architecture gate command, audit commands, OpenAPI contract (optional bindings) |
 | **Runtime adapters** | Symlinks and configs for Cursor, Claude, OpenCode, Kimi, Junie, Devin, Kiro | Your IDE/editor |
 
 **ASDD** answers *which phase* and *which spec artifact*.  

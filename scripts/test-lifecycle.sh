@@ -82,6 +82,11 @@ grep -q '"slice_id": "demo-slice"' .harness/state/registry.json
 grep -q '"phase": "implementation"' .harness/state/slices/demo-slice/manifest.json
 grep -q '"feature_id": "f1"' .harness/state/slices/demo-slice/manifest.json
 
+# Owned product paths exist (DRIFT-05 fails passing features whose scope_paths are missing)
+mkdir -p src/api web/ui
+echo 'export {};' >src/api/index.js
+echo 'export {};' >web/ui/index.js
+
 echo "== invariants pass on valid state =="
 env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/tmp/asdd-lifecycle-pos.log 2>&1
 grep -q 'PASS' /tmp/asdd-lifecycle-pos.log
@@ -90,12 +95,24 @@ printf '{"status":"completed","loop_count":0}' | JEV_API_KEY=dummy-test-key node
 # Claude Code Stop protocol: pass → {}; stop_hook_active always releases the session
 printf '{"hook_event_name":"Stop","stop_hook_active":false}' | JEV_API_KEY=dummy-test-key node .harness/scripts/verify-on-stop.mjs | grep -qx '{}'
 printf '{"hook_event_name":"Stop","stop_hook_active":true}' | env -u JEV_API_KEY node .harness/scripts/verify-on-stop.mjs | grep -qx '{}'
-# verify-on-stop without a key is a FAIL, not a silent pass (Jev is required)
-MISSING_KEY_OUT="$(printf '{"status":"completed","loop_count":0}' | env -u JEV_API_KEY node .harness/scripts/verify-on-stop.mjs)"
-grep -q 'followup_message' <<<"$MISSING_KEY_OUT"
-grep -q 'JEV_API_KEY' <<<"$MISSING_KEY_OUT"
+# Jev is skill-scoped (shape-up / product-delivery): verify-on-stop does not need a key
+printf '{"status":"completed","loop_count":0}' | env -u JEV_API_KEY node .harness/scripts/verify-on-stop.mjs | grep -qx '{}'
 
 cp .harness/features/demo-slice.features.json /tmp/asdd-lifecycle-features.bak
+
+echo "== unknown feature key warns with the intended key =="
+node --input-type=module <<'EOF'
+import { readFileSync, writeFileSync } from 'node:fs';
+const p = '.harness/features/demo-slice.features.json';
+const doc = JSON.parse(readFileSync(p, 'utf8'));
+doc.features[0].requirements = ['REQ-001'];
+writeFileSync(p, `${JSON.stringify(doc, null, 2)}\n`);
+EOF
+env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/tmp/asdd-lifecycle-unknown.log 2>&1
+grep -q 'feature f1 has unknown key "requirements" (ignored) — did you mean "req_ids"?' /tmp/asdd-lifecycle-unknown.log
+cp /tmp/asdd-lifecycle-features.bak .harness/features/demo-slice.features.json
+env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/tmp/asdd-lifecycle-unknown.log 2>&1
+! grep -q 'unknown key' /tmp/asdd-lifecycle-unknown.log
 
 echo "== negative: overlapping concurrent scopes =="
 node --input-type=module <<'EOF'
@@ -186,6 +203,51 @@ cp /tmp/asdd-lifecycle-features.bak .harness/features/demo-slice.features.json
 
 echo "== recovered state is valid again =="
 env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/dev/null
+
+echo "== contract (REQ-001, REQ-002, REQ-003): DRIFT-06 warns by default =="
+cp .harness/config/project.json /tmp/asdd-lifecycle-project.bak
+node --input-type=module <<'EOF'
+import { readFileSync, writeFileSync } from 'node:fs';
+const p = '.harness/features/demo-slice.features.json';
+const doc = JSON.parse(readFileSync(p, 'utf8'));
+delete doc.features[0].scope_paths;
+doc.features[0].owner = undefined;
+writeFileSync(p, `${JSON.stringify(doc, null, 2)}\n`);
+EOF
+env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/tmp/asdd-lifecycle-contract.log 2>&1
+grep -q 'WARN .*needs non-empty repository-relative scope_paths (DRIFT-06)' /tmp/asdd-lifecycle-contract.log
+
+echo "== contract: drift.contract=fail turns DRIFT-06 into FAIL =="
+node --input-type=module <<'EOF'
+import { readFileSync, writeFileSync } from 'node:fs';
+const p = '.harness/config/project.json';
+const cfg = JSON.parse(readFileSync(p, 'utf8'));
+cfg.drift = { contract: 'fail' };
+writeFileSync(p, `${JSON.stringify(cfg, null, 2)}\n`);
+EOF
+expect_fail "feature without scope_paths in fail mode"
+grep -q 'needs non-empty repository-relative scope_paths (DRIFT-06)' /tmp/asdd-lifecycle-neg.log
+cp /tmp/asdd-lifecycle-features.bak .harness/features/demo-slice.features.json
+node --input-type=module <<'EOF'
+import { readFileSync, writeFileSync } from 'node:fs';
+const p = '.harness/features/demo-slice.features.json';
+const doc = JSON.parse(readFileSync(p, 'utf8'));
+doc.features[0].status = 'passing';
+doc.features[0].evidence = 'Tests passed';
+writeFileSync(p, `${JSON.stringify(doc, null, 2)}\n`);
+EOF
+expect_fail "passing without evidence_commit in fail mode"
+grep -q 'passing without a valid evidence_commit SHA (DRIFT-06)' /tmp/asdd-lifecycle-neg.log
+node --input-type=module <<'EOF'
+import { readFileSync, writeFileSync } from 'node:fs';
+const p = '.harness/features/demo-slice.features.json';
+const doc = JSON.parse(readFileSync(p, 'utf8'));
+doc.features[0].evidence_commit = 'abc1234';
+writeFileSync(p, `${JSON.stringify(doc, null, 2)}\n`);
+EOF
+env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/dev/null
+cp /tmp/asdd-lifecycle-features.bak .harness/features/demo-slice.features.json
+cp /tmp/asdd-lifecycle-project.bak .harness/config/project.json
 
 echo "== lite-first: E1/E3/E4 signals warn while in progress =="
 node .harness/scripts/init-slice.mjs grow-slice >/dev/null
@@ -291,5 +353,22 @@ expect_fail "lite serial violation"
 grep -q 'allows at most one in_progress' /tmp/asdd-lifecycle-neg.log
 cp /tmp/asdd-lifecycle-features.bak .harness/features/demo-slice.features.json
 env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/dev/null
+
+echo "== spec drift (REQ-004, REQ-011): Verify-on-Stop injects DRIFT-01 =="
+git init -q -b main .
+git add -A
+git -c user.email=t@example.com -c user.name=t commit -q -m baseline
+env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/dev/null
+mkdir -p src/rogue && echo 'x' >src/rogue/file.js
+expect_fail "unmapped change (DRIFT-01)"
+grep -q 'DRIFT-01 src/rogue/file.js changed but is not mapped' /tmp/asdd-lifecycle-neg.log
+DRIFT_OUT="$(printf '{"status":"completed","loop_count":0}' | env -u JEV_API_KEY node .harness/scripts/verify-on-stop.mjs)"
+grep -q 'followup_message' <<<"$DRIFT_OUT"
+grep -q 'DRIFT-01' <<<"$DRIFT_OUT"
+node .harness/scripts/check-spec-drift.mjs --json >/tmp/asdd-lifecycle-drift.json && exit 1
+grep -q '"drift_level": "blocking"' /tmp/asdd-lifecycle-drift.json
+mkdir -p src/api && mv src/rogue/file.js src/api/file.js && rmdir src/rogue
+env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/dev/null
+rm -rf .git src
 
 echo "OK lifecycle e2e test"

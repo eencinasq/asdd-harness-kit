@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-drift-consistency-002",
+  "timestamp": "2026-10-27T00:39:20Z",
+  "agent": "claude",
+  "human": "squad",
+  "slice_id": "drift-consistency",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "f1",
+  "evidence": "knowledge-lib indexes one-line/bullet/table REQs like drift-lib; Semgrep 'requires login' replaced by file lines; unknown feature keys warn with alias hints; DRIFT-01 maps test files naming a slice REQ; installer records .harness/package.json as managed",
+  "scope_paths": [".harness/scripts", "scripts", "docs/architecture"]
+}

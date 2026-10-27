@@ -1,0 +1,35 @@
+# Example: scheduled codebase audit (computational pass only).
+# Copy to .github/workflows/harness-audit.yml to enable. The runner decision is open; see
+# docs/architecture/spec-drift-and-audit.md ("Runner (open decision)").
+# The inferential pass (codebase-audit skill) needs an agent runtime and is not run here.
+name: harness-audit
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sync state
+        run: node .harness/scripts/sync-state.mjs
+      - name: Audit
+        run: node .harness/scripts/audit-codebase.mjs
+      - name: Commit report
+        run: |
+          git config user.name 'harness-audit'
+          git config user.email 'harness-audit@users.noreply.github.com'
+          git add .harness/audits/
+          git diff --cached --quiet || git commit -m 'chore(audit): scheduled codebase audit'
+          git push

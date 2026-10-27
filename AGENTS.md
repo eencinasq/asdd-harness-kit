@@ -42,7 +42,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 3. Write a session file at the end of every significant action, then run `sync-state` to regenerate the manifest ([manifest.md](.harness/steering/manifest.md)).
 4. Codegraph first ([codegraph.md](.harness/steering/codegraph.md)).
 5. On failure: leave `in_progress`/`blocked`; log per path in `structure.md`.
-6. Before session end or `passing`, `node .harness/scripts/check-invariants.mjs` must exit 0. On Cursor, the Verify-on-Stop hook injects FAIL output back into the prompt ([session-loop.md](.harness/steering/session-loop.md)).
+6. Before session end or `passing`, `node .harness/scripts/check-invariants.mjs` must exit 0. On Cursor, the Verify-on-Stop hook injects FAIL output back into the prompt ([session-loop.md](.harness/steering/session-loop.md)). It includes spec drift; engineers and the Tech Lead also use the `spec-drift-auditor` MCP server ([spec-drift.md](.harness/steering/spec-drift.md)).
 7. Modify only the files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors. Mapping and the lite `spec.md` exception: [session-loop.md](.harness/steering/session-loop.md).
 
 ## Non-negotiables

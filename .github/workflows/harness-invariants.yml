@@ -9,12 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # spec drift needs the base branch and evidence commits
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Unit tests (Jev client, command gate, MCP gate server)
-        run: node --test .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .agents/mcp/jev-gate-server.test.mjs
+      - name: Unit tests (Jev client, command gate, MCP gate server, spec drift)
+        run: node --test .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .agents/mcp/jev-gate-server.test.mjs .harness/scripts/drift-lib.test.mjs .harness/scripts/audit-codebase.test.mjs .agents/mcp/spec-drift-auditor.test.mjs .agents/modules/http-api/adapters/openapi.test.mjs tools/drift-dashboard/src/model.test.mjs
 
       - name: Installer smoke test (runtimes + modules)
         run: bash scripts/test-install-into.sh
@@ -27,7 +29,11 @@ jobs:
           node .harness/scripts/check-project-config.mjs
           node .harness/scripts/check-skills-index.mjs
 
-      - name: Check harness invariants (registry exercised via sync-state)
+      - name: Check harness invariants (registry exercised via sync-state; spec drift incl. DRIFT-07 on PRs)
+        env:
+          HARNESS_PR_BRANCH: ${{ github.head_ref }}
+          HARNESS_PR_BODY: ${{ github.event.pull_request.body }}
+          HARNESS_DRIFT_BASE: ${{ github.event.pull_request.base.sha }}
         run: |
           node .harness/scripts/sync-state.mjs
           node .harness/scripts/check-invariants.mjs

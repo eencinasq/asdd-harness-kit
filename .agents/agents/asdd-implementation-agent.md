@@ -25,7 +25,7 @@ Catalog: `.harness/steering/skills.md` (name and description only). `Read` a ski
 ## Jev (required)
 
 - Dangerous bash: `checkCommandSafety` in `.harness/scripts/jev-command-gate.mjs`. Block when not allowed.
-- Gold-plating: `check-invariants.mjs` runs Jev noul on in-progress `scope_paths` diffs.
+- Gold-plating: `check-invariants.mjs` runs spec drift check `DRIFT-01` (changed files must be mapped by the slice spec or in-progress `scope_paths`). Jev is not involved.
 - Hill chart: `hillChartGate` in `.harness/scripts/jev-gates.mjs` when a timebox is expiring.
 - If Jev is unavailable, do not mark features `passing`.
 
@@ -108,7 +108,7 @@ Per `.harness/steering/session-loop.md` and root `AGENTS.md`:
 
 - Work from eligible `TASK-*` entries in `.harness/features/<slice_id>.features.json`; dependencies must be passing.
 - Default to one active feature. Parallelize independent tasks only when each has a unique `owner`, non-empty and non-overlapping `scope_paths`, and the coordinator holds the slice lock. Set ownership/status before dispatch. Workers modify only owned task paths and return verification evidence; coordinator audits the combined diff and alone updates trackers, manifests, progress records, and index rows. Prefer isolated worktrees when available.
-- After verification passes, coordinator sets `passing` and writes `evidence` (command + result). Never mark `passing` without running verification.
+- After verification passes, commit the verified code, then the coordinator sets `passing`, writes `evidence` (command + result), and records that commit's SHA as `evidence_commit`. Never mark `passing` without running verification. Before asking for `passing`, call `audit_diff` (MCP `spec-drift-auditor`, `author` mode) or run `node .harness/scripts/check-spec-drift.mjs`.
 - **Defect review (when skill present):** After feature `verification` is green, run skill `open-code-review` on the feature/branch diff before `passing`. Unresolved CRITICAL/HIGH → leave `in_progress`/`blocked` with notes. If `ocr` is missing, ask the human; record skipped in evidence/notes — do not invent a review and do not skip test verification.
 - On repeated failure, set `blocked` and append `docs/agent-failure-log.md`.
 - Update `.harness/progress/<slice_id>.md` (session record) and the slice row in `.harness/PROGRESS.md`.

@@ -8,3 +8,6 @@
 
 | Slice | Status | Phase | Last Session | Progress |
 |-------|--------|-------|--------------|----------|
+| unified-versioning | in_progress | discovery | — | — |
+| drift-consistency | in_progress | discovery | — | — |
+| knowledge-simplify | in_progress | discovery | — | — |

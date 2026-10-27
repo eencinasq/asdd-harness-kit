@@ -152,7 +152,7 @@ Last updated: [ISO date]
 After writing `tasks.md`, also create or refresh `.harness/features/[spec-name].features.json` per `.harness/steering/session-loop.md`:
 
 - Follow the tracker shape in `.harness/features/feature.schema.json`.
-- Project `Depends on` as `depends_on` and declared writable paths as `scope_paths`. Tasks with overlapping scopes must be serialized or replanned. Assign `owner` at dispatch time; leave it unset during planning.
+- Project `Depends on` as `depends_on` and declared writable paths as `scope_paths`. Every feature needs non-empty `scope_paths`, even serial ones (spec drift contract `DRIFT-06`); planned files may not exist yet. Tasks with overlapping scopes must be serialized or replanned. Assign `owner` at dispatch time; leave it unset during planning.
 
 - One feature object per `TASK-NNN` (`id`, `priority`, `title`, `user_visible_behavior` from Acceptance, `verification` commands, `status: not_started`, `req_ids`).
 - Set per-slice `paths.features` to that file path; sync the global registry `features` field.

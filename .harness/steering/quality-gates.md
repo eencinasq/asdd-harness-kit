@@ -9,7 +9,7 @@ tags:
 
 # Quality Gates
 
-Portable acceptance criteria for spec coverage, cumulative confidence, design readiness, task planning readiness, domain placement, and tech debt. These criteria are normative. The agent applying a gate shall apply them as written.
+Portable acceptance criteria for spec coverage, cumulative confidence, design readiness, task planning readiness, domain placement, spec drift, and tech debt. These criteria are normative. The agent applying a gate shall apply them as written.
 
 **Project binding (mandatory):** test commands, domain-placement findings, and stack paths live in [quality-gates.project.md](quality-gates.project.md). The agent shall apply this contract and that binding together.
 
@@ -121,6 +121,18 @@ Portable rules and scope: [domain-layer.md](domain-layer.md). Findings, paths, a
 - **QG-DOM-04.** If a placement violation matches no active finding row, then the agent shall apply [domain-layer.md](domain-layer.md) and shall not lower the severity.
 - **QG-DOM-05.** When a HIGH finding is open, the Refactor agent shall classify it as CRITICAL or HIGH and shall correct it before marking the refactor complete.
 - **QG-DOM-06.** When a HIGH finding is open, the Implementation agent shall withhold `passing` until that finding is closed.
+
+## Spec Drift Gate
+
+Computational sensor: `node .harness/scripts/check-spec-drift.mjs` (also inside `check-invariants.mjs`, so Verify-on-Stop and CI run it). Checks `DRIFT-01` … `DRIFT-07`: [docs/architecture/spec-drift-and-audit.md](../../docs/architecture/spec-drift-and-audit.md). Bindings (test globs, base branch): [quality-gates.project.md](quality-gates.project.md).
+
+### Acceptance criteria
+
+- **QG-DRIFT-01.** If a changed product file is not mapped to the active slice (`DRIFT-01`), then the agent shall not mark any feature `passing` and shall either revert the change or add the path to the spec through the owning phase.
+- **QG-DRIFT-02.** When a `passing` feature's owned files change after its `evidence_commit` (`DRIFT-02`), the agent shall set the feature back to `in_progress` and shall rerun its verification.
+- **QG-DRIFT-03.** While any MUST requirement has no implementing feature (`DRIFT-03`), the QA agent shall return BLOCK for the Spec Coverage Gate.
+- **QG-DRIFT-04.** *(Optional, inactive.)* When the squad sets a spec compliance cutoff here, the QA agent shall return BLOCK below it. No cutoff is set; the CI workflow, the MCP server, and the dashboard shall not define one.
+- **QG-DRIFT-05.** The agent shall treat inferential audit findings as advisory until the Tech Lead confirms them, and shall not use them to return BLOCK.
 
 ## Tech Debt Cleanup Gate (SP-002)
 

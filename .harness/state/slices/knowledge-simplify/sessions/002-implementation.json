@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-knowledge-simplify-002",
+  "timestamp": "2026-10-26T22:46:55Z",
+  "agent": "claude",
+  "human": "squad",
+  "slice_id": "knowledge-simplify",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "f1",
+  "evidence": "Removed Kuzu backend (upstream archived 2025-10-10); fixed sqlite vec_dim meta collision; fallbacks now reported in tool results and stderr; installer removes kuzu on upgrade; artifact versions bumped to 3.6.0",
+  "scope_paths": [".harness/scripts", ".agents/mcp", "scripts"]
+}

@@ -7,8 +7,8 @@
  * portable interchange format; knowledge.db is a query-optimized sidecar.
  *
  * Same node/edge/chunk contract as the JSONL files. Embeddings are stored as
- * Float32 BLOBs; scoring (cosine) still runs in JS — sqlite-vec ANN is a later
- * option per docs/architecture/knowledge-scaling.md.
+ * Float32 BLOBs; with the sqlite-vec extension installed a vec0 table serves
+ * nearest-neighbour search, otherwise the server scores cosine in JS.
  *
  * Freshness: meta.generated_at in the DB must equal meta.json's generated_at —
  * a stale DB (e.g. JSONL regenerated on an old Node) is ignored.
@@ -130,7 +130,8 @@ export function writeSqliteIndex(root, { nodes, edges, chunks, meta }) {
         : null;
       insChunk.run(id, node ?? null, slice_id ?? null, text, hash ?? null, blob, JSON.stringify(rest));
     }
-    const insMeta = db.prepare('INSERT INTO meta (key, value) VALUES (?, ?)');
+    // OR REPLACE: meta may already carry vec_dim, which is written again below.
+    const insMeta = db.prepare('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)');
     for (const [k, v] of Object.entries(meta)) {
       insMeta.run(k, JSON.stringify(v));
     }
@@ -156,7 +157,7 @@ export function writeSqliteIndex(root, { nodes, edges, chunks, meta }) {
           insVec.run(c.id, Buffer.from(new Float32Array(c.embedding).buffer));
         }
       }
-      db.prepare('INSERT INTO meta (key, value) VALUES (?, ?)').run('vec_dim', String(dim));
+      insMeta.run('vec_dim', String(dim));
     }
 
     db.exec('COMMIT');
@@ -188,41 +189,45 @@ function rowToChunk(r) {
 
 /**
  * Open the sqlite index if supported, present, and fresh vs meta.json.
- * @returns adapter or null (caller falls back to JSONL)
+ * @returns {{ store: object|null, reason: string|null }} reason says why no
+ *   store was opened (caller falls back to JSONL and reports it)
  */
 export function openSqliteIndex(root) {
-  if (!sqliteSupported()) return null;
+  if (!sqliteSupported()) return { store: null, reason: 'node:sqlite unavailable (Node >= 22.5)' };
   const dir = join(root, KNOWLEDGE_DIR);
   const dbPath = join(dir, 'knowledge.db');
   const metaPath = join(dir, 'meta.json');
-  if (!existsSync(dbPath) || !existsSync(metaPath)) return null;
+  if (!existsSync(metaPath)) return { store: null, reason: null };
+  if (!existsSync(dbPath)) return { store: null, reason: 'knowledge.db missing — run sync-knowledge.mjs' };
 
   let jsonMeta;
   try {
     jsonMeta = JSON.parse(readFileSync(metaPath, 'utf8'));
-  } catch {
-    return null;
+  } catch (error) {
+    return { store: null, reason: `meta.json unreadable: ${error.message}` };
   }
 
   let db;
+  let vecLoaded;
   try {
     db = openDb(dbPath);
-    attachVec(db); // vec0 only exists in connections that loaded the extension
+    vecLoaded = Boolean(attachVec(db)); // vec0 only exists in connections that loaded the extension
     const row = db.prepare("SELECT value FROM meta WHERE key = 'generated_at'").get();
     const dbGeneratedAt = row ? JSON.parse(row.value) : null;
     if (dbGeneratedAt !== jsonMeta.generated_at) {
       db.close();
-      return null; // stale sidecar — JSONL is newer
+      return { store: null, reason: 'knowledge.db is stale (last sqlite write failed?) — rerun sync-knowledge.mjs' };
     }
-  } catch {
-    return null;
+  } catch (error) {
+    try { db?.close(); } catch {}
+    return { store: null, reason: `knowledge.db unreadable: ${error.message}` };
   }
 
   const scalar = (sql, ...params) => db.prepare(sql).get(...params)?.n ?? 0;
   const nodeFromRow = (r) => JSON.parse(r.data);
   const edgeFromRow = (r) => ({ from: r.from_id, to: r.to_id, rel: r.rel, ...(r.data ? JSON.parse(r.data) : {}) });
 
-  return {
+  const store = {
     backend: 'sqlite',
 
     meta: () => jsonMeta,
@@ -256,36 +261,28 @@ export function openSqliteIndex(root) {
       db.prepare('SELECT data FROM nodes WHERE slice_id = ?').all(sliceId).map(nodeFromRow),
 
     // ANN via sqlite-vec when the vec_chunks virtual table was written.
+    // Returns null when not applicable (no extension/table, or a slice filter:
+    // KNN picks k globally before the join, so the caller's exact cosine over
+    // the slice pool is used instead). Real query errors throw.
     vectorSearch: (queryVec, k, sliceId) => {
-      try {
-        const hasVec = db
-          .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='vec_chunks'")
-          .get();
-        if (!hasVec) return null;
-        const q = Buffer.from(new Float32Array(queryVec).buffer);
-        const rows = sliceId
-          ? db
-              .prepare(
-                `SELECT c.*, v.distance AS distance FROM vec_chunks v
-                 JOIN chunks c ON c.id = v.chunk_id
-                 WHERE v.embedding MATCH ? AND v.k = ? AND c.slice_id = ?
-                 ORDER BY v.distance`
-              )
-              .all(q, Number(k), sliceId)
-          : db
-              .prepare(
-                `SELECT c.*, v.distance AS distance FROM vec_chunks v
-                 JOIN chunks c ON c.id = v.chunk_id
-                 WHERE v.embedding MATCH ? AND v.k = ?
-                 ORDER BY v.distance`
-              )
-              .all(q, Number(k));
-        return rows.map((r) => ({ ...rowToChunk(r), score: 1 - Number(r.distance) }));
-      } catch {
-        return null;
-      }
+      if (!vecLoaded || sliceId) return null;
+      const hasVec = db
+        .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='vec_chunks'")
+        .get();
+      if (!hasVec) return null;
+      const q = Buffer.from(new Float32Array(queryVec).buffer);
+      const rows = db
+        .prepare(
+          `SELECT c.*, v.distance AS distance FROM vec_chunks v
+           JOIN chunks c ON c.id = v.chunk_id
+           WHERE v.embedding MATCH ? AND v.k = ?
+           ORDER BY v.distance`
+        )
+        .all(q, Number(k));
+      return rows.map((r) => ({ ...rowToChunk(r), score: 1 - Number(r.distance) }));
     },
 
     close: () => db.close(),
   };
+  return { store, reason: null };
 }

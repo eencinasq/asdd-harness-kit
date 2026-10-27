@@ -28,11 +28,10 @@
  * Called automatically at the end of sync-state.mjs runs (embeddings never
  * requested there — only preserved); use this script's --embed to (re)vectorize.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { scanKnowledge, KNOWLEDGE_DIR } from './knowledge-lib.mjs';
 import { sqliteSupported, writeSqliteIndex } from './knowledge-store-sqlite.mjs';
-import { kuzuAvailable, writeKuzuIndex } from './knowledge-store-kuzu.mjs';
 import { loadEnv } from './env-loader.mjs';
 
 loadEnv(); // KNOWLEDGE_EMBEDDINGS_* may live in .env/.env.local
@@ -130,6 +129,10 @@ export async function writeKnowledgeIndex(root = process.cwd(), { embed = false,
 
   const outDir = join(root, KNOWLEDGE_DIR);
   mkdirSync(outDir, { recursive: true });
+  // Kuzu store from kit <= 3.5 (backend removed: upstream archived 2025-10)
+  for (const stale of ['kuzu', 'kuzu.wal', 'kuzu.meta.json']) {
+    rmSync(join(outDir, stale), { recursive: true, force: true });
+  }
   writeJsonl(join(outDir, 'nodes.jsonl'), nodes);
   writeJsonl(join(outDir, 'edges.jsonl'), edges);
   writeJsonl(join(outDir, 'chunks.jsonl'), chunks);
@@ -143,25 +146,14 @@ export async function writeKnowledgeIndex(root = process.cwd(), { embed = false,
   };
   writeFileSync(join(outDir, 'meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
 
-  // Embedded tier: query-optimized backends alongside the JSONL.
-  // kuzu = required embedded graph+vector engine; sqlite = node:sqlite sidecar
-  // (with sqlite-vec ANN table when the extension is installed).
+  // Query tier: node:sqlite sidecar alongside the JSONL (with a sqlite-vec
+  // ANN table when the extension is installed).
   meta.backends = ['jsonl'];
   if (backend !== 'jsonl') {
-    if (kuzuAvailable()) {
-      const { dim } = await writeKuzuIndex(root, { nodes, edges, chunks, meta });
-      meta.backends.push('kuzu');
-      if (dim) meta.vec_dim = dim;
-    } else if (backend === 'kuzu') {
-      throw new Error('--backend=kuzu requires the kuzu package (npm i kuzu)');
-    } else {
-      meta.kuzu_skipped = 'kuzu package not installed';
-    }
-
-    if (backend !== 'kuzu' && sqliteSupported()) {
+    if (sqliteSupported()) {
       writeSqliteIndex(root, { nodes, edges, chunks, meta });
       meta.backends.push('sqlite');
-    } else if (backend === 'sqlite' && !sqliteSupported()) {
+    } else if (backend === 'sqlite') {
       throw new Error('--backend=sqlite requires node:sqlite (Node >= 22.5)');
     }
   }
@@ -180,8 +172,8 @@ async function main() {
   const root = process.cwd();
   const args = process.argv.slice(2);
   const backend = argValue(args, '--backend') ?? 'auto';
-  if (!['auto', 'jsonl', 'sqlite', 'kuzu'].includes(backend)) {
-    console.error(`unknown --backend: ${backend} (auto|jsonl|sqlite|kuzu)`);
+  if (!['auto', 'jsonl', 'sqlite'].includes(backend)) {
+    console.error(`unknown --backend: ${backend} (auto|jsonl|sqlite)`);
     process.exit(1);
   }
 

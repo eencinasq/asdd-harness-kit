@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "knowledge-simplify",
+  "source_tasks": ".harness/specs/knowledge-simplify/tasks.md",
+  "features": [
+    {
+      "id": "f1",
+      "title": "SQLite-only knowledge backend with visible degradation",
+      "user_visible_behavior": "Embedded syncs keep working; knowledge_status/search report the backend, search mode, and warnings actually in effect",
+      "status": "in_progress",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": ["REQ-001", "REQ-002", "REQ-003", "REQ-004"],
+      "verification": ["npm test", "node .harness/scripts/check-invariants.mjs"],
+      "evidence": "npm test 84/84 pass (4 new embedding/fallback tests); upgrade of an old install removes kuzu (86 -> 2 deps); repeated --embed + MCP semantic-ann search verified in a scratch project. Awaiting commit for evidence_commit.",
+      "scope_paths": [
+        ".harness/scripts/knowledge-store.mjs",
+        ".harness/scripts/knowledge-store-sqlite.mjs",
+        ".harness/scripts/sync-knowledge.mjs",
+        ".harness/scripts/sync-knowledge.test.mjs",
+        ".harness/scripts/knowledge-lib.mjs",
+        ".agents/mcp/knowledge-server.mjs",
+        ".harness/steering/knowledge.md",
+        ".harness/config/versions.json",
+        "scripts/install-into.sh",
+        "scripts/test-install-into.sh",
+        "package.json",
+        "package-lock.json"
+      ]
+    }
+  ]
+}
