@@ -1,5 +1,5 @@
 ---
-name: business-slice-canvas
+name: business-model-canvas
 description: Parses Business Model Canvas and Lean Canvas inputs into structured product capabilities, personas, and revenue-critical features.
 ---
 

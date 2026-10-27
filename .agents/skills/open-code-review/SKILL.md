@@ -21,7 +21,7 @@ file is **discovery + contract**, not an installer.
 | Layer | What OCR owns |
 |-------|----------------|
 | Defect review | Bugs, security, maintainability on the **diff** (line-level) |
-| Does **not** own | Spec compliance (REQ/EARS), CCS, feature `verification` tests, domain language |
+| Does **not** own | Spec compliance (REQ/EARS), phase gates, feature `verification` tests, domain language |
 
 **Owners (agents):** Implementation (pre-`passing`) → QA Mode B (coverage adjunct) → Refactor (CRITICAL/HIGH security).  
 **Not a pipeline phase.** No new `manifest.phase`.
@@ -137,7 +137,7 @@ Repo overrides (when present): `.opencodereview/rule.json`. Preview: `ocr rules 
 - Substituting OCR for `verification` / TDD evidence.
 - Inventing review comments when CLI is unavailable.
 - Full-repo `ocr scan` on every feature.
-- Treating OCR as a new ASDD phase or CCS input by itself.
+- Treating OCR as a new ASDD phase or phase-gate input by itself.
 - Passing oversized `--background-file` (>8000 chars) — summarize instead.
 
 ## Verification

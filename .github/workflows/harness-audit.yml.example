@@ -1,6 +1,6 @@
 # Example: scheduled codebase audit (computational pass only).
-# Copy to .github/workflows/harness-audit.yml to enable. The runner decision is open; see
-# docs/architecture/spec-drift-and-audit.md ("Runner (open decision)").
+# Copy to .github/workflows/harness-audit.yml to enable. The runner is the project's choice; see
+# https://github.com/eencinasq/asdd-harness-kit#codebase-auditor
 # The inferential pass (codebase-audit skill) needs an agent runtime and is not run here.
 name: harness-audit
 

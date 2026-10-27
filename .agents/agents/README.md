@@ -1,6 +1,8 @@
-# ASDD Cursor subagents
+# ASDD subagents
 
-Project subagents for the **ASDD** pipeline. **Content (role, responsibilities, inputs, outputs, gates) matches** [`.agents/agents/asdd-*.md`](../../.agents/agents/) — Cursor files add only a **runtime adapter** (`Read` skills, `Write`/`StrReplace`, Task handoffs, Codegraph MCP). Both runtimes use SoT under [`.harness/`](../../.harness/) and **must write** the **per-slice** [`.harness/state/slices/<slice-id>/manifest.json`](../../.harness/state/slices/) and sync the matching row in the global [`.harness/state/manifest.json`](../../.harness/state/manifest.json) index per [`.harness/steering/manifest.md`](../../.harness/steering/manifest.md).
+Project subagents for the **ASDD** pipeline. `.agents/agents/asdd-*.md` is the single source for every role (responsibilities, inputs, outputs, gates). Runtime folders link to these files; the portable runtime contract is [`_runtime-template.md`](_runtime-template.md).
+
+All agents use SoT under [`.harness/`](../../.harness/). They write session files to `.harness/state/slices/<slice-id>/sessions/` and run `sync-state.mjs`, which generates the per-slice `manifest.json` and the global `.harness/state/registry.json` — see [`manifest.md`](../../.harness/steering/manifest.md). Agents never hand-edit generated files.
 
 ## Pipeline
 
@@ -10,41 +12,41 @@ Discovery → Spec → Validation → Domain → Design → Task planning → Im
                                               Integration (Bruno) + E2E (Playwright)
 ```
 
+Small work (≤3 files, ≤1 new domain concept): `asdd-lite-agent` — see [`asdd-lite.md`](../../.harness/steering/asdd-lite.md).
+
 ## Invoke
 
 Ask the parent agent to delegate, or reference by name, e.g. `@asdd-spec-agent` with the spec folder (`.harness/specs/<name>/`).
 
 ## Project steering
 
-**Parent and every subagent** must **`Read`** files under [`.harness/steering/`](../../.harness/steering/) directly (SoT). Parent chat also loads [`.cursor/rules/asdd-steering.mdc`](../rules/asdd-steering.mdc) (`alwaysApply`). Index: [steering README](../../.harness/steering/README.md), [skills index](../../.harness/steering/skills.md).
+**Parent and every subagent** must **`Read`** files under [`.harness/steering/`](../../.harness/steering/) directly (SoT), with JIT loading per [`_runtime-template.md`](_runtime-template.md). Index: [steering README](../../.harness/steering/README.md), [skills index](../../.harness/steering/skills.md). On Cursor, the parent chat also loads `.cursor/rules/asdd-steering.mdc` (`alwaysApply`), installed from `runtimes/cursor/asdd-steering.mdc`.
 
-## Kiro → Cursor behavior
+## Runtime adapters
 
-| Kiro | Cursor subagent |
-|------|-----------------|
-| Same ASDD body (responsibilities / tasks) | Same body + **Cursor runtime** section at top |
-| `.harness/steering/` via explicit Read in agent prompts | **`Read` explicit files** (see Cursor runtime + Project skills) |
-| Skills | Read [`.harness/steering/skills.md`](../../.harness/steering/skills.md) (name and description). `Read` [`.agents/skills/<name>/SKILL.md`](../skills/) only when that task starts |
-| Verify-on-Stop | **`.cursor/hooks.json`** `stop` → `node .harness/scripts/verify-on-stop.mjs`. FAIL output from `check-invariants.mjs` is the next prompt |
-| Per-slice manifest / heartbeats | **Write** `.harness/state/slices/<id>/manifest.json` + sync global registry row every run — see `manifest.md` |
-| Context-fresh sub-agents | `Task` tool for parallel waves |
-| `fsWrite` | `Write` / `StrReplace` |
-| Code exploration | **Mandatory** Codegraph MCP — `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md` |
+| Concern | Contract |
+|---------|----------|
+| Role body | Same file for every runtime; edit under `.agents/agents/` once |
+| Steering | Explicit `Read` of `.harness/steering/` (never `.kiro/steering`) |
+| Skills | Read [`skills.md`](../../.harness/steering/skills.md) (name and description). `Read` [`.agents/skills/<name>/SKILL.md`](../skills/) only when that task starts |
+| Verify-on-Stop | Cursor: `.cursor/hooks.json` `stop`; Claude Code: `.claude/settings.json` `Stop` → `node .harness/scripts/verify-on-stop.mjs`. FAIL output from `check-invariants.mjs` is the next prompt |
+| State | Session file + `sync-state.mjs` after every significant action — see `manifest.md` |
+| Context-fresh sub-agents | The runtime's task/subagent tool for parallel waves |
+| Code exploration | **Mandatory** Codegraph MCP — [`codegraph.md`](../../.harness/steering/codegraph.md) + [`codegraph-agents.md`](../../.harness/steering/codegraph-agents.md) |
 
-Source of truth for role text: `.agents/agents/asdd-*.md`. Runtime folders (`.cursor/agents`, `.kiro/agents`, …) are hardlinks/symlinks to the same files — edit under `.agents/agents/` once.
+Optional stack modules (Bruno, Playwright, web-UI, HTTP API): [`.agents/modules/README.md`](../modules/README.md). The installer copies enabled module agents into this folder. Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-harness-kit#adopter-checklist).
 
-Optional stack modules (Bruno, Playwright, web-UI): [`.agents/modules/README.md`](../modules/README.md). Portability: [`docs/asdd-harness-portability.md`](../../docs/asdd-harness-portability.md).
-
-## Other runtimes
+## Runtimes
 
 | Runtime | Adapter |
 |---------|---------|
-| Junie | `.junie/agents/*` → symlinks to this folder |
-| Codex | `.codex/agents/*.toml` + `.codex/config.toml` (wrappers; body stays here) |
-| OpenCode | `.opencode/agents/*.md` + `opencode.json` (wrappers; body stays here) |
+| Cursor | `.cursor/agents/*` → symlinks here |
+| Claude Code | `.claude/agents/*` → symlinks here |
+| Junie | `.junie/agents/*` → symlinks here |
+| Devin | `.devin/agents/*` → symlinks here |
+| Kimi | `.kimi-code/agents` → symlink here (also native `.agents/agents` discovery) |
+| OpenCode | `.opencode/agents/*` → symlinks here; `opencode.json` loads `AGENTS.md` |
+| Kiro | `.kiro/agents/*` → symlinks here |
+| Codex | No agent adapter; MCP projection only (`.agents/mcp/mcp.codex.toml`) |
 
 Skills remain under `.agents/skills/` for all runtimes.
-
-| Kimi | `.kimi-code/agents` → symlink here (also native `.agents/agents` discovery) |
-| Devin | `.devin/agents/*` → symlinks here |
-| Claude Code | `.claude/agents/*` → symlinks here |

@@ -4,12 +4,12 @@ tags:
   - validation
   - qa
   - implementation
-  - task-planning
+  - task_planning
 ---
 
 # Quality Gates
 
-Portable acceptance criteria for spec coverage, cumulative confidence, design readiness, task planning readiness, domain placement, spec drift, and tech debt. These criteria are normative. The agent applying a gate shall apply them as written.
+Portable acceptance criteria for the phase chain, discovery, spec, validation, domain, spec coverage, design readiness, task planning readiness, domain placement, spec drift, and tech debt. These criteria are normative. The agent applying a gate shall apply them as written.
 
 **Project binding (mandatory):** test commands, domain-placement findings, and stack paths live in [quality-gates.project.md](quality-gates.project.md). The agent shall apply this contract and that binding together.
 
@@ -40,6 +40,52 @@ Portable acceptance criteria for spec coverage, cumulative confidence, design re
 - **QG-DEC-06.** The agent shall compare each score to the bounds below using the recorded value, and shall not round a score across a bound.
 - **QG-DEC-07.** If the slice manifest `mode` is `lite`, then the agent shall skip these gates and shall follow [asdd-lite.md](asdd-lite.md).
 - **QG-DEC-08.** If a value required from [quality-gates.project.md](quality-gates.project.md) is still unfilled, then the agent shall return BLOCK for the gate that requires it and shall not invent a command, path, or finding.
+- **QG-DEC-09.** Before starting a phase, the agent shall read `gates` in the generated slice manifest. When the gate of the preceding phase is missing or BLOCK, the agent shall not start. When it is WARN, the agent shall start only after a Tech Lead `override` session for that phase (`acknowledged_by` in the gate). Domain is optional: when no domain gate exists, Design follows Validation. Refactor follows QA. `check-invariants.mjs` reports violations as WARN.
+- **QG-DEC-10.** Each agent shall record its phase confidence score and uncertainty factors in the session `evidence`. The agent shall log a confidence trend across phases as INFO only and shall not combine scores across phases into a gate decision.
+
+## Discovery Gate
+
+Applied by the Discovery Agent before it writes `phase_completed` for `discovery`. The anti-pattern score comes from the `anti-pattern-detection` skill.
+
+### Acceptance criteria
+
+- **QG-DIS-01.** When the discovery confidence score is less than 0.85, the agent shall return BLOCK and shall set the capability status to `DRAFT — AWAITING CLARIFICATION`.
+- **QG-DIS-02.** When the anti-pattern score is less than 0.70 or a CRITICAL anti-pattern is unresolved, the agent shall return BLOCK and shall flag the capability for PO review.
+- **QG-DIS-03.** When the anti-pattern score is greater than or equal to 0.70 and less than 0.85, the agent shall return WARN, shall apply the suggested fixes, and shall list the remaining findings as concerns.
+- **QG-DIS-04.** When the discovery confidence score and the anti-pattern score are each greater than or equal to 0.85, the agent shall return PASS for this gate.
+
+## Spec Gate
+
+Applied by the Spec Agent before it writes `phase_completed` for `spec`.
+
+### Acceptance criteria
+
+- **QG-SPC-01.** When the spec confidence score is less than 0.85, the agent shall return BLOCK and shall set requirements status to `DRAFT` or `BLOCKED`.
+- **QG-SPC-02.** When the anti-pattern score is less than 0.70 or a CRITICAL anti-pattern is unresolved, the agent shall return BLOCK and shall set requirements status to `DRAFT`.
+- **QG-SPC-03.** If an acceptance criterion does not follow an EARS pattern, or a requirement names a domain entity absent from the domain model without flagging it as an uncertainty factor, then the agent shall return BLOCK.
+- **QG-SPC-04.** When the spec confidence score is greater than or equal to 0.85 and no BLOCK criterion is triggered, the agent shall set requirements status to `READY` and shall return PASS for this gate.
+
+## Validation Gate
+
+Applied by the Validation Agent. The gate decision is the `Gate Decision` of `spec-validation-report.md`.
+
+### Acceptance criteria
+
+- **QG-VAL-01.** When one or more BLOCKING findings exist in MUST requirements, the agent shall decide `BLOCKED` and shall return BLOCK.
+- **QG-VAL-02.** When no BLOCKING finding exists in MUST requirements but HIGH findings or failing SHOULD or COULD requirements remain, the agent shall decide `PASSED_WITH_WARNINGS`, shall return WARN, and shall list each finding as a concern.
+- **QG-VAL-03.** When the validation confidence score is less than 0.75, the agent shall return WARN and shall list each uncertainty factor that produced the score.
+- **QG-VAL-04.** When no BLOCKING or HIGH finding exists and the validation confidence score is greater than or equal to 0.75, the agent shall decide `PASSED` and shall return PASS for this gate.
+- **QG-VAL-05.** If a prior validation report exists, then the agent shall return BLOCK while any prior BLOCKING finding remains unaddressed.
+
+## Domain Gate
+
+Applied by the Domain Agent when the slice runs the domain phase.
+
+### Acceptance criteria
+
+- **QG-DMN-01.** When the domain confidence score is less than 0.85, the agent shall return BLOCK; the Spec Agent shall not re-run and the Design Agent shall not start.
+- **QG-DMN-02.** If an entity referenced in `requirements.md` is absent from the domain model, then the agent shall return BLOCK.
+- **QG-DMN-03.** When the domain confidence score is greater than or equal to 0.85 and no BLOCK criterion is triggered, the agent shall return PASS for this gate.
 
 ## Spec Coverage Gate
 
@@ -124,7 +170,7 @@ Portable rules and scope: [domain-layer.md](domain-layer.md). Findings, paths, a
 
 ## Spec Drift Gate
 
-Computational sensor: `node .harness/scripts/check-spec-drift.mjs` (also inside `check-invariants.mjs`, so Verify-on-Stop and CI run it). Checks `DRIFT-01` … `DRIFT-07`: [docs/architecture/spec-drift-and-audit.md](../../docs/architecture/spec-drift-and-audit.md). Bindings (test globs, base branch): [quality-gates.project.md](quality-gates.project.md).
+Computational sensor: `node .harness/scripts/check-spec-drift.mjs` (also inside `check-invariants.mjs`, so Verify-on-Stop and CI run it). Checks `DRIFT-01` … `DRIFT-07`: [README → spec drift and audit](https://github.com/eencinasq/asdd-harness-kit#spec-drift-and-codebase-audit). Bindings (test globs, base branch): [quality-gates.project.md](quality-gates.project.md).
 
 ### Acceptance criteria
 

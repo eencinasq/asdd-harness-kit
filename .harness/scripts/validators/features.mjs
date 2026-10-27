@@ -25,6 +25,9 @@ export function contractFindings(feature) {
   if (feature?.status === 'passing' && !SHA_RE.test(String(feature?.evidence_commit ?? ''))) {
     out.push(`feature ${id} is passing without a valid evidence_commit SHA (DRIFT-06)`);
   }
+  if (feature?.status === 'passing' && !String(feature?.evidence ?? '').trim()) {
+    out.push(`feature ${id} is passing without evidence (DRIFT-06)`);
+  }
   return out;
 }
 

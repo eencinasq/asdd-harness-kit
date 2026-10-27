@@ -22,16 +22,16 @@ Also: [`.harness/features/<slice>.features.json`](../features/) feature tracker 
 |-------|------|
 | `schema_version` | `"3.0"` |
 | `slice_id` | Stable id (matches folder name) |
-| `phase` | Current ASDD phase (derived from latest session) |
+| `phase` | Current ASDD phase (derived from latest session): `discovery` → `spec` → `validation` → `domain` → `design` → `task_planning` → `implementation` → `qa` → `knowledge`. `refactor` is optional; completing it hands off to `knowledge` |
 | `status` | `in_progress` \| `DONE` \| `PARKED` \| `ABANDONED` |
 | `mode` | `"lite"` (default), `"full"`, or `"escalated"` — derived from session events (`init-slice --full`, escalation `checkpoint`), never hand-edited |
 | `escalation_signals` | Detected growth evidence on lite slices (`E1-scope-spread`, `E3-domain-growth`, `E4-dissent`, `E5-implementation-blocked`) |
 | `escalation_required` | `true` when mode is `lite` and signals are open — `sync-state` will not derive `DONE` in this state |
-| `gates` | Per-phase gate status: `PASS` / `WARN` / `BLOCK` |
+| `gates` | Per-phase gate status: `PASS` / `WARN` / `BLOCK`. `phase_completed` with non-empty `concerns` or a `dissent` gives `WARN`; a Tech Lead `override` session (`human` set) for that phase adds `acknowledged_by`. The next phase starts only on `PASS` or acknowledged `WARN` (`QG-DEC-09`) |
 | `active_features` | Features currently `in_progress` with owner and scope |
 | `session_log` | Chronological summary of all sessions |
 | `contributors` | All agents and humans who wrote sessions |
-| `paths` | `specs`, `features`, `tasks` |
+| `paths` | `specs`, `features`, `tasks` — `features` is set from the latest session carrying `features_path` |
 
 Removed from v2.0: `ccs`, `confidence_chain`, `agent_heartbeats`, `phase_data`. These are replaced by the session log.
 
@@ -78,6 +78,6 @@ Each session is a single JSON file written once, never modified.
 2. If every slice is `DONE` or `PARKED`/`ABANDONED`: **stop** — ask for new intent or unpark.
 3. Read the generated per-slice manifest for the target slice.
 4. Read features from `paths.features` when present.
-5. Read required steering files for the phase (JIT loading per [_runtime-template.md](../agents/_runtime-template.md)).
+5. Read required steering files for the phase (JIT loading per [_runtime-template.md](../../.agents/agents/_runtime-template.md)).
 6. During Implementation, use scoped same-slice concurrency contract.
 7. On phase complete: **write a session file**, then run `sync-state`.

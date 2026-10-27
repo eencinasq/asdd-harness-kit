@@ -4,7 +4,7 @@ inclusion: always
 
 # Session loop (Harness Engineering ∩ ASDD)
 
-Closes the gap between **ASDD phases** (manifest + specs) and **coding sessions** (scoped task execution, verification, handoff). Explainer + diagrams: [`docs/asdd-and-harness-engineering.md`](../../docs/asdd-and-harness-engineering.md).
+Closes the gap between **ASDD phases** (manifest + specs) and **coding sessions** (scoped task execution, verification, handoff). Explainer: [README → Guides, then sensors](https://github.com/eencinasq/asdd-harness-kit#guides-then-sensors).
 
 ## Artifacts
 
@@ -32,7 +32,7 @@ If two agents write sessions for the same slice simultaneously, both files exist
 1. Read generated `.harness/state/registry.json` for squad state.
 2. Read generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice.
 3. Read features when `paths.features` is set.
-4. Read steering for the phase (JIT loading per [`_runtime-template.md`](../agents/_runtime-template.md)).
+4. Read steering for the phase (JIT loading per [`_runtime-template.md`](../../.agents/agents/_runtime-template.md)).
 5. Pick work:
    - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.
    - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners and disjoint file scopes; otherwise work serially.
@@ -59,11 +59,11 @@ Each item in `.features.json`:
 
 **Rules:** one `in_progress` by default. Multiple tasks may be `in_progress` only when each has a unique `owner`, non-empty non-overlapping `scope_paths`, and the coordinator has written a session file for the slice. Scope overlap includes a file and its ancestor directory. Workers must not edit shared Harness state, registry, manifests, or session files of other agents. `passing` requires non-empty `evidence`, an `evidence_commit`, and a passing Verify-on-Stop check in the same session; on repeated verify fail → `blocked` + [agent-failure-log](../../docs/agent-failure-log.md).
 
-**Evidence commit:** run the verification, commit the verified code, then record that commit's SHA as `evidence_commit` (the features file itself is a harness record and may change afterwards). Spec drift check `DRIFT-02` reopens the feature when any file under its `scope_paths` changes after that commit. Missing `scope_paths` or `evidence_commit` is reported as `DRIFT-06`, at the severity set by `drift.contract` in `.harness/config/project.json` (`warn` by default, `fail` once slices are migrated).
+**Evidence commit:** run the verification, commit the verified code, then record that commit's SHA as `evidence_commit` (the features file itself is a harness record and may change afterwards). Spec drift check `DRIFT-02` reopens the feature when any file under its `scope_paths` changes after that commit. Missing `scope_paths`, `evidence`, or `evidence_commit` is reported as `DRIFT-06`, at the severity set by `drift.contract` in `.harness/config/project.json` (`warn` by default, `fail` once slices are migrated).
 
 ## When to create / update features.json
 
-1. **Task Planning (mandatory):** project `tasks.md` → `.harness/features/<slice_id>.features.json`; set `manifest.paths.features`. Do not hand off to Implementation until this file exists with one item per `TASK-NNN`, all `not_started`.
+1. **Task Planning (mandatory):** project `tasks.md` → `.harness/features/<slice_id>.features.json`; write a session with `features_path` and run `sync-state` so the generated `paths.features` points at it. Do not hand off to Implementation until this file exists with one item per `TASK-NNN`, all `not_started`.
 2. **Implementation:** coordinator projects tasks, dependencies, owners, and file scopes into the tracker before dispatch. Set eligible entries to `in_progress`; workers return verification evidence; coordinator audits and records `passing` + evidence and writes a session file.
 3. **QA:** may add evidence or mark blocked; do not invent `passing` without running verification.
 4. **Do not** replace `tasks.md` — features are the session projection for Harness; tasks remain ASDD SoT for waves/deps.
@@ -130,6 +130,6 @@ Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The age
 
 Both Cursor and Claude Code run this automatically. `.cursor/hooks.json` binds `stop` to `node .harness/scripts/verify-on-stop.mjs` (`loop_limit` 3, `failClosed` true); `.claude/settings.json` binds `Stop` to the same script. When the invariants run exits non-zero, the hook submits the FAIL output as the next prompt (Cursor) or a `decision: block` reason (Claude, respecting `stop_hook_active`) so the agent corrects the harness state before the session ends. When the command exits 0, the hook returns `{}` and the session may end. The hook does not inject a follow-up when `status` is `aborted` or `error`. After `loop_limit`, a remaining FAIL still means the feature is not `passing`.
 
-Other runtimes do not inject that prompt. The `--live` command is still mandatory before handoff (see the enforcement matrix in [docs/asdd-harness-portability.md](../../docs/asdd-harness-portability.md)).
+Other runtimes do not inject that prompt. The `--live` command is still mandatory before handoff (see the enforcement matrix in [README → How a session works](https://github.com/eencinasq/asdd-harness-kit#how-a-session-works)).
 
 Session close, and what wins when a control disagrees with this file, is in [controls.md](./controls.md). Gold-plating in this file still decides which files may change.

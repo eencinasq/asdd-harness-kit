@@ -13,6 +13,7 @@
  * - Per-slice sessions v3.0 (state/slices/<id>/sessions/*.json)
  * - Feature tracker invariants (dependencies, concurrent ownership/scope, evidence)
  * - Spec drift DRIFT-01 … DRIFT-07 (drift-lib.mjs)
+ * - Phase chain QG-DEC-09 (WARN; validators/phase-chain.mjs)
  * - Orphan slice detection
  * - Registry consistency
  */
@@ -22,7 +23,9 @@ import validatePaths from './validators/paths.mjs';
 import validateManifest from './validators/manifest.mjs';
 import validateFeatures from './validators/features.mjs';
 import validateSkills from './validators/skills.mjs';
+import validateSteeringTags from './validators/steering-tags.mjs';
 import validateLiteEscalation from './validators/lite-escalation.mjs';
+import validatePhaseChain from './validators/phase-chain.mjs';
 import validateSpecDrift from './validators/spec-drift.mjs';
 import { assertJevConfigured } from './jev-gates.mjs';
 
@@ -64,7 +67,9 @@ validatePaths(ctx);
 validateManifest(ctx);
 validateFeatures(ctx);
 validateSkills(ctx);
+validateSteeringTags(ctx);
 validateLiteEscalation(ctx);
+validatePhaseChain(ctx);
 validateSpecDrift(ctx);
 
 // Jev is skill-scoped (shape-up / product-delivery). Harness invariants never invoke System One.

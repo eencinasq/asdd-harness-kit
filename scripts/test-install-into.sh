@@ -43,7 +43,6 @@ test -f "$TMP/existing-app/.agents/skills/product-delivery/references/shape-up-i
 test -f "$TMP/existing-app/.agents/skills/product-delivery/references/asdd-harness-handoff.md"
 test -f "$TMP/existing-app/.agents/skills/product-delivery/references/technical-diagrams.md"
 test -f "$TMP/existing-app/.agents/skills/product-delivery/contracts/delivery-map.schema.yaml"
-test -f "$TMP/existing-app/docs/pipeline-documentation.md"
 
 # project.json derives name from directory
 grep -q '"project_id": "existing-app"' "$TMP/existing-app/.harness/config/project.json"
@@ -66,7 +65,6 @@ test -f "$TMP/existing-app/.harness/scripts/knowledge-store.mjs"
 test -f "$TMP/existing-app/.harness/scripts/knowledge-store-sqlite.mjs"
 test ! -e "$TMP/existing-app/.harness/scripts/knowledge-store-kuzu.mjs"
 test -f "$TMP/existing-app/.harness/scripts/sync-knowledge.mjs"
-test -f "$TMP/existing-app/.harness/scripts/sync-knowledge.test.mjs"
 test -f "$TMP/existing-app/.agents/mcp/knowledge-server.mjs"
 grep -q '"knowledge"' "$TMP/existing-app/.agents/mcp/mcp.json"
 # Spec drift sensor + spec-drift-auditor MCP server (REQ-029)
@@ -92,7 +90,7 @@ node -e '
   for (const f of ["AGENTS.md", ".harness/steering/product.md", "README.md"])
     if (m.includes(f)) throw new Error(`managed_files wrongly lists ${f}`);
   const s = require(process.argv[1]).seeded_files || {};
-  if (!/^[0-9a-f]{64}$/.test(s["docs/asdd-harness-portability.md"] || "")) throw new Error("seeded_files misses docs/asdd-harness-portability.md");
+  if (!/^[0-9a-f]{64}$/.test(s["docs/dissent-log.md"] || "")) throw new Error("seeded_files misses docs/dissent-log.md");
   if ("README.md" in s) throw new Error("seeded_files wrongly lists the project README.md");
 ' "$TMP/existing-app/.harness/config/installed-versions.json"
 # Isolated knowledge deps manifest (installed via .harness/package.json)
@@ -139,14 +137,20 @@ grep -q '"failClosed": true' "$TMP/existing-app/.cursor/hooks.json"
 test -f "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 test -f "$TMP/existing-app/.harness/config/project.schema.json"
 test -f "$TMP/existing-app/scripts/harness-migrate.mjs"
-test -f "$TMP/existing-app/docs/shape-up-asdd-harness-integration.md"
+# Pipeline, Jev, and drift docs were merged into the kit README (linked by URL)
+test ! -e "$TMP/existing-app/docs/pipeline-documentation.md"
+test ! -e "$TMP/existing-app/docs/jev-integration.md"
+test ! -e "$TMP/existing-app/docs/architecture/spec-drift-and-audit.md"
 node "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 test ! -e "$TMP/existing-app/runtimes"
 test ! -e "$TMP/existing-app/.agents/modules"
 test ! -e "$TMP/existing-app/scripts/enable-module.sh"
-test -f "$TMP/existing-app/.agents/mcp/jev-gate-server.test.mjs"
 
-# Kit-internal / dev-only files must never be installed
+# Kit-internal / dev-only files must never be installed, kit tests included
+if find "$TMP/existing-app/.harness" "$TMP/existing-app/.agents" -path '*/node_modules' -prune -o \( -name '*.test.*' -o -name '*.spec.*' \) -print | grep .; then
+  echo "kit test files were installed (listed above)" >&2
+  exit 1
+fi
 test ! -e "$TMP/existing-app/scripts/generate-versions.mjs"
 test ! -e "$TMP/existing-app/scripts/npx-install.cjs"
 test ! -e "$TMP/existing-app/scripts/test-install-into.sh"
@@ -290,7 +294,7 @@ for mod in bruno playwright-e2e web-ui http-api; do
       test -d "$MTMP/$mod-app/.agents/skills/api-and-interface-design"
       # spec compliance adapter for the spec-drift-auditor server (REQ-029)
       test -f "$MTMP/$mod-app/.agents/mcp/adapters/openapi.mjs"
-      (cd "$MTMP/$mod-app" && node --test .agents/mcp/adapters/openapi.test.mjs >/dev/null)
+      test ! -e "$MTMP/$mod-app/.agents/mcp/adapters/openapi.test.mjs"
       ;;
   esac
   echo "  OK"

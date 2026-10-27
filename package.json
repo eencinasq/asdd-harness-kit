@@ -1,6 +1,6 @@
 {
   "name": "asdd-harness-kit",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "description": "Portable process layer for Agent Specification-Driven Development (ASDD) and Harness Engineering",
   "bin": {
     "asdd-harness-kit": "scripts/npx-install.cjs"
@@ -18,7 +18,7 @@
     "README.md"
   ],
   "scripts": {
-    "test": "bash scripts/test-install-into.sh && bash scripts/test-lifecycle.sh && node --test .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .harness/scripts/sync-knowledge.test.mjs .agents/mcp/jev-gate-server.test.mjs .harness/scripts/drift-lib.test.mjs .harness/scripts/semgrep-lib.test.mjs .harness/scripts/audit-codebase.test.mjs .agents/mcp/spec-drift-auditor.test.mjs .agents/modules/http-api/adapters/openapi.test.mjs tools/drift-dashboard/src/model.test.mjs",
+    "test": "bash scripts/test-install-into.sh && bash scripts/test-lifecycle.sh && node --test .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .harness/scripts/sync-knowledge.test.mjs .harness/scripts/sync-state.test.mjs .agents/mcp/jev-gate-server.test.mjs .harness/scripts/drift-lib.test.mjs .harness/scripts/semgrep-lib.test.mjs .harness/scripts/audit-codebase.test.mjs .agents/mcp/spec-drift-auditor.test.mjs .agents/modules/http-api/adapters/openapi.test.mjs tools/drift-dashboard/src/model.test.mjs",
     "test:full-flow": "bash scripts/test-full-flow.sh",
     "build:ui": "vite build --config tools/drift-dashboard/vite.config.mjs"
   },

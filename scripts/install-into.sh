@@ -448,7 +448,7 @@ copy_tree() {
   local rel local_src local_dest
   while IFS= read -r -d '' rel; do
     rel="${rel#./}"
-    case "${rel##*/}" in .DS_Store|._*) continue ;; esac
+    case "${rel##*/}" in .DS_Store|._*|*.test.*|*.spec.*) continue ;; esac  # kit tests are not installed
     local_src="$src/$rel"
     local_dest="$dest/$rel"
     copy_file "$local_src" "$local_dest" "$policy"
@@ -488,13 +488,10 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/check-skills-index.mjs" "$TARGET/.harness/scripts/check-skills-index.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/verify-on-stop.mjs" "$TARGET/.harness/scripts/verify-on-stop.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/drift-lib.mjs" "$TARGET/.harness/scripts/drift-lib.mjs" refresh
-  copy_file "$KIT_DIR/.harness/scripts/drift-lib.test.mjs" "$TARGET/.harness/scripts/drift-lib.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/semgrep-lib.mjs" "$TARGET/.harness/scripts/semgrep-lib.mjs" refresh
-  copy_file "$KIT_DIR/.harness/scripts/semgrep-lib.test.mjs" "$TARGET/.harness/scripts/semgrep-lib.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/check-spec-drift.mjs" "$TARGET/.harness/scripts/check-spec-drift.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/audit-lib.mjs" "$TARGET/.harness/scripts/audit-lib.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/audit-codebase.mjs" "$TARGET/.harness/scripts/audit-codebase.mjs" refresh
-  copy_file "$KIT_DIR/.harness/scripts/audit-codebase.test.mjs" "$TARGET/.harness/scripts/audit-codebase.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/audit-triage.mjs" "$TARGET/.harness/scripts/audit-triage.mjs" refresh
   copy_file "$KIT_DIR/.harness/audits/README.md" "$TARGET/.harness/audits/README.md" refresh
   # Examples only: the target's .github/ is never touched
@@ -506,7 +503,6 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/escalate-slice.mjs" "$TARGET/.harness/scripts/escalate-slice.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/sync-state.mjs" "$TARGET/.harness/scripts/sync-state.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-client.mjs" "$TARGET/.harness/scripts/jev-client.mjs" refresh
-  copy_file "$KIT_DIR/.harness/scripts/jev-client.test.mjs" "$TARGET/.harness/scripts/jev-client.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/env-loader.mjs" "$TARGET/.harness/scripts/env-loader.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/knowledge-lib.mjs" "$TARGET/.harness/scripts/knowledge-lib.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/knowledge-store.mjs" "$TARGET/.harness/scripts/knowledge-store.mjs" refresh
@@ -521,10 +517,8 @@ install_harness_scaffold() {
     fi
   fi
   copy_file "$KIT_DIR/.harness/scripts/sync-knowledge.mjs" "$TARGET/.harness/scripts/sync-knowledge.mjs" refresh
-  copy_file "$KIT_DIR/.harness/scripts/sync-knowledge.test.mjs" "$TARGET/.harness/scripts/sync-knowledge.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-gates.mjs" "$TARGET/.harness/scripts/jev-gates.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-command-gate.mjs" "$TARGET/.harness/scripts/jev-command-gate.mjs" refresh
-  copy_file "$KIT_DIR/.harness/scripts/jev-command-gate.test.mjs" "$TARGET/.harness/scripts/jev-command-gate.test.mjs" refresh
   copy_file "$KIT_DIR/.harness/config/project.schema.json" "$TARGET/.harness/config/project.schema.json" refresh
   copy_file "$KIT_DIR/.harness/config/README.md" "$TARGET/.harness/config/README.md" refresh
 
@@ -683,10 +677,8 @@ install_agents_core() {
   copy_file "$KIT_DIR/.agents/mcp/sync-runtime-mcp.cjs" "$TARGET/.agents/mcp/sync-runtime-mcp.cjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/README.md" "$TARGET/.agents/mcp/README.md" refresh
   copy_file "$KIT_DIR/.agents/mcp/jev-gate-server.mjs" "$TARGET/.agents/mcp/jev-gate-server.mjs" refresh
-  copy_file "$KIT_DIR/.agents/mcp/jev-gate-server.test.mjs" "$TARGET/.agents/mcp/jev-gate-server.test.mjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/knowledge-server.mjs" "$TARGET/.agents/mcp/knowledge-server.mjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/spec-drift-auditor.mjs" "$TARGET/.agents/mcp/spec-drift-auditor.mjs" refresh
-  copy_file "$KIT_DIR/.agents/mcp/spec-drift-auditor.test.mjs" "$TARGET/.agents/mcp/spec-drift-auditor.test.mjs" refresh
   copy_tree "$KIT_DIR/.agents/mcp/ui" "$TARGET/.agents/mcp/ui" refresh
   if [[ "$FORCE_MCP" -eq 1 ]]; then
     local old_force=$FORCE
@@ -722,18 +714,12 @@ register_mcp_server() {
 install_docs_root() {
   [[ "$SKIP_DOCS" -eq 1 ]] && return 0
   copy_file "$KIT_DIR/AGENTS.md" "$TARGET/AGENTS.md" create
-  copy_file "$KIT_DIR/docs/asdd-harness-portability.md" "$TARGET/docs/asdd-harness-portability.md" create
-  copy_file "$KIT_DIR/docs/asdd-and-harness-engineering.md" "$TARGET/docs/asdd-and-harness-engineering.md" create
-  copy_file "$KIT_DIR/docs/pipeline-documentation.md" "$TARGET/docs/pipeline-documentation.md" refresh
-  copy_file "$KIT_DIR/docs/shape-up-asdd-harness-integration.md" "$TARGET/docs/shape-up-asdd-harness-integration.md" create
-  copy_file "$KIT_DIR/docs/jev-integration.md" "$TARGET/docs/jev-integration.md" refresh
   copy_file "$KIT_DIR/scripts/install-into.sh" "$TARGET/scripts/install-into.sh" refresh
   if [[ "$DRY_RUN" -eq 0 ]]; then
     chmod +x "$TARGET/scripts/install-into.sh" 2>/dev/null || true
   fi
   # Scaffold domain model and operational logs
   copy_file "$KIT_DIR/docs/architecture/domain-model.md" "$TARGET/docs/architecture/domain-model.md" create
-  copy_file "$KIT_DIR/docs/architecture/spec-drift-and-audit.md" "$TARGET/docs/architecture/spec-drift-and-audit.md" refresh
   copy_file "$KIT_DIR/docs/agent-failure-log.md" "$TARGET/docs/agent-failure-log.md" create
   copy_file "$KIT_DIR/docs/dissent-log.md" "$TARGET/docs/dissent-log.md" create
   copy_file "$KIT_DIR/docs/self-healing-log.md" "$TARGET/docs/self-healing-log.md" create
@@ -870,7 +856,7 @@ wire_runtime_cursor() {
     log "${C_DIM}KEEP${C_RESET}  $TARGET/.cursor/mcp.json"
   fi
   copy_file "$KIT_DIR/runtimes/cursor/asdd-steering.mdc" "$TARGET/.cursor/rules/asdd-steering.mdc" refresh
-  copy_runtime_models "cursor" "$TARGET/.cursor"
+  remove_runtime_models "$TARGET/.cursor"
   install_cursor_verify_hook
 }
 
@@ -1008,7 +994,7 @@ wire_runtime_claude() {
   else
     log "${C_DIM}KEEP${C_RESET}  $TARGET/CLAUDE.md"
   fi
-  copy_runtime_models "claude" "$TARGET/.claude"
+  remove_runtime_models "$TARGET/.claude"
   install_claude_hooks
 }
 
@@ -1069,12 +1055,15 @@ link_runtime_dir() {
   fi
 }
 
-copy_runtime_models() {
-  local runtime="$1"
-  local target_dir="$2"
-  if [[ -f "$KIT_DIR/runtimes/$runtime/models.json" ]]; then
-    copy_file "$KIT_DIR/runtimes/$runtime/models.json" "$target_dir/models.json" refresh
-  fi
+# Agents declare `model: inherit`; per-runtime tier→model files are retired.
+# Remove a kit-installed copy (it carries "tier_models"); keep any user file.
+remove_runtime_models() {
+  local file="$1/models.json"
+  [[ -f "$file" ]] || return 0
+  grep -q '"tier_models"' "$file" || return 0
+  log "${C_YELLOW}REMOVE${C_RESET} $file (agents inherit the runtime model)"
+  [[ "$DRY_RUN" -eq 1 ]] && return 0
+  rm -f "$file"
 }
 
 wire_runtime_opencode() {
@@ -1102,7 +1091,7 @@ EOF
   else
     warn "Node or MCP projection script unavailable — skip OpenCode MCP projection"
   fi
-  copy_runtime_models "opencode" "$TARGET/.opencode"
+  remove_runtime_models "$TARGET/.opencode"
 }
 
 wire_runtime_kimi() {
@@ -1112,7 +1101,7 @@ wire_runtime_kimi() {
   link_runtime_dir "$TARGET/.kimi-code/agents" "../.agents/agents"
   link_runtime_skills ".kimi-code"
   link_runtime_mcp "$TARGET/.kimi-code/mcp.json" "../.agents/mcp/mcp.json"
-  copy_runtime_models "kimi" "$TARGET/.kimi-code"
+  remove_runtime_models "$TARGET/.kimi-code"
 }
 
 wire_runtime_junie() {
@@ -1121,7 +1110,7 @@ wire_runtime_junie() {
   link_runtime_agent_files ".junie"
   link_runtime_skills ".junie"
   link_runtime_mcp "$TARGET/.junie/mcp/mcp.json" "../../.agents/mcp/mcp.json"
-  copy_runtime_models "junie" "$TARGET/.junie"
+  remove_runtime_models "$TARGET/.junie"
 }
 
 wire_runtime_devin() {
@@ -1130,7 +1119,7 @@ wire_runtime_devin() {
   link_runtime_agent_files ".devin"
   link_runtime_skills ".devin"
   link_runtime_mcp "$TARGET/.devin/mcp_config.json" "../.agents/mcp/mcp.json"
-  copy_runtime_models "devin" "$TARGET/.devin"
+  remove_runtime_models "$TARGET/.devin"
 }
 
 wire_runtime_kiro() {
@@ -1139,7 +1128,7 @@ wire_runtime_kiro() {
   link_runtime_agent_files ".kiro"
   link_runtime_skills ".kiro"
   link_runtime_mcp "$TARGET/.kiro/settings/mcp.json" "../../.agents/mcp/mcp.json"
-  copy_runtime_models "kiro" "$TARGET/.kiro"
+  remove_runtime_models "$TARGET/.kiro"
 }
 
 wire_runtimes() {
@@ -1308,7 +1297,7 @@ print_summary() {
   log "  • Skills catalog               → .agents/skills/"
   log "  • Harness scripts              → .harness/scripts/"
   log "  • Project adapter              → .harness/config/project.json"
-  log "  • Model tier mapping           → .harness/config/models.json"
+  log "  • Agent tier guidance          → .harness/config/models.json (agents use model: inherit)"
 
   if [[ -n "$RUNTIMES" && "$RUNTIMES" != "none" ]]; then
     log "  • Runtime wiring               → $RUNTIMES"

@@ -1,7 +1,7 @@
 ---
 name: asdd-task-planning-agent
 description: Decomposes approved architecture designs or behavioral slices into precise, parallelizable Execution Waves for the Implementation Agent. Produces tasks.md with atomic implementation steps grouped into Parallel Waves. Sixth agent in the ASDD pipeline (Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge).
-model: tier-b
+model: inherit
 mode: subagent
 
 ---
@@ -165,4 +165,4 @@ After writing `tasks.md`, also create or refresh `.harness/features/[spec-name].
 - [ ] No circular dependencies.
 - [ ] All `REQ-NNN` traced.
 - [ ] Task granularity rules followed.
-- [ ] `.harness/features/[spec-name].features.json` created and per-slice `paths.features` set (+ global registry row).
+- [ ] `.harness/features/[spec-name].features.json` created; session file written (with `features_path`) and `sync-state.mjs` run so `paths.features` is set.

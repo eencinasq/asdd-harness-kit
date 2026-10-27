@@ -2,10 +2,10 @@
 
 Runtime-agnostic map. **Read this first**, then load steering from **`.harness/steering/`** directly.
 
-- Process: [docs/asdd-and-harness-engineering.md](docs/asdd-and-harness-engineering.md)
-- Portability: [docs/asdd-harness-portability.md](docs/asdd-harness-portability.md)
+- Process: [README → Guides, then sensors](https://github.com/eencinasq/asdd-harness-kit#guides-then-sensors)
+- Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-harness-kit#adopter-checklist)
 - Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit); enable them with the kit installer.
-- Jev (shape-up / product-delivery only): [docs/jev-integration.md](docs/jev-integration.md) · [`.harness/steering/jev.md`](.harness/steering/jev.md)
+- Jev (shape-up / product-delivery only): [README → Jev (skill-scoped)](https://github.com/eencinasq/asdd-harness-kit#jev-skill-scoped) · [`.harness/steering/jev.md`](.harness/steering/jev.md)
 
 ## INIT (every session)
 
@@ -15,8 +15,8 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 4. **JIT steering loading:**
    - Each steering file has YAML frontmatter with `inclusion` and `tags`.
    - Load all `inclusion: "always"` files (controls, session-loop, manifest, skills, security-rules, jev, README).
-   - Load `inclusion: "auto"` files **only when their tags match the current phase**.
-   - Skip auto files whose tags do not intersect the current phase — this saves context window.
+   - Load `inclusion: "auto"` files **only when their tags match the current phase** (as named in `sync-state.mjs`, e.g. `task_planning`), the slice `mode` (`lite`), or the active role (`review`, `ui`).
+   - Skip auto files whose tags do not intersect those keys — this saves context window. Explicit `Read` instructions in an agent file always apply.
    - **Lite-first:** all slices start in `lite` mode (default in `init-slice.mjs`). Use `--full` only for work known upfront to be cross-cutting/architectural. Growth in a lite slice triggers evidence-based escalation — see [`asdd-lite.md`](.harness/steering/asdd-lite.md).
 5. Pick work:
    - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.

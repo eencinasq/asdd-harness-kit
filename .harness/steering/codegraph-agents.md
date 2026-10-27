@@ -1,15 +1,22 @@
 ---
 inclusion: auto
 tags:
+  - discovery
+  - spec
+  - validation
+  - domain
+  - design
+  - task_planning
   - implementation
+  - qa
+  - knowledge
   - refactor
+  - lite
 ---
 
 # Codegraph — per-agent checklist
 
 Copy into Task / subagent prompts. Follow in **parent chat** and **every `asdd-*` subagent**.
-
-Cursor: `preToolUse` hook (`.cursor/hooks/asdd-task-codegraph-inject.sh`) may append this mandate when missing.
 
 ## Mandatory
 

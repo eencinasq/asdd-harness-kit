@@ -17,7 +17,7 @@ Spec drift is the gap between what a slice says and what the repository does. Th
 | `node .harness/scripts/check-spec-drift.mjs [--json] [--base <ref>]` | On demand | Anyone |
 | MCP server `spec-drift-auditor` | In chat, with an optional dashboard | Engineers and the Tech Lead |
 
-Checks `DRIFT-00`…`DRIFT-07` and their gates `QG-DRIFT-01`…`05` are defined in [quality-gates.md](./quality-gates.md). This file does not restate them. Design: [docs/architecture/spec-drift-and-audit.md](../../docs/architecture/spec-drift-and-audit.md).
+Checks `DRIFT-00`…`DRIFT-07` and their gates `QG-DRIFT-01`…`05` are defined in [quality-gates.md](./quality-gates.md). This file does not restate them. Design: [README → spec drift and audit](https://github.com/eencinasq/asdd-harness-kit#spec-drift-and-codebase-audit).
 
 ## Engineers (author)
 

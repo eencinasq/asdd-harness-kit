@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "description": "ASDD agent model tier mapping. Assigns each agent to a capability tier based on its reasoning requirements, then maps tiers to runtime-specific model recommendations. Goal: minimize token spend without compromising gate quality.",
+  "description": "ASDD agent tier guidance. Agents declare `model: inherit` and run on the model of the runtime session that invokes them. Tiers describe each agent's reasoning needs so the squad can pick a suitable session model; this file binds no model.",
   "tier_definitions": {
     "tier-s": {
       "label": "Architect",

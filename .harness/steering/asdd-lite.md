@@ -51,7 +51,7 @@ The slice's `spec.md`, `design.md`, `tasks.md` remain — full artifacts are add
 | Full ASDD (9 phases) | ASDD-Lite (4 phases) | What changes |
 |----------------------|----------------------|--------------|
 | Discovery + Spec | **Spec** | One `spec.md` — 1-paragraph intent + 3-5 EARS MUST requirements. No capability decomposition, no prioritization matrix. |
-| Validation + Domain + Design | **Design** | One `design.md` — what changes (files/modules), new domain terms (or "none"), 1-2 ADRs *only if* architectural decision needed. No CCS. |
+| Validation + Domain + Design | **Design** | One `design.md` — what changes (files/modules), new domain terms (or "none"), 1-2 ADRs *only if* architectural decision needed. No confidence scores. |
 | Task Planning | **Tasks** | Simple `tasks.md` — 1-5 tasks, single wave, direct mapping to `features.json`. No dependency graph. |
 | Implementation | **Implementation** | Same TDD red-green-refactor. One feature at a time. |
 | QA | **QA-Light** | Run existing + new tests, verify coverage. No formal spec-coverage-report unless >10% uncovered. |
@@ -75,7 +75,7 @@ The slice's `spec.md`, `design.md`, `tasks.md` remain — full artifacts are add
 
 ## Dropped from full ASDD
 
-- Confidence Chain (CCS) scoring
+- Per-phase confidence scoring (`QG-DIS`, `QG-SPC`, `QG-VAL`, `QG-DMN`, `QG-DES`, `QG-TPL`)
 - Formal quality gates (BLOCK/WARN thresholds)
 - Multi-agent orchestration (one agent owns the whole slice)
 - Behavioral Slicing / capability prioritization

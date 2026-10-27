@@ -13,7 +13,7 @@ description: >-
 
 The computational pass (`node .harness/scripts/audit-codebase.mjs`) finds drift, unowned code, failing audit commands, Semgrep violations (with the rule's fix), and churn hotspots. This skill adds judgement: does the code in the hottest files still do what its requirements say? Semgrep findings (`SEMGREP`) are already computational; do not restate them as spec verdicts.
 
-Design: [`docs/architecture/spec-drift-and-audit.md`](../../../docs/architecture/spec-drift-and-audit.md) section 2.
+Design: [README → Codebase auditor](https://github.com/eencinasq/asdd-harness-kit#codebase-auditor).
 
 ## Who runs it
 

@@ -47,6 +47,7 @@ function collectArtifacts() {
   const artifacts = {};
   const version = getKitVersion();
   const record = (rel) => {
+    if (/\.(test|spec)\./.test(rel)) return; // kit tests are not installed into clients
     if (existsSync(join(root, rel))) artifacts[rel] = version; // listed files may be retired
   };
 
@@ -120,16 +121,13 @@ function collectArtifacts() {
 
   // Docs
   for (const f of [
-    'asdd-harness-portability.md', 'asdd-and-harness-engineering.md',
-    'pipeline-documentation.md', 'shape-up-asdd-harness-integration.md',
-    'jev-integration.md', 'self-healing-log.md',
+    'self-healing-log.md',
     'knowledge-base/README.md',
   ]) {
     record(`docs/${f}`);
   }
   for (const f of [
     'architecture/domain-model.md', 'architecture/knowledge-scaling.md',
-    'architecture/spec-drift-and-audit.md',
     'agent-failure-log.md', 'dissent-log.md',
   ]) {
     record(`docs/${f}`);
@@ -148,11 +146,6 @@ function collectArtifacts() {
   record('.harness/audits/README.md');
   record('.github/CODEOWNERS.harness.example');
   record('.github/workflows/harness-audit.yml.example');
-
-  // Per-runtime model configs
-  for (const entry of readdirSync(join(root, 'runtimes'), { withFileTypes: true })) {
-    if (entry.isDirectory()) record(`runtimes/${entry.name}/models.json`);
-  }
 
   // Runtime recipes (only files that get copied, not symlinked)
   for (const f of ['asdd-steering.mdc']) {
