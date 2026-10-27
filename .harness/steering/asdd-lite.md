@@ -78,7 +78,7 @@ The slice's `spec.md`, `design.md`, `tasks.md` remain — full artifacts are add
 - Per-phase confidence scoring (`QG-DIS`, `QG-SPC`, `QG-VAL`, `QG-DMN`, `QG-DES`, `QG-TPL`)
 - Formal quality gates (BLOCK/WARN thresholds)
 - Multi-agent orchestration (one agent owns the whole slice)
-- Behavioral Slicing / capability prioritization
+- Scope mapping (done upstream by `product-delivery`; one intent = one slice)
 - Domain model updates (unless new terms introduced)
 - Parallel wave execution
 - Spec validation report (self-review instead)

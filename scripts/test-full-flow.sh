@@ -35,7 +35,7 @@ fi
 echo "== 1. intake gates: Shape Up + Product Delivery (Jev) =="
 if [[ "$LIVE" -eq 1 ]]; then
   node --input-type=module <<'EOF'
-import { shapeUpGates, earsGate, sliceChoice, hillChartGate } from './.harness/scripts/jev-gates.mjs';
+import { shapeUpGates, earsGate, scopeChoice, hillChartGate } from './.harness/scripts/jev-gates.mjs';
 
 const pitch = {
   problem: 'Customers abandon carts because reordering requires rebuilding the cart.',
@@ -61,12 +61,12 @@ if (ears.result._unavailable) {
 }
 console.log(`  earsGate prob_yes=${ears.result.prob_yes} (pass>=0.85 → ${ears.ok})`);
 
-const sc = await sliceChoice('Customers can reorder a previous purchase with one tap from the orders page.');
+const sc = await scopeChoice('Quick reorder: tapping Reorder on a past order fills the cart with its items at current prices.');
 if (sc.result._unavailable) {
-  console.error('sliceChoice unavailable:', sc.result._reason);
+  console.error('scopeChoice unavailable:', sc.result._reason);
   process.exit(1);
 }
-console.log(`  sliceChoice=${sc.result.choice}`);
+console.log(`  scopeChoice=${sc.result.choice}`);
 
 const hill = await hillChartGate({ task: 'reorder-api endpoint', timeboxRemaining: 0.1 });
 if (hill.result._unavailable) {

@@ -1,0 +1,117 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: ScopeMap
+description: >-
+  A bet Shape Up pitch split into scopes. Each kept scope maps to one ASDD
+  slice (one intent.md). No epics, stories, sprints, or backlog.
+type: object
+required:
+  - artifact
+  - pitch
+  - scopes
+  - validation
+properties:
+  artifact:
+    type: object
+    required: [type, id, version, status]
+    properties:
+      type:
+        const: scope_map
+      id:
+        type: string
+        pattern: "^SCOPE-MAP-[0-9]{3,}$"
+      version:
+        type: string
+      status:
+        enum: [draft, validated, blocked]
+  pitch:
+    type: object
+    required: [id, betting_state, appetite, problem, desired_outcome]
+    properties:
+      id:
+        type: string
+      source:
+        type: string
+        description: Path, URL, or tracker reference of the canonical pitch
+      betting_state:
+        const: bet
+      cycle:
+        type: string
+        description: Cycle the pitch was bet for, e.g. "2026-C4 (six weeks)"
+      appetite:
+        type: string
+        description: Time boundary for the whole bet, never an estimate
+      problem:
+        type: string
+      desired_outcome:
+        type: string
+      no_gos:
+        type: array
+        items: { type: string }
+  scopes:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      required: [id, name, outcome, class, must_haves, depends_on]
+      properties:
+        id:
+          type: string
+          pattern: "^SCOPE-[0-9]{3,}$"
+        name:
+          type: string
+          description: Short name in the project's language
+        outcome:
+          type: string
+          description: The one observable result a person can try when the scope is done
+        class:
+          enum: [must_have, nice_to_have]
+          description: Result of jev_scope_choice (reshape scopes are removed from the map)
+        must_haves:
+          type: array
+          items: { type: string }
+        nice_to_haves:
+          type: array
+          items: { type: string }
+        no_gos:
+          type: array
+          items: { type: string }
+        rabbit_holes:
+          type: array
+          items: { type: string }
+        pending_definitions:
+          type: array
+          items: { type: string }
+        depends_on:
+          type: array
+          items:
+            type: string
+            pattern: "^SCOPE-[0-9]{3,}$"
+        slice_id:
+          type: string
+          description: ASDD slice created for this scope (.harness/specs/<slice_id>/intent.md)
+  reshaped:
+    type: array
+    description: Scopes removed from the bet by jev_scope_choice or the shapers; returned to shaping
+    items:
+      type: object
+      required: [name, reason]
+      properties:
+        name: { type: string }
+        reason: { type: string }
+  validation:
+    type: object
+    required: [all_items_placed, cycles, fits_appetite]
+    properties:
+      all_items_placed:
+        type: boolean
+      unplaced_items:
+        type: array
+        items: { type: string }
+      cycles:
+        type: array
+        description: Dependency cycles found (must be empty before handoff)
+        items:
+          type: array
+          items: { type: string }
+      fits_appetite:
+        type: boolean

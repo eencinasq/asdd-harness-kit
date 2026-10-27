@@ -3,8 +3,10 @@
 ## Category
 [FEATURE | BUG | IMPROVEMENT | MODULE | PRODUCT]
 
-## Target Slice
-[MVP | V1 | V2 | ...]
+## Scope
+- Pitch ID: [PITCH-XXX | ad-hoc]
+- Scope ID: [SCOPE-XXX] — [scope name]
+- Scope class: [must_have | nice_to_have]
 
 ## Problem Statement
 [One paragraph. What problem does this solve? For whom?]

@@ -523,8 +523,6 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/config/README.md" "$TARGET/.harness/config/README.md" refresh
 
   copy_file "$KIT_DIR/.harness/features/feature.schema.json" "$TARGET/.harness/features/feature.schema.json" refresh
-  copy_file "$KIT_DIR/scripts/harness-migrate.mjs" "$TARGET/scripts/harness-migrate.mjs" refresh
-  copy_file "$KIT_DIR/scripts/migrate-v2-v3.mjs" "$TARGET/scripts/migrate-v2-v3.mjs" refresh
   copy_tree "$KIT_DIR/.harness/scripts/validators" "$TARGET/.harness/scripts/validators" refresh
   copy_file "$KIT_DIR/.harness/config/versions.json" "$TARGET/.harness/config/versions.json" refresh
   copy_file "$KIT_DIR/.harness/config/models.json" "$TARGET/.harness/config/models.json" refresh
@@ -738,6 +736,35 @@ remove_runtime_docs() {
   log "${C_YELLOW}REMOVE${C_RESET} $TARGET/runtimes (runtime recipes remain in asdd-harness-kit)"
   [[ "$DRY_RUN" -eq 1 ]] && return 0
   rm -rf "$TARGET/runtimes"
+}
+
+# Kit files no longer installed into projects. They were kit-owned and refreshed
+# on every install; remove them on upgrade.
+# - Scrum-era product-delivery files (product-delivery is Shape Up only now).
+# - Migration scripts: they stay in the kit and run against a project from its
+#   root, e.g. `node <kit>/scripts/migrate-v2-v3.mjs --write`.
+RETIRED_KIT_PATHS=(
+  scripts/harness-migrate.mjs
+  scripts/migrate-v2-v3.mjs
+  .agents/skills/product-delivery/agents
+  .agents/skills/product-delivery/contracts/discovery.schema.yaml
+  .agents/skills/product-delivery/contracts/delivery-map.schema.yaml
+  .agents/skills/product-delivery/contracts/sprint-plan.schema.yaml
+  .agents/skills/product-delivery/contracts/tech-spec.schema.yaml
+  .agents/skills/product-delivery/contracts/user-story.schema.yaml
+  .agents/skills/product-delivery/references/technical-diagrams.md
+  .agents/skills/user-story-decomposition
+  .agents/skills/capability-prioritization
+)
+
+remove_retired_kit_files() {
+  local rel
+  for rel in "${RETIRED_KIT_PATHS[@]}"; do
+    [[ -e "$TARGET/$rel" ]] || continue
+    log "${C_YELLOW}REMOVE${C_RESET} $TARGET/$rel (retired kit file)"
+    [[ "$DRY_RUN" -eq 1 ]] && continue
+    rm -rf "${TARGET:?}/$rel"
+  done
 }
 
 remove_module_sources() {
@@ -1373,6 +1400,7 @@ main() {
   install_harness_scaffold
   install_project_adapter
   install_agents_core
+  remove_retired_kit_files
   remove_runtime_docs
   remove_module_sources
   install_docs_root

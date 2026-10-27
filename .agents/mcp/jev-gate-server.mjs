@@ -9,7 +9,7 @@
  *   jev_status          — assert JEV_API_KEY usable (skillRequired)
  *   jev_shape_up_gates  — appetite score + rabbit-hole noul
  *   jev_ears_gate       — EARS observability noul
- *   jev_slice_choice    — mvp|v1|v2|backlog choice
+ *   jev_scope_choice    — must_have|nice_to_have|reshape per scope
  *   check_command_safety — pattern allow/deny (no Jev)
  *
  * Protocol: MCP over line-delimited JSON-RPC 2.0 on stdio
@@ -20,7 +20,7 @@ import {
   assertJevConfigured,
   shapeUpGates,
   earsGate,
-  sliceChoice,
+  scopeChoice,
   THRESHOLDS,
 } from '../../.harness/scripts/jev-gates.mjs';
 import { jevHealthCheck } from '../../.harness/scripts/jev-client.mjs';
@@ -80,17 +80,17 @@ const TOOLS = [
     },
   },
   {
-    name: 'jev_slice_choice',
+    name: 'jev_scope_choice',
     description:
-      'Product-delivery slice choice: mvp | v1 | v2 | backlog for a user story.',
+      'Product-delivery scope class within a bet: must_have | nice_to_have | reshape (back to shaping, never a backlog).',
     inputSchema: {
       type: 'object',
       properties: {
-        story: {
-          description: 'User story object or summary string',
+        scope: {
+          description: 'Scope object (id, name, outcome, must-haves) or summary string',
         },
       },
-      required: ['story'],
+      required: ['scope'],
     },
   },
   {
@@ -208,17 +208,17 @@ async function handleToolCall(id, params) {
       return;
     }
 
-    if (name === 'jev_slice_choice') {
+    if (name === 'jev_scope_choice') {
       const blocked = requireSkillJev();
       if (blocked) {
         reply(id, toolResult(blocked, true));
         return;
       }
-      if (args.story === undefined || args.story === null || args.story === '') {
-        reply(id, toolResult({ error: 'arguments.story is required' }, true));
+      if (args.scope === undefined || args.scope === null || args.scope === '') {
+        reply(id, toolResult({ error: 'arguments.scope is required' }, true));
         return;
       }
-      const result = await sliceChoice(args.story);
+      const result = await scopeChoice(args.scope);
       reply(id, toolResult({ ...result, thresholds: THRESHOLDS }, Boolean(result.unavailable || !result.ok)));
       return;
     }

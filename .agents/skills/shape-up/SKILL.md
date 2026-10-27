@@ -72,7 +72,11 @@ What are you working on?
 
   5. Convert or hand off a pitch
      → Preserve the canonical pitch and create the requested derived artifact
-     → Output: shareable pitch, epic, user story, task, discovery intake, or pitch bundle
+     → Output: shareable pitch, scope map, discovery intake, or pitch bundle
+
+  6. Bet a pitch and start building
+     → Record the betting decision; hand a bet pitch to product-delivery
+     → Output: bet pitch, then one ASDD intent per scope
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -82,7 +86,8 @@ What are you working on?
 - If user pastes or describes an existing pitch → Flow 2 (Review)
 - If user uses `--pitch` flag → Flow 3 (Quick Pitch)
 - If user describes a vague idea or problem → Flow 4 (Explore First)
-- If user asks to share, convert, hand off, or create tickets from a pitch → Flow 5 (Convert / Handoff)
+- If user asks to share, convert, split into scopes, or hand off a pitch → Flow 5 (Convert / Handoff)
+- If user asks to build a bet pitch in this repository → Flow 6 (Bet and hand off to `product-delivery`)
 
 **Command-line shortcuts:**
 - `/shape` → Show entry point
@@ -91,7 +96,7 @@ What are you working on?
 - `/spec --pitch` → Start Flow 3 (quick pitch format only)
 - `/shape --established` → Flow 1 with established product mode
 - `/shape --new-product` → Flow 1 with new product mode
-- `/shape --convert <format>` → Flow 5 (`share`, `epic`, `story`, `task`, `discovery`, or `bundle`)
+- `/shape --convert <format>` → Flow 5 (`share`, `scope_map`, `discovery`, or `bundle`)
 
 ---
 
@@ -287,7 +292,7 @@ The 5 ingredients:
 What's next?
 
   • Copy to your pitch doc
-  • Create Linear issue from this pitch
+  • Bring it to the betting table
   • Review and refine further
   • Shape another feature
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -374,11 +379,11 @@ Use this flow only after a canonical pitch exists or after creating one through 
 | User intent | Output mode |
 |---|---|
 | Share with a team or decision maker | `share` |
-| Several independent scopes or outcomes | `epic` |
-| One actor and one coherent outcome | `story` |
-| One concrete action | `task` |
+| Split the pitch into independently finishable scopes | `scope_map` |
 | Send to another discovery workflow | `discovery` |
 | Prepare a complete downstream handoff | `bundle` |
+
+Shape Up has no epics, user stories, story points, sprints, or backlog. Never convert a pitch into those artifacts.
 
 Do not generate every format automatically. Use the smallest format that satisfies the request. If the request is ambiguous, return the canonical pitch and list the available conversion modes.
 
@@ -390,7 +395,7 @@ Do not generate every format automatically. Use the smallest format that satisfi
 4. Carry forward appetite, betting status, problem, desired outcome, boundaries, scopes, risks, and open questions.
 5. Mark derived or unsupported details as `DERIVED`, `PROPOSED`, or `PENDING_DEFINITION`.
 6. Add `source_pitch_id` and `source_scope_id` to every derived artifact.
-7. Preserve the betting state; a converted ticket is not automatically approved work.
+7. Preserve the betting state; a converted artifact is not automatically bet work.
 8. Report unresolved questions and any conversion loss explicitly.
 
 ### Bundle handoff
@@ -420,6 +425,32 @@ Before returning a conversion, verify:
 - the betting state is preserved.
 
 If the conversion changes the problem, outcome, appetite, or boundaries, return `RE-SHAPING_REQUIRED` instead of silently rewriting the pitch.
+
+---
+
+## Flow 6: Bet and Hand Off
+
+Shaping produces options; the betting table decides. Use this flow when a pitch is `ready_for_bet` or has been bet.
+
+### Betting states
+
+| State | Meaning | Next step |
+|---|---|---|
+| `needs_shaping` | Not concrete enough to bet on | Back to Flow 1 or Flow 2 |
+| `ready_for_bet` | Shaped, Jev gates passed, waiting for the betting table | Betting table decides |
+| `bet` | Chosen for the coming cycle (six-week big batch or one-to-two-week small batch) | Hand off to `product-delivery` |
+| `no_bet` | Not chosen this cycle | Let it go; no backlog. Re-pitch later only if it still matters |
+
+### Betting table rules
+
+- Bet one cycle at a time; there is no queue of future work.
+- A bet gives a team the whole cycle on the pitch, uninterrupted.
+- The appetite is a hard boundary: at the end of the cycle the work ships or the circuit breaker cuts it. No automatic extension.
+- After each cycle comes cooldown: fix what the team chooses, explore, and shape the next pitches.
+
+### Handoff
+
+When the pitch is `bet` and the repository has `.harness/`, `Read` `.agents/skills/product-delivery/SKILL.md`. It splits the pitch into scopes, writes one `intent.md` per scope, and hands each intent to the ASDD Discovery agent.
 
 ---
 
@@ -454,18 +485,18 @@ Would you like to:
 
 ---
 
-## Integration with Linear MCP
+## Integration with Trackers
 
-**If Linear MCP is available:**
+**If a tracker MCP (Linear, Jira, GitHub) is available:**
 
-- Offer to create Linear issue from pitch
-- Fetch existing issues for context
-- Check team/project for pitch placement
+- Offer to record the pitch and its betting decision there
+- Map a bet cycle to the tracker's cycle or milestone, and each scope to one issue
+- Fetch existing issues only as evidence for the problem
 
-**If Linear MCP not available:**
+**If no tracker MCP is available:**
 
-- Output pitch as markdown
-- User can copy to their system
+- Output the pitch as markdown
+- User can copy it to their system
 
 ---
 
@@ -476,8 +507,6 @@ Would you like to:
 **`/shape --convert <format>`** → Routes to Flow 5 (Convert / Handoff)
 
 **`/four-risks`** → Complements Step 3 (rabbit hole identification)
-
-**`/now-next-later`** → Betting table output maps to NOW column
 
 ---
 
@@ -499,5 +528,5 @@ Would you like to:
 - [`references/methodology.md`](./references/methodology.md) - Full methodology
 - [`references/techniques.md`](./references/techniques.md) - Breadboarding, fat marker, de-risking
 - [`references/pitch-template.md`](./references/pitch-template.md) - 5 ingredients with examples
-- [`references/conversions.md`](./references/conversions.md) - Share, ticket, discovery, and bundle conversions
+- [`references/conversions.md`](./references/conversions.md) - Share, scope map, discovery, and bundle conversions
 - [Shape Up (free book)](https://basecamp.com/shapeup)

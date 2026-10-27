@@ -1,195 +1,119 @@
-# End-to-End Example
-
-## Scenario
-
-A product team wants users to reset a forgotten password.
-
-This example uses a direct raw idea. In the primary workflow, shape it first and add the delivery map before Product Discovery:
+# End-to-End Example: Pitch → Scopes → Intents → ASDD
 
 ```text
-Pitch → EPIC-001 → US-001, US-002 → TASK-001… → dependency graph → sprint plan
+PITCH-014 (bet, six weeks)
+  → scope map: SCOPE-001 (must_have), SCOPE-002 (nice_to_have ~)
+  → intents: orders-quick-reorder, orders-reorder-edit
+  → @asdd-discovery-agent per intent → ASDD pipeline per slice
 ```
 
-This example uses a direct raw idea. When the source is a Shape Up pitch, add the pitch intake and delivery map before Product Discovery:
+## 1. Bet pitch (from `shape-up`)
 
-```text
-Pitch → EPIC-001 → US-001, US-002 → TASK-001… → dependency graph → sprint plan
+```markdown
+# Pitch: Reorder in one tap
+- Pitch ID: PITCH-014
+- Betting state: bet (cycle 2026-C4)
+- Appetite: six weeks
+
+Problem: Returning customers rebuild the same cart by hand every week; support
+logs show 30% of "where is my old order" tickets are people trying to repeat it.
+
+Solution (breadboard): Orders page → "Reorder" button per past order → cart
+pre-filled → existing checkout. Optional: edit quantities before adding.
+
+Must-haves: reorder a past order into the cart; skip items no longer sold and say so.
+Nice-to-haves (~): edit quantities in a review step before adding to the cart.
+No-gos: no subscriptions or scheduled reorders; no changes to checkout.
+Rabbit holes: price changes since the original order — patched: always use the
+current price and show it in the cart.
 ```
 
----
+`jev_shape_up_gates` passed when the pitch was shaped.
 
-# 1. Product Discovery
+## 2. Scope map
 
-## Problem Statement
+Two parts can be finished and tried separately: reordering works without the edit step, so they are two scopes.
 
-Users who forget their password cannot regain access without support intervention.
+```yaml
+artifact: { type: scope_map, id: SCOPE-MAP-014, version: "1.0", status: validated }
+pitch:
+  id: PITCH-014
+  betting_state: bet
+  cycle: 2026-C4
+  appetite: six weeks
+  problem: Returning customers rebuild the same cart by hand every week.
+  desired_outcome: A customer repeats a past order in one tap.
+  no_gos: [no subscriptions or scheduled reorders, no changes to checkout]
+scopes:
+  - id: SCOPE-001
+    name: Quick reorder
+    outcome: Tapping Reorder on a past order fills the cart with its items at current prices.
+    class: must_have            # jev_scope_choice
+    must_haves:
+      - reorder a past order into the cart
+      - skip items no longer sold and say so
+    rabbit_holes: [price changes since the original order — use current price]
+    depends_on: []
+    slice_id: orders-quick-reorder
+  - id: SCOPE-002
+    name: Reorder edit step
+    outcome: Before adding, the customer can change quantities or drop items.
+    class: nice_to_have         # jev_scope_choice
+    must_haves: [edit quantities before adding to the cart]
+    depends_on: [SCOPE-001]
+    slice_id: orders-reorder-edit
+validation: { all_items_placed: true, unplaced_items: [], cycles: [], fits_appetite: true }
+```
 
-## Target Users
+## 3. Intents
 
-Registered users with an existing account.
+`node .harness/scripts/init-slice.mjs orders-quick-reorder`, then `.harness/specs/orders-quick-reorder/intent.md`:
+
+```markdown
+# Intent: orders-quick-reorder
+
+## Source
+- Pitch ID: PITCH-014
+- Scope ID: SCOPE-001 — Quick reorder
+- Scope map: .harness/specs/orders-quick-reorder/scope-map.yaml
+- Betting state: bet
+- Cycle: 2026-C4
+- Scope class: must_have
+
+## Problem
+Returning customers rebuild the same cart by hand every week.
 
 ## Desired Outcome
+Tapping Reorder on a past order fills the cart with its items at current prices.
 
-A user can securely initiate and complete a password reset flow.
+## Appetite
+Six weeks for the whole pitch (shared with orders-reorder-edit).
 
-## Business Value
+## Must-have outcomes
+- MH-01: When a signed-in customer taps Reorder on a past order, the system shall add every still-sold item of that order to the cart at its current price.
+- MH-02: If an item of the past order is no longer sold, then the system shall leave it out of the cart and tell the customer which item was skipped.
 
-Reduces support dependency and improves account recovery.
+## No-gos
+- No subscriptions or scheduled reorders.
+- No changes to checkout.
 
-## In Scope
+## Rabbit holes
+- Price changes since the original order — always use the current price and show it in the cart.
 
-- Request password reset
-- Receive a recovery mechanism
-- Set a new password
+## Actors
+- Signed-in returning customer: repeats a past order.
 
-## Out of Scope
+## Depends on
+- none
 
-- Changing a password while already authenticated
-- Account deletion
+## Open questions
+- none
+```
 
-## Pending Definitions
+Each must-have passed `jev_ears_gate`. `orders-reorder-edit` gets its own intent the same way, with `Scope class: nice_to_have` and `Depends on: orders-quick-reorder`.
 
-- Recovery mechanism details
-- Password policy
+## 4. Handoff
 
-## Success Criteria
-
-- Eligible users can recover account access.
-- Unauthorized users cannot reset another user's password.
-
----
-
-# 2. HF User Story
-
-## Title
-
-Reset Forgotten Password
-
-## Business Value
-
-Allow users to recover account access without requiring manual support.
-
-## User Story
-
-As a registered user, I want to reset my forgotten password so that I can regain access to my account.
-
-## Description
-
-The user must be able to initiate account recovery and complete the process using an approved recovery mechanism.
-
-## Acceptance Criteria
-
-### AC-01 — Start Password Recovery
-
-Given I have a registered account  
-When I request password recovery  
-Then the system initiates the approved recovery flow.
-
-### AC-02 — Complete Password Reset
-
-Given I have successfully completed the required recovery verification  
-When I provide a valid new password  
-Then my password is updated and I can use it according to the approved authentication flow.
-
-## Out of Scope
-
-- Password changes for authenticated users
-
-## Pending Definitions
-
-- Password policy
-- Recovery token expiration
-- Delivery channel
-
----
-
-# 3. AF Refinement
-
-## Domain Glossary
-
-- Password Recovery: process used to regain account access.
-- Recovery Verification: approved mechanism proving control of the account.
-
-## Backend Contracts
-
-`PENDING_DEFINITION`
-
-No verified endpoint contract was supplied.
-
-## Proposed Tests
-
-- Verify an eligible account can initiate recovery.
-- Verify recovery cannot complete without successful verification.
-- Verify acceptance criteria AC-01 and AC-02.
-
----
-
-# 4. Technical Specification
-
-## Overview
-
-Implement password recovery while preserving existing authentication behavior.
-
-## Source Requirements
-
-- HF User Story: Reset Forgotten Password
-- AC-01
-- AC-02
-
-## Functional Requirements
-
-- Support initiating recovery.
-- Support completing recovery after required verification.
-
-## Pending Decisions
-
-- Recovery transport
-- Token lifecycle
-- Password policy
-
-## Risks
-
-- Account enumeration risk
-- Recovery mechanism abuse
-
-## Testing Strategy
-
-### Unit
-
-Validate password policy once defined.
-
-### Integration
-
-Validate recovery lifecycle once contracts are defined.
-
----
-
-# 5. Sprint Plan
-
-## Sprint Goal
-
-Deliver a validated password recovery workflow once the pending security and contract decisions are approved.
-
-## Included Work
-
-### Password Recovery
-
-**Dependencies:**
-
-- Recovery mechanism definition
-- Password policy definition
-
-**Tasks:**
-
-1. Finalize pending product decisions.
-2. Validate technical contract.
-3. Implement approved recovery workflow.
-4. Add tests derived from AC-01 and AC-02.
-
-## Planning Status
-
-PARTIALLY_READY
-
-## Blockers
-
-- Critical recovery details require definition before implementation planning can be finalized.
+1. `@asdd-discovery-agent` on `orders-quick-reorder` first (no dependencies, must-have).
+2. `@asdd-discovery-agent` on `orders-reorder-edit` after `orders-quick-reorder` passes QA.
+3. If week five arrives and SCOPE-002 is not close to done, hammer it: the cycle ships SCOPE-001 alone. SCOPE-002 does not move to a backlog; if it still matters, it is shaped and pitched again.

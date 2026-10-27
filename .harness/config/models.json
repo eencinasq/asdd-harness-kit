@@ -54,17 +54,17 @@
   },
   "human_driven_stages": {
     "shape_up": {
-      "owner": "Product Owner + Tech Lead + Architect (humans)",
-      "description": "Shape raw ideas into bounded, bettable pitches. Fixed time, variable scope.",
-      "output": "Pitch document with appetite, boundaries, must-haves, nice-to-haves, no-gos",
-      "agent_role": "None — agents do NOT run shape-up during ASDD sessions",
+      "owner": "Shapers (Product + Tech Lead + Architect) and the betting table (humans)",
+      "description": "Shape raw ideas into bounded pitches and bet them for a cycle. Fixed time, variable scope. No backlog.",
+      "output": "Bet pitch with appetite, solution, rabbit holes, no-gos, must-haves, nice-to-haves",
+      "agent_role": "Coaching only; humans decide the bet. ASDD agents do not run shape-up",
       "model": "N/A"
     },
     "product_delivery": {
-      "owner": "Product Owner + Tech Lead (humans)",
-      "description": "Transform betted pitch into delivery artifacts: epic, user stories, tech spec, sprint plan",
-      "output": "Tracker issue (Linear/Jira/GitHub) or manual pitch doc with acceptance criteria and dependencies",
-      "agent_role": "None — agents do NOT re-run product delivery during ASDD sessions",
+      "owner": "Tech Lead with the shapers (humans approve)",
+      "description": "Split a bet pitch into scopes and write one intent.md per scope (one ASDD slice each)",
+      "output": "Scope map and one .harness/specs/<slice-id>/intent.md per scope, handed to the Discovery agent",
+      "agent_role": "An agent may draft the scope map and intents; humans approve before Discovery starts",
       "model": "N/A"
     }
   },

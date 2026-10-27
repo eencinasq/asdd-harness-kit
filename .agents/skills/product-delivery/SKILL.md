@@ -1,213 +1,101 @@
 ---
 name: product-delivery
 description: >-
-  Consumes Shape Up pitch artifacts and transforms them into validated,
-  traceable delivery artifacts across epics, user stories, technical
-  specifications, tasks, relationships, dependencies, and sprint planning.
+  Turns a bet Shape Up pitch into ASDD work. Splits the pitch into as many
+  scopes as it needs, writes one intent.md per scope (one ASDD slice each),
+  and hands every intent to the ASDD Discovery agent to run the pipeline.
+  Use when a pitch has been bet and the team starts building it.
 ---
 
 # Product Delivery Skill
 
-**Version:** 1.2
-**Status:** Production Draft
+**Version:** 2.0
+**Method:** [Shape Up](https://basecamp.com/shapeup) only — no epics, user stories, story points, sprints, velocity, or backlog.
 
 ## Purpose
-Consume a shaped Shape Up proposal and transform it into validated, traceable, implementation-ready delivery artifacts. Shaping and betting remain upstream responsibilities of the `shape-up` workflow.
 
-## Progressive Disclosure & Agents
+Take a pitch the betting table has bet on and make it buildable by the ASDD pipeline:
 
-| Component | Path | Purpose |
-|---|---|---|
-| Product Discovery Agent | [`agents/product-discovery.md`](./agents/product-discovery.md) | Problem framing, user needs, scope, discovery validation gate |
-| User Story Architect Agent | [`agents/user-story-architect.md`](./agents/user-story-architect.md) | Hybrid Human-First (HF) & Agent-First (AF) user stories |
-| Tech Spec Generator Agent | [`agents/tech-spec-generator.md`](./agents/tech-spec-generator.md) | Implementation architecture, contracts, task decomposition |
-| Technical Diagrams Guide | [`references/technical-diagrams.md`](./references/technical-diagrams.md) | Mermaid, C4, use-case, and sequence diagram standards |
-| Sprint Planning Agent | [`agents/sprint-planning.md`](./agents/sprint-planning.md) | Capacity, sequencing, dependency mapping, sprint plan gate |
-| Shape Up Input Guide | [`references/shape-up-input.md`](./references/shape-up-input.md) | Pitch intake, conversion, traceability, relations, and dependencies |
-| ASDD + Harness Handoff | [`references/asdd-harness-handoff.md`](./references/asdd-harness-handoff.md) | Converts ready delivery artifacts into an ASDD slice and Harness execution projection |
-| Discovery Schema | [`contracts/discovery.schema.yaml`](./contracts/discovery.schema.yaml) | Discovery artifact schema contract |
-| User Story Schema | [`contracts/user-story.schema.yaml`](./contracts/user-story.schema.yaml) | HF/AF user story schema contract |
-| Delivery Map Schema | [`contracts/delivery-map.schema.yaml`](./contracts/delivery-map.schema.yaml) | Epic, stories, tasks, relations, and dependency graph |
-| Tech Spec Schema | [`contracts/tech-spec.schema.yaml`](./contracts/tech-spec.schema.yaml) | Tech spec schema contract |
-| Sprint Plan Schema | [`contracts/sprint-plan.schema.yaml`](./contracts/sprint-plan.schema.yaml) | Sprint plan schema contract |
-| End-to-End Example | [`examples/end-to-end-example.md`](./examples/end-to-end-example.md) | Complete artifact pipeline example |
-
-## Canonical Flow
 ```text
-Shape Up Pitch Artifact Bundle
-  ↓
-Pitch Intake and Delivery Map
-  ↓
-Product Discovery / Epic
-  ↓
-Validated Product Requirements and Story Candidates
-  ↓
-Human-First User Story
-  ↓
-Agent-First Refinement
-  ↓
-Technical Specification
-  ↓
-Implementation Tasks and Dependency Graph
-  ↓
-Sprint Plan
-  ↓
-ASDD + Harness Handoff (when implementation is requested)
-  ↓
+Bet pitch
+  ↓  map the scopes (as many as needed)
+Scope map  ── SCOPE-001, SCOPE-002, …
+  ↓  one intent per scope
+.harness/specs/<slice-id>/intent.md   (one ASDD slice per scope)
+  ↓  hand off
 ASDD Discovery → Spec → Validation → Domain → Design → Task Planning
   ↓
 Harness Implementation → QA → Knowledge
 ```
 
-## Core Principles
-- **Ambiguity is a defect:** clarify, label assumptions, or mark `PENDING_DEFINITION`.
-- **Contracts over assumptions:** every stage consumes and produces explicit artifacts.
-- **AI is a pilot, not an authority:** humans retain approval authority.
-- **Evidence before completion:** never fabricate details.
-- **Traceability:** downstream artifacts must link to upstream requirements.
-- **Stable identity:** every epic, story, task, relation, and dependency has an identifier.
-- **Explicit graph:** dependencies control execution order; other relations explain meaning without blocking work.
-- **Required Jev via MCP (this skill + shape-up only):** use the **`jev-gate` MCP**. After EARS drafts: `jev_status` → `jev_ears_gate` `{ requirement }` → `jev_slice_choice` `{ story }`. Ambiguous EARS (`ok=false` / `prob_yes` &lt; 0.85) must be rewritten or recorded with `# jev-override: accept`. `unavailable` / `isError` blocks delivery. Do not call Jev from other skills or harness ASDD. Shell fallback to `.harness/scripts/jev-gates.mjs` only if MCP is down. Overlapping file scopes are enforced by `.harness/scripts/validators/features.mjs`, not a second Jev call.
+Shaping and betting stay upstream in the `shape-up` skill. Requirements, design, and tasks stay downstream in the ASDD agents. This skill owns only the split from pitch to intents and the traceability between them.
 
-## Shape Up pitch input
+## Components
 
-The primary input is a Shape Up pitch artifact bundle. Read [`references/shape-up-input.md`](./references/shape-up-input.md) for the input contract. If the `shape-up` skill is installed, also read its conversion reference at [`../shape-up/references/conversions.md`](../shape-up/references/conversions.md).
+| Component | Path | Purpose |
+|---|---|---|
+| Pitch intake and scope mapping | [`references/shape-up-input.md`](./references/shape-up-input.md) | Entry gate, how to split a pitch into scopes, classification, dependencies |
+| Intent handoff | [`references/asdd-harness-handoff.md`](./references/asdd-harness-handoff.md) | One `intent.md` per scope, slice creation, handoff to the Discovery agent, scope changes during the cycle |
+| Scope map schema | [`contracts/scope-map.schema.yaml`](./contracts/scope-map.schema.yaml) | Pitch, scopes, dependencies, and intent links |
+| End-to-end example | [`examples/end-to-end-example.md`](./examples/end-to-end-example.md) | One pitch split into two scopes and two intents |
 
-The bundle may contain:
+If the `shape-up` skill is installed, its [`references/conversions.md`](../shape-up/references/conversions.md) defines the scope map format this skill fills.
 
-- the canonical pitch;
-- a betting decision;
-- a scope map;
-- rabbit-hole or risk notes;
-- a shareable pitch or approved pitch conversion.
+## Required Jev gates (MCP)
 
-If only a raw idea, user request, or unshaped problem is supplied, stop delivery conversion and route it to `shape-up` first. Do not create an epic or user story from an unshaped input.
+Jev is required for this skill and `shape-up` only. Other skills and the ASDD agents must not call Jev. Use the **`jev-gate` MCP**:
 
-The pitch remains the upstream source artifact. This skill converts it into delivery artifacts without silently changing its meaning:
+1. **`jev_status`** before any other `jev_*` call.
+2. **`jev_scope_choice`** `{ scope }` for each scope: `must_have`, `nice_to_have`, or `reshape`. A `reshape` result removes the scope from this bet and returns it to shaping. It never goes to a backlog.
+3. **`jev_ears_gate`** `{ requirement }` for each must-have outcome written into an intent. Rewrite when `ok=false` (`prob_yes` < 0.85), or record `# jev-override: accept` with a reason.
+
+`unavailable` or `isError` blocks the handoff. Do not fake a pass. Shell fallback (`.harness/scripts/jev-gates.mjs`) only when the MCP server is down.
+
+## Entry gate
+
+Start only when all are true:
+
+- a canonical pitch exists with a stable `pitch_id`;
+- the betting state is `bet`;
+- the pitch has problem, appetite, solution, rabbit holes, and no-gos;
+- `jev_shape_up_gates` passed when the pitch was shaped.
+
+Otherwise stop. A raw idea, request, or unshaped problem goes to `shape-up` first. `needs_shaping`, `ready_for_bet`, and `no_bet` pitches do not enter ASDD.
+
+## Workflow
+
+1. **Intake.** Read the pitch and record `pitch_id`, betting state, appetite, cycle, problem, desired outcome, solution elements, rabbit holes, no-gos, must-haves, and nice-to-haves. Read [`references/shape-up-input.md`](./references/shape-up-input.md).
+2. **Map the scopes.** Split the pitch into as many scopes as it needs: one scope when the pitch is small and coherent, several when it has parts that can be finished and shown independently. Split by working outcome, never by layer (UI / API / database). Every must-have and nice-to-have lands in exactly one scope.
+3. **Classify.** Run `jev_scope_choice` per scope. Keep `must_have` and `nice_to_have (~)` scopes; return `reshape` scopes to shaping.
+4. **Check the map.** No unplaced pitch item, no dependency cycle, every scope has one observable outcome, and the scopes together fit the appetite. If they do not fit, cut nice-to-haves or return `RE-SHAPING_REQUIRED`. Never extend the appetite.
+5. **Write the intents.** One `intent.md` per kept scope, from `.harness/steering/templates/intent.md`. Must-haves are written as observable EARS-style outcomes and pass `jev_ears_gate`. Read [`references/asdd-harness-handoff.md`](./references/asdd-harness-handoff.md).
+6. **Create the slices.** `node .harness/scripts/init-slice.mjs <slice-id>` per intent (lite by default; `--full` only for a scope known upfront to be cross-cutting).
+7. **Hand off.** Hand each intent to `@asdd-discovery-agent`, in dependency order. Independent scopes may run in parallel with separate owners.
+
+## Artifact states
+
+`PITCH_INTAKE → SCOPE_MAP → SCOPE_VALIDATION → INTENTS_WRITTEN → HANDED_OFF`
+
+Critical gaps block a transition. Record blockers as `PENDING_DEFINITION`.
+
+## Traceability
+
+Every intent, requirement, and Harness feature must trace back:
 
 ```text
-pitch → delivery map → discovery → epic → user stories → tasks → sprint plan
+TASK → REQ → intent (slice) → scope → pitch
 ```
 
-The conversion must preserve:
+Fields: `source_pitch_id`, `source_scope_id`, `slice_id`, `req_ids`, `task_id`. If a source ID is missing, write `PENDING_DEFINITION` and stop the affected gate; never invent an ID that looks approved.
 
-- pitch identity and status;
-- appetite as a time boundary, never as a fabricated estimate;
-- must-haves, nice-to-haves, and no-gos;
-- source scopes and rabbit holes;
-- assumptions, open questions, and unresolved decisions;
-- traceability from every derived artifact back to its source.
+## Anti-hallucination rules
 
-When a pitch has multiple independent scopes, create one parent epic and derive stories from those scopes. When a scope has one coherent actor outcome, create one user story. When a scope contains several independent outcomes, split it into related stories under the epic. Create tasks only for concrete discovery, validation, design, or implementation actions.
+Never invent requirements, business rules, architecture, APIs, schemas, UI details, estimates, or approvals. Use:
 
-The pitch status controls delivery readiness:
-
-- `needs_shaping` or `proposed`: create a partial delivery map and report blockers;
-- `ready_for_bet`: prepare delivery artifacts but do not claim commitment;
-- `bet`: allow downstream planning when all delivery gates pass;
-- `no_bet`, `parked`, or `abandoned`: preserve the map for traceability and stop implementation planning.
-
-The conversion output should include a delivery map with:
-
-- one epic or explicit epic container;
-- user stories linked to the epic and source scope;
-- tasks linked to stories or discovery risks;
-- typed relationships;
-- dependency edges and a cycle check;
-- orphan, ambiguous, and blocked items;
-- pending definitions and approval state.
-
-## Global States
-`PITCH_INTAKE → DELIVERY_MAP → DISCOVERY → DISCOVERY_VALIDATION → HF_AUTHORING → HF_VALIDATION → AF_REFINEMENT → TECH_SPEC → TECH_VALIDATION → SPRINT_PLANNING → SPRINT_VALIDATION → READY_FOR_DELIVERY`
-
-When the project has Harness installed and implementation is requested, `READY_FOR_DELIVERY` hands off to the ASDD pipeline. Read [`references/asdd-harness-handoff.md`](./references/asdd-harness-handoff.md) and continue with the project’s ASDD agents. Product Delivery artifacts remain traceability inputs; `.harness/` phase artifacts and the Harness feature tracker own implementation state.
-
-`PITCH_INTAKE` and `DELIVERY_MAP` are the required entry stages for the primary Shape Up workflow. A raw idea must first go through `shape-up`.
-
-Critical gaps block transitions.
-
-## Artifact Metadata
-```yaml
-artifact:
-  type: string
-  id: string
-  version: string
-  status: draft | validated | approved | partially_ready | blocked
-  source_artifacts: []
-  assumptions: []
-  pending_definitions: []
-  risks: []
-  dependencies: []
-  relations: []
-  source_pitch_id: string
-  parent_id: string
-  source_scope_id: string
-```
-
-## Finding Types
-`BLOCKER`, `CRITICAL_RISK`, `RISK`, `AMBIGUITY`, `DEPENDENCY`, `ASSUMPTION`, `PENDING_DEFINITION`, `PROPOSAL`.
-
-## Orchestration Rules
-- Require a Shape Up pitch artifact bundle as the primary input.
-- If no pitch exists: route the request to `shape-up` and stop delivery conversion.
-- Validate the pitch artifact, betting state, appetite, boundaries, source scopes, and risk notes before producing delivery artifacts.
-- Run the Shape Up input conversion before Product Discovery and produce a delivery map.
-- Create the parent epic from the pitched outcome and preserve its appetite and scope boundaries.
-- Derive stories from source scopes, keeping one actor outcome per story; do not create stories without a source scope or explicit proposal.
-- Derive tasks from approved stories, discovery risks, or explicit validation needs; never turn every sentence into a task.
-- Add dependencies only when one item cannot start or finish correctly before another; record other connections as typed relations.
-- Detect dependency cycles, orphan stories, orphan tasks, and stories without acceptance boundaries before Sprint Planning.
-- If the pitch problem or outcome is unclear: run Product Discovery, but preserve the unresolved pitch field and mark the delivery map `PARTIALLY_READY` or `BLOCKED`.
-- If requirements exist but no HF User Story: run User Story Architect in HF mode.
-- If HF exists and technical precision is needed: run AF refinement.
-- If implementation design is needed: run Tech Spec Generator.
-- If implementation-ready work must be scheduled: run Sprint Planning.
-- Do not skip critical stages.
-- Do not force unnecessary stages when a validated artifact already exists.
-- Do not mutate an approved pitch silently. If conversion changes the problem, outcome, appetite, or boundaries, flag `RE-SHAPING_REQUIRED`.
-- When implementation is requested and `.harness/` exists, execute the ASDD + Harness handoff after `READY_FOR_DELIVERY`; do not jump directly from a story or sprint plan to code.
-- Preserve the full traceability chain `TASK → REQ → story → source scope → epic → pitch` in the handoff artifacts and feature tracker.
-- At implementation closure, route scope changes and cycle decisions through the handoff reference and the Shape Up closure rules.
-
-## Anti-Hallucination Rules
-Never fabricate:
-- requirements
-- business rules
-- architecture
-- APIs
-- database schemas
-- UI specifications
-- assets
-- estimates
-- team capacity
-- approvals
-
-Use:
 - `PENDING_DEFINITION`
 - `ASSUMPTION — CONFIRMATION REQUIRED`
 - `PROPOSED — VALIDATION REQUIRED`
-- `INSUFFICIENT_INFORMATION`
 
-## Internal Validation
-Before major output:
-1. Analyze context.
-2. Extract evidence.
-3. Map evidence to the relevant contract.
-4. Detect gaps.
-5. Check traceability.
-6. Validate consistency.
-7. Generate output.
-8. Run the quality gate.
+## Final rule
 
-For the required Shape Up input, also:
-
-9. Validate source-to-artifact traceability.
-10. Validate relation types and dependency direction.
-11. Detect cycles and orphan artifacts.
-12. Confirm that must-have stories are represented and nice-to-have stories are labeled.
-13. Confirm that no implementation planning proceeds from a non-bet state.
-
-Do not expose private chain-of-thought. Provide concise conclusions, assumptions, risks, open questions, and next steps when useful.
-
-## Final Rule
-A downstream agent may increase precision but must not silently change the meaning of an approved upstream requirement. If meaning or scope changes: flag it, identify the source artifact, request validation, and update only after confirmation.
+Downstream agents may add precision but must not silently change the meaning of the pitch. If the problem, outcome, appetite, or no-gos would change: flag `RE-SHAPING_REQUIRED`, name the source artifact, and stop until the shapers decide.

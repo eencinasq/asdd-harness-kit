@@ -2,10 +2,10 @@
 /**
  * Plan or apply migration of legacy per-slice manifests to schema v2.
  *
- * Usage:
- *   node scripts/harness-migrate.mjs                 # dry run
- *   node scripts/harness-migrate.mjs --write         # apply safely
- *   node scripts/harness-migrate.mjs --slice <id> --write
+ * Kit-only: not installed into projects. Run it from the project root:
+ *   node <kit>/scripts/harness-migrate.mjs                 # dry run
+ *   node <kit>/scripts/harness-migrate.mjs --write         # apply safely
+ *   node <kit>/scripts/harness-migrate.mjs --slice <id> --write
  */
 import {
 	existsSync,

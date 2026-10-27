@@ -61,21 +61,21 @@ test('jevChoice POSTs System One with a criteria map and returns the choice', as
   const fetchMock = mock.method(globalThis, 'fetch', async (_url, opts) => {
     const body = JSON.parse(opts.body);
     assert.equal(body.questions.decision.type, 'choice');
-    assert.deepEqual(Object.keys(body.questions.decision.criteria).sort(), ['backlog', 'mvp', 'v1', 'v2']);
+    assert.deepEqual(Object.keys(body.questions.decision.criteria).sort(), ['must_have', 'nice_to_have', 'reshape']);
     return jsonResponse({
-      answers: { decision: { type: 'choice', choice: 'mvp', confidence: 0.37 } }
+      answers: { decision: { type: 'choice', choice: 'must_have', confidence: 0.37 } }
     });
   });
   t.after(() => fetchMock.mock.restore());
 
   const result = await jevChoice(
-    'Which slice?',
-    { story: 'login' },
-    ['mvp', 'v1', 'v2', 'backlog'],
-    'backlog'
+    'Which scope class?',
+    { scope: 'login' },
+    ['must_have', 'nice_to_have', 'reshape'],
+    'reshape'
   );
   assert.equal(result._fallback, false);
-  assert.equal(result.choice, 'mvp');
+  assert.equal(result.choice, 'must_have');
 });
 
 test('API failure is unavailable when Jev is required', async (t) => {
