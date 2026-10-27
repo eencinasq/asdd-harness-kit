@@ -1,218 +1,93 @@
-# Shape Up Input to Delivery Artifacts
+# Pitch Intake and Scope Mapping
 
-This guide defines the primary input contract for `product-delivery`. It consumes a Shape Up pitch artifact bundle and converts it into an epic, user stories, tasks, relationships, dependencies, and a sprint plan.
+This guide defines the input contract for `product-delivery` and how a bet pitch is split into scopes. Each kept scope later becomes one ASDD intent (see [`asdd-harness-handoff.md`](./asdd-harness-handoff.md)).
 
-The pitch is the source of product intent and commitment boundaries. The delivery artifacts add structure and precision; they must not silently change the pitch. This workflow does not shape raw ideas.
+The pitch is the source of product intent and commitment boundaries. The scope map adds structure; it must not silently change the pitch. This workflow does not shape raw ideas.
 
-## Required input bundle
+## Required input
 
-The minimum input is a canonical Shape Up pitch with:
+A canonical Shape Up pitch with:
 
-- a stable pitch identifier or explicit `PENDING_DEFINITION`;
-- a betting status;
-- an appetite;
+- a stable pitch identifier, or an explicit `PENDING_DEFINITION`;
+- betting state `bet` and the cycle it was bet for;
+- an appetite (small batch: one to two weeks; big batch: six weeks);
 - a problem and desired outcome;
-- boundaries, must-haves, nice-to-haves, and no-gos;
-- scopes or an explicit statement that scopes are pending;
-- assumptions, open questions, and rabbit holes.
+- the rough solution (elements, breadboard or fat-marker sketch);
+- must-haves, nice-to-haves, and no-gos;
+- rabbit holes and how the shapers patched them;
+- assumptions and open questions.
 
-Optional companion artifacts include:
+Optional companions: the betting decision, a scope map drafted by the shapers, risk notes, a shareable pitch.
 
-- `betting-decision.md`;
-- `scope-map.md`;
-- risk or rabbit-hole notes;
-- a shareable pitch conversion.
+If the canonical pitch is absent, or its state is not `bet`, send the input to the `shape-up` skill.
 
-If the canonical pitch is absent, send the input to the Shape Up shaping workflow. A raw request is not sufficient input for this skill.
+## Source field mapping
 
-## Required source fields
-
-Read the pitch and preserve these fields:
-
-| Pitch field | Delivery use |
+| Pitch field | Use in the scope map and intents |
 |---|---|
-| Pitch id or title | `source_pitch_id` and artifact provenance |
-| Betting state | Approval and readiness status |
-| Appetite | Time boundary for planning |
-| Problem | Discovery problem statement |
-| Desired outcome | Epic outcome and story value |
-| Rough solution | Proposal context, never a verified requirement |
-| Must-haves | Required stories and acceptance boundaries |
-| Nice-to-haves | Optional stories, lower priority, cuttable |
-| No-gos | Out of scope and negative constraints |
-| Scopes | Epic children and story candidates |
-| Rabbit holes | Discovery or validation tasks and risks |
-| Assumptions/open questions | Pending definitions and blockers |
+| Pitch ID | `source_pitch_id` on the map and every intent |
+| Betting state and cycle | Entry gate; recorded in each intent |
+| Appetite | Shared boundary for all scopes of the bet; never an estimate |
+| Problem | Each intent's problem, narrowed to its scope |
+| Desired outcome | Split into one observable outcome per scope |
+| Rough solution | Context for each scope, never a verified requirement |
+| Must-haves | Assigned to exactly one scope; become the intent's must-have outcomes |
+| Nice-to-haves (~) | Assigned to exactly one scope; cuttable when the appetite tightens |
+| No-gos | Copied to every scope they bound |
+| Rabbit holes | Copied to the scopes they touch, with the shapers' patch |
+| Assumptions / open questions | `PENDING_DEFINITION` in the affected intent |
 
-If a required source field is missing, preserve `PENDING_DEFINITION` rather than filling it from intuition. The resulting delivery map must be `PARTIALLY_READY` or `BLOCKED` until the missing field is resolved.
+If a required field is missing, keep `PENDING_DEFINITION` and mark the scope map `blocked` until it is resolved. Do not fill it from intuition.
 
-## Conversion pipeline
+## What a scope is
 
-```text
-Shape Up pitch artifact bundle
-  ↓
-Pitch intake
-  ↓
-Delivery map
-  ├── Epic
-  ├── User stories
-  ├── Discovery / validation tasks
-  ├── Implementation tasks
-  ├── Relationships
-  └── Dependency graph
-  ↓
-Product discovery and validation
-  ↓
-Technical specification
-  ↓
-Sprint plan
-```
+A scope is a part of the project that can be built, integrated, and finished on its own, so a person can try it working (Shape Up, "Map the Scopes"). Good scopes:
 
-The delivery map is the bridge between the pitch and the downstream artifacts. Create it before detailed story writing. It is required for the primary Shape Up workflow even when the pitch has only one scope, because it preserves source identity and readiness state.
+- have **one observable outcome**;
+- cut **vertically** through every layer they need (UI, API, data), never one layer alone;
+- are named in the **project's language**, so the team can talk about them;
+- are **independent** where possible; a dependency exists only when one scope cannot be finished before another.
 
-## Epic conversion
+## Splitting the pitch
 
-Create one parent epic for the pitched outcome. The epic may be a real epic or an explicit container for a single scope, but it must preserve the pitch relationship. It must include:
+Split as much as the pitch needs, no more:
 
-- `id`, `title`, and `source_pitch_id`;
-- the problem and desired outcome;
-- appetite and current betting state;
-- must-have and nice-to-have scope;
-- source scope identifiers;
-- out-of-scope boundaries;
-- success signals;
-- open questions and risks.
+- **One scope** — the pitch is a small batch, or the whole outcome only works as one piece. The pitch becomes a single intent.
+- **Several scopes** — the pitch has parts that can be finished and shown separately (different places in the breadboard, different actors, or outcomes that work without each other).
 
-Use an explicit `epic` even when it acts as a container for one story if the workflow requires a stable parent for traceability. Mark it `container: true` rather than inventing extra scope.
+Signals that a candidate scope is too big: it has more than one observable outcome; it touches unrelated places in the breadboard; its must-haves serve different actors. Split it.
 
-## User story conversion
+Signals that two scopes should merge: neither can be shown working without the other; they always change the same files; one has no outcome of its own.
 
-Create a user story when one specific actor has one coherent outcome. Each story must link to:
+The building team may discover new scopes during the cycle. A new scope that keeps the problem, outcome, appetite, and no-gos joins the map (and gets its own intent). Anything else is `RE-SHAPING_REQUIRED`.
 
-- its parent epic;
-- one source pitch;
-- one source scope where available;
-- its must-have or nice-to-have classification;
-- its direct dependencies;
-- its acceptance boundary;
-- unresolved definitions.
+## Classifying scopes
 
-Use the HF format for business clarity:
+Run `jev_scope_choice` `{ scope }` for each scope:
 
-```text
-As a <specific actor>,
-I want <observable outcome>,
-so that <value>.
-```
+| Class | Meaning | Action |
+|---|---|---|
+| `must_have` | The bet fails without it | Keep; its intent is built first |
+| `nice_to_have` (~) | Valuable, but cuttable when the appetite tightens (scope hammering) | Keep; mark `~` in the intent |
+| `reshape` | Does not fit this bet | Remove from the map; return to shaping. Never park it in a backlog |
 
-The story may contain proposed acceptance criteria, but unsupported criteria must be marked `PENDING_DEFINITION` or `PROPOSED — VALIDATION REQUIRED`.
+If Jev and the shapers disagree, the shapers decide and record the reason in the scope map.
 
-Do not combine several actors, independent outcomes, or unrelated workflows in one story. Split them and relate them to the same epic when appropriate.
+## Dependencies
 
-## Task conversion
+- Add `depends_on` only when a scope cannot be finished before another one. Ordering preferences are not dependencies.
+- Check for cycles before writing intents. A cycle means the split is wrong: merge or re-split those scopes.
+- Independent scopes may be built in parallel by separate owners with disjoint file scopes.
 
-Create a task for one concrete action. Valid task categories include:
+## Scope map gate
 
-- `discovery` — investigate a product or domain question;
-- `validation` — reduce a rabbit hole or test an assumption;
-- `design` — define a solution boundary or contract;
-- `implementation` — build an approved behavior;
-- `verification` — prove a story or requirement;
-- `release` — perform an approved delivery action.
+Before writing intents, verify:
 
-Every task needs:
+- the pitch is `bet` and its ID is stable;
+- every must-have and nice-to-have is placed in exactly one scope, and no pitch item is dropped;
+- every scope has one observable outcome and a `must_have` or `nice_to_have` class;
+- no dependency cycles;
+- the scopes together fit the appetite (cut `~` items or return `RE-SHAPING_REQUIRED`; never extend the appetite);
+- open questions are `PENDING_DEFINITION`, not guesses.
 
-- `id` and title;
-- source story, scope, or rabbit hole;
-- one owner or `PENDING_DEFINITION`;
-- completion signal;
-- dependencies, when real;
-- status and blockers.
-
-Do not create implementation tasks from rough solution language until discovery and technical validation support them.
-
-## Relationships versus dependencies
-
-Use a typed relation when two artifacts are connected conceptually. Use a dependency only when execution order or correctness requires it.
-
-For relations, `from` is the artifact making the reference and `to` is the referenced artifact. Use `from` as the blocked item and `to` as the prerequisite for dependencies.
-
-### Relation types
-
-| Type | Meaning | Blocks execution? |
-|---|---|---:|
-| `derived_from` | Artifact was created from another artifact | No |
-| `contains` | Parent epic contains story or story contains task | No |
-| `refines` | Artifact adds precision to another | No |
-| `validates` | Work checks an assumption or outcome | Usually no |
-| `duplicates` | Two artifacts overlap and need resolution | No |
-| `relates_to` | Meaningful connection without a stronger type | No |
-| `depends_on` | Target must be ready before source can proceed | Yes |
-| `blocks` | Target cannot proceed until source is resolved | Yes |
-| `conflicts_with` | Both cannot be accepted together without a decision | Decision required |
-
-Store `depends_on` and `blocks` in the dependency graph as directed edges. Store the other relations separately so conceptual relationships do not artificially serialize the plan.
-
-## Dependency rules
-
-1. Dependencies must point from a blocked item to the item it needs.
-2. Every dependency must include a reason.
-3. A dependency must identify the blocking artifact, not a vague team or system.
-4. Detect cycles before Sprint Planning.
-5. Do not use priority as a substitute for dependency.
-6. Do not infer a dependency only because two stories touch the same area.
-7. Mark external or unknown dependencies `PENDING_DEFINITION`.
-8. A nice-to-have must not block a must-have unless the pitch explicitly requires that relationship.
-
-Example:
-
-```yaml
-dependencies:
-  - from: US-002
-    to: US-001
-    reason: "The confirmation flow requires the account enrollment behavior."
-
-relations:
-  - from: US-001
-    to: PITCH-001
-    type: derived_from
-  - from: EPIC-001
-    to: US-001
-    type: contains
-  - from: TASK-003
-    to: RISK-001
-    type: validates
-```
-
-## Priority and appetite
-
-Use the pitch's scope classification:
-
-- must-have stories are required for the pitched outcome;
-- nice-to-have stories are candidates for cutting;
-- out-of-scope items are excluded;
-- unresolved rabbit holes become validation work or blockers.
-
-Do not claim that all stories fit the appetite until scope, dependencies, and capacity are validated. The appetite is a boundary; it is not permission to fabricate estimates. A `bet` status permits downstream planning; it does not bypass validation or capacity checks.
-
-## Delivery map quality gate
-
-Before handing work to technical specification or sprint planning, verify:
-
-- one parent epic or an explicit reason no epic is needed;
-- every story has a source pitch and epic relationship;
-- every story has one actor and one coherent outcome;
-- every task has a source story, scope, or risk;
-- every must-have scope has representation;
-- nice-to-haves are labeled and cuttable;
-- no-gos are not converted into work;
-- relations use a known type;
-- dependencies have direction and reason;
-- no dependency cycle exists;
-- no orphan story or task exists;
-- open questions and blockers remain visible;
-- no approved pitch meaning changed silently.
-- the source pitch is present and its betting state permits the requested downstream action;
-- raw ideas have not been converted directly into delivery artifacts.
-
-If the gate fails, use `PARTIALLY_READY` or `BLOCKED` and list the finding.
+Record the map in [`../contracts/scope-map.schema.yaml`](../contracts/scope-map.schema.yaml) format.

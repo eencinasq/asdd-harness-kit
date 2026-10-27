@@ -136,11 +136,9 @@ function collectArtifacts() {
   // Root kit files
   record('AGENTS.md');
   record('scripts/install-into.sh');
-  record('scripts/harness-migrate.mjs');
   record('scripts/test-install-into.sh');
   record('scripts/test-lifecycle.sh');
   record('scripts/test-full-flow.sh');
-  record('scripts/migrate-v2-v3.mjs');
 
   // Audit + CI examples (copied into .harness/)
   record('.harness/audits/README.md');

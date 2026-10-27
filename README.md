@@ -182,7 +182,7 @@ A guide steers the agent before it edits. A sensor checks the result and, on fai
 | When that task starts | Read `.agents/skills/<name>/SKILL.md`. Do not read `references/` until that body says to | `skills.md` |
 | Before any product edit | Stay inside the files mapped to the active spec. Do not refactor unless the spec, the current task, or the slice phase `refactor` asks for it | `.harness/steering/session-loop.md` |
 | At a full-ASDD phase gate | Apply EARS / coverage criteria in `quality-gates.md`. Lite skips those numeric gates | `.harness/steering/quality-gates.md` |
-| Before Shape Up bet or EARS freeze | `jev-gate` MCP (`jev_shape_up_gates`, `jev_ears_gate`, `jev_slice_choice`) — shape-up / product-delivery only | `.harness/steering/jev.md` |
+| Before a Shape Up bet or writing intents | `jev-gate` MCP (`jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate`) — shape-up / product-delivery only | `.harness/steering/jev.md` |
 | Dangerous bash | `jev-command-gate.mjs` pattern allow/deny (no Jev) — hook-wired on Cursor and Claude Code, both fail-closed; advisory elsewhere | `.harness/scripts/jev-command-gate.mjs` |
 | In-progress diff vs spec | Deterministic scope mapping (`session-loop.md` + `features.mjs`); Jev gold-plating is disabled | `.harness/steering/session-loop.md` |
 | Lite slice governance | Serial rule (one `in_progress`, FAIL) + escalation signals block `DONE` while open (`validators/lite-escalation.mjs`, `sync-state.mjs`) | `.harness/steering/asdd-lite.md` |
@@ -218,115 +218,81 @@ After a module copies a skill into `.agents/skills/`, regenerate the catalog wit
 
 ## Delivery pipeline
 
-An idea becomes verified code through four stages. Each stage consumes and produces explicit artifacts that trace back to the source pitch, so no requirement is lost or changed silently.
+An idea becomes verified code through [Shape Up](https://basecamp.com/shapeup) and ASDD. There are no epics, user stories, story points, sprints, velocity, or backlog: work is a bet pitch, split into scopes, and each scope is one ASDD slice.
 
 ```text
 Idea
-  → 1. Shape Up          pitch, appetite, rabbit holes        (Jev: jev_shape_up_gates)
-  → Bet / No bet / Park / Abandon
-  → 2. Product Delivery  epic, stories, EARS REQs, tech spec  (Jev: jev_ears_gate + jev_slice_choice)
-  → 3. External tracker  optional projection (GitHub, Linear, Jira)
-  → 4. ASDD + Harness    Discovery … Task Planning → Implementation → QA → Knowledge   (no Jev)
-  → Ship / Re-shape / Park / Abandon
+  → 1. Shape Up          pitch: appetite, solution, rabbit holes, no-gos   (Jev: jev_shape_up_gates)
+  → Betting table        bet for a cycle, or let it go (no backlog)
+  → 2. Product Delivery  scope map → one intent.md per scope               (Jev: jev_scope_choice + jev_ears_gate)
+  → 3. ASDD + Harness    per intent: Discovery … Task Planning → Implementation → QA → Knowledge   (no Jev)
+  → End of cycle         ship verified scopes; hammer or cut the rest; cooldown
 ```
 
 | Concern | Shape Up | ASDD | Harness |
 |---|---|---|---|
-| Select work | Pitch and betting decision | Intent and capability context | Slice registry is the execution index |
+| Select work | Pitch and betting decision | One intent per scope | Slice registry is the execution index |
 | Control uncertainty | Appetite, boundaries, rabbit holes | Discovery, Validation, Domain, Design | Blocked state and evidence expose unresolved work |
 | Define the solution | Rough solution and no-gos | Requirements, contracts, design, domain rules | Feature tracker records the executable projection |
-| Control time and scope | Fixed appetite, variable scope | Scope and acceptance boundaries | Tasks, dependencies, `scope_paths`, ownership |
-| Demonstrate completion | Ship or a closure decision | QA and Knowledge artifacts | Verification and evidence required for `passing` |
+| Control time and scope | Fixed appetite, variable scope | Must-have vs nice-to-have (~) outcomes | Tasks, dependencies, `scope_paths`, ownership |
+| Demonstrate completion | Ship, or the circuit breaker | QA and Knowledge artifacts | Verification and evidence required for `passing` |
 
-A pitch is a commitment proposal, an ASDD slice is the specification source of truth, and a Harness feature is the current execution projection.
+A pitch is a commitment, a scope is an independently finishable part of it, an ASDD slice is the specification source of truth for one scope, and a Harness feature is the current execution projection.
 
 ### 1. Shape Up
 
-The `shape-up` skill turns an idea into a pitch. Terms follow Basecamp's [Shape Up](https://basecamp.com/shapeup): appetite, pitches, betting, scopes, hill charts, rabbit holes, cool-down, circuit breakers.
+The `shape-up` skill turns an idea into a pitch. Terms follow Basecamp's [Shape Up](https://basecamp.com/shapeup): appetite, pitches, betting, cycles, scopes, hill charts, rabbit holes, cooldown, circuit breaker.
 
-Before shaping, capture the actor, the problem, the observable outcome, known constraints, available evidence, and open questions. Do not turn an unvalidated idea into a capability or task.
+A pitch contains:
 
-A pitch (`docs/discovery/<name>.md`, plus a `-bundle.md` handoff package) contains:
+1. **Problem** — the specific friction, for whom, with evidence.
+2. **Appetite** — the time the work is worth (small batch: one to two weeks; big batch: six weeks). A boundary, not an estimate.
+3. **Solution** — the main elements, as a breadboard or fat-marker sketch; rough, solved, bounded.
+4. **Rabbit holes** — risks found while shaping, each patched, cut, or flagged.
+5. **No-gos** — what the work explicitly will not do.
 
-1. **Problem and desired outcome** — why it matters, and what changes for a specific actor.
-2. **Appetite** — the time the team is willing to spend. A commitment boundary, not an estimate.
-3. **Rough solution** — the smallest coherent approach; a direction, not the final design.
-4. **Boundaries and no-gos** — what keeps the work from expanding silently.
-5. **Must-haves and nice-to-haves** — scope that can be cut, in that order.
-6. **Rabbit holes** — unknowns that need validation.
-7. **Scopes** — independently buildable and verifiable parts.
-8. **Success signals** — evidence that the outcome was reached.
-9. **Assumptions and open questions** — marked for confirmation.
+Must-haves and nice-to-haves (~) separate what the bet needs from what can be cut.
 
-**Rules that keep a pitch honest:**
+**Betting.** Run `jev_status` then `jev_shape_up_gates` (appetite score ≥ 4, rabbit-hole score ≥ 0.80); `unavailable` stops the bet. The betting table then decides for one cycle:
 
-- *Appetite is not an estimate.* Choose one, two, four, or six weeks to fit the project; six weeks is not mandatory.
-- *Scope is variable inside the boundary.* When work outgrows the appetite, cut in this order: nice-to-haves, then workflow simplification, then split a scope into a later bet. Stop and re-shape when a must-have cannot fit. Security, compliance, safety, data integrity, and quality gates are never optional scope.
-- *Rabbit holes need evidence.* Each becomes a time-boxed spike, a known Design constraint, a blocked item with an owner and unblock condition, or a reason to reject the bet. Never hide one inside an implementation task.
-
-Before betting, confirm: specific problem and actor, observable outcome, explicit appetite, separated must-haves, no-gos that protect the boundary, rabbit holes with a decision path, a coherent but not falsely detailed solution, independently verifiable scopes, visible assumptions, no hard constraint hidden as optional scope, and a bet that can be traced into a slice.
-
-**Betting decision.** Run `jev_status` then `jev_shape_up_gates` (appetite score ≥ 4, rabbit-hole score ≥ 0.80); `unavailable` stops the bet. Then record one decision, with who decided, the date, the appetite, team ownership, and start conditions:
-
-| Decision | Meaning | Next action |
+| State | Meaning | Next action |
 |---|---|---|
-| `bet` | The team commits the appetite and ownership | Create or activate the ASDD slice |
-| `no_bet` | Not selected now | Preserve the decision and reason |
-| `parked` | Valuable but blocked by timing, dependency, or evidence | Record the unblock condition |
-| `abandoned` | Intentionally closed | Preserve the reason and learning |
-| `needs_shaping` | Not concrete enough to decide | Return to shaping |
-
-A pitch alone never moves a slice to implementation: the normal ASDD gates, bindings, domain checks, and quality gates still apply.
+| `needs_shaping` | Not concrete enough to bet on | Return to shaping |
+| `ready_for_bet` | Shaped, gates passed | Betting table decides |
+| `bet` | The team gets the whole cycle for this pitch | Product Delivery splits it into intents |
+| `no_bet` | Not chosen this cycle | Let it go — no backlog; re-pitch later only if it still matters |
 
 ### 2. Product Delivery
 
-The `product-delivery` skill expands a `bet` pitch into delivery artifacts under `docs/discovery/`:
+The `product-delivery` skill splits a `bet` pitch into as many scopes as it needs and writes one intent per scope:
 
 ```text
-Pitch bundle → Delivery map → Discovery → HF stories → AF refinement → Tech spec → Work plan
+Bet pitch → scope map (SCOPE-001 … SCOPE-N) → .harness/specs/<slice-id>/intent.md per scope → @asdd-discovery-agent
 ```
 
-| Artifact | Path | Contents |
-|---|---|---|
-| Delivery map | `<name>-delivery-map.yaml` | Epic, stories, tasks, dependency graph — every item with a stable ID |
-| Product discovery | `<name>-discovery.md` | Problem framing, users, scope, constraints |
-| HF user stories | `<name>-stories.md` | Human-first stories with acceptance criteria |
-| AF refinement | `<name>-af-refinement.md` | Contracts, UI states, test strategy |
-| Tech spec | `<name>-tech-spec.md` | Architecture, contracts, diagrams (state machine, context, sequence, flow, rules), rollout |
-| Work plan | `<name>-work-plan.md` | Phases, execution order, capacity, blockers |
+- A **scope** is a part that can be built, integrated, and shown working on its own, cut vertically through every layer it needs. A small pitch is one scope; a pitch with independent parts is several.
+- `jev_scope_choice` classifies each scope as `must_have`, `nice_to_have` (~), or `reshape` (out of this bet, back to shaping — never a backlog).
+- Each intent carries the pitch and scope IDs, the bet's appetite, must-have outcomes written as EARS-style statements (checked with `jev_ears_gate` ≥ 0.85, or `# jev-override: accept`), nice-to-haves, no-gos, rabbit holes, and dependencies on other scopes.
+- Intents go to `@asdd-discovery-agent` in dependency order; independent scopes can run in parallel.
 
-```yaml
-source_pitch: { id: PITCH-XXX, status: bet, appetite: 4 weeks }
-epic:   { id: EPIC-XXX, source_pitch_id: PITCH-XXX, source_scope_ids: [SCOPE-001] }
-stories:
-  - { id: US-001, actor: …, outcome: …, classification: must_have, acceptance_criteria: [], dependencies: [] }
-tasks:
-  - { id: TASK-001, type: implementation, completion_signal: …, dependencies: [] }
-dependency_graph: { nodes: [], edges: [], cycles: [] }
-```
+Details: [`product-delivery/SKILL.md`](.agents/skills/product-delivery/SKILL.md) and the [handoff reference](.agents/skills/product-delivery/references/asdd-harness-handoff.md). A pitch or scope may also live in a tracker (GitHub Issues, Linear, Jira) through the `external-trackers` skill: a tracker cycle holds the bet, one issue per scope is optional, and the tracker is never the source of truth.
 
-After drafting EARS requirements, run `jev_status` → `jev_ears_gate` (ambiguity score ≥ 0.85, or an explicit `# jev-override: accept`) → `jev_slice_choice` (`mvp`, `v1`, `v2`, or `backlog`) before freezing `REQ-*`. The handoff into ASDD is defined in [`asdd-harness-handoff.md`](.agents/skills/product-delivery/references/asdd-harness-handoff.md); it preserves the chain `TASK → REQ → story → scope → epic → pitch` and never changes the approved pitch silently.
-
-### 3. External tracker (optional)
-
-The `external-trackers` skill mirrors approved stories into GitHub Issues, Linear, or Jira when the team needs an external planning view. The tracker is a projection, never the source of truth: stories become issues (story, acceptance criteria, out of scope, pending definitions, and the source pitch, epic, and scope IDs), tasks become issues or checklist items, dependencies become links. Labels: `story`, `task`, `<capability-slug>`, `must-have`, `nice-to-have`. Overlapping file scopes are caught by Harness `scope_paths`, not by Jev.
-
-### 4. ASDD + Harness
+### 3. ASDD + Harness
 
 | Source | ASDD + Harness destination |
 |---|---|
-| Problem and outcome | `intent.md` and `capability.md` |
+| Problem and outcome (per scope) | `intent.md` and `capability.md` |
 | Actors and domain language | Discovery and Domain artifacts |
-| Must-haves, nice-to-haves, stories | Requirements, acceptance criteria, features in `.features.json` |
-| Rough solution, tech spec | Design input, subject to validation |
+| Must-have outcomes | MUST requirements, features in `.features.json` |
+| Nice-to-haves (~) | SHOULD/COULD requirements, cut first when time runs short |
+| Solution elements | Design input, subject to validation |
 | Rabbit holes | Validation risks, spikes, or explicit blockers |
 | No-gos | Out of scope and non-goals |
-| Scopes, tasks, dependencies, work plan | `tasks.md` waves and execution order |
-| Success signals | Requirements, verification, QA evidence |
+| Scope dependencies | Slice order; `tasks.md` waves inside a slice |
 
-During Discovery, challenge the pitch. If the problem, actor, or outcome changes in a way that affects appetite or scope, re-shape and re-bet.
+Discovery keeps the scope exactly as the intent defines it. An intent with more than one observable outcome goes back to Product Delivery (`SCOPE_SPLIT_REQUIRED`). If the problem, actor, outcome, appetite, or no-gos change, re-shape and re-bet.
 
-**Task Planning** turns approved scopes into tasks and the feature tracker. Every feature needs an observable behavior, a verification command, `scope_paths`, traceability (`req_ids`), and an owner when work runs in parallel. Tasks discovered later are fine inside the approved scope and appetite; a new capability, actor, domain rule, external contract, or material appetite change returns to shaping.
+**Task Planning** turns the approved design into tasks and the feature tracker. Every feature needs an observable behavior, a verification command, `scope_paths`, traceability (`req_ids`), and an owner when work runs in parallel. Tasks discovered later are fine inside the scope and appetite; a newly discovered scope gets its own intent; a new capability, actor, domain rule, external contract, or appetite change returns to shaping.
 
 **Implementation** edits only mapped files. A feature becomes `passing` only with its verification result, `evidence`, `evidence_commit`, and `check-invariants.mjs` exiting 0. Numeric cutoffs live only in `.harness/steering/quality-gates.md`, and the full suite in `quality-gates.project.md` runs before a new spec enters Task Planning.
 
@@ -346,9 +312,9 @@ Open signals are WARNs; completing `qa`/`knowledge` with signals open is a FAIL.
 
 #### Progress and cycle closure
 
-Harness statuses say whether a feature started or passed. Shape Up adds an optional uncertainty view per scope — `unknown → understood → implemented → verified` (a hill chart) — that never replaces feature status or evidence. At any point the coordinator should know which scopes are unknown, which risks are active, which must-haves are done, what can be cut, and whether the rest fits the appetite.
+Harness statuses say whether a feature started or passed. Shape Up adds a hill chart per scope — uphill while unknowns remain, downhill once the approach is settled — that never replaces feature status or evidence. At any point the team should know which scopes are still uphill, which must-haves are done, and what can be cut.
 
-At the end of the appetite, decide explicitly: ship the verified must-haves, cut unfinished nice-to-haves, re-shape and re-bet changed work, park it with a restart condition, or abandon it. Never extend a cycle silently. The Knowledge phase records the outcome, decisions, rejected scope, and reusable learning; cool-down covers QA follow-up, cleanup, and the next betting batch. Optional adapter files: `.harness/specs/<slice>/pitch.md`, `betting-decision.md`, `scope-map.md`.
+At the end of the cycle: ship the verified must-have scopes, cut unfinished nice-to-haves (scope hammering), or let the circuit breaker stop the bet. Never extend a cycle silently. Unfinished work is not carried over; if it still matters it is shaped and pitched again. The Knowledge phase records the outcome, decisions, cut scope, and reusable learning; cooldown covers fixes the team chooses, exploration, and shaping the next pitches.
 
 #### Harness artifacts
 
@@ -366,16 +332,18 @@ At the end of the appetite, decide explicitly: ship the verified must-haves, cut
 
 #### Traceability
 
+```text
+TASK → REQ → intent (slice) → scope → pitch
+```
+
 | Artifact | Traces to |
 |---|---|
-| Pitch | Raw idea |
-| Delivery map, discovery | Pitch |
-| Stories | Delivery map, discovery |
-| AF refinement → tech spec → work plan | Stories, delivery map |
-| Tracker issues | Stories, tasks |
-| Slice manifest | Pitch, issues |
-| Features | Stories, tasks, `REQ-*` |
-| `tasks.md` | Delivery map, work plan |
+| Pitch | Raw idea, betting decision |
+| Scope map | Pitch |
+| `intent.md` (one per scope) | Scope, pitch |
+| `capability.md`, `requirements.md` | Intent |
+| `tasks.md`, features | `REQ-*` |
+| Tracker issues (optional) | Pitch, scope |
 
 ---
 
@@ -386,11 +354,11 @@ TypeSafe **System One** is required **only** by the `shape-up` and `product-deli
 | Where | Calls |
 |---|---|
 | Shape Up | `jev_status`, `jev_shape_up_gates` (appetite ≥ 4, rabbit hole ≥ 0.80) |
-| Product Delivery | `jev_status`, `jev_ears_gate` (≥ 0.85), `jev_slice_choice` |
+| Product Delivery | `jev_status`, `jev_scope_choice` (must_have / nice_to_have / reshape), `jev_ears_gate` (≥ 0.85) |
 | Trackers | None — overlapping `scope_paths` are checked by `validators/features.mjs` |
 | Harness | None — `jev-command-gate.mjs` is a pattern-only command gate; `check-invariants --live` does not need the key |
 
-Prefer the **`jev-gate` MCP server** (`.agents/mcp/jev-gate-server.mjs`): `jev_status`, `jev_shape_up_gates`, `jev_ears_gate`, `jev_slice_choice`, and `check_command_safety` (hooks; pattern only). Shell fallback when MCP is unavailable:
+Prefer the **`jev-gate` MCP server** (`.agents/mcp/jev-gate-server.mjs`): `jev_status`, `jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate`, and `check_command_safety` (hooks; pattern only). Shell fallback when MCP is unavailable:
 
 ```bash
 export JEV_API_KEY="…"                    # or .env / .env.local — never commit it
@@ -401,7 +369,7 @@ node .harness/scripts/jev-gates.mjs health
 | Script | Role |
 |---|---|
 | `jev-client.mjs` | The only HTTP client: `POST {endpoint}/systemone` |
-| `jev-gates.mjs` | Shape Up, EARS, slice, and hill gates (the library behind the MCP server) |
+| `jev-gates.mjs` | Shape Up, scope, EARS, and hill gates (the library behind the MCP server) |
 | `jev-command-gate.mjs` | Pattern command safety and the runtime hook entrypoint |
 
 Config in `.harness/config/project.json` (`apiKey` stays empty; the key comes from the environment):
@@ -532,7 +500,7 @@ Engineers work in separate slices, or in one slice with disjoint `scope_paths`. 
 | Invariants before handoff | `check-invariants.mjs` exits 0; the same failure three times changes the guide or sensor that missed it |
 | Mapped files only | Product edits stay inside the active spec; no unrequested refactors |
 | One numeric gate | Cutoffs live only in `quality-gates.md` |
-| Traceability and stable identity | Every pitch, epic, story, task, and REQ has an ID, and downstream artifacts link upstream |
+| Traceability and stable identity | Every pitch, scope, intent, REQ, and task has an ID, and downstream artifacts link upstream |
 | Unconfigured is not a pass | A missing tool, binding, or key is reported, never counted as success |
 
 ---
@@ -541,7 +509,7 @@ Engineers work in separate slices, or in one slice with disjoint `scope_paths`. 
 
 **Agents** (`.agents/agents/`) — Discovery, Spec, Validation, Domain, Design, Task Planning, Implementation, QA, Knowledge, Refactor, and Lite. Runtime-agnostic markdown.
 
-**Skills** (`.agents/skills/`) — Shape Up, Product Delivery, External Trackers, Capability Discovery, Capability Prioritization, User-Story Decomposition, Domain-Language Extraction, Test-Driven Development, Documentation & ADRs, Open Code Review, Anti-Pattern Detection, Codebase Audit, Business Model Canvas, and Create MCP App. Agents see names and descriptions ([`skills.md`](.harness/steering/skills.md)) and read a skill's body only when the task starts.
+**Skills** (`.agents/skills/`) — Shape Up, Product Delivery, External Trackers, Capability Discovery, Domain-Language Extraction, Test-Driven Development, Documentation & ADRs, Open Code Review, Anti-Pattern Detection, Codebase Audit, Business Model Canvas, and Create MCP App. Agents see names and descriptions ([`skills.md`](.harness/steering/skills.md)) and read a skill's body only when the task starts.
 
 **Steering** (`.harness/steering/`)
 

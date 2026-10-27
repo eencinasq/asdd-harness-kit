@@ -1,44 +1,51 @@
 # Intent: <slice-name>
 
+> One intent = one scope of a bet Shape Up pitch = one ASDD slice. Written by the `product-delivery` skill (or by hand), then handed to `@asdd-discovery-agent`.
+> Work outside a pitch (a cooldown fix, a bug) writes `Source: ad-hoc (cooldown)` and skips the pitch fields.
+
 ## Source
 
-> If this slice originated from a human-driven Shape Up + Product Delivery cycle, fill this section. If it is a raw idea or ad-hoc work, write "Source: ad-hoc" and skip the tracker fields.
-
-- **Tracker type:** `linear` | `jira` | `github` | `manual` | `ad-hoc`
-- **Tracker URL:** [link to issue/epic/pitch document]
 - **Pitch ID:** [PITCH-XXX]
-- **Epic ID:** [EPIC-XXX]
-- **Story IDs:** [US-001, US-002, …]
-- **Assigned by:** [PO / TL name]
-- **Timebox:** [e.g., 2 weeks — appetite from Shape Up]
-- **Betting state:** `bet` | `proposed` | `needs_shaping` | `parked`
+- **Scope ID:** [SCOPE-XXX] — [scope name]
+- **Scope map:** [path or link to the scope map]
+- **Betting state:** `bet`
+- **Cycle:** [cycle the pitch was bet for, e.g. 2026-C4]
+- **Scope class:** `must_have` | `nice_to_have` (~)
+- **Tracker URL:** [optional link to the pitch or scope issue]
 
-**Rule:** Only `bet` state may enter ASDD. If any other state, stop and ask the human.
+**Rule:** Only a `bet` pitch enters ASDD. For any other state, stop and ask the human.
 
 ---
 
 ## Problem
-[One paragraph: what problem does this solve? For whom?]
+[The part of the pitch's problem this scope solves. Who has it, when.]
 
 ## Desired Outcome
-[Observable, measurable result. What changes for the actor?]
+[The one observable result a person can try when this scope is done.]
 
 ## Appetite
-[Time the team is willing to invest — e.g., 2 weeks. Appetite is a boundary, not an estimate.]
+[The bet's appetite, e.g. six weeks for the whole pitch. A boundary, not an estimate. Shared by every scope of the bet.]
 
-## Boundaries and No-Gos
-- **Must-haves:** [Required scope — agent must deliver]
-- **Nice-to-haves:** [Cuttable scope — agent may skip if timebox tightens]
-- **No-gos:** [Explicit scope exclusion — agent must not cross]
+## Must-have outcomes
+> Written as observable EARS-style statements and checked with `jev_ears_gate`. Discovery turns them into capabilities; Spec turns them into EARS requirements.
+
+- **MH-01:** When [trigger], the [actor] shall [observable outcome].
+- **MH-02:** If [condition], then the [actor] shall [observable outcome].
+
+## Nice-to-haves (~)
+- [Cuttable item. Cut first when the appetite tightens (scope hammering).]
+
+## No-gos
+- [Explicit exclusion from the pitch. The agents must not cross it.]
+
+## Rabbit holes
+- [Risk from the pitch that touches this scope, and the shapers' patch.]
 
 ## Actors
-- [Specific actor name]: [what they do]
+- [Specific actor]: [what they do in this scope]
 
-## Open Questions / Risks
-- [Unresolved ambiguity or rabbit hole — flag as PENDING_DEFINITION in spec]
+## Depends on
+- [Other scope / slice that must be finished first, or "none"]
 
-## Acceptance Criteria (from tracker)
-> Copy or reference the acceptance criteria from the tracker issue. Do not paraphrase. If the criteria are missing, flag as PENDING_DEFINITION.
-
-- **AC-01:** [Given … When … Then …]
-- **AC-02:** [Given … When … Then …]
+## Open questions
+- [Unresolved item — PENDING_DEFINITION in the spec]

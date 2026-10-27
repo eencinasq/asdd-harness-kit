@@ -107,7 +107,7 @@ Read the following before producing any output:
 - Parse "Uncertainty Factors" from failing agent.
 - Synthesize evidence and provide to agent for re-execution.
 
-### Mode A: Post-Sprint Analysis
+### Mode A: Cooldown Analysis (after each cycle)
 - Read failure/dissent logs and update `lessons-learned.md`.
 - Generate ADRs for significant architectural decisions.
 

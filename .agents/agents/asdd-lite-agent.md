@@ -59,7 +59,7 @@ Produce `.harness/specs/<slice-id>/spec.md` containing:
 - **Domain placement** — identify the owning domain concepts and layers using the project binding; name the concrete artifacts it specifies (or "none").
 - **Assumptions** — bullet list of assumptions being made.
 
-No capability decomposition, no prioritization matrix, no user-story decomposition.
+No capability decomposition and no scope mapping (one intent is already one scope).
 
 ### Phase 2: Design
 

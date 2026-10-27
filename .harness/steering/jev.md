@@ -26,7 +26,7 @@ Load order: real env → `.env.local` → `.env` (loader: `.harness/scripts/env-
 | Caller | Uses Jev? |
 |--------|-----------|
 | `shape-up` skill | **Required via MCP** — `jev_status` + `jev_shape_up_gates` |
-| `product-delivery` skill | **Required via MCP** — `jev_status` + `jev_ears_gate` + `jev_slice_choice` |
+| `product-delivery` skill | **Required via MCP** — `jev_status` + `jev_scope_choice` + `jev_ears_gate` |
 | Harness invariants / verify-on-stop | No |
 | Command shell gate | No (pattern allow/deny only) |
 | Gold-plating validator | No |
@@ -40,8 +40,8 @@ Prefer MCP over shell. Server: `.agents/mcp/jev-gate-server.mjs` (see `.agents/m
 |------|-------|---------|
 | `jev_status` | both | Confirm key / optional health |
 | `jev_shape_up_gates` | shape-up | Appetite + rabbit-hole |
-| `jev_ears_gate` | product-delivery | EARS observability |
-| `jev_slice_choice` | product-delivery | mvp / v1 / v2 / backlog |
+| `jev_scope_choice` | product-delivery | Scope class in a bet: must_have / nice_to_have / reshape (never a backlog) |
+| `jev_ears_gate` | product-delivery | Must-have outcome in an intent is observable (EARS) |
 | `check_command_safety` | hooks | Pattern allow/deny (no System One) |
 
 ## Modules (library behind MCP)
@@ -49,7 +49,7 @@ Prefer MCP over shell. Server: `.agents/mcp/jev-gate-server.mjs` (see `.agents/m
 | Call | Module |
 |------|--------|
 | `jevScore` / `jevNoul` / `jevChoice` | `.harness/scripts/jev-client.mjs` → `POST /v1/systemone` |
-| Shape Up, EARS, slice, hill | `.harness/scripts/jev-gates.mjs` |
+| Shape Up, scope, EARS, hill | `.harness/scripts/jev-gates.mjs` |
 | Overlapping file scopes | `.harness/scripts/validators/features.mjs` (deterministic, no Jev) |
 
 ```bash

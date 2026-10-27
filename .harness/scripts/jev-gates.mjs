@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Required Jev gates for Shape Up → Product Delivery → Harness execution.
+ * Required Jev gates for Shape Up (pitch, bet, scopes) → Product Delivery (intents) → ASDD.
  * Collision with overlapping scopes is enforced by features.mjs (deterministic).
  *
  *   node .harness/scripts/jev-gates.mjs health
@@ -81,12 +81,16 @@ export async function earsGate(requirement) {
   return { ok: result.prob_yes >= THRESHOLDS.ears, result };
 }
 
-export async function sliceChoice(story) {
+// Shape Up scope classification inside a bet. 'reshape' sends the scope back
+// to shaping (never a backlog); it is also the default when Jev cannot decide.
+export const SCOPE_CLASSES = ['must_have', 'nice_to_have', 'reshape'];
+
+export async function scopeChoice(scope) {
   const result = await jevChoice(
-    'Which slice should this user story belong to?',
-    { story },
-    ['mvp', 'v1', 'v2', 'backlog'],
-    'backlog'
+    'Within this bet, is this scope a must-have, a cuttable nice-to-have, or outside the bet (reshape)?',
+    { scope },
+    SCOPE_CLASSES,
+    'reshape'
   );
   if (result._unavailable) return gateFail(result);
   return { ok: Boolean(result.choice), result };

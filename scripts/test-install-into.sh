@@ -13,6 +13,11 @@ echo '# my product' >"$TMP/existing-app/README.md"
 # Pretend project already has a filled binding that must be kept
 mkdir -p "$TMP/existing-app/.harness/steering"
 echo '# KEEP ME' >"$TMP/existing-app/.harness/steering/product.md"
+# Simulate an upgrade from a kit that still shipped Scrum-era files
+mkdir -p "$TMP/existing-app/.agents/skills/product-delivery/agents" "$TMP/existing-app/.agents/skills/user-story-decomposition"
+echo '# Sprint Planning Agent' >"$TMP/existing-app/.agents/skills/product-delivery/agents/sprint-planning.md"
+echo '---' >"$TMP/existing-app/.agents/skills/user-story-decomposition/SKILL.md"
+mkdir -p "$TMP/existing-app/scripts" && echo '// old kit copy' >"$TMP/existing-app/scripts/migrate-v2-v3.mjs"
 
 echo "== help contains new flags =="
 "$ROOT/scripts/install-into.sh" --help | grep -q -- '--interactive'
@@ -41,8 +46,12 @@ test -f "$TMP/existing-app/.agents/skills/shape-up/references/methodology.md"
 test -f "$TMP/existing-app/.agents/skills/shape-up/references/conversions.md"
 test -f "$TMP/existing-app/.agents/skills/product-delivery/references/shape-up-input.md"
 test -f "$TMP/existing-app/.agents/skills/product-delivery/references/asdd-harness-handoff.md"
-test -f "$TMP/existing-app/.agents/skills/product-delivery/references/technical-diagrams.md"
-test -f "$TMP/existing-app/.agents/skills/product-delivery/contracts/delivery-map.schema.yaml"
+test -f "$TMP/existing-app/.agents/skills/product-delivery/contracts/scope-map.schema.yaml"
+test -f "$TMP/existing-app/.agents/skills/product-delivery/examples/end-to-end-example.md"
+# Retired Scrum-era kit files are removed on upgrade
+test ! -e "$TMP/existing-app/.agents/skills/product-delivery/agents"
+test ! -e "$TMP/existing-app/.agents/skills/user-story-decomposition"
+test ! -e "$TMP/existing-app/.agents/skills/capability-prioritization"
 
 # project.json derives name from directory
 grep -q '"project_id": "existing-app"' "$TMP/existing-app/.harness/config/project.json"
@@ -105,7 +114,16 @@ grep -q '^name: product-delivery$' "$TMP/existing-app/.agents/skills/product-del
 grep -q 'references/conversions.md' "$TMP/existing-app/.agents/skills/product-delivery/SKILL.md"
 grep -q 'bundle_type: shape_up_pitch_bundle' "$TMP/existing-app/.agents/skills/shape-up/references/conversions.md"
 grep -q 'source_pitch_id:' "$TMP/existing-app/.agents/skills/shape-up/references/conversions.md"
-grep -q 'pitch_bundle' "$TMP/existing-app/.agents/skills/product-delivery/contracts/delivery-map.schema.yaml"
+grep -q 'const: scope_map' "$TMP/existing-app/.agents/skills/product-delivery/contracts/scope-map.schema.yaml"
+grep -q 'jev_scope_choice' "$TMP/existing-app/.agents/skills/product-delivery/SKILL.md"
+if rg -n 'sprint-plan|user-story|Sprint Plan|EPIC-[0-9]|US-[0-9]|jev_slice_choice' \
+  "$TMP/existing-app/.agents/skills/shape-up" \
+  "$TMP/existing-app/.agents/skills/product-delivery" \
+  "$TMP/existing-app/.agents/skills/external-trackers" \
+  "$TMP/existing-app/.harness/steering/templates/intent.md"; then
+  echo "Scrum artifact found in the Shape Up workflow" >&2
+  exit 1
+fi
 
 if rg -n 'shape-up-pitch|ai-product-delivery' \
   "$TMP/existing-app/.agents/skills/shape-up" \
@@ -136,7 +154,8 @@ grep -q '"failClosed": true' "$TMP/existing-app/.cursor/hooks.json"
 (cd "$TMP/existing-app" && echo '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"rm -rf /tmp/anything"}}' | env -u JEV_API_KEY node .harness/scripts/jev-command-gate.mjs) | grep -q '"permissionDecision": *"deny"'
 test -f "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 test -f "$TMP/existing-app/.harness/config/project.schema.json"
-test -f "$TMP/existing-app/scripts/harness-migrate.mjs"
+test ! -e "$TMP/existing-app/scripts/harness-migrate.mjs"
+test ! -e "$TMP/existing-app/scripts/migrate-v2-v3.mjs"
 # Pipeline, Jev, and drift docs were merged into the kit README (linked by URL)
 test ! -e "$TMP/existing-app/docs/pipeline-documentation.md"
 test ! -e "$TMP/existing-app/docs/jev-integration.md"

@@ -2,9 +2,9 @@
 /**
  * migrate-v2-v3.mjs — migrate from editable manifest model (v2.0) to append-only sessions (v3.0).
  *
- * Usage:
- *   node scripts/migrate-v2-v3.mjs --dry-run
- *   node scripts/migrate-v2-v3.mjs --write
+ * Kit-only: not installed into projects. Run it from the project root:
+ *   node <kit>/scripts/migrate-v2-v3.mjs --dry-run
+ *   node <kit>/scripts/migrate-v2-v3.mjs --write
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
@@ -15,7 +15,7 @@ const dryRun = process.argv.includes('--dry-run');
 const writeMode = process.argv.includes('--write');
 
 if (!dryRun && !writeMode) {
-  console.error('Usage: node scripts/migrate-v2-v3.mjs --dry-run | --write');
+  console.error('Usage (from the project root): node <kit>/scripts/migrate-v2-v3.mjs --dry-run | --write');
   process.exit(1);
 }
 
@@ -32,6 +32,43 @@ function log(action, path) {
 function writeJson(p, data) {
   mkdirSync(join(p, '..'), { recursive: true });
   writeFileSync(p, `${JSON.stringify(data, null, 2)}\n`);
+}
+
+// A v3 stub generated from empty sessions reads "discovery / in_progress" and
+// hides the real state, which only the global v2 row still holds. Seed
+// sessions from that row so sync-state regenerates the true phase and status.
+function seedFromGlobalRow(sliceId, row, stub, sessionsDir) {
+  const at = stub.updated_at || stub.created_at || new Date().toISOString();
+  const base = { schema_version: '1.0', agent: 'human', human: 'squad', slice_id: sliceId, concerns: [] };
+  const sessions = [
+    { ...base, session_id: `sess-${sliceId}-001`, timestamp: stub.created_at || at, event_type: 'phase_started', phase: 'discovery', evidence: 'Slice initialized (seeded from global manifest row)' },
+  ];
+  const done = row.status === 'DONE';
+  if (done || row.phase !== 'discovery') {
+    sessions.push({
+      ...base,
+      session_id: `sess-${sliceId}-002`,
+      timestamp: at,
+      event_type: done ? 'phase_completed' : 'phase_started',
+      phase: done ? 'knowledge' : row.phase,
+      evidence: `Seeded from global manifest row: phase ${row.phase}, status ${row.status}`,
+    });
+  }
+  if (row.status === 'PARKED' || row.status === 'ABANDONED') {
+    console.warn(`WARN  ${sliceId}: status ${row.status} is not derived by sync-state; set it by hand after migration`);
+  }
+  log('CREATE', sessionsDir);
+  if (!dryRun) mkdirSync(sessionsDir, { recursive: true });
+  sessions.forEach((s, i) => {
+    const filePath = join(sessionsDir, `${String(i + 1).padStart(3, '0')}-migrate.json`);
+    log('WRITE', filePath);
+    if (!dryRun) writeJson(filePath, s);
+  });
+  if (!dryRun) {
+    const result = spawnSync(process.execPath, ['.harness/scripts/sync-state.mjs', '--slice', sliceId], { cwd: root, encoding: 'utf8' });
+    if (result.status !== 0) console.error(`FAIL  sync-state for ${sliceId}:`, result.stderr);
+    else console.log(`SYNC  ${sliceId} → v3.0 manifest regenerated from seeded sessions`);
+  }
 }
 
 function migrateSlice(sliceId, sliceEntry) {
@@ -51,7 +88,12 @@ function migrateSlice(sliceId, sliceEntry) {
   }
 
   if (v2Manifest.schema_version === '3.0') {
-    console.log(`SKIP  ${sliceId}: already v3.0`);
+    const hasSessions = existsSync(sessionsDir) && readdirSync(sessionsDir).some((n) => n.endsWith('.json'));
+    if (hasSessions || !sliceEntry?.phase) {
+      console.log(`SKIP  ${sliceId}: already v3.0`);
+      return;
+    }
+    seedFromGlobalRow(sliceId, sliceEntry, v2Manifest, sessionsDir);
     return;
   }
 

@@ -26,7 +26,7 @@ Ordered most-structural to most-semantic:
 | 2 | **Behavior surfaces** | Route/endpoint registrars, controllers, message/event handlers, CLI command tables, cron/queue/job consumers, UI route trees. Each coherent surface ≈ a capability (or a sub-capability of one). |
 | 3 | **Persistence entities** | Schema files: `schema.prisma`, `schema.graphql`, `migrations/`, `drizzle/`, ORM model dirs, SQL DDL. Entity clusters (tables that change together) bound capabilities. |
 | 4 | **Tests** | `*.test.*`/`spec`/`e2e` trees and describe-blocks — test names already describe behaviors = features under capabilities. |
-| 5 | **Docs & trackers** | README/ARCHITECTURE/docs dirs, `docs/architecture`, `docs/discovery`, external tracker backlogs (Linear/Jira/GitHub Issues) via the `external-trackers` skill. |
+| 5 | **Docs & trackers** | README/ARCHITECTURE/docs dirs, `docs/architecture`, `docs/discovery`, past pitches and scope issues in external trackers (Linear/Jira/GitHub Issues) via the `external-trackers` skill. |
 | 6 | **Codegraph** | `codegraph_context` / `codegraph_explore` for module graph, top entry points, cluster shapes. Structural questions → codegraph, not grep loops. |
 | 7 | **Knowledge index** | `knowledge_search` — is a capability already specced/imported? Prevents re-discovery. (`knowledge_status` first; if absent, `node .harness/scripts/sync-knowledge.mjs`.) |
 

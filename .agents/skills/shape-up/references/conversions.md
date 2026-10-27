@@ -9,13 +9,13 @@ The canonical pitch remains the source artifact. Every conversion is derived, ke
 | Mode | Use when | Primary output |
 |---|---|---|
 | `share` | A team or decision maker needs a concise version | Shareable pitch |
-| `epic` | The pitch contains several independent scopes or outcomes | Epic with scope index |
-| `story` | One actor has one coherent outcome | User story |
-| `task` | One concrete action is needed | Task |
+| `scope_map` | The pitch must be split into independently finishable scopes | Scope map |
 | `discovery` | Another workflow must investigate the problem | Discovery intake |
 | `bundle` | A downstream workflow needs the full source context | Portable pitch bundle |
 
 Choose one mode unless the caller explicitly requests several. If no mode is requested, return the canonical pitch only.
+
+Shape Up has no epics, user stories, story points, sprints, or backlog. Work is a bet pitch, split into scopes; the building team owns the tasks inside each scope. To turn a bet pitch into ASDD slices (one `intent.md` per scope), use the `product-delivery` skill.
 
 ## Common provenance contract
 
@@ -24,7 +24,7 @@ Every derived artifact must include:
 ```yaml
 source_pitch_id: PITCH-001
 source_scope_id: SCOPE-001
-derived_artifact_id: STORY-001
+derived_artifact_id: SCOPE-MAP-001
 derived_from: PITCH-001
 betting_state: ready_for_bet
 derivation_status: DERIVED
@@ -49,7 +49,7 @@ Use this when the user wants a concise version for a team, product review, or de
 
 ## Source
 - Pitch ID: <PITCH-001>
-- Status: <proposed state>
+- Status: <betting state>
 - Appetite: <time boundary>
 
 ## The problem
@@ -73,114 +73,47 @@ Use this when the user wants a concise version for a team, product review, or de
 - <risk and de-risking action>
 
 ## Decision needed
-<bet / needs_shaping / no_bet / parked / abandoned>
+<bet / needs_shaping / no_bet>
 ```
 
-## Epic
+## Scope map
 
-Use an epic when the pitch represents one meaningful outcome with multiple independent scopes, actors, or workflows.
+A scope is a slice of the project that can be built, integrated, and finished on its own — a piece the team can show working (Shape Up, chapter "Map the Scopes"). Split the pitch into as many scopes as it needs: one for a small, coherent pitch; several when the pitch has independent parts. Do not split by layer (UI, API, database); each scope cuts through every layer it touches.
 
 ```markdown
-# Epic: <outcome>
+# Scope map: <pitch title>
 
 ## Provenance
-- Epic ID: <EPIC-001>
 - Source pitch: <PITCH-001>
 - Betting state: <state>
-- Appetite: <time boundary>
+- Appetite: <time boundary for the whole bet>
 
-## Problem and desired outcome
-<Condensed pitch context.>
-
-## Boundaries
-- Must-haves: <items>
-- Nice-to-haves: <items>
-- No-gos: <items>
-
-## Child stories or scopes
-| ID | Type | Title | Source scope | Classification |
+## Scopes
+| Scope ID | Name | Outcome (what works when it is done) | Class | Depends on |
 |---|---|---|---|---|
-| <STORY-001> | story | <title> | <SCOPE-001> | must_have |
+| SCOPE-001 | <short name> | <observable result> | must_have | — |
+| SCOPE-002 | <short name> | <observable result> | nice_to_have (~) | SCOPE-001 |
 
-## Relations and dependencies
-- <artifact> `derived_from` <source artifact>
-- <artifact> `depends_on` <prerequisite> — <reason>
+## Per scope
+### SCOPE-001 — <name>
+- Must-haves: <items from the pitch that live in this scope>
+- Nice-to-haves (~): <cuttable items>
+- No-gos: <pitch no-gos that bound this scope>
+- Rabbit holes: <risks from the pitch that touch this scope>
+- Open questions: <PENDING_DEFINITION items>
 
-## Open decisions
-- <question>
+## Unscoped pitch items
+- <item the map could not place — resolve before handoff or return RE-SHAPING_REQUIRED>
 ```
 
-Create child stories only for independently valuable outcomes or scopes. Do not create a story merely to populate the epic.
+Rules:
 
-## User story
-
-Use a user story for one specific actor and one observable outcome.
-
-```markdown
-# User story: <short title>
-
-## Provenance
-- Story ID: <STORY-001>
-- Source pitch: <PITCH-001>
-- Source scope: <SCOPE-001>
-- Parent epic: <EPIC-001>
-- Classification: must_have | nice_to_have | proposed
-
-## Story
-As a <specific actor>,
-I want <observable outcome>,
-so that <value>.
-
-## Acceptance boundary
-- <observable behavior>
-- <observable behavior>
-
-## Relations
-- derived_from: <source scope>
-- relates_to: <story or task>
-
-## Dependencies
-- depends_on: <artifact> — <reason>
-
-## Out of scope
-- <explicit exclusion>
-
-## Pending definitions
-- <question>
-```
-
-Do not invent acceptance details that the pitch does not support. Mark them `PENDING_DEFINITION` or leave them for the receiving discovery workflow.
-
-## Task
-
-Use a task for one concrete action that supports shaping, validation, design, implementation, verification, or release.
-
-```markdown
-# Task: <verb-led action>
-
-## Provenance
-- Task ID: <TASK-001>
-- Source pitch: <PITCH-001>
-- Source story or scope: <STORY-001 or SCOPE-001>
-- Type: discovery | validation | design | implementation | verification | release
-
-## Action
-<One concrete action.>
-
-## Purpose
-<Risk, scope, or outcome supported by the action.>
-
-## Completion signal
-<Observable result or artifact.>
-
-## Dependencies
-- depends_on: <artifact> — <reason>
-
-## Open questions
-- <question>
-```
-
-A task must not hide a new capability or material scope change. If it does, return to shaping.
+1. Every must-have and nice-to-have in the pitch lands in exactly one scope; nothing is dropped silently.
+2. Each scope has one observable outcome a person can try when the scope is done.
+3. `Class` is `must_have` or `nice_to_have`. Anything that does not fit the bet goes back to shaping (`reshape`); it is never parked in a backlog.
+4. Add `depends_on` only when a scope cannot be finished before another one; prefer independent scopes.
+5. The sum of all scopes fits the bet's appetite. If it does not, cut nice-to-haves or return `RE-SHAPING_REQUIRED`; never extend the appetite.
+6. The building team may discover new scopes while working. A new scope that preserves the problem, outcome, appetite, and no-gos joins the map; anything else returns to shaping.
 
 ## Discovery intake
 
@@ -247,8 +180,8 @@ When a conversion is created, append it to `conversions`:
 
 ```yaml
 conversions:
-  - id: EPIC-001
-    type: epic
+  - id: SCOPE-MAP-001
+    type: scope_map
     source_pitch_id: PITCH-001
     source_scope_ids: [SCOPE-001, SCOPE-002]
     status: derived

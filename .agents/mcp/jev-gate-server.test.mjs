@@ -81,8 +81,8 @@ test('tools/list exposes skill gates and command safety', async (t) => {
   assert.deepEqual(names, [
     'check_command_safety',
     'jev_ears_gate',
+    'jev_scope_choice',
     'jev_shape_up_gates',
-    'jev_slice_choice',
     'jev_status',
   ]);
 });

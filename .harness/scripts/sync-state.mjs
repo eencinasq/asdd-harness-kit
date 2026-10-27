@@ -235,9 +235,11 @@ function deriveSource(sessions) {
         tracker_type: s.source.tracker_type || null,
         tracker_url: s.source.tracker_url || null,
         pitch_id: s.source.pitch_id || null,
-        epic_id: s.source.epic_id || null,
+        scope_id: s.source.scope_id || null,
+        cycle: s.source.cycle || null,
         assigned_by: s.source.assigned_by || null,
-        timebox_weeks: s.source.timebox_weeks || null,
+        // timebox_weeks: older session files
+        appetite_weeks: s.source.appetite_weeks || s.source.timebox_weeks || null,
       };
     }
   }
