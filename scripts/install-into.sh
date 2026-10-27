@@ -864,6 +864,7 @@ wire_runtime_cursor() {
   if [[ -L "$TARGET/.cursor/skills" || ! -e "$TARGET/.cursor/skills" ]]; then
     rm -f "$TARGET/.cursor/skills" 2>/dev/null || true
     ln -sfn ../.agents/skills "$TARGET/.cursor/skills"
+    record_managed "$TARGET/.cursor/skills"
     log "${C_BLUE}LINK${C_RESET}  $TARGET/.cursor/skills → ../.agents/skills"
   else
     log "${C_DIM}KEEP${C_RESET}  $TARGET/.cursor/skills"
@@ -878,6 +879,7 @@ wire_runtime_cursor() {
   done
   if [[ ! -e "$TARGET/.cursor/mcp.json" ]]; then
     ln -sfn ../.agents/mcp/mcp.json "$TARGET/.cursor/mcp.json"
+    record_managed "$TARGET/.cursor/mcp.json"
     log "${C_BLUE}LINK${C_RESET}  $TARGET/.cursor/mcp.json"
   else
     log "${C_DIM}KEEP${C_RESET}  $TARGET/.cursor/mcp.json"
@@ -902,6 +904,7 @@ install_cursor_verify_hook() {
     return 0
   fi
   mkdir -p "$TARGET/.cursor"
+  record_managed "$dest"
   if [[ ! -e "$dest" ]]; then
     cp "$KIT_DIR/.cursor/hooks.json" "$dest"
     log "${C_BLUE}COPY${C_RESET}  $dest"
@@ -955,6 +958,7 @@ install_claude_hooks() {
     return 0
   fi
   mkdir -p "$TARGET/.claude"
+  record_managed "$dest"
   node --input-type=module - "$dest" <<'EOF'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
@@ -997,6 +1001,7 @@ wire_runtime_claude() {
   if [[ -L "$TARGET/.claude/skills" || ! -e "$TARGET/.claude/skills" ]]; then
     rm -f "$TARGET/.claude/skills" 2>/dev/null || true
     ln -sfn ../.agents/skills "$TARGET/.claude/skills"
+    record_managed "$TARGET/.claude/skills"
     log "${C_BLUE}LINK${C_RESET}  $TARGET/.claude/skills"
   else
     log "${C_DIM}KEEP${C_RESET}  $TARGET/.claude/skills"
@@ -1011,14 +1016,19 @@ wire_runtime_claude() {
   done
   if [[ ! -e "$TARGET/.mcp.json" ]]; then
     ln -sfn .agents/mcp/mcp.json "$TARGET/.mcp.json"
+    record_managed "$TARGET/.mcp.json"
     log "${C_BLUE}LINK${C_RESET}  $TARGET/.mcp.json"
   else
     log "${C_DIM}KEEP${C_RESET}  $TARGET/.mcp.json"
   fi
+  local claude_md='Follow [`AGENTS.md`](AGENTS.md) (ASDD + Harness INIT, locks, SoT under `.harness/`).'
   if [[ ! -e "$TARGET/CLAUDE.md" ]]; then
-    printf '%s\n' 'Follow [`AGENTS.md`](AGENTS.md) (ASDD + Harness INIT, locks, SoT under `.harness/`).' >"$TARGET/CLAUDE.md"
+    printf '%s\n' "$claude_md" >"$TARGET/CLAUDE.md"
+    record_managed "$TARGET/CLAUDE.md"
     log "${C_BLUE}COPY${C_RESET}  $TARGET/CLAUDE.md"
   else
+    # Still the kit's one-liner: kit-owned. Anything else is the project's own.
+    [[ "$(cat "$TARGET/CLAUDE.md")" == "$claude_md" ]] && record_managed "$TARGET/CLAUDE.md"
     log "${C_DIM}KEEP${C_RESET}  $TARGET/CLAUDE.md"
   fi
   remove_runtime_models "$TARGET/.claude"
@@ -1050,6 +1060,7 @@ link_runtime_skills() {
   if [[ -L "$path" || ! -e "$path" ]]; then
     rm -f "$path" 2>/dev/null || true
     ln -sfn ../.agents/skills "$path"
+    record_managed "$path"
     log "${C_BLUE}LINK${C_RESET}  $path"
   else
     log "${C_DIM}KEEP${C_RESET}  $path"
@@ -1063,6 +1074,7 @@ link_runtime_mcp() {
     rm -f "$target_path" 2>/dev/null || true
     mkdir -p "$(dirname "$target_path")"
     ln -sfn "$source_path" "$target_path"
+    record_managed "$target_path"
     log "${C_BLUE}LINK${C_RESET}  $target_path"
   else
     log "${C_DIM}KEEP${C_RESET}  $target_path"
@@ -1076,6 +1088,7 @@ link_runtime_dir() {
     rm -f "$target_path" 2>/dev/null || true
     mkdir -p "$(dirname "$target_path")"
     ln -sfn "$source_path" "$target_path"
+    record_managed "$target_path"
     log "${C_BLUE}LINK${C_RESET}  $target_path"
   else
     log "${C_DIM}KEEP${C_RESET}  $target_path"
