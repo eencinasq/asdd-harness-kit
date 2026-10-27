@@ -1320,7 +1320,7 @@ print_summary() {
   if [[ -n "$RUNTIMES" && "$RUNTIMES" != "none" ]]; then
     log ""
     log "${C_DIM}Runtime-specific notes:${C_RESET}"
-    log "  Model configs copied to each runtime directory."
+    log "  Agents use model: inherit (they run on the invoking session's model)."
     log "  Review .harness/config/models.json for tier rationale."
     if [[ "$RUNTIMES" == *cursor* ]]; then
       log "  Cursor:  verify-on-stop + jev-command-gate hooks active in .cursor/hooks.json"

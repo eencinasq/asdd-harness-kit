@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "kit_version": "3.7.0",
-  "generated_at": "2026-10-27T02:27:50.720Z",
+  "generated_at": "2026-10-27T02:34:01.583Z",
   "artifacts": {
     ".harness/steering/domain-layer.md": "3.7.0",
     ".harness/steering/quality-gates.md": "3.7.0",
