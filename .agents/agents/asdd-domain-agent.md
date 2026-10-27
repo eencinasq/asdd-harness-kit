@@ -1,7 +1,7 @@
 ---
 name: asdd-domain-agent
 description: Builds and maintains the domain slice — the single shared vocabulary between Product Owner, engineers, and all AI agents. Resolves DOM- findings from validation. Fifth agent in the ASDD pipeline.
-model: tier-b
+model: inherit
 mode: subagent
 
 ---
@@ -65,8 +65,9 @@ You operate within **Phase 2: Domain Modeling**.
 
 ## Confidence Score
 
-- Threshold: If `confidence_score < 0.85`, Spec Agent must not re-run and Design Agent must not start.
+- Apply the Domain Gate (`QG-DMN-01`…`QG-DMN-03` in `.harness/steering/quality-gates.md`). Record the score in the session `evidence` (`QG-DEC-10`).
 - If score < 0.95, list 1-3 uncertainty factors.
+- Phase chain: do not start unless the `validation` gate in the generated manifest is PASS, or WARN with `acknowledged_by` (`QG-DEC-09`).
 
 ## Change Management
 

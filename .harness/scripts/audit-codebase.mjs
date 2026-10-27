@@ -13,7 +13,7 @@
  *
  * Never edits product code. TL dismissals in .harness/audits/triage.json are suppressed
  * while the files they point to are unchanged. The inferential pass is the codebase-audit skill.
- * Design: docs/architecture/spec-drift-and-audit.md
+ * Design: https://github.com/eencinasq/asdd-harness-kit#spec-drift-and-codebase-audit
  */
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';

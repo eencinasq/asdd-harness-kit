@@ -55,16 +55,20 @@ function readSessions(sliceDir) {
 
 export { readSessions };
 
-function derivePhase(sessions) {
+// Ordered pipeline. 'refactor' is optional and handled in derivePhase.
+export const PHASES = ['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'knowledge'];
+
+export function derivePhase(sessions) {
   const phaseEvents = sessions.filter((s) =>
     s.event_type === 'phase_started' || s.event_type === 'phase_completed'
   );
   if (phaseEvents.length === 0) return 'discovery';
   const latest = phaseEvents[phaseEvents.length - 1];
   if (latest.event_type === 'phase_completed') {
-    const phases = ['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'knowledge'];
-    const idx = phases.indexOf(latest.phase);
-    return idx >= 0 && idx + 1 < phases.length ? phases[idx + 1] : latest.phase;
+    // Refactor is optional (post-QA or Self-Healing PR); it hands off to knowledge.
+    if (latest.phase === 'refactor') return 'knowledge';
+    const idx = PHASES.indexOf(latest.phase);
+    return idx >= 0 && idx + 1 < PHASES.length ? PHASES[idx + 1] : latest.phase;
   }
   return latest.phase;
 }
@@ -167,12 +171,14 @@ function deriveActiveFeatures(sessions) {
   return Array.from(features.values());
 }
 
-function deriveGates(sessions) {
+export function deriveGates(sessions) {
   const gates = {};
   for (const s of sessions) {
     if (s.event_type === 'phase_completed') {
+      // QG-GATE-02: completing with concerns is WARN; it needs a TL override (QG-GATE-04).
+      const hasConcerns = Array.isArray(s.concerns) && s.concerns.length > 0;
       gates[s.phase] = {
-        status: 'PASS',
+        status: hasConcerns ? 'WARN' : 'PASS',
         by: s.human || s.agent,
         at: s.timestamp,
         evidence: s.evidence || null,
@@ -187,6 +193,9 @@ function deriveGates(sessions) {
         evidence: s.evidence || null,
         concerns: s.concerns || [],
       };
+    }
+    if (s.event_type === 'override' && s.phase && s.human && gates[s.phase]) {
+      gates[s.phase].acknowledged_by = s.human;
     }
     if (s.event_type === 'dissent' && s.phase) {
       const existing = gates[s.phase] || { status: 'WARN' };
@@ -235,6 +244,27 @@ function deriveSource(sessions) {
   return null;
 }
 
+// Conventional slice paths (when present on disk), then the existing manifest,
+// then sessions carrying `features_path` (Task Planning). Latest wins.
+export function derivePaths(sessions, existingPaths, sliceId) {
+  const paths = {};
+  if (sliceId) {
+    const conventional = {
+      specs: `.harness/specs/${sliceId}`,
+      tasks: `.harness/specs/${sliceId}/tasks.md`,
+      features: `.harness/features/${sliceId}.features.json`,
+    };
+    for (const [key, rel] of Object.entries(conventional)) {
+      if (existsSync(join(root, rel))) paths[key] = rel;
+    }
+  }
+  Object.assign(paths, existingPaths || {});
+  for (const s of sessions) {
+    if (typeof s.features_path === 'string' && s.features_path) paths.features = s.features_path;
+  }
+  return paths;
+}
+
 function deriveOpenDissents(sessions) {
   const dissents = sessions.filter((s) => s.event_type === 'dissent');
   const overrides = sessions.filter((s) => s.event_type === 'override');
@@ -267,7 +297,7 @@ function generateSliceManifest(sliceId, sessions) {
     escalated_from_lite: escalatedFromLite,
     created_at: existing.created_at || new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    paths: existing.paths || {},
+    paths: derivePaths(sessions, existing.paths, sliceId),
     gates: deriveGates(sessions),
     active_features: deriveActiveFeatures(sessions),
     open_dissents: deriveOpenDissents(sessions),

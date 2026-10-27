@@ -6,7 +6,7 @@ inclusion: always
 
 **SoT** for line-base rules. Agents **Read** files here directly.
 
-Portability: [docs/asdd-harness-portability.md](../../docs/asdd-harness-portability.md) · Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit)
+Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-harness-kit#adopter-checklist) · Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit)
 
 ## Layers
 
@@ -22,7 +22,7 @@ Portability: [docs/asdd-harness-portability.md](../../docs/asdd-harness-portabil
 | File | Contents |
 |------|----------|
 | `domain-layer.md` | Domain placement contract |
-| `quality-gates.md` | Coverage / readiness (Lite skips CCS) |
+| `quality-gates.md` | Phase gates, phase chain, coverage / readiness (Lite skips the numeric gates) |
 | `jev.md` | Jev skill-scoped to shape-up / product-delivery |
 | `manifest.md` | Manifest schema v3 (generated from sessions) |
 | `session-loop.md` | Features + evidence (no v2 locks) |

@@ -1,6 +1,6 @@
 # Audits
 
-Output of the codebase auditor. Design: [`docs/architecture/spec-drift-and-audit.md`](../../docs/architecture/spec-drift-and-audit.md) section 2.
+Output of the codebase auditor. Design: [README → Codebase auditor](https://github.com/eencinasq/asdd-harness-kit#codebase-auditor).
 
 | File | Written by | Content |
 |------|-----------|---------|

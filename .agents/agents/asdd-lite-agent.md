@@ -1,7 +1,7 @@
 ---
 name: asdd-lite-agent
 description: Lightweight ASDD agent for small features and bugs. Combines Spec → Design → Tasks → Implementation → QA-Lite into a single-agent flow. Use when work touches ≤3 files, introduces ≤1 new domain concept, and does not cross architectural boundaries.
-model: tier-c
+model: inherit
 mode: subagent
 ---
 
@@ -14,7 +14,7 @@ The portable runtime contract is defined in `.agents/agents/_runtime-template.md
 
 Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts.
 
-- When you start Shape Up or EARS: `Read` `.agents/skills/shape-up/SKILL.md` or `.agents/skills/product-delivery/SKILL.md` and run `.harness/scripts/jev-gates.mjs`
+- When you start Shape Up or EARS: `Read` `.agents/skills/shape-up/SKILL.md` or `.agents/skills/product-delivery/SKILL.md`. That skill runs its own Jev gates through the `jev-gate` MCP; do not call Jev outside it.
 - When you start a UI task, and the folder exists: `Read` `.agents/skills/frontend-ui-engineering/SKILL.md`
 - When you start an HTTP or API change, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
 - When you start live browser verification, and the folder exists: `Read` `.agents/skills/browser-testing-with-devtools/SKILL.md`
@@ -71,7 +71,7 @@ Produce `.harness/specs/<slice-id>/design.md` containing:
 - **ADRs** — 1-2 ADRs *only if* an architectural decision is being made. Otherwise skip.
 - **Risks** — bullet list of risks and mitigations.
 
-No confidence chain, no CCS, no formal gate thresholds.
+No confidence scores, no formal gate thresholds.
 
 ### Phase 3: Tasks
 
@@ -122,6 +122,5 @@ Note: the harness already detects scope spread, domain growth, dissent, and impl
 - [ ] All tasks have passing tests with evidence in `.features.json`.
 - [ ] Full test suite green (no regressions).
 - [ ] Manifest synced with `sync-state.mjs` (never hand-edited): `status: "DONE"`, and no open `escalation_signals` (escalate first if present).
-- [ ] Global registry row synced.
 - [ ] `PROGRESS.md` slice row updated.
 - [ ] `node .harness/scripts/check-invariants.mjs --live` exits 0.

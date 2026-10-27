@@ -31,6 +31,13 @@ function unquote(value) {
   return value;
 }
 
+function parseName(text) {
+  const endFm = text.indexOf('\n---\n', 4);
+  if (!text.startsWith('---\n') || endFm < 0) return '';
+  const line = text.slice(4, endFm).split('\n').find((l) => l.startsWith('name:'));
+  return line ? unquote(line.slice('name:'.length).trim()) : '';
+}
+
 function parseDescription(text) {
   if (!text.startsWith('---\n')) fail('skill file missing frontmatter');
   const endFm = text.indexOf('\n---\n', 4);
@@ -64,7 +71,10 @@ function catalog() {
     .map((entry) => entry.name)
     .sort();
   return folders.map((folder) => {
-    const description = parseDescription(readFileSync(join(skillsDir, folder, 'SKILL.md'), 'utf8'));
+    const text = readFileSync(join(skillsDir, folder, 'SKILL.md'), 'utf8');
+    const name = parseName(text);
+    if (name !== folder) fail(`${folder}: SKILL.md name "${name}" must match its folder name`);
+    const description = parseDescription(text);
     if (!description) fail(`${folder}: SKILL.md description is empty`);
     if (description.includes('\n')) fail(`${folder}: description must be a single line in the index`);
     return { folder, description };

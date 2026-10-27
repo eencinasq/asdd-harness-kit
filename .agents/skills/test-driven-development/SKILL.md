@@ -33,7 +33,7 @@ Discover **this repository’s** test commands and conventions before the first 
 
 **When NOT to use:** Pure configuration changes, documentation updates, or static content changes that have no behavioral impact.
 
-**Related:** For browser-based changes, combine TDD with runtime verification — **Read** `.cursor/skills/browser-testing-with-devtools/SKILL.md` when that skill exists.
+**Related:** For browser-based changes, combine TDD with runtime verification — **Read** `.agents/skills/browser-testing-with-devtools/SKILL.md` when that skill exists.
 
 ## Discover the Stack First
 

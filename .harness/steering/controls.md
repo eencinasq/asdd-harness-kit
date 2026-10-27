@@ -31,12 +31,12 @@ Practice behind this layout: [Harness engineering for coding agent users](https:
 
 Fast sensors run before the session ends. The pipeline repeats the invariants check. The full suite stays at the Task Planning gate because it is the more expensive behaviour sensor.
 
-ASDD-Lite skips CCS and the numeric gates (`QG-DEC-07`, [asdd-lite.md](./asdd-lite.md)). It still uses feature evidence, invariants, and session close. Jev is not used in ASDD-Lite (skill-scoped to shape-up / product-delivery only).
+ASDD-Lite skips the confidence scores and the numeric phase gates (`QG-DEC-07`, [asdd-lite.md](./asdd-lite.md)). It still uses feature evidence, invariants, and session close. Jev is not used in ASDD-Lite (skill-scoped to shape-up / product-delivery only).
 
 ## Precedence
 
 1. **Edits.** [session-loop.md](./session-loop.md) gold-plating decides which files may change.
-2. **Numbers.** [quality-gates.md](./quality-gates.md) is the only cutoff. An agent prompt shall not invent a second CCS or coverage threshold.
+2. **Numbers.** [quality-gates.md](./quality-gates.md) is the only cutoff. An agent prompt shall not invent a second confidence or coverage threshold, and shall not combine confidence scores across phases (`QG-DEC-10`).
 3. **Skills.** [skills.md](./skills.md) decides when a skill body is read.
 4. **Done.** A feature is `passing` only after its `verification` evidence is recorded and the left sensors for this session exit 0. A green narrative is not evidence.
 5. **Repeat.** When the same failure has three log entries, change the guide or sensor that missed it ([QG-DEB-06](./quality-gates.md)). Do not only patch the product code.

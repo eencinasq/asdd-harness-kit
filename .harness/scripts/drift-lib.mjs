@@ -3,7 +3,7 @@
  * check-spec-drift.mjs, audit-codebase.mjs, and the spec-drift-auditor MCP server.
  *
  * Pure reads: harness files, git (via spawnSync), test files. Never writes.
- * Design: docs/architecture/spec-drift-and-audit.md
+ * Design: https://github.com/eencinasq/asdd-harness-kit#spec-drift-and-codebase-audit
  */
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';

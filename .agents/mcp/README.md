@@ -24,7 +24,7 @@ The `spec-drift-auditor` MCP server (`.agents/mcp/spec-drift-auditor.mjs`) is th
 }
 ```
 
-Design: [`docs/architecture/spec-drift-and-audit.md`](../../docs/architecture/spec-drift-and-audit.md). The installer adds this server to an existing `mcp.json` without changing other entries.
+Design: [README → spec drift and audit](https://github.com/eencinasq/asdd-harness-kit#spec-drift-and-codebase-audit). The installer adds this server to an existing `mcp.json` without changing other entries.
 
 Servers with `"enabled": false` are skipped by `sync-runtime-mcp.cjs` projections.
 

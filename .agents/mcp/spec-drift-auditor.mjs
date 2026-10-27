@@ -7,7 +7,7 @@
  * lives in .harness/scripts (drift-lib.mjs, audit-lib.mjs) so Verify-on-Stop,
  * CI, and chat run the same logic. Read-only: this server never writes files.
  *
- * Design: docs/architecture/spec-drift-and-audit.md
+ * Design: https://github.com/eencinasq/asdd-harness-kit#spec-drift-and-codebase-audit
  * Protocol: MCP over line-delimited JSON-RPC 2.0 on stdio
  *   (initialize, ping, tools/*, resources/*, prompts/*).
  * MCP App: when the host declares io.modelcontextprotocol/ui, audit_diff,
