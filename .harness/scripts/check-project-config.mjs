@@ -52,9 +52,7 @@ if (config) {
 		'specs',
 		'state',
 		'features',
-		'progress',
 		'progress_index',
-		'locks',
 	];
 	for (const key of requiredPaths) {
 		requireString(config.paths, key, `${configPath}.paths`);

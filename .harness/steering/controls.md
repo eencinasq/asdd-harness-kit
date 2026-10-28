@@ -49,4 +49,4 @@ Leave a clean state before handoff:
 1. `node .harness/scripts/check-invariants.mjs` exits 0.
 2. No feature is `passing` without `evidence`.
 3. The diff contains only files mapped to the active spec, plus the harness records [session-loop.md](./session-loop.md) allows.
-4. The `PROGRESS.md` row matches the per-slice manifest.
+4. `sync-state.mjs` has run after the last session, so the manifest, registry, and `PROGRESS.md` are current.

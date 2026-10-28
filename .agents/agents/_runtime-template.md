@@ -24,7 +24,7 @@ This file is the **same ASDD role as** the corresponding `.agents/agents/asdd-*-
    - At the end of every significant action (phase complete, feature start, dissent, override), **write a session file** to `.harness/state/slices/<slice-id>/sessions/`. Session files are append-only — never edit an existing session.
    - After writing sessions, run `node .harness/scripts/sync-state.mjs --slice <slice-id>` to regenerate the manifest and registry.
    - For implementation, also update features per `.harness/steering/session-loop.md`.
-   - Gates are PASS / WARN / BLOCK per phase (`quality-gates.md`). Check the preceding phase gate before starting (`QG-DEC-09`). Confidence scores stay per phase in session `evidence`; never combine them across phases (`QG-DEC-10`). No lock files.
+   - Gates are PASS / WARN / BLOCK per phase (`quality-gates.md`). Check the preceding phase gate before starting (`QG-DEC-09`). Confidence scores stay per phase in session `evidence`; never combine them across phases (`QG-DEC-10`).
 7. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via the runtime's subagent tool.
 8. **Parallel work:** Use the runtime's subagent tool for context-fresh sub-agents / waves (e.g. Cursor and Claude Code `Task`, Kiro `invokeSubAgent`).
 9. **Model:** Each agent frontmatter declares `model: inherit` — the agent runs on the model of the runtime session (parent agent) that invokes it. `.harness/config/models.json` records each agent's tier (`tier-s` … `tier-c`) as guidance for choosing that session model; it binds no model. To run an agent on a different tier permanently, log a Dissent Notice in the slice session.

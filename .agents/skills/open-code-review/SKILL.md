@@ -52,7 +52,7 @@ Do **not** skip OCR solely because no OCR LLM is configured. Run Delegation Mode
 
 1. Tell the human to install the CLI (or use Team Marketplace + CLI).
 2. Do **not** fabricate findings.
-3. Record skipped in `PROGRESS.md` / feature notes / `code-review-report.md`.
+3. Record skipped in feature notes / `code-review-report.md`.
 4. Still run normal `verification` (tests).
 
 ## When to use
@@ -110,7 +110,7 @@ Write/update `.harness/specs/<slice_id>/code-review-report.md` (and optional `oc
 ### 5. Harness / QA gates
 
 - Unresolved CRITICAL/HIGH → do not set feature `passing` (leave `in_progress`/`blocked`) or flag in QA report / handoff to Refactor.
-- Medium → WARN in evidence / PROGRESS.
+- Medium → WARN in evidence.
 - Spec coverage gate still follows `quality-gates.md` (OCR does not replace MUST coverage).
 - List this skill in the agent’s final message when used or explicitly skipped (CLI missing only).
 

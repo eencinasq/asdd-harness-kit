@@ -66,7 +66,7 @@ Read enough evidence to avoid asking questions that the repository already answe
 
 1. **Request context:** current request, `intent.md`, acceptance criteria, constraints, risks, and pending definitions.
 2. **ASDD context:** global manifest, per-slice manifest, current phase, requirements, validation report, domain model, prior design, tasks, and the next phase gate.
-3. **Harness context:** `.harness/PROGRESS.md`, progress record, lock, features file, owners, dependencies, verification evidence, and project steering.
+3. **Harness context:** `.harness/state/registry.json`, the slice manifest and sessions, features file, owners, dependencies, verification evidence, and project steering.
 4. **Current implementation:** affected code paths, domain boundaries, APIs, UI behavior, persistence, integrations, tests, and recent verification. Use `codegraph_explore` before grep or broad file reading for symbol, flow, and impact questions.
 
 For a new capability, report when no relevant implementation exists. For a change or defect, the current implementation review is mandatory.
@@ -123,7 +123,7 @@ After the user answers, restate the refined decision and confirm any material as
 | Domain model | `docs/architecture/domain-model.md` | Optional |
 | Validation report | `.harness/specs/[spec-name]/spec-validation-report.md` | Optional |
 | Current implementation | Repository code, tests, interfaces, and verification records | Required for changes, defects, and resumed work |
-| Harness execution state | `.harness/PROGRESS.md`, progress, locks, features, and manifests | Required for resumed or implementation-related work |
+| Harness execution state | Registry, slice manifest, sessions, and features | Required for resumed or implementation-related work |
 
 
 ## Output: capability.md

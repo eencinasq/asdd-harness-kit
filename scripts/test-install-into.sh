@@ -93,6 +93,10 @@ test -f "$TMP/existing-app/.agents/skills/codebase-audit/SKILL.md"
 (cd "$TMP/existing-app" && node .harness/scripts/learn.mjs >/dev/null)
 test -f "$TMP/existing-app/.harness/state/learning/patterns.json"
 test -f "$TMP/existing-app/.harness/steering/templates/steering-proposal.md"
+# No lock or progress scaffolding (kit-hygiene REQ-012, AC-008)
+test ! -e "$TMP/existing-app/.harness/state/locks"
+test ! -e "$TMP/existing-app/.harness/progress"
+node -e 'const p = require(process.argv[1]).paths; if ("locks" in p || "progress" in p) throw new Error("project.json declares paths.locks or paths.progress");' "$TMP/existing-app/.harness/config/project.json"
 # Shipped guidance (kit-hygiene REQ-002, REQ-007, REQ-010) is checked where it lands: the installed project
 node "$ROOT/scripts/check-guidance.mjs" --only stale "$TMP/existing-app"
 node "$ROOT/scripts/check-guidance.mjs" --only cutoffs "$TMP/existing-app"

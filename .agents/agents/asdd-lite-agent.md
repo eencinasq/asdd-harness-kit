@@ -99,7 +99,7 @@ After all tasks pass:
 - **QA-Light** — run the full test suite; verify no regressions.
 - **Domain boundaries** — run the required boundary checks from the project's domain placement binding (a failing check means the feature is not passing).
 - **Defect review** — run `ocr` on the diff if available (per `.agents/skills/open-code-review/SKILL.md`).
-- **Update state** — per-slice manifest, global index, `PROGRESS.md`, progress file.
+- **Update state** — write a session file and run `sync-state.mjs` (manifest, registry, and `PROGRESS.md` are generated).
 - **Handoff** — summary with verification results and next steps.
 
 ## Escalation
@@ -122,5 +122,4 @@ Note: the harness already detects scope spread, domain growth, dissent, and impl
 - [ ] All tasks have passing tests with evidence in `.features.json`.
 - [ ] Full test suite green (no regressions).
 - [ ] Manifest synced with `sync-state.mjs` (never hand-edited): `status: "DONE"`, and no open `escalation_signals` (escalate first if present).
-- [ ] `PROGRESS.md` slice row updated.
 - [ ] `node .harness/scripts/check-invariants.mjs --live` exits 0.

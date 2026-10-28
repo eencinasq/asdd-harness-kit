@@ -14,12 +14,12 @@ Closes the gap between **ASDD phases** (manifest + specs) and **coding sessions*
 | [`.harness/state/slices/<id>/manifest.json`](../state/slices/) | `sync-state.mjs` (generated) | Per-slice phase machine — never hand-edited |
 | [`.harness/state/slices/<id>/sessions/*.json`](../state/slices/) | Agent / human (append-only) | Session log — write once, never modify |
 | [`.harness/features/<slice_id>.features.json`](../features/) | Task Planning (create) · Implementation/QA (status+evidence) | Feature tracker |
-| [`.harness/PROGRESS.md`](../PROGRESS.md) | Humans / generated | **Index only** — active slices table; never append session records here |
+| [`.harness/PROGRESS.md`](../PROGRESS.md) | `sync-state.mjs` (generated) | Active slices table for humans — rewritten on every sync, never edited |
 | [`AGENTS.md`](../../AGENTS.md) | Humans | INIT + definition of done |
 
-## No locks (v3.0)
+## Concurrent work
 
-The v2 lock protocol (`state/locks/<slice>.lock`) has been removed. Concurrent work is safe because:
+Concurrent work is safe because:
 
 1. **Session logs are append-only** — each writer creates a new file, never modifies an existing one.
 2. **Manifests are generated** — `sync-state.mjs` computes the single source of truth from all session files.

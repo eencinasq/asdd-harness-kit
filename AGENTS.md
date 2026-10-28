@@ -32,7 +32,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 | `.harness/state/slices/<id>/manifest.json` | **Generated** per-slice phase machine |
 | `.harness/state/slices/<id>/sessions/*.json` | Append-only session logs (one writer per file) |
 | `.harness/features/` | Session feature tracker |
-| `.harness/PROGRESS.md` | Active slices index (human-curated or generated) |
+| `.harness/PROGRESS.md` | **Generated** active slices table for humans (`sync-state.mjs`) |
 | `.harness/knowledge/` | **Generated** knowledge index (graph + chunks via `sync-knowledge.mjs`; `knowledge` MCP server queries it) |
 
 ## Working rules

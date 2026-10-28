@@ -23,7 +23,7 @@
     "bindings_complete": { "type": "boolean" },
     "paths": {
       "type": "object",
-      "required": ["steering", "specs", "state", "features", "progress", "progress_index", "locks"],
+      "required": ["steering", "specs", "state", "features", "progress_index"],
       "additionalProperties": { "type": "string", "minLength": 1 }
     },
     "bindings": {

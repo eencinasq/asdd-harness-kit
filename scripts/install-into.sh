@@ -532,10 +532,9 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/config/models.json" "$TARGET/.harness/config/models.json" refresh
   copy_file "$KIT_DIR/scripts/templates/PROGRESS.md" "$TARGET/.harness/PROGRESS.md" create
   copy_file "$KIT_DIR/scripts/templates/manifest.json" "$TARGET/.harness/state/manifest.json" create
-  copy_file "$KIT_DIR/.harness/state/locks/README.md" "$TARGET/.harness/state/locks/README.md" create
 
   local d
-  for d in specs features progress state/slices state/archive; do
+  for d in specs features state/slices state/archive; do
     if [[ "$DRY_RUN" -eq 1 ]]; then
       log "${C_DIM}DIR${C_RESET}   $TARGET/.harness/$d"
       continue
@@ -629,9 +628,7 @@ EOF
     "specs": ".harness/specs",
     "state": ".harness/state",
     "features": ".harness/features",
-    "progress": ".harness/progress",
-    "progress_index": ".harness/PROGRESS.md",
-    "locks": ".harness/state/locks"
+    "progress_index": ".harness/PROGRESS.md"
   },
   "bindings": {
     "product": ".harness/steering/product.md",
@@ -1024,7 +1021,7 @@ wire_runtime_claude() {
   else
     log "${C_DIM}KEEP${C_RESET}  $TARGET/.mcp.json"
   fi
-  local claude_md='Follow [`AGENTS.md`](AGENTS.md) (ASDD + Harness INIT, locks, SoT under `.harness/`).'
+  local claude_md='Follow [`AGENTS.md`](AGENTS.md) (ASDD + Harness INIT, SoT under `.harness/`).'
   if [[ ! -e "$TARGET/CLAUDE.md" ]]; then
     printf '%s\n' "$claude_md" >"$TARGET/CLAUDE.md"
     record_managed "$TARGET/CLAUDE.md"

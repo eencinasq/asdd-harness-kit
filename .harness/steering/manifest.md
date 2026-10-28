@@ -33,8 +33,6 @@ Also: [`.harness/features/<slice>.features.json`](../features/) feature tracker 
 | `contributors` | All agents and humans who wrote sessions |
 | `paths` | `specs`, `features`, `tasks` — `features` is set from the latest session carrying `features_path` |
 
-Removed from v2.0: `ccs`, `confidence_chain`, `agent_heartbeats`, `phase_data`. These are replaced by the session log.
-
 ## Session file format
 
 Each session is a single JSON file written once, never modified.
@@ -68,7 +66,7 @@ Each session is a single JSON file written once, never modified.
 4. **Run `sync-state`** after writing sessions: `node .harness/scripts/sync-state.mjs --slice <id>`.
 5. **Advance phase** only when the gate for that phase is PASS per [quality-gates.md](./quality-gates.md).
 6. **On DONE:** write a `phase_completed` session for `knowledge`, then `sync-state`. The generated manifest will show `status: DONE`.
-7. **PARKED / ABANDONED:** write a session with `event_type: checkpoint` and note the status change.
+7. **PARKED / ABANDONED:** write a `checkpoint` session with `"status": "PARKED"` or `"ABANDONED"` and a `note`. It holds until a later checkpoint sets `"status": "in_progress"` (resume).
 8. **Handoffs:** when picking up another human's work, set `handoff_from` and `handoff_note` in your session file.
 9. **Never** edit a generated manifest or registry directly. Always append sessions and regenerate.
 

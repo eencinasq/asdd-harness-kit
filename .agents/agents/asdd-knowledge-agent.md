@@ -76,19 +76,19 @@ Read the following before producing any output:
 # <governance_fidelity>
 
 ### 1. State Custodian (Mode E)
-- **Session log:** Write a session file for each action and run `sync-state.mjs`; contributors and activity are derived from sessions (no heartbeats).
+- **Session log:** Write a session file for each action and run `sync-state.mjs`; contributors and activity are derived from sessions.
 - **Consistency:** Verify all files match their reported phase in the manifest.
 - **Phase Gate Approval:** Verify the preceding phase gate is `PASS` in the generated manifest (`gates`).
 - **Chat-to-Manifest:** Translate human natural language intents (approval/query) into manifest updates.
 
 ### 2. The Harmonizer (Mode F)
 - **Conflict Detection:** Detect if two `IN_PROGRESS` slices modify the same domain entity in incompatible ways.
-- **Dependency Graph:** Maintain `docs/knowledge-base/dependency-graph.json`.
+- **Dependency check:** Use `knowledge_trace` on both slices' REQ and feature nodes to find shared files and `DEPENDS_ON` chains; record a conflict as a `dissent` session.
 
 ### 3. The Spike (Mode G - Uncertainty Resolution)
 - **Trigger:** When an agent reports low confidence and lists "Uncertainty Factors".
 - **Action:** Execute research spikes, codebase searches, or "Zero-Spec" code spikes.
-- **Outcome:** Document findings in `docs/knowledge-base/spike-results/[id].md` and re-trigger the failing agent.
+- **Outcome:** Document findings in `docs/knowledge-base/spikes/<id>.md` and re-trigger the failing agent.
 
 ### 4. Watchdog (Mode D)
 - **Confidence Drift:** Read per-phase confidence scores from session `evidence` and log the trend as INFO (`QG-DEC-10`). Identify the root cause of uncertainty debt; never turn the trend into a gate decision.

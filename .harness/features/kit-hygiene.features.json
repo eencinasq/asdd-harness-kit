@@ -7,7 +7,7 @@
       "id": "TASK-001",
       "title": "Guidance sensor and reliable shell assertions",
       "user_visible_behavior": "Add kit-only `scripts/check-guidance.mjs <dir>` with `stale` (REQ-001 phrases), `cutoffs` (ADR-006), and `budget` (binding `Always-loaded steering budget`) checks, plus `scripts/check-guidance.test.mjs` fixtures for AC-001, AC-005, AC-007.",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 1,
       "owner": "claude",
       "req_ids": [
@@ -19,7 +19,7 @@
       "verification": [
         "node --test scripts/check-guidance.test.mjs"
       ],
-      "evidence": "Reopened by OCR delegation review: MEDIUM cutoff regex false positive on integer 1.",
+      "evidence": "node --test scripts/check-guidance.test.mjs: 5/5 pass (AC-001, AC-005 incl. integer-count negative, AC-007). lifecycle OK. OCR delegation review: 0 CRITICAL/HIGH, CR-001 MEDIUM fixed here, CR-002 LOW observation (code-review-report.md).",
       "scope_paths": [
         "scripts/check-guidance.mjs",
         "scripts/check-guidance.test.mjs",
@@ -29,7 +29,7 @@
         ".harness/steering/quality-gates.project.md",
         "docs/agent-failure-log.md"
       ],
-      "evidence_commit": "9950aef"
+      "evidence_commit": "4f3403c"
     },
     {
       "id": "TASK-002",
@@ -47,7 +47,7 @@
       "verification": [
         "node --test .harness/scripts/sync-state.test.mjs"
       ],
-      "evidence": "node --test .harness/scripts/sync-state.test.mjs: 14/14 pass (AC-002, AC-003, AC-004). bash scripts/test-lifecycle.sh: OK. PROGRESS.md regenerated from the registry.",
+      "evidence": "node --test .harness/scripts/sync-state.test.mjs: 14/14 pass (AC-002, AC-003, AC-004). lifecycle OK. OCR delegation review: no findings on sync-state.mjs/init-slice.mjs (code-review-report.md, review 1).",
       "scope_paths": [
         ".harness/scripts/sync-state.mjs",
         ".harness/scripts/sync-state.test.mjs",
@@ -59,7 +59,7 @@
       "id": "TASK-003",
       "title": "Remove stale mechanisms from shipped guidance and scaffolding",
       "user_visible_behavior": "Remove lock, progress-record, hand-edited `PROGRESS.md`, `dependency-graph.json`, `spike-results`, and heartbeat instructions from shipped guidance; document PARKED/ABANDONED checkpoints and the generated `PROGRESS.md`; stop scaffolding `.harness/state/locks/` and `.harness/progress/`; make `paths.progress`/`paths.locks` optional; delete `validators/locks.mjs` and `.harness/state/locks/README.md`; fix the installer-generated `CLAUDE.md` text..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 3,
       "owner": "claude",
       "req_ids": [
