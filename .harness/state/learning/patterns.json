@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T01:06:50.412Z",
+  "generated_at": "2026-10-28T01:14:17.895Z",
   "threshold": 3,
   "summary": {
-    "patterns": 3,
+    "patterns": 4,
     "open": 0,
     "in_flight": 1,
     "verified": 0,
@@ -14,24 +14,25 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 3,
+      "occurrences": 4,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-27T01:00:27Z",
+      "last_seen": "2026-10-28T01:14:17.837Z",
       "sources": [
         "escalation"
       ],
       "slices": [
         "drift-consistency",
+        "kit-hygiene",
         "knowledge-simplify",
         "unified-versioning"
       ],
       "examples": [
         "scope touches 3 top-level modules: .harness, docs, scripts",
-        "scope touches 3 top-level modules: .agents, .harness, scripts",
-        "scope touches 2 top-level modules: .harness, scripts"
+        "scope touches 4 top-level modules: .harness, docs, package.json, scripts",
+        "scope touches 3 top-level modules: .agents, .harness, scripts"
       ],
       "proposals": [
         {
@@ -61,6 +62,27 @@
       ],
       "examples": [
         "Validation Gate BLOCK (QG-VAL-01): VAL-001 BLOCKING on MUST REQ-008 - upgrade behavior for existing hook configs undefined; installer substring match would keep the old path forever. Validation confidence 0.80. Report: .harness/specs/kit-hygiene/spec-validation-report.md"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-eefd8205",
+      "signature": "failure:git:committed-without-checking-branch",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28",
+      "last_seen": "2026-10-28",
+      "sources": [
+        "failure"
+      ],
+      "slices": [
+        "kit-hygiene"
+      ],
+      "examples": [
+        "Two commits meant for `main` landed on `fix/managed-runtime-files`; the branch had been switched outside the session and the agent did not run `git branch --show-current` before committing."
       ],
       "proposals": []
     },

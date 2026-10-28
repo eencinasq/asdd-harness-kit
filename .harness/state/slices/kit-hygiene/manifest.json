@@ -4,11 +4,16 @@
   "phase": "implementation",
   "status": "in_progress",
   "mode": "full",
-  "escalation_signals": [],
+  "escalation_signals": [
+    {
+      "type": "E1-scope-spread",
+      "evidence": "scope touches 4 top-level modules: .harness, docs, package.json, scripts"
+    }
+  ],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-10-28T00:58:57.231Z",
-  "updated_at": "2026-10-28T01:06:50.373Z",
+  "updated_at": "2026-10-28T01:14:17.860Z",
   "paths": {
     "specs": ".harness/specs/kit-hygiene",
     "tasks": ".harness/specs/kit-hygiene/tasks.md",
@@ -58,7 +63,24 @@
       "concerns": []
     }
   },
-  "active_features": [],
+  "active_features": [
+    {
+      "id": "TASK-001",
+      "owner": "asdd-implementation",
+      "human": "eencinas",
+      "since": "2026-10-28T01:14:17.837Z",
+      "handoff_from": null,
+      "scope_paths": [
+        "scripts/check-guidance.mjs",
+        "scripts/check-guidance.test.mjs",
+        "scripts/test-install-into.sh",
+        "scripts/test-lifecycle.sh",
+        "package.json",
+        ".harness/steering/quality-gates.project.md",
+        "docs/agent-failure-log.md"
+      ]
+    }
+  ],
   "open_dissents": 0,
   "source": null,
   "session_log": [
@@ -149,6 +171,14 @@
       "event": "phase_completed",
       "phase": "task_planning",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-10-28T01:14:17.837Z",
+      "agent": "asdd-implementation",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
     }
   ],
   "contributors": [
@@ -160,6 +190,7 @@
     "asdd-validation",
     "asdd-domain",
     "asdd-design",
-    "asdd-task-planning"
+    "asdd-task-planning",
+    "asdd-implementation"
   ]
 }

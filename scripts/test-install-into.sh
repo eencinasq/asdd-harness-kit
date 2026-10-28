@@ -93,8 +93,15 @@ test -f "$TMP/existing-app/.agents/skills/codebase-audit/SKILL.md"
 (cd "$TMP/existing-app" && node .harness/scripts/learn.mjs >/dev/null)
 test -f "$TMP/existing-app/.harness/state/learning/patterns.json"
 test -f "$TMP/existing-app/.harness/steering/templates/steering-proposal.md"
+# Shipped guidance (kit-hygiene REQ-002, REQ-007, REQ-010) is checked where it lands: the installed project
+node "$ROOT/scripts/check-guidance.mjs" --only stale "$TMP/existing-app"
+node "$ROOT/scripts/check-guidance.mjs" --only cutoffs "$TMP/existing-app"
+node "$ROOT/scripts/check-guidance.mjs" --only budget "$TMP/existing-app"
+node "$ROOT/scripts/check-guidance.mjs" --only asserts "$ROOT"
 # Kit development artifacts never reach a project: not by the installer, not by the npm package
-! grep -rqs 'Project binding for the kit itself' "$TMP/existing-app/.harness" "$TMP/existing-app/docs"
+if grep -rqs 'Project binding for the kit itself' "$TMP/existing-app/.harness" "$TMP/existing-app/docs"; then
+  echo "kit-only binding text leaked into the installed project" >&2; exit 1
+fi
 test -z "$(find "$TMP/existing-app/.harness/specs" "$TMP/existing-app/.harness/state/archive" -mindepth 1 -not -name README.md 2>/dev/null)"
 test ! -e "$TMP/existing-app/docs/knowledge-base/steering-proposals"
 for kit_slice in "$ROOT"/.harness/specs/*/ "$ROOT"/.harness/state/archive/*/; do
@@ -125,7 +132,7 @@ node -e '
   if ("README.md" in s) throw new Error("seeded_files wrongly lists the project README.md");
 ' "$TMP/existing-app/.harness/config/installed-versions.json"
 # Isolated knowledge deps manifest (installed via .harness/package.json)
-! grep -q '"kuzu"' "$TMP/existing-app/.harness/package.json"
+if grep -q '"kuzu"' "$TMP/existing-app/.harness/package.json"; then echo "kuzu still in .harness/package.json" >&2; exit 1; fi
 grep -q '"sqlite-vec"' "$TMP/existing-app/.harness/package.json"
 grep -qxF '.harness/node_modules' "$TMP/existing-app/.gitignore"
 grep -qxF '.harness/knowledge' "$TMP/existing-app/.gitignore"

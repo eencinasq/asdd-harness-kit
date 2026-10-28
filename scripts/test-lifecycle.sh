@@ -112,7 +112,7 @@ env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/tmp/asdd-lifecyc
 grep -q 'feature f1 has unknown key "requirements" (ignored) — did you mean "req_ids"?' /tmp/asdd-lifecycle-unknown.log
 cp /tmp/asdd-lifecycle-features.bak .harness/features/demo-slice.features.json
 env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/tmp/asdd-lifecycle-unknown.log 2>&1
-! grep -q 'unknown key' /tmp/asdd-lifecycle-unknown.log
+if grep -q 'unknown key' /tmp/asdd-lifecycle-unknown.log; then echo "unexpected unknown-key warning" >&2; exit 1; fi
 
 echo "== negative: overlapping concurrent scopes =="
 node --input-type=module <<'EOF'

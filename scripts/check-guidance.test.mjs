@@ -1,0 +1,87 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { checkAsserts, checkBudget, checkCutoffs, checkStale, alwaysLoadedBytes } from './check-guidance.mjs';
+
+function withDir(fn) {
+  return () => {
+    const root = mkdtempSync(join(tmpdir(), 'guidance-'));
+    try {
+      fn(root, (rel, text) => {
+        mkdirSync(join(root, rel, '..'), { recursive: true });
+        writeFileSync(join(root, rel), text);
+      });
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  };
+}
+
+test('REQ-002 AC-001: a stale mechanism in shipped guidance fails with file and phrase', withDir((root, write) => {
+  write('.agents/agents/asdd-implementation-agent.md', '# Impl\n\nThe coordinator holds the slice lock.\n');
+  write('.harness/steering/session-loop.md', '---\ninclusion: always\n---\n# Loop\n');
+  const findings = checkStale(root);
+  assert.equal(findings.length, 1);
+  assert.match(findings[0], /\.agents\/agents\/asdd-implementation-agent\.md:3 .*slice lock/);
+
+  write('.agents/agents/asdd-implementation-agent.md', '# Impl\n\nThe coordinator alone writes shared state.\n');
+  assert.deepEqual(checkStale(root), []);
+}));
+
+test('REQ-001: every removed mechanism is caught; kit-only files are not scanned', withDir((root, write) => {
+  const banned = [
+    'Update `.harness/progress/<slice>.md`.',
+    'Update the slice row in `PROGRESS.md`.',
+    'Maintain `docs/knowledge-base/dependency-graph.json`.',
+    'Write `docs/knowledge-base/spike-results/x.md`.',
+    'Send a heartbeat every hour.',
+    'Seed `.harness/state/locks/`.',
+  ];
+  write('AGENTS.md', banned.join('\n'));
+  assert.equal(checkStale(root).length, banned.length);
+  write('AGENTS.md', '# ok\n');
+  write('README.md', 'The v2 slice lock was removed.\n');
+  write('.harness/specs/s/intent.md', 'holds the slice lock\n');
+  write('.harness/steering/product.md', 'heartbeat\n');
+  assert.deepEqual(checkStale(root), [], 'README, specs, and kit bindings are kit-only');
+}));
+
+test('REQ-007 AC-005: agent cutoffs fail; ranges and latency targets do not', withDir((root, write) => {
+  write('.agents/agents/asdd-refactor-agent.md', [
+    '# Refactor',
+    '- **Threshold:** If `score < 0.75`, TL review is mandatory.',
+    'Design confidence score: [0.0–1.0]',
+    'Measurable NFRs: p95 < 200ms.',
+    'Your own confidence target is raised to **0.90**.',
+    'Each CRITICAL finding reduces confidence by 0.10.',
+    'MUST requirement coverage < 100% blocks.',
+    'Apply `QG-DES-02`.',
+  ].join('\n'));
+  const findings = checkCutoffs(root);
+  assert.deepEqual(findings.map((f) => f.match(/:(\d+) /)[1]), ['2', '5', '6', '7']);
+}));
+
+test('REQ-010 AC-007: budget passes at or below the binding, fails above or when unfilled', withDir((root, write) => {
+  write('AGENTS.md', 'x'.repeat(100));
+  write('.harness/steering/a.md', `---\ninclusion: always\n---\n${'y'.repeat(50)}`);
+  write('.harness/steering/b.md', '---\ninclusion: auto\ntags:\n  - qa\n---\nnot counted');
+  const size = alwaysLoadedBytes(root);
+  assert.equal(size, 100 + `---\ninclusion: always\n---\n${'y'.repeat(50)}`.length);
+
+  const binding = (v) => write('.harness/steering/quality-gates.project.md', `- Always-loaded steering budget: \`${v}\` bytes\n`);
+  binding(size);
+  assert.deepEqual(checkBudget(root, root), []);
+  binding(size - 1);
+  assert.match(checkBudget(root, root)[0], new RegExp(`${size} bytes > budget ${size - 1}`));
+  binding('…');
+  assert.match(checkBudget(root, root)[0], /unconfigured/);
+}));
+
+test('TASK-001: a bare `!` assertion in a kit test script fails', withDir((root, write) => {
+  write('scripts/test-x.sh', '#!/usr/bin/env bash\nset -euo pipefail\n! grep -q x file\nif grep -q y file; then exit 1; fi\n');
+  const findings = checkAsserts(root);
+  assert.equal(findings.length, 1);
+  assert.match(findings[0], /scripts\/test-x\.sh:3/);
+}));
