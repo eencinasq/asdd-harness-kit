@@ -32,7 +32,9 @@
     "!.harness/steering/quality-gates.project.md",
     "!.harness/steering/design-system.md",
     "!docs/knowledge-base/steering-proposals/**",
-    "!docs/architecture/domain-model.md"
+    "!docs/architecture/domain-model.md",
+    "!docs/agent-failure-log.md",
+    "!docs/dissent-log.md"
   ],
   "scripts": {
     "test": "bash scripts/test-install-into.sh && bash scripts/test-lifecycle.sh && node --test scripts/check-guidance.test.mjs .harness/scripts/jev-client.test.mjs .harness/scripts/command-gate.test.mjs .harness/scripts/sync-knowledge.test.mjs .harness/scripts/sync-state.test.mjs .agents/mcp/jev-gate-server.test.mjs .harness/scripts/drift-lib.test.mjs .harness/scripts/semgrep-lib.test.mjs .harness/scripts/audit-codebase.test.mjs .harness/scripts/learning-lib.test.mjs .agents/mcp/spec-drift-auditor.test.mjs .agents/modules/http-api/adapters/openapi.test.mjs tools/drift-dashboard/src/model.test.mjs",

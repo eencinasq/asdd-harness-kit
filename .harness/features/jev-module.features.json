@@ -7,7 +7,7 @@
       "id": "TASK-001",
       "title": "Install tests for default, module, all, upgrade, remove, kit-only",
       "user_visible_behavior": "Replace the \"Jev on every install\" assertions with: default install has no Jev surface and passes config and invariant checks, no default `.mjs` imports Jev code; `--modules=jev` and `--modules=all` install it with the stated `capabilities.jev`; an upgrade of a pre-module Jev install keeps it; `--remove-modules=jev` removes it and a re-run does not bring it back; this slice's artifacts never land in a project or the npm package.",
-      "status": "passing",
+      "status": "in_progress",
       "priority": 1,
       "owner": "claude",
       "req_ids": [
@@ -25,7 +25,7 @@
       "verification": [
         "bash -n scripts/test-install-into.sh && bash -n scripts/test-full-flow.sh"
       ],
-      "evidence": "bash -n on both scripts OK. test-install-into fails at the first default-install Jev assertion (jev-client.mjs present), as planned until TASK-002/003. Import detector matches the current check-invariants.mjs import. Test-only change.",
+      "evidence": "Reopened: add log-leak assertions found during TASK-003.",
       "scope_paths": [
         "scripts/test-install-into.sh",
         "scripts/test-full-flow.sh"
@@ -36,7 +36,7 @@
       "id": "TASK-002",
       "title": "Core harness without Jev",
       "user_visible_behavior": "Remove the Jev import from `check-invariants.mjs`; make `capabilities.jev` optional in `check-project-config.mjs` (required when `modules.jev` is true, existing checks when present); delete the no-op `jev-gold-plating.mjs`..",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": 2,
       "owner": "claude",
       "req_ids": [
@@ -51,7 +51,7 @@
       "verification": [
         "bash scripts/test-lifecycle.sh"
       ],
-      "evidence": "",
+      "evidence": "Code committed; test-lifecycle OK and check-project-config/check-invariants pass without Jev. Cannot be set passing yet: invariants FAIL with DRIFT-02 on DONE kit-hygiene features (shared test/installer files), and two of them verify through test-install-into, which stays red until TASK-003.",
       "scope_paths": [
         ".harness/scripts/check-invariants.mjs",
         ".harness/scripts/check-project-config.mjs",
@@ -62,7 +62,7 @@
       "id": "TASK-003",
       "title": "Installer: Jev as a module",
       "user_visible_behavior": "Move the Jev copies, `jev.md`, MCP entry, and `capabilities.jev` into `enable_one_module jev`; include `jev` in `all` and the picker; add `detect_installed_modules` and `--remove-modules=jev`; stop seeding Jev in the project.json template and upgrade patcher; move the `jev-gate` MCP entry to `.agents/modules/jev/mcp.json`; record it in versions..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 3,
       "owner": "claude",
       "req_ids": [
@@ -84,8 +84,12 @@
         ".agents/mcp/mcp.json",
         ".agents/modules/jev/mcp.json",
         "scripts/generate-versions.mjs",
-        ".harness/config/versions.json"
-      ]
+        ".harness/config/versions.json",
+        "scripts/templates/docs/agent-failure-log.md",
+        "scripts/templates/docs/dissent-log.md",
+        "package.json"
+      ],
+      "notes": "Scope extended during implementation: a module test install showed the kit's own docs/agent-failure-log.md (with kit slice entries) is seeded into projects; logs now seed from scripts/templates/docs/ and the kit logs are excluded from npm (REQ-010 spirit: kit artifacts never ship)."
     },
     {
       "id": "TASK-004",

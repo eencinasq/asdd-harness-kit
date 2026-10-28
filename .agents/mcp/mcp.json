@@ -7,14 +7,6 @@
         ".agents/mcp/bin/codegraph-mcp.cjs"
       ]
     },
-    "jev-gate": {
-      "type": "stdio",
-      "command": "node",
-      "args": [
-        ".agents/mcp/jev-gate-server.mjs"
-      ],
-      "enabled": true
-    },
     "knowledge": {
       "type": "stdio",
       "command": "node",

@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-jev-module-014",
+  "timestamp": "2026-10-28T13:11:20.094Z",
+  "agent": "asdd-implementation",
+  "human": "eencinas",
+  "slice_id": "jev-module",
+  "concerns": [
+    "DRIFT-02 applies to features of DONE slices; a later slice editing a shared file reopens historical evidence"
+  ],
+  "event_type": "feature_blocked",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "evidence": "Blocked on TASK-003: DRIFT-02 reopened DONE kit-hygiene features; re-verification needs test-install-into green."
+}

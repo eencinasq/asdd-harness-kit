@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "jev-gate": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        ".agents/mcp/jev-gate-server.mjs"
+      ],
+      "enabled": true
+    }
+  }
+}

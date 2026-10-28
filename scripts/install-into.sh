@@ -57,7 +57,9 @@ Options:
   --no-interactive        Never prompt, even in TTY
   --from-git              Clone kit into a temp dir (for curl | bash)
   --kit-dir <path>        Kit source (default: parent of scripts/)
-  --modules=<list>        bruno,playwright-e2e,web-ui,http-api — or "all"
+  --modules=<list>        bruno,playwright-e2e,web-ui,http-api,jev — or "all"
+                          (jev: Shape Up / Product Delivery gates via System One; needs JEV_API_KEY)
+  --remove-modules=<list> Remove installed modules (supported: jev); later runs keep them off
   --runtime=<name>        cursor | claude | opencode | kimi | junie | devin | kiro
                           comma-separated values or none (default: none)
   --force                 Overwrite portable kit files that already exist
@@ -90,6 +92,7 @@ SKIP_DEPS=0
 INTERACTIVE=0
 NO_INTERACTIVE=0
 MODULES=""
+REMOVE_MODULES=""
 RUNTIMES=""
 KIT_DIR=""
 TARGET=""
@@ -183,6 +186,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --modules=*) MODULES="${1#*=}"; shift ;;
+    --remove-modules=*) REMOVE_MODULES="${1#*=}"; shift ;;
     --modules)
       MODULES="${2:-}"; [[ -n "$MODULES" ]] || die "--modules needs a value"
       shift 2
@@ -346,7 +350,7 @@ run_interactive() {
 
   # Modules
   local mod_picked
-  mod_picked="$(pick_many "Select optional modules to enable:" bruno playwright-e2e web-ui http-api)"
+  mod_picked="$(pick_many "Select optional modules to enable:" bruno playwright-e2e web-ui http-api jev)"
   if [[ -n "$mod_picked" ]]; then
     MODULES="$mod_picked"
   else
@@ -462,7 +466,7 @@ install_portable_steering() {
   local f
   for f in domain-layer.md quality-gates.md manifest.md session-loop.md asdd-lite.md \
            codegraph.md codegraph-agents.md knowledge.md skills.md security-rules.md controls.md \
-           jev.md spec-drift.md README.md; do
+           spec-drift.md README.md; do
     copy_file "$KIT_DIR/.harness/steering/$f" "$TARGET/.harness/steering/$f" refresh
   done
   copy_tree "$KIT_DIR/.harness/steering/templates" "$TARGET/.harness/steering/templates" refresh
@@ -506,7 +510,6 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/init-slice.mjs" "$TARGET/.harness/scripts/init-slice.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/escalate-slice.mjs" "$TARGET/.harness/scripts/escalate-slice.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/sync-state.mjs" "$TARGET/.harness/scripts/sync-state.mjs" refresh
-  copy_file "$KIT_DIR/.harness/scripts/jev-client.mjs" "$TARGET/.harness/scripts/jev-client.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/env-loader.mjs" "$TARGET/.harness/scripts/env-loader.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/knowledge-lib.mjs" "$TARGET/.harness/scripts/knowledge-lib.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/knowledge-store.mjs" "$TARGET/.harness/scripts/knowledge-store.mjs" refresh
@@ -521,7 +524,6 @@ install_harness_scaffold() {
     fi
   fi
   copy_file "$KIT_DIR/.harness/scripts/sync-knowledge.mjs" "$TARGET/.harness/scripts/sync-knowledge.mjs" refresh
-  copy_file "$KIT_DIR/.harness/scripts/jev-gates.mjs" "$TARGET/.harness/scripts/jev-gates.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/command-gate.mjs" "$TARGET/.harness/scripts/command-gate.mjs" refresh
   # Deprecated shim: hook configs not yet rewritten still call it (identical verdicts)
   copy_file "$KIT_DIR/.harness/scripts/jev-command-gate.mjs" "$TARGET/.harness/scripts/jev-command-gate.mjs" refresh
@@ -584,14 +586,7 @@ data.kit.installed_at = installedAt;
 data.capabilities ??= {};
 data.capabilities.codegraph ??= { enabled: false, required: false };
 data.capabilities.orca ??= { enabled: false, experimental: true };
-data.capabilities.jev ??= {
-  enabled: true,
-  required: false,
-  required_by: ['shape-up', 'product-delivery'],
-  apiKey: '',
-  endpoint: 'https://api.typesafe.ai/v1',
-  fallbackPolicy: 'fail-closed',
-};
+// capabilities.jev is written only by the jev module (enable_one_module jev).
 // Migrate older installs that forced global required=true
 if (data.capabilities.jev && data.capabilities.jev.required === true && !data.capabilities.jev.required_by) {
   data.capabilities.jev.required = false;
@@ -656,14 +651,6 @@ EOF
     "orca": {
       "enabled": false,
       "experimental": true
-    },
-    "jev": {
-      "enabled": true,
-      "required": false,
-      "required_by": ["shape-up", "product-delivery"],
-      "apiKey": "",
-      "endpoint": "https://api.typesafe.ai/v1",
-      "fallbackPolicy": "fail-closed"
     }
   },
   "runtimes": []
@@ -677,7 +664,6 @@ install_agents_core() {
   copy_tree "$KIT_DIR/.agents/mcp/bin" "$TARGET/.agents/mcp/bin" refresh
   copy_file "$KIT_DIR/.agents/mcp/sync-runtime-mcp.cjs" "$TARGET/.agents/mcp/sync-runtime-mcp.cjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/README.md" "$TARGET/.agents/mcp/README.md" refresh
-  copy_file "$KIT_DIR/.agents/mcp/jev-gate-server.mjs" "$TARGET/.agents/mcp/jev-gate-server.mjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/knowledge-server.mjs" "$TARGET/.agents/mcp/knowledge-server.mjs" refresh
   copy_file "$KIT_DIR/.agents/mcp/spec-drift-auditor.mjs" "$TARGET/.agents/mcp/spec-drift-auditor.mjs" refresh
   copy_tree "$KIT_DIR/.agents/mcp/ui" "$TARGET/.agents/mcp/ui" refresh
@@ -694,8 +680,9 @@ install_agents_core() {
 }
 
 # Add one kit server to an existing mcp.json without touching the others.
+# The entry comes from the kit baseline, or from a module's mcp.json fragment ($2).
 register_mcp_server() {
-  local name="$1" file="$TARGET/.agents/mcp/mcp.json"
+  local name="$1" source="${2:-$KIT_DIR/.agents/mcp/mcp.json}" file="$TARGET/.agents/mcp/mcp.json"
   [[ "$DRY_RUN" -eq 1 || ! -f "$file" ]] && return 0
   local added
   added=$(node -e '
@@ -707,7 +694,7 @@ register_mcp_server() {
     cfg.mcpServers[name] = JSON.parse(fs.readFileSync(kitFile, "utf8")).mcpServers[name];
     fs.writeFileSync(file, JSON.stringify(cfg, null, 2) + "\n");
     console.log("added");
-  ' "$KIT_DIR/.agents/mcp/mcp.json" "$file" "$name" 2>/dev/null) || return 0
+  ' "$source" "$file" "$name" 2>/dev/null) || return 0
   [[ "$added" == "added" ]] && log "${C_GREEN}ADD${C_RESET}   $file (mcpServers.$name)"
   return 0
 }
@@ -722,8 +709,9 @@ install_docs_root() {
   # Scaffold domain model and operational logs
   # The kit's own docs/architecture/domain-model.md describes the kit and never ships; projects get the stub
   copy_file "$KIT_DIR/scripts/templates/docs/domain-model.md" "$TARGET/docs/architecture/domain-model.md" create
-  copy_file "$KIT_DIR/docs/agent-failure-log.md" "$TARGET/docs/agent-failure-log.md" create
-  copy_file "$KIT_DIR/docs/dissent-log.md" "$TARGET/docs/dissent-log.md" create
+  # Seed empty logs from templates: the kit's own docs/*-log.md hold the kit's history and never ship
+  copy_file "$KIT_DIR/scripts/templates/docs/agent-failure-log.md" "$TARGET/docs/agent-failure-log.md" create
+  copy_file "$KIT_DIR/scripts/templates/docs/dissent-log.md" "$TARGET/docs/dissent-log.md" create
   copy_file "$KIT_DIR/docs/knowledge-base/README.md" "$TARGET/docs/knowledge-base/README.md" create
 }
 
@@ -803,8 +791,93 @@ enable_one_module() {
       copy_tree "$KIT_DIR/.agents/modules/http-api/skills" "$TARGET/.agents/skills" refresh
       copy_tree "$KIT_DIR/.agents/modules/http-api/adapters" "$TARGET/.agents/mcp/adapters" refresh
       ;;
-    *) die "unknown module: $m (bruno|playwright-e2e|web-ui|http-api)" ;;
+    jev)
+      # Source stays at its installed paths (relative imports); only the copy is gated.
+      for f in "${JEV_MODULE_FILES[@]}"; do copy_file "$KIT_DIR/$f" "$TARGET/$f" refresh; done
+      register_mcp_server jev-gate "$KIT_DIR/.agents/modules/jev/mcp.json"
+      seed_jev_capability
+      ;;
+    *) die "unknown module: $m (bruno|playwright-e2e|web-ui|http-api|jev)" ;;
   esac
+}
+
+JEV_MODULE_FILES=(
+  .harness/scripts/jev-client.mjs
+  .harness/scripts/jev-gates.mjs
+  .agents/mcp/jev-gate-server.mjs
+  .harness/steering/jev.md
+)
+
+# capabilities.jev for the jev module; never overwrites an existing block.
+seed_jev_capability() {
+  local config="$TARGET/.harness/config/project.json"
+  [[ "$DRY_RUN" -eq 1 || ! -f "$config" ]] && return 0
+  node -e '
+    const fs = require("fs"); const p = process.argv[1]; const d = JSON.parse(fs.readFileSync(p, "utf8"));
+    d.capabilities ??= {};
+    d.capabilities.jev ??= { enabled: true, required: false, required_by: ["shape-up", "product-delivery"],
+      apiKey: "", endpoint: "https://api.typesafe.ai/v1", fallbackPolicy: "fail-closed" };
+    fs.writeFileSync(p, JSON.stringify(d, null, 2) + "\n");
+  ' "$config"
+}
+
+# Upgrade: projects installed before Jev became a module keep it. An explicit
+# modules.jev=false (from --remove-modules=jev) wins over detection.
+detect_installed_modules() {
+  local config="$TARGET/.harness/config/project.json" state="none"
+  if [[ -f "$config" ]] && command -v node >/dev/null 2>&1; then
+    state="$(node -e '
+      const c = require(process.argv[1]);
+      if (c.modules?.jev === false) process.stdout.write("off");
+      else if (c.modules?.jev === true || c.capabilities?.jev?.enabled === true) process.stdout.write("on");
+      else process.stdout.write("none");
+    ' "$config" 2>/dev/null || echo none)"
+  fi
+  [[ "$state" == "off" ]] && return 0
+  [[ ",$REMOVE_MODULES," == *",jev,"* ]] && return 0
+  if [[ "$state" == "on" || -f "$TARGET/.harness/scripts/jev-gates.mjs" ]]; then
+    if [[ ",$MODULES," != *",jev,"* && "$MODULES" != "all" ]]; then
+      MODULES="${MODULES:+$MODULES,}jev"
+      info "Jev already installed — keeping the jev module (remove with --remove-modules=jev)"
+    fi
+  fi
+}
+
+remove_modules() {
+  [[ -n "$REMOVE_MODULES" ]] || return 0
+  local m
+  IFS=',' read -r -a mods <<<"$REMOVE_MODULES"
+  for m in "${mods[@]}"; do
+    m="$(echo "$m" | tr -d ' ')"
+    [[ -n "$m" ]] || continue
+    [[ "$m" == "jev" ]] || die "--remove-modules supports: jev (got $m)"
+    [[ ",$MODULES," == *",jev,"* || "$MODULES" == "all" ]] && die "jev is in both --modules and --remove-modules"
+    log "${C_BOLD}REMOVE MODULE${C_RESET} jev"
+    local f
+    for f in "${JEV_MODULE_FILES[@]}"; do
+      if [[ -e "$TARGET/$f" ]]; then
+        log "${C_YELLOW}REMOVE${C_RESET} $f"
+        [[ "$DRY_RUN" -eq 1 ]] || rm -f "$TARGET/$f"
+      fi
+    done
+    [[ "$DRY_RUN" -eq 1 ]] && continue
+    node -e '
+      const fs = require("fs");
+      const [config, mcp] = process.argv.slice(1);
+      if (fs.existsSync(config)) {
+        const d = JSON.parse(fs.readFileSync(config, "utf8"));
+        if (d.capabilities) delete d.capabilities.jev;
+        d.modules ??= {};
+        d.modules.jev = false;
+        fs.writeFileSync(config, JSON.stringify(d, null, 2) + "\n");
+      }
+      if (fs.existsSync(mcp)) {
+        const d = JSON.parse(fs.readFileSync(mcp, "utf8"));
+        if (d.mcpServers) delete d.mcpServers["jev-gate"];
+        fs.writeFileSync(mcp, JSON.stringify(d, null, 2) + "\n");
+      }
+    ' "$TARGET/.harness/config/project.json" "$TARGET/.agents/mcp/mcp.json"
+  done
 }
 
 refresh_skills_index() {
@@ -823,7 +896,7 @@ refresh_skills_index() {
 enable_modules() {
   [[ -n "$MODULES" ]] || return 0
   local list="$MODULES"
-  [[ "$list" == "all" ]] && list="bruno,playwright-e2e,web-ui,http-api"
+  [[ "$list" == "all" ]] && list="bruno,playwright-e2e,web-ui,http-api,jev"
   local m
   IFS=',' read -r -a mods <<<"$list"
   for m in "${mods[@]}"; do
@@ -1436,6 +1509,8 @@ main() {
   remove_runtime_docs
   remove_module_sources
   install_docs_root
+  detect_installed_modules
+  remove_modules
   enable_modules
   refresh_skills_index
   wire_runtimes

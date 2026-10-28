@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T13:10:36.129Z",
+  "generated_at": "2026-10-28T13:11:28.735Z",
   "threshold": 3,
   "summary": {
-    "patterns": 11,
+    "patterns": 12,
     "open": 0,
     "in_flight": 2,
     "verified": 0,
@@ -50,7 +50,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T13:10:36.061Z",
+      "last_seen": "2026-10-28T13:11:28.664Z",
       "sources": [
         "escalation"
       ],
@@ -63,7 +63,7 @@
       ],
       "examples": [
         "scope touches 3 top-level modules: .harness, docs, scripts",
-        "scope touches 2 top-level modules: .harness, scripts",
+        "scope touches 3 top-level modules: .agents, .harness, scripts",
         "scope touches 10 top-level modules: .agents, .cursor, .github, .harness, AGENTS.md, README.md, docs, package.json, runtimes, scripts"
       ],
       "proposals": [
@@ -96,6 +96,27 @@
       "examples": [
         "Validation Gate BLOCK (QG-VAL-01): VAL-001 on MUST REQ-005 - upgrade detection enables Jev on every existing project with no way off. Validation confidence 0.78.",
         "Validation Gate BLOCK (QG-VAL-01): VAL-001 BLOCKING on MUST REQ-008 - upgrade behavior for existing hook configs undefined; installer substring match would keep the old path forever. Validation confidence 0.80. Report: .harness/specs/kit-hygiene/spec-validation-report.md"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-f880c576",
+      "signature": "blocked:feature:.harness/scripts",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T13:11:20.094Z",
+      "last_seen": "2026-10-28T13:11:20.094Z",
+      "sources": [
+        "blocked"
+      ],
+      "slices": [
+        "jev-module"
+      ],
+      "examples": [
+        "Blocked on TASK-003: DRIFT-02 reopened DONE kit-hygiene features; re-verification needs test-install-into green."
       ],
       "proposals": []
     },
