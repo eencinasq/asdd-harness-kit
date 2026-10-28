@@ -72,7 +72,7 @@
       "verification": [
         "bash scripts/test-install-into.sh (stale check green)"
       ],
-      "evidence": "check-guidance --only stale: PASS on the kit and on the installed project in test-install-into (incl. generated CLAUDE.md). test-install-into REQ-012/AC-008 assertions pass (no locks/progress dirs or paths). check-project-config PASS. OCR review 2: no CRITICAL/HIGH/MEDIUM (CR-003 LOW, CR-004 obs). test-install-into still stops at cutoffs (TASK-004).",
+      "evidence": "Re-verified after DRIFT-02 (TASK-004 edited asdd-implementation-agent.md and asdd-discovery-agent.md, shared with this scope): check-guidance --only stale PASS on the kit and, in the same test-install-into run, on the installed project; REQ-012 assertions pass. OCR review 2 holds.",
       "scope_paths": [
         "AGENTS.md",
         ".harness/steering/session-loop.md",
@@ -89,14 +89,14 @@
         ".harness/scripts/check-project-config.mjs",
         ".harness/config/project.schema.json"
       ],
-      "evidence_commit": "46e42f1",
+      "evidence_commit": "4e86211",
       "notes": "Deleted .harness/scripts/validators/locks.mjs and .harness/state/locks/README.md in 46e42f1 (removed from scope_paths: DRIFT-05 cannot express a deletion). Also added REQ-012 assertions to scripts/test-install-into.sh, a file owned by TASK-001, without listing it in this scope."
     },
     {
       "id": "TASK-004",
       "title": "Agent prompts cite gate rules instead of numbers",
       "user_visible_behavior": "Replace every numeric cutoff in `.agents/agents/` with the `QG-*` rule it belongs to, or delete it when no gate defines it (refactor 0.75/0.90, validation shortcut and dynamic target, design/implementation raised targets, task-planning restatement, discovery/spec deductions, QA restatement and \"catch 90%\")..",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 4,
       "owner": "claude",
       "req_ids": [
@@ -108,7 +108,7 @@
       "verification": [
         "node scripts/check-guidance.mjs --only cutoffs ."
       ],
-      "evidence": "",
+      "evidence": "node scripts/check-guidance.mjs --only cutoffs .: PASS (was 21 findings). bash scripts/test-install-into.sh: exit 0, cutoffs PASS on the installed project. Review 3: Markdown only, no findings.",
       "scope_paths": [
         ".agents/agents/asdd-refactor-agent.md",
         ".agents/agents/asdd-domain-agent.md",
@@ -119,7 +119,8 @@
         ".agents/agents/asdd-validation-agent.md",
         ".agents/agents/asdd-implementation-agent.md",
         ".agents/agents/asdd-qa-agent.md"
-      ]
+      ],
+      "evidence_commit": "4e86211"
     },
     {
       "id": "TASK-005",
