@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-019",
+  "timestamp": "2026-10-28T01:20:41.743Z",
+  "agent": "asdd-implementation",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "TASK-003 edited a file owned by TASK-001 outside its scope_paths",
+    "DRIFT-05 cannot express a feature that deletes files"
+  ],
+  "event_type": "checkpoint",
+  "phase": "implementation",
+  "evidence": "DRIFT-02 on TASK-001 (test-install-into.sh changed by TASK-003) -> re-verified, evidence_commit 46e42f1. DRIFT-05 on TASK-003 (deleted files in scope_paths) -> removed from scope_paths with a note."
+}

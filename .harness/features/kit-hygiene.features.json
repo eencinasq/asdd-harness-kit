@@ -19,7 +19,7 @@
       "verification": [
         "node --test scripts/check-guidance.test.mjs"
       ],
-      "evidence": "node --test scripts/check-guidance.test.mjs: 5/5 pass (AC-001, AC-005 incl. integer-count negative, AC-007). lifecycle OK. OCR delegation review: 0 CRITICAL/HIGH, CR-001 MEDIUM fixed here, CR-002 LOW observation (code-review-report.md).",
+      "evidence": "Re-verified after DRIFT-02 (TASK-003 added REQ-012 assertions to scripts/test-install-into.sh): node --test scripts/check-guidance.test.mjs 5/5 pass; test-install-into syntax OK and its stale stage passes. OCR review 1 holds (CR-001 fixed).",
       "scope_paths": [
         "scripts/check-guidance.mjs",
         "scripts/check-guidance.test.mjs",
@@ -29,7 +29,7 @@
         ".harness/steering/quality-gates.project.md",
         "docs/agent-failure-log.md"
       ],
-      "evidence_commit": "4f3403c"
+      "evidence_commit": "46e42f1"
     },
     {
       "id": "TASK-002",
@@ -59,7 +59,7 @@
       "id": "TASK-003",
       "title": "Remove stale mechanisms from shipped guidance and scaffolding",
       "user_visible_behavior": "Remove lock, progress-record, hand-edited `PROGRESS.md`, `dependency-graph.json`, `spike-results`, and heartbeat instructions from shipped guidance; document PARKED/ABANDONED checkpoints and the generated `PROGRESS.md`; stop scaffolding `.harness/state/locks/` and `.harness/progress/`; make `paths.progress`/`paths.locks` optional; delete `validators/locks.mjs` and `.harness/state/locks/README.md`; fix the installer-generated `CLAUDE.md` text..",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 3,
       "owner": "claude",
       "req_ids": [
@@ -72,7 +72,7 @@
       "verification": [
         "bash scripts/test-install-into.sh (stale check green)"
       ],
-      "evidence": "",
+      "evidence": "check-guidance --only stale: PASS on the kit and on the installed project in test-install-into (incl. generated CLAUDE.md). test-install-into REQ-012/AC-008 assertions pass (no locks/progress dirs or paths). check-project-config PASS. OCR review 2: no CRITICAL/HIGH/MEDIUM (CR-003 LOW, CR-004 obs). test-install-into still stops at cutoffs (TASK-004).",
       "scope_paths": [
         "AGENTS.md",
         ".harness/steering/session-loop.md",
@@ -87,10 +87,10 @@
         "scripts/templates/bindings/structure.md",
         "scripts/install-into.sh",
         ".harness/scripts/check-project-config.mjs",
-        ".harness/config/project.schema.json",
-        ".harness/scripts/validators/locks.mjs",
-        ".harness/state/locks/README.md"
-      ]
+        ".harness/config/project.schema.json"
+      ],
+      "evidence_commit": "46e42f1",
+      "notes": "Deleted .harness/scripts/validators/locks.mjs and .harness/state/locks/README.md in 46e42f1 (removed from scope_paths: DRIFT-05 cannot express a deletion). Also added REQ-012 assertions to scripts/test-install-into.sh, a file owned by TASK-001, without listing it in this scope."
     },
     {
       "id": "TASK-004",
