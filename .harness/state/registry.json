@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-10-28T13:09:49.823Z",
+  "generated_at": "2026-10-28T13:10:36.089Z",
   "slices": [
     {
       "slice_id": "jev-module",
@@ -8,11 +8,11 @@
       "status": "in_progress",
       "mode": "full",
       "active_features": 1,
-      "escalation_signals": 0,
+      "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-10-28T13:09:49.818Z",
+      "last_activity": "2026-10-28T13:10:36.087Z",
       "contributors": [
         "squad",
         "human",

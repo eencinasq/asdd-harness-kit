@@ -7,7 +7,7 @@
       "id": "TASK-001",
       "title": "Install tests for default, module, all, upgrade, remove, kit-only",
       "user_visible_behavior": "Replace the \"Jev on every install\" assertions with: default install has no Jev surface and passes config and invariant checks, no default `.mjs` imports Jev code; `--modules=jev` and `--modules=all` install it with the stated `capabilities.jev`; an upgrade of a pre-module Jev install keeps it; `--remove-modules=jev` removes it and a re-run does not bring it back; this slice's artifacts never land in a project or the npm package.",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 1,
       "owner": "claude",
       "req_ids": [
@@ -25,17 +25,18 @@
       "verification": [
         "bash -n scripts/test-install-into.sh && bash -n scripts/test-full-flow.sh"
       ],
-      "evidence": "",
+      "evidence": "bash -n on both scripts OK. test-install-into fails at the first default-install Jev assertion (jev-client.mjs present), as planned until TASK-002/003. Import detector matches the current check-invariants.mjs import. Test-only change.",
       "scope_paths": [
         "scripts/test-install-into.sh",
         "scripts/test-full-flow.sh"
-      ]
+      ],
+      "evidence_commit": "e7d48b0"
     },
     {
       "id": "TASK-002",
       "title": "Core harness without Jev",
       "user_visible_behavior": "Remove the Jev import from `check-invariants.mjs`; make `capabilities.jev` optional in `check-project-config.mjs` (required when `modules.jev` is true, existing checks when present); delete the no-op `jev-gold-plating.mjs`..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 2,
       "owner": "claude",
       "req_ids": [

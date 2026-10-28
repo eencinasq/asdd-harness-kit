@@ -4,8 +4,8 @@
  * Run from repo root: node .harness/scripts/check-invariants.mjs [--live] [--record]
  *
  * --live (or HARNESS_JEV_LIVE=1): structural live path for verify-on-stop.
- * Jev is skill-scoped (shape-up / product-delivery only) and is not invoked
- * from harness invariants.
+ * Jev is an optional module used only by the shape-up / product-delivery skills;
+ * harness invariants never import or call it.
  *
  * --live or --record: the run's FAIL lines (QG-LEARN-01) and WARN lines (QG-LEARN-08)
  * are recorded as learning signals under .harness/state/learning/signals/. HARNESS_RUNTIME names the runtime
@@ -33,7 +33,6 @@ import validateLiteEscalation from './validators/lite-escalation.mjs';
 import validatePhaseChain from './validators/phase-chain.mjs';
 import validateSpecDrift from './validators/spec-drift.mjs';
 import validateLearning from './validators/learning.mjs';
-import { assertJevConfigured } from './jev-gates.mjs';
 
 const root = process.cwd();
 const errors = [];
@@ -78,12 +77,6 @@ validateLiteEscalation(ctx);
 validatePhaseChain(ctx);
 validateSpecDrift(ctx);
 validateLearning(ctx);
-
-// Jev is skill-scoped (shape-up / product-delivery). Harness invariants never invoke System One.
-const jevReady = assertJevConfigured();
-if (!jevReady.ok) {
-  fail(jevReady.error);
-}
 
 if (warnings.length) {
   for (const w of warnings) console.warn(`WARN  ${w}`);

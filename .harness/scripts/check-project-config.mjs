@@ -97,9 +97,14 @@ if (config) {
 		warnings.push('project bindings are scaffolded but still require project-specific content');
 	}
 
+	// Jev is an optional module: capabilities.jev is required only when modules.jev is true.
 	const jev = config.capabilities?.jev;
-	if (!jev || typeof jev !== 'object') {
-		errors.push(`${configPath}.capabilities.jev is required`);
+	if (jev === undefined) {
+		if (config.modules?.jev === true) {
+			errors.push(`${configPath}.capabilities.jev is required when modules.jev is true (re-run the installer with --modules=jev)`);
+		}
+	} else if (!jev || typeof jev !== 'object') {
+		errors.push(`${configPath}.capabilities.jev must be an object`);
 	} else {
 		// Jev is skill-scoped: required only for shape-up + product-delivery.
 		// Harness ASDD phases must not treat global required=true as a gate.
