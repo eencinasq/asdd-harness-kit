@@ -19,7 +19,7 @@
       "verification": [
         "node --test scripts/check-guidance.test.mjs"
       ],
-      "evidence": "Re-verified after DRIFT-02 (TASK-003 added REQ-012 assertions to scripts/test-install-into.sh): node --test scripts/check-guidance.test.mjs 5/5 pass; test-install-into syntax OK and its stale stage passes. OCR review 1 holds (CR-001 fixed).",
+      "evidence": "Re-verified after DRIFT-02 (TASK-005 edited test-install-into.sh, package.json): check-guidance tests 5/5; all four checks PASS on the kit; test-install-into exit 0 at 38b4823 (sensor stages PASS on the installed project).",
       "scope_paths": [
         "scripts/check-guidance.mjs",
         "scripts/check-guidance.test.mjs",
@@ -29,7 +29,7 @@
         ".harness/steering/quality-gates.project.md",
         "docs/agent-failure-log.md"
       ],
-      "evidence_commit": "46e42f1"
+      "evidence_commit": "38b4823"
     },
     {
       "id": "TASK-002",
@@ -72,7 +72,7 @@
       "verification": [
         "bash scripts/test-install-into.sh (stale check green)"
       ],
-      "evidence": "Re-verified after DRIFT-02 (TASK-004 edited asdd-implementation-agent.md and asdd-discovery-agent.md, shared with this scope): check-guidance --only stale PASS on the kit and, in the same test-install-into run, on the installed project; REQ-012 assertions pass. OCR review 2 holds.",
+      "evidence": "Re-verified after DRIFT-02 (TASK-005 edited install-into.sh, implementation agent): stale PASS on the kit and installed project; REQ-012 assertions pass in test-install-into at 38b4823.",
       "scope_paths": [
         "AGENTS.md",
         ".harness/steering/session-loop.md",
@@ -89,7 +89,7 @@
         ".harness/scripts/check-project-config.mjs",
         ".harness/config/project.schema.json"
       ],
-      "evidence_commit": "4e86211",
+      "evidence_commit": "38b4823",
       "notes": "Deleted .harness/scripts/validators/locks.mjs and .harness/state/locks/README.md in 46e42f1 (removed from scope_paths: DRIFT-05 cannot express a deletion). Also added REQ-012 assertions to scripts/test-install-into.sh, a file owned by TASK-001, without listing it in this scope."
     },
     {
@@ -108,7 +108,7 @@
       "verification": [
         "node scripts/check-guidance.mjs --only cutoffs ."
       ],
-      "evidence": "node scripts/check-guidance.mjs --only cutoffs .: PASS (was 21 findings). bash scripts/test-install-into.sh: exit 0, cutoffs PASS on the installed project. Review 3: Markdown only, no findings.",
+      "evidence": "Re-verified after DRIFT-02 (TASK-005 edited the implementation agent): cutoffs PASS on the kit and installed project at 38b4823.",
       "scope_paths": [
         ".agents/agents/asdd-refactor-agent.md",
         ".agents/agents/asdd-domain-agent.md",
@@ -120,13 +120,13 @@
         ".agents/agents/asdd-implementation-agent.md",
         ".agents/agents/asdd-qa-agent.md"
       ],
-      "evidence_commit": "4e86211"
+      "evidence_commit": "38b4823"
     },
     {
       "id": "TASK-005",
       "title": "Command gate rename with shim and upgrade rewrite",
       "user_visible_behavior": "Move the gate to `command-gate.mjs` exporting `runHookCli()`; keep `jev-command-gate.mjs` as a shim; installer installs both and rewrites old hook entries without duplicates; update hooks, runtime recipes, MCP server, CI, docs, versions..",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 5,
       "owner": "claude",
       "req_ids": [
@@ -139,7 +139,7 @@
       "verification": [
         "node --test .harness/scripts/command-gate.test.mjs && bash scripts/test-install-into.sh"
       ],
-      "evidence": "",
+      "evidence": "node --test .harness/scripts/command-gate.test.mjs .agents/mcp/jev-gate-server.test.mjs: all pass (AC-006 shim parity on 4 payloads, shim re-exports). bash scripts/test-install-into.sh: exit 0 incl. upgrade test (one gate entry calling command-gate.mjs in Cursor and Claude; similar project hook untouched). npm test 128/128 before the CR-005 fix. OCR review 4: CR-005/006 MEDIUM fixed, CR-007 LOW.",
       "scope_paths": [
         ".harness/scripts/command-gate.mjs",
         ".harness/scripts/jev-command-gate.mjs",
@@ -156,7 +156,8 @@
         "README.md",
         ".harness/steering/controls.md",
         ".agents/agents/asdd-implementation-agent.md"
-      ]
+      ],
+      "evidence_commit": "38b4823"
     },
     {
       "id": "TASK-006",
