@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T01:33:20.431Z",
+  "generated_at": "2026-10-28T01:35:16.588Z",
   "threshold": 3,
   "summary": {
-    "patterns": 7,
+    "patterns": 8,
     "open": 0,
     "in_flight": 1,
     "verified": 0,
@@ -19,7 +19,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T01:33:20.372Z",
+      "last_seen": "2026-10-28T01:35:16.519Z",
       "sources": [
         "escalation"
       ],
@@ -167,6 +167,25 @@
       ],
       "examples": [
         "Seeding the kit's domain model in docs/architecture/ during Domain leaked it into installed projects, and `npm test` still passed: `! grep …` lines in scripts/test-install-into.sh (2) and scripts/test-lifecycle.sh (1) never fail under `set -e`."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-f374bf6d",
+      "signature": "sensor:DRIFT-02",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:34:26.022Z",
+      "last_seen": "2026-10-28T01:34:26.022Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [],
+      "examples": [
+        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification"
       ],
       "proposals": []
     }

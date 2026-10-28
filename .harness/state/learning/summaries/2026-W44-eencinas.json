@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "author": "eencinas",
+  "week": "2026-W44",
+  "signatures": {
+    "sensor:DRIFT-02": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-10-28T01:34:26.022Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification"
+      ]
+    }
+  }
+}
