@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { checkAsserts, checkBudget, checkCutoffs, checkStale, alwaysLoadedBytes } from './check-guidance.mjs';
+
+const KIT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 function withDir(fn) {
   return () => {
@@ -87,3 +91,12 @@ test('TASK-001: a bare `!` assertion in a kit test script fails', withDir((root,
   assert.equal(findings.length, 1);
   assert.match(findings[0], /scripts\/test-x\.sh:3/);
 }));
+
+test('REQ-006: the agent prompts the kit ships contain no cutoff of their own', () => {
+  assert.deepEqual(checkCutoffs(KIT_ROOT), []);
+});
+
+test('REQ-013: always-loaded steering plus AGENTS.md is below the 36,627 bytes it had before kit-hygiene', () => {
+  const size = alwaysLoadedBytes(KIT_ROOT);
+  assert.ok(size < 36627, `${size} bytes`);
+});

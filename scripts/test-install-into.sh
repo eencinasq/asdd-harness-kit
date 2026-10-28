@@ -100,7 +100,7 @@ cmp -s "$ROOT/scripts/templates/docs/domain-model.md" "$TMP/existing-app/docs/ar
 test ! -e "$TMP/existing-app/.harness/state/locks"
 test ! -e "$TMP/existing-app/.harness/progress"
 node -e 'const p = require(process.argv[1]).paths; if ("locks" in p || "progress" in p) throw new Error("project.json declares paths.locks or paths.progress");' "$TMP/existing-app/.harness/config/project.json"
-# Shipped guidance (kit-hygiene REQ-002, REQ-007, REQ-010) is checked where it lands: the installed project
+# Shipped guidance (kit-hygiene REQ-001/002 stale, REQ-006/007 cutoffs, REQ-010/013 budget) is checked where it lands: the installed project
 node "$ROOT/scripts/check-guidance.mjs" --only stale "$TMP/existing-app"
 node "$ROOT/scripts/check-guidance.mjs" --only cutoffs "$TMP/existing-app"
 node "$ROOT/scripts/check-guidance.mjs" --only budget "$TMP/existing-app"

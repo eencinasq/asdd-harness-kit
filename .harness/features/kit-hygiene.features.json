@@ -214,6 +214,30 @@
         ".harness/steering/quality-gates.project.md"
       ],
       "evidence_commit": "1cc0614"
+    },
+    {
+      "id": "TASK-008",
+      "title": "Name REQ-006 and test REQ-013",
+      "user_visible_behavior": "The test suite names and asserts every MUST requirement, so coverage does not rely on ID collisions with other slices.",
+      "status": "in_progress",
+      "priority": 8,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-006",
+        "REQ-013"
+      ],
+      "depends_on": [
+        "TASK-004",
+        "TASK-007"
+      ],
+      "verification": [
+        "node --test scripts/check-guidance.test.mjs"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "scripts/check-guidance.test.mjs",
+        "scripts/test-install-into.sh"
+      ]
     }
   ]
 }

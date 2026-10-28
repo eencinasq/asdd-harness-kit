@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-10-28T00:58:57.231Z",
-  "updated_at": "2026-10-28T01:30:57.508Z",
+  "updated_at": "2026-10-28T01:33:20.395Z",
   "paths": {
     "specs": ".harness/specs/kit-hygiene",
     "tasks": ".harness/specs/kit-hygiene/tasks.md",
@@ -61,9 +61,40 @@
       "at": "2026-10-28T01:06:50.345Z",
       "evidence": "Task Planning Readiness Gate PASS (QG-TPL-01): task planning confidence 0.86 >= 0.85, design READY. Tech Debt Cleanup Gate PASS (QG-DEB-04): npm test 0 failures after staging the domain model (see checkpoint 010; suite reliability fix planned in TASK-001). 7 tasks in 3 waves, serial, every REQ traced; feature tracker written.",
       "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-10-28T01:32:02.729Z",
+      "evidence": "7/7 features passing with evidence_commit; npm test 128/128; check-invariants --live PASS; OCR delegation reviews 1-6 in code-review-report.md (0 CRITICAL/HIGH; 3 MEDIUM fixed).",
+      "concerns": []
+    },
+    "qa": {
+      "status": "BLOCK",
+      "by": "eencinas",
+      "at": "2026-10-28T01:33:00.148Z",
+      "evidence": "Spec Coverage Gate BLOCK (QG-SPEC-05): MUST coverage 10/11, REQ-006 has no test that names it; SHOULD REQ-013 untested (WARN QG-SPEC-07). OBS-001/002 sensor defects logged. Report: spec-coverage-report.md",
+      "concerns": [
+        "UNCOV-001 REQ-006",
+        "UNCOV-002 REQ-013",
+        "OBS-001 DRIFT-04 false negative from REQ id collisions",
+        "OBS-002 priority matrix ignored"
+      ]
     }
   },
-  "active_features": [],
+  "active_features": [
+    {
+      "id": "TASK-008",
+      "owner": "asdd-implementation",
+      "human": "eencinas",
+      "since": "2026-10-28T01:33:20.372Z",
+      "handoff_from": null,
+      "scope_paths": [
+        "scripts/check-guidance.test.mjs",
+        "scripts/test-install-into.sh"
+      ]
+    }
+  ],
   "open_dissents": 0,
   "source": null,
   "session_log": [
@@ -314,6 +345,38 @@
       "event": "checkpoint",
       "phase": "implementation",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-10-28T01:32:02.729Z",
+      "agent": "asdd-implementation",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-10-28T01:33:00.148Z",
+      "agent": "asdd-qa",
+      "human": "eencinas",
+      "event": "phase_blocked",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-10-28T01:33:20.252Z",
+      "agent": "asdd-implementation",
+      "human": "eencinas",
+      "event": "phase_started",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-10-28T01:33:20.372Z",
+      "agent": "asdd-implementation",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
     }
   ],
   "contributors": [
@@ -326,6 +389,7 @@
     "asdd-domain",
     "asdd-design",
     "asdd-task-planning",
-    "asdd-implementation"
+    "asdd-implementation",
+    "asdd-qa"
   ]
 }

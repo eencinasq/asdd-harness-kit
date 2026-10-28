@@ -54,5 +54,13 @@ Serial execution (one owner, one `in_progress` feature). Each task ends with its
 - **Verification:** `node scripts/check-guidance.mjs --only budget .`
 - **REQ trace:** REQ-010, REQ-013
 
+## Wave 4 — from QA (spec-coverage-report.md, UNCOV-001/002)
+
+### TASK-008 — Name REQ-006 and test REQ-013
+- **Description:** Add tests in `scripts/check-guidance.test.mjs` that assert the kit's own agent prompts have no cutoff (REQ-006) and that the always-loaded steering is below 36,627 bytes (REQ-013); cite both IDs where `test-install-into.sh` runs the same checks on the installed project.
+- **Files affected:** `scripts/check-guidance.test.mjs`, `scripts/test-install-into.sh`
+- **Verification:** `node --test scripts/check-guidance.test.mjs`
+- **REQ trace:** REQ-006, REQ-013
+
 ## Task Planning Confidence Score
 0.86 — uncertainty: TASK-003 touches many files; TASK-005 depends on the hook merge code in the installer.

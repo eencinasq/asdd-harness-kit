@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T01:30:57.553Z",
+  "generated_at": "2026-10-28T01:33:20.431Z",
   "threshold": 3,
   "summary": {
-    "patterns": 4,
+    "patterns": 7,
     "open": 0,
     "in_flight": 1,
     "verified": 0,
@@ -19,7 +19,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T01:30:57.479Z",
+      "last_seen": "2026-10-28T01:33:20.372Z",
       "sources": [
         "escalation"
       ],
@@ -45,6 +45,27 @@
       ]
     },
     {
+      "id": "LP-e9c4ddb0",
+      "signature": "blocked:phase:qa",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:33:00.148Z",
+      "last_seen": "2026-10-28T01:33:00.148Z",
+      "sources": [
+        "blocked"
+      ],
+      "slices": [
+        "kit-hygiene"
+      ],
+      "examples": [
+        "Spec Coverage Gate BLOCK (QG-SPEC-05): MUST coverage 10/11, REQ-006 has no test that names it; SHOULD REQ-013 untested (WARN QG-SPEC-07). OBS-001/002 sensor defects logged. Report: spec-coverage-report.md"
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-130d8d22",
       "signature": "blocked:phase:validation",
       "kind": "escape",
@@ -62,6 +83,48 @@
       ],
       "examples": [
         "Validation Gate BLOCK (QG-VAL-01): VAL-001 BLOCKING on MUST REQ-008 - upgrade behavior for existing hook configs undefined; installer substring match would keep the old path forever. Validation confidence 0.80. Report: .harness/specs/kit-hygiene/spec-validation-report.md"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-16f38eb6",
+      "signature": "failure:drift:priority-matrix-ignored",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28",
+      "last_seen": "2026-10-28",
+      "sources": [
+        "failure"
+      ],
+      "slices": [
+        "kit-hygiene"
+      ],
+      "examples": [
+        "OBS-002 — the requirement parser reports 13 MUST requirements; two are SHOULD in the priority matrix."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-7efed69b",
+      "signature": "failure:drift:req-id-collision-across-slices",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28",
+      "last_seen": "2026-10-28",
+      "sources": [
+        "failure"
+      ],
+      "slices": [
+        "kit-hygiene"
+      ],
+      "examples": [
+        "OBS-001 — DRIFT-04 counted REQ-006 and REQ-013 as covered because tests from earlier slices mention the same unnamespaced IDs."
       ],
       "proposals": []
     },

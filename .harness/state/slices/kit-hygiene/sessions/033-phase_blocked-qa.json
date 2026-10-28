@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-033",
+  "timestamp": "2026-10-28T01:33:00.148Z",
+  "agent": "asdd-qa",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "UNCOV-001 REQ-006",
+    "UNCOV-002 REQ-013",
+    "OBS-001 DRIFT-04 false negative from REQ id collisions",
+    "OBS-002 priority matrix ignored"
+  ],
+  "event_type": "phase_blocked",
+  "phase": "qa",
+  "evidence": "Spec Coverage Gate BLOCK (QG-SPEC-05): MUST coverage 10/11, REQ-006 has no test that names it; SHOULD REQ-013 untested (WARN QG-SPEC-07). OBS-001/002 sensor defects logged. Report: spec-coverage-report.md"
+}

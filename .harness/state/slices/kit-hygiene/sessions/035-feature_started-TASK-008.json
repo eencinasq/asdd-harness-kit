@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-035",
+  "timestamp": "2026-10-28T01:33:20.372Z",
+  "agent": "asdd-implementation",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-008",
+  "scope_paths": [
+    "scripts/check-guidance.test.mjs",
+    "scripts/test-install-into.sh"
+  ],
+  "evidence": "Start TASK-008 (REQ-006, REQ-013)"
+}

@@ -33,3 +33,19 @@
 - **Failure:** Two commits meant for `main` landed on `fix/managed-runtime-files`; the branch had been switched outside the session and the agent did not run `git branch --show-current` before committing.
 - **Remediation:** Tech Lead chose a fast-forward of `main` to the branch head. Agents check the current branch before every commit.
 
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-qa
+- **Phase:** qa
+- **Signature:** drift:req-id-collision-across-slices
+- **Failure:** OBS-001 — DRIFT-04 counted REQ-006 and REQ-013 as covered because tests from earlier slices mention the same unnamespaced IDs.
+- **Remediation:** QA counted coverage by hand and blocked. Candidate fix (separate slice): namespace REQ mentions per slice or restrict DRIFT-04 to the slice's own test files.
+
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-qa
+- **Phase:** qa
+- **Signature:** drift:priority-matrix-ignored
+- **Failure:** OBS-002 — the requirement parser reports 13 MUST requirements; two are SHOULD in the priority matrix.
+- **Remediation:** Recorded; fix belongs with OBS-001 in a drift slice.
+
