@@ -5,7 +5,7 @@ import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } fro
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { deniedLabel, isDangerousCommand, checkCommandSafety } from './jev-command-gate.mjs';
+import { deniedLabel, isDangerousCommand, checkCommandSafety } from './command-gate.mjs';
 
 test('whitelist allows harness and git reads', () => {
   assert.equal(isDangerousCommand('git status'), false);
@@ -45,7 +45,7 @@ test('QG-LEARN-01: a hook denial writes a command signal without the command tex
     mkdirSync(join(root, '.harness'), { recursive: true });
     cpSync(here, join(root, '.harness/scripts'), { recursive: true });
     const payload = JSON.stringify({ hook_event_name: 'PreToolUse', tool_input: { command: 'rm -rf /tmp/secret-token-123' } });
-    const out = spawnSync(process.execPath, ['.harness/scripts/jev-command-gate.mjs'], { cwd: root, input: payload, encoding: 'utf8' });
+    const out = spawnSync(process.execPath, ['.harness/scripts/command-gate.mjs'], { cwd: root, input: payload, encoding: 'utf8' });
     assert.match(out.stdout, /"permissionDecision":"deny"/);
     const dir = join(root, '.harness/state/learning/signals');
     const [file] = readdirSync(dir);
@@ -55,4 +55,34 @@ test('QG-LEARN-01: a hook denial writes a command signal without the command tex
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('REQ-008 REQ-009 AC-006: command-gate.mjs and the jev-command-gate.mjs shim give identical verdicts', () => {
+  const root = mkdtempSync(join(tmpdir(), 'gate-shim-'));
+  try {
+    mkdirSync(join(root, '.harness'), { recursive: true });
+    cpSync(dirname(fileURLToPath(import.meta.url)), join(root, '.harness/scripts'), { recursive: true });
+    const payloads = [
+      { hook_event_name: 'PreToolUse', tool_input: { command: 'git push --force origin main' } },
+      { hook_event_name: 'PreToolUse', tool_input: { command: 'git status' } },
+      { command: 'rm -rf build' },
+      { command: 'ls -la' },
+    ];
+    for (const payload of payloads) {
+      const run = (script) => spawnSync(process.execPath, [`.harness/scripts/${script}`], { cwd: root, input: JSON.stringify(payload), encoding: 'utf8' });
+      const current = run('command-gate.mjs');
+      const shim = run('jev-command-gate.mjs');
+      assert.equal(current.status, 0);
+      assert.equal(shim.status, 0);
+      assert.equal(shim.stdout, current.stdout, `same verdict for ${JSON.stringify(payload)}`);
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('REQ-009: the shim re-exports the library API', async () => {
+  const shim = await import('./jev-command-gate.mjs');
+  assert.equal(shim.isDangerousCommand('rm -rf .'), true);
+  assert.equal((await shim.checkCommandSafety('git status')).allowed, true);
 });

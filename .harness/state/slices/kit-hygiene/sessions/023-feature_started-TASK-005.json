@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-023",
+  "timestamp": "2026-10-28T01:22:57.636Z",
+  "agent": "asdd-implementation",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "scope_paths": [
+    ".harness/scripts/command-gate.mjs",
+    ".harness/scripts/jev-command-gate.mjs",
+    ".harness/scripts/command-gate.test.mjs",
+    ".harness/scripts/jev-command-gate.test.mjs",
+    ".agents/mcp/jev-gate-server.mjs",
+    ".agents/mcp/README.md",
+    "scripts/install-into.sh",
+    "scripts/test-install-into.sh",
+    ".cursor/hooks.json",
+    "runtimes/**",
+    ".github/workflows/harness-invariants.yml",
+    "package.json",
+    "scripts/generate-versions.mjs",
+    "README.md",
+    ".harness/steering/controls.md",
+    ".agents/agents/asdd-implementation-agent.md"
+  ],
+  "evidence": "Start TASK-005 (REQ-008, REQ-009)"
+}

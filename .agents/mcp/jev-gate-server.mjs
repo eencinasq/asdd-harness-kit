@@ -15,7 +15,7 @@
  * Protocol: MCP over line-delimited JSON-RPC 2.0 on stdio
  */
 import { createInterface } from 'node:readline';
-import { checkCommandSafety } from '../../.harness/scripts/jev-command-gate.mjs';
+import { checkCommandSafety } from '../../.harness/scripts/command-gate.mjs';
 import {
   assertJevConfigured,
   shapeUpGates,

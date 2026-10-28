@@ -64,3 +64,20 @@ None.
 
 ### Recommendation
 PASS
+
+## Review 4 — TASK-005
+
+### Review Scope
+Workspace diff before the TASK-005 commit (OCR preview, code files): `.harness/scripts/command-gate.mjs` (renamed), `.harness/scripts/jev-command-gate.mjs` (shim), `.harness/scripts/command-gate.test.mjs`, `.agents/mcp/jev-gate-server.mjs`, `scripts/install-into.sh` (hook merge), `scripts/test-install-into.sh`, `scripts/generate-versions.mjs`, `.github/workflows/harness-invariants.yml`.
+
+### Findings
+| ID | Severity | File | Description |
+|----|----------|------|-------------|
+| CR-005 | MEDIUM | `scripts/install-into.sh` (Cursor and Claude merge) | The upgrade rewrite matched any command containing `jev-command-gate.mjs`, so a project-owned hook such as `tools/jev-command-gate.mjs` would be pointed at a file that does not exist. **Fixed:** only `.harness/scripts/jev-command-gate.mjs` is rewritten; the upgrade test now includes a similarly named project hook and asserts it is untouched. |
+| CR-006 | MEDIUM | `.harness/scripts/command-gate.mjs` | The Cursor `agent_message` still named `jev-command-gate.mjs`. **Fixed** before review. |
+| CR-007 | LOW | `scripts/install-into.sh` | The "gate already present" check is a substring match (`command-gate.mjs`); a project hook with that substring would suppress adding the kit gate. Pre-existing behavior, unchanged in kind. |
+
+No CRITICAL or HIGH findings.
+
+### Recommendation
+PASS_WITH_NOTES (CR-005, CR-006 fixed; CR-007 noted)

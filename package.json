@@ -34,7 +34,7 @@
     "!docs/knowledge-base/steering-proposals/**"
   ],
   "scripts": {
-    "test": "bash scripts/test-install-into.sh && bash scripts/test-lifecycle.sh && node --test scripts/check-guidance.test.mjs .harness/scripts/jev-client.test.mjs .harness/scripts/jev-command-gate.test.mjs .harness/scripts/sync-knowledge.test.mjs .harness/scripts/sync-state.test.mjs .agents/mcp/jev-gate-server.test.mjs .harness/scripts/drift-lib.test.mjs .harness/scripts/semgrep-lib.test.mjs .harness/scripts/audit-codebase.test.mjs .harness/scripts/learning-lib.test.mjs .agents/mcp/spec-drift-auditor.test.mjs .agents/modules/http-api/adapters/openapi.test.mjs tools/drift-dashboard/src/model.test.mjs",
+    "test": "bash scripts/test-install-into.sh && bash scripts/test-lifecycle.sh && node --test scripts/check-guidance.test.mjs .harness/scripts/jev-client.test.mjs .harness/scripts/command-gate.test.mjs .harness/scripts/sync-knowledge.test.mjs .harness/scripts/sync-state.test.mjs .agents/mcp/jev-gate-server.test.mjs .harness/scripts/drift-lib.test.mjs .harness/scripts/semgrep-lib.test.mjs .harness/scripts/audit-codebase.test.mjs .harness/scripts/learning-lib.test.mjs .agents/mcp/spec-drift-auditor.test.mjs .agents/modules/http-api/adapters/openapi.test.mjs tools/drift-dashboard/src/model.test.mjs",
     "test:full-flow": "bash scripts/test-full-flow.sh",
     "build:ui": "vite build --config tools/drift-dashboard/vite.config.mjs"
   },

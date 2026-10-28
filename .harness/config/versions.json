@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "kit_version": "3.8.1",
-  "generated_at": "2026-10-28T00:56:16.373Z",
+  "generated_at": "2026-10-28T01:24:17.851Z",
   "artifacts": {
     ".harness/steering/domain-layer.md": "3.8.1",
     ".harness/steering/quality-gates.md": "3.8.1",
@@ -44,6 +44,7 @@
     ".harness/scripts/sync-state.mjs": "3.8.1",
     ".harness/scripts/jev-client.mjs": "3.8.1",
     ".harness/scripts/jev-gates.mjs": "3.8.1",
+    ".harness/scripts/command-gate.mjs": "3.8.1",
     ".harness/scripts/jev-command-gate.mjs": "3.8.1",
     ".harness/scripts/env-loader.mjs": "3.8.1",
     ".harness/scripts/knowledge-lib.mjs": "3.8.1",
@@ -62,7 +63,6 @@
     ".harness/scripts/validators/jev-gold-plating.mjs": "3.8.1",
     ".harness/scripts/validators/learning.mjs": "3.8.1",
     ".harness/scripts/validators/lite-escalation.mjs": "3.8.1",
-    ".harness/scripts/validators/locks.mjs": "3.8.1",
     ".harness/scripts/validators/manifest.mjs": "3.8.1",
     ".harness/scripts/validators/paths.mjs": "3.8.1",
     ".harness/scripts/validators/phase-chain.mjs": "3.8.1",

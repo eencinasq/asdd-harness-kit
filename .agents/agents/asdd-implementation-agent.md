@@ -26,7 +26,7 @@ Catalog: `.harness/steering/skills.md` (name and description only). `Read` a ski
 
 Jev is scoped to the `shape-up` and `product-delivery` skills ([jev.md](../../.harness/steering/jev.md)). This agent does not call it.
 
-- Dangerous bash: `checkCommandSafety` in `.harness/scripts/jev-command-gate.mjs` (pattern allow/deny only). Block when not allowed.
+- Dangerous bash: `checkCommandSafety` in `.harness/scripts/command-gate.mjs` (pattern allow/deny only). Block when not allowed.
 - Gold-plating: `check-invariants.mjs` runs spec drift check `DRIFT-01` (changed files must be mapped by the slice spec or in-progress `scope_paths`).
 
 ---

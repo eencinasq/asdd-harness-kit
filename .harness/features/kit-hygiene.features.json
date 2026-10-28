@@ -126,7 +126,7 @@
       "id": "TASK-005",
       "title": "Command gate rename with shim and upgrade rewrite",
       "user_visible_behavior": "Move the gate to `command-gate.mjs` exporting `runHookCli()`; keep `jev-command-gate.mjs` as a shim; installer installs both and rewrites old hook entries without duplicates; update hooks, runtime recipes, MCP server, CI, docs, versions..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 5,
       "owner": "claude",
       "req_ids": [
@@ -144,7 +144,6 @@
         ".harness/scripts/command-gate.mjs",
         ".harness/scripts/jev-command-gate.mjs",
         ".harness/scripts/command-gate.test.mjs",
-        ".harness/scripts/jev-command-gate.test.mjs",
         ".agents/mcp/jev-gate-server.mjs",
         ".agents/mcp/README.md",
         "scripts/install-into.sh",

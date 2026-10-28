@@ -95,7 +95,7 @@ Do not copy from another product monorepo: specs, `PROGRESS.md` history, filled 
 5. Validate the generated adapter: `node .harness/scripts/check-project-config.mjs`.
 6. Validate Harness state: `node .harness/scripts/check-invariants.mjs`. This also checks that `.harness/steering/skills.md` lists only the name and description of each folder under `.agents/skills/`.
 7. Fill `quality-gates.project.md` before Discovery: the full-suite command, the failure-log path, and `Active findings` (`none` or real rows). A stub blocks the gate that needs it.
-8. With `--runtime=cursor`, confirm `.cursor/hooks.json` runs `node .harness/scripts/verify-on-stop.mjs` on `stop` and `node .harness/scripts/jev-command-gate.mjs` on `beforeShellExecution`. With `--runtime=claude`, confirm `.claude/settings.json` registers the same two scripts on `Stop` and `PreToolUse` (Bash).
+8. With `--runtime=cursor`, confirm `.cursor/hooks.json` runs `node .harness/scripts/verify-on-stop.mjs` on `stop` and `node .harness/scripts/command-gate.mjs` on `beforeShellExecution`. With `--runtime=claude`, confirm `.claude/settings.json` registers the same two scripts on `Stop` and `PreToolUse` (Bash).
 9. For `shape-up` / `product-delivery`: set `JEV_API_KEY`, keep `capabilities.jev.apiKey` empty, prefer the `jev-gate` MCP server (`jev_status`), shell fallback `node .harness/scripts/jev-gates.mjs health`. Confirm `required: false` and `required_by: ["shape-up","product-delivery"]` ([Jev](#jev-skill-scoped)).
 10. Optional spec drift and audit bindings in `quality-gates.project.md` (`Test file globs`, `Drift base branch`, `Audit commands`, `Contract command`, `OpenAPI spec`) and the `Gate command` in `domain-layer.project.md`. Unfilled ones report `unconfigured`. Keep `drift.contract: "warn"` in `project.json` until every feature has `scope_paths` and `passing` features have `evidence_commit`, then set `"fail"` ([spec drift](#spec-drift-and-codebase-audit)).
 11. Create the first slice via Discovery or ASDD-Lite.
@@ -156,7 +156,7 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 |---------|------------------------|----------------|
 | Cursor | `beforeShellExecution` hook (fail-closed) | `stop` hook (fail-closed) |
 | Claude Code | `PreToolUse`/`Bash` hook | `Stop` hook (loop-safe) |
-| OpenCode, Kimi, Junie, Devin, Kiro | Advisory — run `node .harness/scripts/jev-command-gate.mjs` before dangerous commands, or expose the `check_command_safety` MCP tool (no System One) | Run `node .harness/scripts/check-invariants.mjs --live` before marking `passing` (no `JEV_API_KEY` required); a failing run is recorded as a learning signal |
+| OpenCode, Kimi, Junie, Devin, Kiro | Advisory — run `node .harness/scripts/command-gate.mjs` before dangerous commands, or expose the `check_command_safety` MCP tool (no System One) | Run `node .harness/scripts/check-invariants.mjs --live` before marking `passing` (no `JEV_API_KEY` required); a failing run is recorded as a learning signal |
 
 | Command | Purpose |
 |---|---|
@@ -184,7 +184,7 @@ A guide steers the agent before it edits. A sensor checks the result and, on fai
 | Before any product edit | Stay inside the files mapped to the active spec. Do not refactor unless the spec, the current task, or the slice phase `refactor` asks for it | `.harness/steering/session-loop.md` |
 | At a full-ASDD phase gate | Apply EARS / coverage criteria in `quality-gates.md`. Lite skips those numeric gates | `.harness/steering/quality-gates.md` |
 | Before a Shape Up bet or writing intents | `jev-gate` MCP (`jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate`) — shape-up / product-delivery only | `.harness/steering/jev.md` |
-| Dangerous bash | `jev-command-gate.mjs` pattern allow/deny (no Jev) — hook-wired on Cursor and Claude Code, both fail-closed; advisory elsewhere | `.harness/scripts/jev-command-gate.mjs` |
+| Dangerous bash | `command-gate.mjs` pattern allow/deny (no Jev) — hook-wired on Cursor and Claude Code, both fail-closed; advisory elsewhere | `.harness/scripts/command-gate.mjs` |
 | In-progress diff vs spec | Deterministic scope mapping (`session-loop.md` + `features.mjs`); Jev gold-plating is disabled | `.harness/steering/session-loop.md` |
 | Lite slice governance | Serial rule (one `in_progress`, FAIL) + escalation signals block `DONE` while open (`validators/lite-escalation.mjs`, `sync-state.mjs`) | `.harness/steering/asdd-lite.md` |
 | Before `passing` or session end | `node .harness/scripts/check-invariants.mjs` must exit 0. WARN does not block. FAIL does | `session-loop.md` |
@@ -357,7 +357,7 @@ TypeSafe **System One** is required **only** by the `shape-up` and `product-deli
 | Shape Up | `jev_status`, `jev_shape_up_gates` (appetite ≥ 4, rabbit hole ≥ 0.80) |
 | Product Delivery | `jev_status`, `jev_scope_choice` (must_have / nice_to_have / reshape), `jev_ears_gate` (≥ 0.85) |
 | Trackers | None — overlapping `scope_paths` are checked by `validators/features.mjs` |
-| Harness | None — `jev-command-gate.mjs` is a pattern-only command gate; `check-invariants --live` does not need the key |
+| Harness | None — `command-gate.mjs` is a pattern-only command gate; `check-invariants --live` does not need the key |
 
 Prefer the **`jev-gate` MCP server** (`.agents/mcp/jev-gate-server.mjs`): `jev_status`, `jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate`, and `check_command_safety` (hooks; pattern only). Shell fallback when MCP is unavailable:
 
@@ -371,7 +371,7 @@ node .harness/scripts/jev-gates.mjs health
 |---|---|
 | `jev-client.mjs` | The only HTTP client: `POST {endpoint}/systemone` |
 | `jev-gates.mjs` | Shape Up, scope, EARS, and hill gates (the library behind the MCP server) |
-| `jev-command-gate.mjs` | Pattern command safety and the runtime hook entrypoint |
+| `command-gate.mjs` | Pattern command safety and the runtime hook entrypoint (`jev-command-gate.mjs` is a deprecated shim for old hook configs; the installer rewrites them) |
 
 Config in `.harness/config/project.json` (`apiKey` stays empty; the key comes from the environment):
 

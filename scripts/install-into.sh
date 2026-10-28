@@ -522,6 +522,8 @@ install_harness_scaffold() {
   fi
   copy_file "$KIT_DIR/.harness/scripts/sync-knowledge.mjs" "$TARGET/.harness/scripts/sync-knowledge.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/jev-gates.mjs" "$TARGET/.harness/scripts/jev-gates.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/command-gate.mjs" "$TARGET/.harness/scripts/command-gate.mjs" refresh
+  # Deprecated shim: hook configs not yet rewritten still call it (identical verdicts)
   copy_file "$KIT_DIR/.harness/scripts/jev-command-gate.mjs" "$TARGET/.harness/scripts/jev-command-gate.mjs" refresh
   copy_file "$KIT_DIR/.harness/config/project.schema.json" "$TARGET/.harness/config/project.schema.json" refresh
   copy_file "$KIT_DIR/.harness/config/README.md" "$TARGET/.harness/config/README.md" refresh
@@ -921,7 +923,7 @@ const stopHook = {
   failClosed: true,
 };
 const shellGateHook = {
-  command: 'node .harness/scripts/jev-command-gate.mjs',
+  command: 'node .harness/scripts/command-gate.mjs',
   timeout: 30,
   failClosed: true,
 };
@@ -937,10 +939,17 @@ if (!stopList.some((entry) => String(entry?.command ?? '').includes('verify-on-s
 }
 
 const gateList = Array.isArray(data.hooks.beforeShellExecution) ? data.hooks.beforeShellExecution : [];
-if (!gateList.some((entry) => String(entry?.command ?? '').includes('jev-command-gate.mjs'))) {
+// Upgrade: the kit gate was renamed from jev-command-gate.mjs; rewrite only the kit path, in place.
+for (const entry of gateList) {
+  if (typeof entry?.command === 'string' && entry.command.includes('.harness/scripts/jev-command-gate.mjs')) {
+    entry.command = entry.command.replaceAll('.harness/scripts/jev-command-gate.mjs', '.harness/scripts/command-gate.mjs');
+    console.log(`MERGE ${dest} (beforeShellExecution: jev-command-gate → command-gate)`);
+  }
+}
+if (!gateList.some((entry) => String(entry?.command ?? '').includes('command-gate.mjs'))) {
   gateList.push(shellGateHook);
   data.hooks.beforeShellExecution = gateList;
-  console.log(`MERGE ${dest} (beforeShellExecution → jev-command-gate)`);
+  console.log(`MERGE ${dest} (beforeShellExecution → command-gate)`);
 }
 
 writeFileSync(dest, `${JSON.stringify(data, null, 2)}\n`);
@@ -950,7 +959,7 @@ EOF
 install_claude_hooks() {
   local dest="$TARGET/.claude/settings.json"
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    log "${C_DIM}HOOK${C_RESET}  $dest PreToolUse(Bash) → jev-command-gate, Stop → verify-on-stop"
+    log "${C_DIM}HOOK${C_RESET}  $dest PreToolUse(Bash) → command-gate, Stop → verify-on-stop"
     return 0
   fi
   if ! command -v node >/dev/null 2>&1; then
@@ -963,18 +972,25 @@ install_claude_hooks() {
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 const dest = process.argv[2];
-const gateCmd = 'node .harness/scripts/jev-command-gate.mjs';
+const gateCmd = 'node .harness/scripts/command-gate.mjs';
 const stopCmd = 'node .harness/scripts/verify-on-stop.mjs';
 const data = existsSync(dest) ? JSON.parse(readFileSync(dest, 'utf8')) : {};
 data.hooks ??= {};
 
 const preList = Array.isArray(data.hooks.PreToolUse) ? data.hooks.PreToolUse : [];
+// Upgrade: the kit gate was renamed from jev-command-gate.mjs; rewrite only the kit path, in place.
+for (const h of preList.flatMap((entry) => entry?.hooks ?? [])) {
+  if (typeof h?.command === 'string' && h.command.includes('.harness/scripts/jev-command-gate.mjs')) {
+    h.command = h.command.replaceAll('.harness/scripts/jev-command-gate.mjs', '.harness/scripts/command-gate.mjs');
+    console.log(`MERGE ${dest} (PreToolUse: jev-command-gate → command-gate)`);
+  }
+}
 const hasGate = preList.some((entry) =>
-  (entry?.hooks ?? []).some((h) => String(h?.command ?? '').includes('jev-command-gate.mjs')));
+  (entry?.hooks ?? []).some((h) => String(h?.command ?? '').includes('command-gate.mjs')));
 if (!hasGate) {
   preList.push({ matcher: 'Bash', hooks: [{ type: 'command', command: gateCmd }] });
   data.hooks.PreToolUse = preList;
-  console.log(`MERGE ${dest} (PreToolUse/Bash → jev-command-gate)`);
+  console.log(`MERGE ${dest} (PreToolUse/Bash → command-gate)`);
 }
 
 const stopList = Array.isArray(data.hooks.Stop) ? data.hooks.Stop : [];
@@ -1365,7 +1381,7 @@ print_summary() {
     log "  Agents use model: inherit (they run on the invoking session's model)."
     log "  Review .harness/config/models.json for tier rationale."
     if [[ "$RUNTIMES" == *cursor* ]]; then
-      log "  Cursor:  verify-on-stop + jev-command-gate hooks active in .cursor/hooks.json"
+      log "  Cursor:  verify-on-stop + command-gate hooks active in .cursor/hooks.json"
     fi
     if [[ "$RUNTIMES" == *claude* ]]; then
       log "  Claude:  .claude/settings.json PreToolUse(Bash)+Stop hooks"

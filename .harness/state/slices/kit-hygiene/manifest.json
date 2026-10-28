@@ -7,13 +7,13 @@
   "escalation_signals": [
     {
       "type": "E1-scope-spread",
-      "evidence": "scope touches 6 top-level modules: .agents, .harness, AGENTS.md, docs, package.json, scripts"
+      "evidence": "scope touches 10 top-level modules: .agents, .cursor, .github, .harness, AGENTS.md, README.md, docs, package.json, runtimes, scripts"
     }
   ],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-10-28T00:58:57.231Z",
-  "updated_at": "2026-10-28T01:22:41.822Z",
+  "updated_at": "2026-10-28T01:22:57.660Z",
   "paths": {
     "specs": ".harness/specs/kit-hygiene",
     "tasks": ".harness/specs/kit-hygiene/tasks.md",
@@ -63,7 +63,33 @@
       "concerns": []
     }
   },
-  "active_features": [],
+  "active_features": [
+    {
+      "id": "TASK-005",
+      "owner": "asdd-implementation",
+      "human": "eencinas",
+      "since": "2026-10-28T01:22:57.636Z",
+      "handoff_from": null,
+      "scope_paths": [
+        ".harness/scripts/command-gate.mjs",
+        ".harness/scripts/jev-command-gate.mjs",
+        ".harness/scripts/command-gate.test.mjs",
+        ".harness/scripts/jev-command-gate.test.mjs",
+        ".agents/mcp/jev-gate-server.mjs",
+        ".agents/mcp/README.md",
+        "scripts/install-into.sh",
+        "scripts/test-install-into.sh",
+        ".cursor/hooks.json",
+        "runtimes/**",
+        ".github/workflows/harness-invariants.yml",
+        "package.json",
+        "scripts/generate-versions.mjs",
+        "README.md",
+        ".harness/steering/controls.md",
+        ".agents/agents/asdd-implementation-agent.md"
+      ]
+    }
+  ],
   "open_dissents": 0,
   "source": null,
   "session_log": [
@@ -242,6 +268,14 @@
       "event": "checkpoint",
       "phase": "implementation",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-10-28T01:22:57.636Z",
+      "agent": "asdd-implementation",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
     }
   ],
   "contributors": [

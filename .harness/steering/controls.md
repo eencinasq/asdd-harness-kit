@@ -24,7 +24,7 @@ Practice behind this layout: [Harness engineering for coding agent users](https:
 | Spec drift (`DRIFT-01`…`07`) | Sensor | Computational, left (in invariants) and in CI; on demand via `spec-drift-auditor` MCP | Behaviour scope, spec traceability | [spec-drift.md](./spec-drift.md), `check-spec-drift.mjs` |
 | Codebase audit | Sensor | Computational (`audit-codebase.mjs`) plus inferential (`codebase-audit` skill), scheduled | Drift and health outside the change lifecycle | [spec-drift.md](./spec-drift.md), `.harness/audits/` |
 | Jev (shape-up / product-delivery only) | Sensor | Computational (System One) | Betting + EARS/slice quality | [jev.md](./jev.md), `jev-gates.mjs` |
-| Command pattern gate | Sensor | Pattern allow/deny before dangerous bash (no Jev) | Safety | `jev-command-gate.mjs` |
+| Command pattern gate | Sensor | Pattern allow/deny before dangerous bash (no Jev) | Safety | `command-gate.mjs` |
 | CI invariants | Sensor | Computational, after integration; repeats the left check | Harness state | `.github/workflows/harness-invariants.yml` |
 | Full suite (SP-002) | Sensor | Computational, before a new spec enters Task Planning | Behaviour | [quality-gates.project.md](./quality-gates.project.md) |
 | Learning loop (`QG-LEARN-*`) | Sensor on the controls themselves | Computational (`learn.mjs`, `validators/learning.mjs`), every sync and stop; proposals inferential, decided by the Tech Lead | The guides and sensors in this table | [quality-gates.md](./quality-gates.md#learning-gate), `docs/knowledge-base/steering-proposals/` |

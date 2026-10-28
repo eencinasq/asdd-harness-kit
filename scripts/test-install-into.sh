@@ -65,7 +65,8 @@ node -e 'const j=require(process.argv[1]).capabilities.jev; if (j.required !== f
 grep -q '"apiKey": ""' "$TMP/existing-app/.harness/config/project.json"
 test -f "$TMP/existing-app/.harness/scripts/jev-client.mjs"
 test -f "$TMP/existing-app/.harness/scripts/jev-gates.mjs"
-test -f "$TMP/existing-app/.harness/scripts/jev-command-gate.mjs"
+test -f "$TMP/existing-app/.harness/scripts/command-gate.mjs"
+test -f "$TMP/existing-app/.harness/scripts/jev-command-gate.mjs"  # deprecated shim
 test -f "$TMP/existing-app/.agents/mcp/jev-gate-server.mjs"
 test -f "$TMP/existing-app/.harness/steering/jev.md"
 # Knowledge index (vector/graph-lite projection of specs + state)
@@ -176,15 +177,15 @@ grep -q 'skills-index:start' "$TMP/existing-app/.harness/steering/skills.md"
 test -f "$TMP/existing-app/.harness/scripts/verify-on-stop.mjs"
 test -f "$TMP/existing-app/.cursor/hooks.json"
 grep -q 'verify-on-stop.mjs' "$TMP/existing-app/.cursor/hooks.json"
-grep -q 'jev-command-gate.mjs' "$TMP/existing-app/.cursor/hooks.json"
+grep -q 'node .harness/scripts/command-gate.mjs' "$TMP/existing-app/.cursor/hooks.json"
 grep -q 'beforeShellExecution' "$TMP/existing-app/.cursor/hooks.json"
 grep -q '"failClosed": true' "$TMP/existing-app/.cursor/hooks.json"
 # command gate speaks the Cursor beforeShellExecution contract
-(cd "$TMP/existing-app" && echo '{"command":"git status"}' | env -u JEV_API_KEY node .harness/scripts/jev-command-gate.mjs) | grep -q '"permission": *"allow"'
-(cd "$TMP/existing-app" && echo '{"command":"rm -rf /tmp/anything"}' | env -u JEV_API_KEY node .harness/scripts/jev-command-gate.mjs) | grep -q '"permission": *"deny"'
+(cd "$TMP/existing-app" && echo '{"command":"git status"}' | env -u JEV_API_KEY node .harness/scripts/command-gate.mjs) | grep -q '"permission": *"allow"'
+(cd "$TMP/existing-app" && echo '{"command":"rm -rf /tmp/anything"}' | env -u JEV_API_KEY node .harness/scripts/command-gate.mjs) | grep -q '"permission": *"deny"'
 # command gate speaks the Claude Code PreToolUse contract
-(cd "$TMP/existing-app" && echo '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"git status"}}' | env -u JEV_API_KEY node .harness/scripts/jev-command-gate.mjs) | grep -q '"permissionDecision": *"allow"'
-(cd "$TMP/existing-app" && echo '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"rm -rf /tmp/anything"}}' | env -u JEV_API_KEY node .harness/scripts/jev-command-gate.mjs) | grep -q '"permissionDecision": *"deny"'
+(cd "$TMP/existing-app" && echo '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"git status"}}' | env -u JEV_API_KEY node .harness/scripts/command-gate.mjs) | grep -q '"permissionDecision": *"allow"'
+(cd "$TMP/existing-app" && echo '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"rm -rf /tmp/anything"}}' | env -u JEV_API_KEY node .harness/scripts/command-gate.mjs) | grep -q '"permissionDecision": *"deny"'
 test -f "$TMP/existing-app/.harness/scripts/check-project-config.mjs"
 test -f "$TMP/existing-app/.harness/config/project.schema.json"
 test ! -e "$TMP/existing-app/scripts/harness-migrate.mjs"
@@ -240,7 +241,7 @@ printf '%s\n' '{"version":1,"hooks":{"beforeShellExecution":[{"command":"echo ke
 "$ROOT/scripts/install-into.sh" "$TMP/existing-app" --runtime=cursor --skip-deps >/dev/null
 grep -q 'echo keep-me' "$TMP/existing-app/.cursor/hooks.json"
 grep -q 'verify-on-stop.mjs' "$TMP/existing-app/.cursor/hooks.json"
-grep -q 'jev-command-gate.mjs' "$TMP/existing-app/.cursor/hooks.json"
+grep -q 'node .harness/scripts/command-gate.mjs' "$TMP/existing-app/.cursor/hooks.json"
 
 # existing mcp.json gains spec-drift-auditor without dropping other servers
 printf '%s\n' '{"mcpServers":{"mine":{"type":"stdio","command":"echo"}}}' >"$TMP/existing-app/.agents/mcp/mcp.json"
@@ -251,8 +252,26 @@ grep -q '"spec-drift-auditor"' "$TMP/existing-app/.agents/mcp/mcp.json"
 # second run keeps binding, does not require --force for create-only, stays hook-idempotent
 "$ROOT/scripts/install-into.sh" "$TMP/existing-app" --skip-deps >/dev/null
 grep -q 'KEEP ME' "$TMP/existing-app/.harness/steering/product.md"
-GATE_COUNT="$(node -e "const h=JSON.parse(require('fs').readFileSync('$TMP/existing-app/.cursor/hooks.json','utf8')); process.stdout.write(String((h.hooks.beforeShellExecution||[]).filter((e)=>String(e?.command??'').includes('jev-command-gate')).length))")"
+GATE_COUNT="$(node -e "const h=JSON.parse(require('fs').readFileSync('$TMP/existing-app/.cursor/hooks.json','utf8')); process.stdout.write(String((h.hooks.beforeShellExecution||[]).filter((e)=>String(e?.command??'').includes('command-gate.mjs')).length))")"
 [[ "$GATE_COUNT" == "1" ]]
+
+# Upgrade (kit-hygiene REQ-008, AC-006): an old gate entry is rewritten, never duplicated
+printf '%s\n' '{"version":1,"hooks":{"beforeShellExecution":[{"command":"node .harness/scripts/jev-command-gate.mjs","timeout":30,"failClosed":true},{"command":"node tools/jev-command-gate.mjs --mine"}]}}' >"$TMP/existing-app/.cursor/hooks.json"
+mkdir -p "$TMP/existing-app/.claude"
+printf '%s\n' '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"node .harness/scripts/jev-command-gate.mjs"}]}]}}' >"$TMP/existing-app/.claude/settings.json"
+"$ROOT/scripts/install-into.sh" "$TMP/existing-app" --runtime=cursor,claude --skip-deps >/dev/null
+node -e '
+  const fs = require("fs");
+  const [cursorPath, claudePath] = process.argv.slice(1);
+  const cursor = JSON.parse(fs.readFileSync(cursorPath, "utf8")).hooks.beforeShellExecution.map((e) => e.command);
+  const claude = JSON.parse(fs.readFileSync(claudePath, "utf8")).hooks.PreToolUse.flatMap((e) => e.hooks.map((h) => h.command));
+  for (const [name, cmds] of [["cursor", cursor], ["claude", claude]]) {
+    const gates = cmds.filter((c) => c.includes(".harness/scripts/") && c.includes("command-gate.mjs"));
+    if (gates.length !== 1 || gates[0] !== "node .harness/scripts/command-gate.mjs")
+      throw new Error(`${name}: expected one gate entry calling command-gate.mjs, got ${JSON.stringify(cmds)}`);
+  }
+  if (!cursor.includes("node tools/jev-command-gate.mjs --mine")) throw new Error("a project-owned hook with a similar name was rewritten");
+' "$TMP/existing-app/.cursor/hooks.json" "$TMP/existing-app/.claude/settings.json"
 
 # ------------------------------------------------------------------
 # Per-runtime MCP validation
@@ -289,7 +308,7 @@ for rt in cursor claude opencode kimi junie devin kiro; do
       validate_runtime_mcp "$RTMP/$rt-app" "$rt" ".mcp.json"
       test -f "$RTMP/$rt-app/CLAUDE.md"
       test -f "$RTMP/$rt-app/.claude/settings.json"
-      grep -q 'jev-command-gate.mjs' "$RTMP/$rt-app/.claude/settings.json"
+      grep -q 'node .harness/scripts/command-gate.mjs' "$RTMP/$rt-app/.claude/settings.json"
       grep -q 'verify-on-stop.mjs' "$RTMP/$rt-app/.claude/settings.json"
       ;;
     opencode)
