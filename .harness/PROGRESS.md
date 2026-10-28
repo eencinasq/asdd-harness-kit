@@ -4,4 +4,4 @@
 
 | Slice | Mode | Phase | Status | Active features |
 |-------|------|-------|--------|-----------------|
-| kit-hygiene | full | implementation | in_progress | 0 |
+| kit-hygiene | full | implementation | in_progress | 1 |

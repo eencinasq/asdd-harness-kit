@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-026",
+  "timestamp": "2026-10-28T01:27:05.290Z",
+  "agent": "asdd-implementation",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-006",
+  "scope_paths": [
+    "scripts/install-into.sh",
+    "scripts/generate-versions.mjs",
+    "scripts/templates/docs/domain-model.md",
+    "docs/architecture/domain-model.md",
+    ".harness/specs/kit-hygiene/domain-model.md",
+    "scripts/test-install-into.sh",
+    "package.json"
+  ],
+  "evidence": "Start TASK-006 (REQ-011); scope adds package.json for the npm exclusion"
+}

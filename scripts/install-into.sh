@@ -720,7 +720,8 @@ install_docs_root() {
     chmod +x "$TARGET/scripts/install-into.sh" 2>/dev/null || true
   fi
   # Scaffold domain model and operational logs
-  copy_file "$KIT_DIR/docs/architecture/domain-model.md" "$TARGET/docs/architecture/domain-model.md" create
+  # The kit's own docs/architecture/domain-model.md describes the kit and never ships; projects get the stub
+  copy_file "$KIT_DIR/scripts/templates/docs/domain-model.md" "$TARGET/docs/architecture/domain-model.md" create
   copy_file "$KIT_DIR/docs/agent-failure-log.md" "$TARGET/docs/agent-failure-log.md" create
   copy_file "$KIT_DIR/docs/dissent-log.md" "$TARGET/docs/dissent-log.md" create
   copy_file "$KIT_DIR/docs/knowledge-base/README.md" "$TARGET/docs/knowledge-base/README.md" create

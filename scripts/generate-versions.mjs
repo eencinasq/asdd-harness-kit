@@ -66,6 +66,9 @@ function collectArtifacts() {
     record(relative(root, path));
   }
 
+  // Domain model stub (the kit's own docs/architecture/domain-model.md is never shipped)
+  record('scripts/templates/docs/domain-model.md');
+
   // Binding stubs (the kit's own .harness/steering bindings are never shipped)
   for (const f of [
     'product.md', 'structure.md', 'tech.md', 'domain-layer.project.md',
@@ -127,7 +130,7 @@ function collectArtifacts() {
     record(`docs/${f}`);
   }
   for (const f of [
-    'architecture/domain-model.md', 'architecture/knowledge-scaling.md',
+    'architecture/knowledge-scaling.md',
     'agent-failure-log.md', 'dissent-log.md',
   ]) {
     record(`docs/${f}`);

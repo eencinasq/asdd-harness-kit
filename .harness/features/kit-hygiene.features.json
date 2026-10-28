@@ -163,7 +163,7 @@
       "id": "TASK-006",
       "title": "Domain model stays in the kit",
       "user_visible_behavior": "Installer seeds `docs/architecture/domain-model.md` from `scripts/templates/docs/domain-model.md`; move the staged kit model from `.harness/specs/kit-hygiene/domain-model.md` to `docs/architecture/domain-model.md`; versions record the template..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 6,
       "owner": "claude",
       "req_ids": [
@@ -182,8 +182,10 @@
         "scripts/templates/docs/domain-model.md",
         "docs/architecture/domain-model.md",
         ".harness/specs/kit-hygiene/domain-model.md",
-        "scripts/test-install-into.sh"
-      ]
+        "scripts/test-install-into.sh",
+        "package.json"
+      ],
+      "notes": "package.json added to scope during implementation: the kit domain model must also be excluded from the npm package (files negation), not only from the installer."
     },
     {
       "id": "TASK-007",

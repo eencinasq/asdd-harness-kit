@@ -81,3 +81,14 @@ No CRITICAL or HIGH findings.
 
 ### Recommendation
 PASS_WITH_NOTES (CR-005, CR-006 fixed; CR-007 noted)
+
+## Review 5 — TASK-006
+
+### Review Scope
+Workspace diff before the TASK-006 commit: `scripts/install-into.sh` (domain-model source), `scripts/generate-versions.mjs`, `scripts/test-install-into.sh`, `package.json` (OCR-reviewable), plus the moved kit domain model.
+
+### Findings
+None. The stub is byte-identical to the previously shipped file (`cmp` in AC-008), so projects see no change; `generate-versions.mjs` still lists `architecture/knowledge-scaling.md`, which does not exist (pre-existing, outside this scope — OBSERVATION).
+
+### Recommendation
+PASS

@@ -94,6 +94,8 @@ test -f "$TMP/existing-app/.agents/skills/codebase-audit/SKILL.md"
 (cd "$TMP/existing-app" && node .harness/scripts/learn.mjs >/dev/null)
 test -f "$TMP/existing-app/.harness/state/learning/patterns.json"
 test -f "$TMP/existing-app/.harness/steering/templates/steering-proposal.md"
+# The kit's own domain model never ships; projects get the stub (kit-hygiene REQ-011, AC-008)
+cmp -s "$ROOT/scripts/templates/docs/domain-model.md" "$TMP/existing-app/docs/architecture/domain-model.md"
 # No lock or progress scaffolding (kit-hygiene REQ-012, AC-008)
 test ! -e "$TMP/existing-app/.harness/state/locks"
 test ! -e "$TMP/existing-app/.harness/progress"
@@ -118,7 +120,7 @@ for kit_slice in "$ROOT"/.harness/specs/*/ "$ROOT"/.harness/state/archive/*/; do
 done
 (cd "$ROOT" && npm pack --dry-run --json 2>/dev/null) | node -e '
   const files = JSON.parse(require("fs").readFileSync(0, "utf8"))[0].files.map((f) => f.path);
-  const kitOnly = /^\.harness\/(specs|state\/slices|state\/archive|state\/learning)\/.+\/|^\.harness\/state\/archive\/.+\.json$|^\.harness\/features\/.+\.features\.json$|^\.harness\/state\/registry\.json$|^\.harness\/config\/project\.json$|^\.harness\/audits\/.+\.json$|^docs\/knowledge-base\/steering-proposals\/|^\.harness\/steering\/(product|structure|tech|design-system|domain-layer\.project|quality-gates\.project)\.md$/;
+  const kitOnly = /^docs\/architecture\/domain-model\.md$|^\.harness\/(specs|state\/slices|state\/archive|state\/learning)\/.+\/|^\.harness\/state\/archive\/.+\.json$|^\.harness\/features\/.+\.features\.json$|^\.harness\/state\/registry\.json$|^\.harness\/config\/project\.json$|^\.harness\/audits\/.+\.json$|^docs\/knowledge-base\/steering-proposals\/|^\.harness\/steering\/(product|structure|tech|design-system|domain-layer\.project|quality-gates\.project)\.md$/;
   const leaked = files.filter((f) => kitOnly.test(f));
   if (leaked.length) throw new Error(`npm package ships kit-only files: ${leaked.join(", ")}`);
   for (const f of ["scripts/templates/bindings/product.md", ".harness/specs/README.md"])
