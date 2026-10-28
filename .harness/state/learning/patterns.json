@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T13:26:42.546Z",
+  "generated_at": "2026-10-28T22:30:47.844Z",
   "threshold": 3,
   "summary": {
     "patterns": 16,
-    "open": 1,
-    "in_flight": 2,
+    "open": 0,
+    "in_flight": 3,
     "verified": 0,
     "unsigned_failures": 0
   },
@@ -50,7 +50,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T13:26:42.488Z",
+      "last_seen": "2026-10-28T22:30:47.778Z",
       "sources": [
         "escalation"
       ],
@@ -82,7 +82,7 @@
       "kind": "escape",
       "occurrences": 5,
       "threshold": 3,
-      "status": "open",
+      "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-28",
       "last_seen": "2026-10-28",
@@ -97,7 +97,15 @@
         "Editing scripts/install-into.sh, package.json (jev-module TASK-003) reopened passing features of the DONE slice kit-hygiene through DRIFT-02; jev-module could not mark features passing until the old slice was re-verified.",
         "Editing scripts/test-install-into.sh (jev-module TASK-001, log-leak assertions) reopened passing features of the DONE slice kit-hygiene through DRIFT-02; jev-module could not mark features passing until the old slice was re-verified."
       ],
-      "proposals": []
+      "proposals": [
+        {
+          "id": "SP-003",
+          "file": "docs/knowledge-base/steering-proposals/SP-003.md",
+          "declared": "proposed",
+          "status": "proposed",
+          "recurrences": 0
+        }
+      ]
     },
     {
       "id": "LP-e9c4ddb0",
@@ -142,6 +150,29 @@
       "examples": [
         "Validation Gate BLOCK (QG-VAL-01): VAL-001 on MUST REQ-005 - upgrade detection enables Jev on every existing project with no way off. Validation confidence 0.78.",
         "Validation Gate BLOCK (QG-VAL-01): VAL-001 BLOCKING on MUST REQ-008 - upgrade behavior for existing hook configs undefined; installer substring match would keep the old path forever. Validation confidence 0.80. Report: .harness/specs/kit-hygiene/spec-validation-report.md"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-262b4267",
+      "signature": "override:qa",
+      "kind": "noise",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:40:26.144Z",
+      "last_seen": "2026-10-28T22:30:07.987Z",
+      "sources": [
+        "override"
+      ],
+      "slices": [
+        "jev-module",
+        "kit-hygiene"
+      ],
+      "examples": [
+        "Tech Lead accepts the QG-SPEC-08 WARN: UNCOV-006 (error-path tests) stays documented in spec-coverage-report.md.",
+        "Tech Lead accepts the QG-SPEC-08 WARN: UNCOV-003 (REQ-012 error path) and UNCOV-004 (REQ-013 has no separate error behavior) stay documented in spec-coverage-report.md."
       ],
       "proposals": []
     },
@@ -310,27 +341,6 @@
       ],
       "examples": [
         "Seeding the kit's domain model in docs/architecture/ during Domain leaked it into installed projects, and `npm test` still passed: `! grep …` lines in scripts/test-install-into.sh (2) and scripts/test-lifecycle.sh (1) never fail under `set -e`."
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-262b4267",
-      "signature": "override:qa",
-      "kind": "noise",
-      "occurrences": 1,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-10-28T01:40:26.144Z",
-      "last_seen": "2026-10-28T01:40:26.144Z",
-      "sources": [
-        "override"
-      ],
-      "slices": [
-        "kit-hygiene"
-      ],
-      "examples": [
-        "Tech Lead accepts the QG-SPEC-08 WARN: UNCOV-003 (REQ-012 error path) and UNCOV-004 (REQ-013 has no separate error behavior) stay documented in spec-coverage-report.md."
       ],
       "proposals": []
     },

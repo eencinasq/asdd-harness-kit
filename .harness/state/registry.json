@@ -1,18 +1,18 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-10-28T13:26:42.513Z",
+  "generated_at": "2026-10-28T22:30:47.808Z",
   "slices": [
     {
       "slice_id": "jev-module",
       "phase": "knowledge",
-      "status": "in_progress",
+      "status": "DONE",
       "mode": "full",
       "active_features": 0,
       "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-10-28T13:26:42.511Z",
+      "last_activity": "2026-10-28T22:30:47.806Z",
       "contributors": [
         "squad",
         "human",
@@ -24,7 +24,8 @@
         "asdd-design",
         "asdd-task-planning",
         "asdd-implementation",
-        "asdd-qa"
+        "asdd-qa",
+        "asdd-knowledge"
       ]
     },
     {
