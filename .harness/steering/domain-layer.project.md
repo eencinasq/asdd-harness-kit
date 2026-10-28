@@ -4,40 +4,40 @@ tags:
   - domain
 ---
 
-# Domain layer — project binding (stub)
+# Domain layer — project binding (asdd-harness-kit)
 
-> Implements the portable contract in [domain-layer.md](domain-layer.md). Fill before Domain / Design / Implementation.
+> **Project binding for the kit itself.** Never shipped: projects get the stub from `scripts/templates/bindings/domain-layer.project.md`.
+
+The kit is a set of scripts and documents, not a layered application. Its "domain" is the harness state model.
 
 ## Primary artifacts
 
 | Role | Path / package |
 |------|----------------|
-| Domain model / entities | … |
-| Use cases / domain services | … |
-| Ports | … |
-| Adapters | … |
-| Delivery (HTTP/UI/CLI) | … |
+| Domain model / entities | `docs/architecture/domain-model.md`; slice, session, feature, pattern, proposal |
+| Use cases / domain services | `.harness/scripts/*-lib.mjs` (drift, audit, learning, knowledge) |
+| Ports | file formats: `.harness/state/**`, `.harness/features/*.features.json`, `feature.schema.json` |
+| Adapters | runtime hooks, MCP servers (`.agents/mcp/`), installer |
+| Delivery (HTTP/UI/CLI) | CLI scripts in `.harness/scripts/` and `scripts/` |
 
 ## Layer flow
 
-`Transport` → `Domain` → `Port` → `Adapter`
+`CLI / hook / MCP` → `*-lib.mjs` → state files
 
 ## Enforcement
 
-**Gate command:** `…` (non-zero exit = not passing)
+**Gate command:** `npm test` (non-zero exit = not passing)
 
-**Semgrep rules:** `…` (optional path to a YAML config such as `.semgrep.yml`; if unfilled, `.semgrep.yml` at the repo root is used when it exists)
+**Semgrep rules:** `…`
 
-**CI / lint:** …
+**CI / lint:** `.github/workflows/harness-invariants.yml`
 
 ## Semgrep boundaries
 
-Used when `Semgrep rules` is unfilled and the repo has no `.semgrep.yml`. The architecture check generates a temporary config from these rows and the `Language` row in [tech.md](tech.md). It runs `semgrep scan --json` and does not write `.semgrep.yml`.
-
 | Paths | Must not import |
 |-------|-----------------|
-| `…` | `…` |
+| `.harness/scripts` | `.agents` |
 
 ## Exceptions
 
-Document justified exceptions and cite ADRs. Existing code alone is not enough.
+None.

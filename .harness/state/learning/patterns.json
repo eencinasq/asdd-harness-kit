@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-28T00:55:23.752Z",
+  "threshold": 3,
+  "summary": {
+    "patterns": 1,
+    "open": 0,
+    "in_flight": 1,
+    "verified": 0,
+    "unsigned_failures": 0
+  },
+  "patterns": [
+    {
+      "id": "LP-a9dc05fe",
+      "signature": "escalation:E1-scope-spread",
+      "kind": "escape",
+      "occurrences": 3,
+      "threshold": 3,
+      "status": "proposed",
+      "reopened": false,
+      "first_seen": "2026-10-26T22:46:55Z",
+      "last_seen": "2026-10-27T01:00:27Z",
+      "sources": [
+        "escalation"
+      ],
+      "slices": [
+        "drift-consistency",
+        "knowledge-simplify",
+        "unified-versioning"
+      ],
+      "examples": [
+        "scope touches 3 top-level modules: .harness, docs, scripts",
+        "scope touches 3 top-level modules: .agents, .harness, scripts",
+        "scope touches 2 top-level modules: .harness, scripts"
+      ],
+      "proposals": [
+        {
+          "id": "SP-001",
+          "file": "docs/knowledge-base/steering-proposals/SP-001.md",
+          "declared": "proposed",
+          "status": "proposed",
+          "recurrences": 0
+        }
+      ]
+    }
+  ]
+}

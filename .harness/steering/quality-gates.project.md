@@ -5,7 +5,9 @@ tags:
   - qa
 ---
 
-# Quality gates — project binding
+# Quality gates — project binding (asdd-harness-kit)
+
+> **Project binding for the kit itself.** Never shipped: projects get the stub from `scripts/templates/bindings/quality-gates.project.md`.
 
 Concrete commands, paths, and findings for [quality-gates.md](quality-gates.md). Fill every `…` slot before Discovery. A stub value does not satisfy a gate.
 
@@ -23,15 +25,15 @@ Concrete commands, paths, and findings for [quality-gates.md](quality-gates.md).
 ## Full-suite test command (SP-002)
 
 ```bash
-# Replace this comment with the project command, for example npm test.
+npm test
 ```
 
-Failure log path: `…`
+Failure log path: `docs/agent-failure-log.md`
 
 ## Domain placement findings
 
 ```
-Active findings: unfilled
+Active findings: none
 ```
 
 Before Discovery, replace `unfilled` with `none`, or with a table of one row per finding. The example rows below stay inactive while the status is `unfilled`.
@@ -46,7 +48,7 @@ Before Discovery, replace `unfilled` with `none`, or with a table of one row per
 Read by `drift-lib.mjs`, `audit-codebase.mjs`, and the `spec-drift-auditor` MCP server. A slot left as `…` uses the default in parentheses, or reports `unconfigured`; it never counts as a pass.
 
 - Test file globs: `…` (default: `**/*.test.*`, `**/*.spec.*`, `**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/test-*.sh`)
-- Drift base branch: `…` (default: `origin/HEAD`, then `main`, then `master`)
+- Drift base branch: `main` (default: `origin/HEAD`, then `main`, then `master`)
 - Audit commands: `…` (one `name=command` per backtick, for example `deps=npm audit --omit=dev`; unfilled → `unconfigured`)
 - Contract command: `…` (`http-api` module `openapi` adapter; non-zero exit = contract drift)
 - OpenAPI spec: `…` (JSON file compared against endpoints cited by requirements when no Contract command is set)
@@ -55,6 +57,6 @@ Read by `drift-lib.mjs`, `audit-codebase.mjs`, and the `spec-drift-auditor` MCP 
 
 | Concern | Path |
 |---------|------|
-| Domain model | `…` |
-| ADR index | `…` |
-| Boundary gate | `…` |
+| Domain model | `docs/architecture/domain-model.md` |
+| ADR index | none yet |
+| Boundary gate | `npm test` |

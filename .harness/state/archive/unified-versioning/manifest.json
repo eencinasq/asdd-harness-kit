@@ -13,8 +13,12 @@
   "escalation_required": true,
   "escalated_from_lite": false,
   "created_at": "2026-10-27T00:56:34.086Z",
-  "updated_at": "2026-10-27T01:01:15.372Z",
-  "paths": {},
+  "updated_at": "2026-10-28T00:18:02.431Z",
+  "paths": {
+    "specs": ".harness/specs/unified-versioning",
+    "tasks": ".harness/specs/unified-versioning/tasks.md",
+    "features": ".harness/features/unified-versioning.features.json"
+  },
   "gates": {},
   "active_features": [
     {

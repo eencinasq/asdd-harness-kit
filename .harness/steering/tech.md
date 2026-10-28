@@ -5,32 +5,32 @@ tags:
   - design
 ---
 
-# Technology stack (stub)
+# Technology stack — asdd-harness-kit
 
-> **Project binding** — replace with this repo's stack. Do not leave Nest/Nx/Draftly defaults from another project.
+> **Project binding for the kit itself.** Never shipped: projects get the stub from `scripts/templates/bindings/tech.md`.
 
 ## Languages & runtimes
 
 | Layer | Technology |
 |-------|------------|
-| Language | … |
-| Runtime | … |
-| Framework(s) | … |
+| Language | JavaScript (ES modules, `.mjs`), Bash |
+| Runtime | Node.js 22+ (22.5+ for `node:sqlite`) |
+| Framework(s) | None in shipped code (zero-dependency scripts and MCP servers); React + Vite only for the dashboard build in `tools/` |
 
 ## Verify / test commands
 
 | Purpose | Command |
 |---------|---------|
-| Unit / project tests | `…` |
-| Full suite (SP-002) | `…` (also list in `quality-gates.project.md`) |
-| Lint / typecheck | `…` |
+| Unit / project tests | `node --test <file>.test.mjs` |
+| Full suite (SP-002) | `npm test` (also in `quality-gates.project.md`) |
+| Lint / typecheck | none configured |
 
 ## API conventions (if any)
 
-<!-- e.g. base path, CQRS bus, error envelope — or "N/A". -->
+MCP servers speak line-delimited JSON-RPC 2.0 over stdio, without an SDK. Hook scripts read a JSON payload on stdin and always print a JSON verdict.
 
 ## Local ports / services
 
 | Service | Port / URL |
 |---------|------------|
-| … | … |
+| None | — |

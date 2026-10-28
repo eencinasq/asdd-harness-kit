@@ -130,6 +130,6 @@ Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The age
 
 Both Cursor and Claude Code run this automatically. `.cursor/hooks.json` binds `stop` to `node .harness/scripts/verify-on-stop.mjs` (`loop_limit` 3, `failClosed` true); `.claude/settings.json` binds `Stop` to the same script. When the invariants run exits non-zero, the hook submits the FAIL output as the next prompt (Cursor) or a `decision: block` reason (Claude, respecting `stop_hook_active`) so the agent corrects the harness state before the session ends. When the command exits 0, the hook returns `{}` and the session may end. The hook does not inject a follow-up when `status` is `aborted` or `error`. After `loop_limit`, a remaining FAIL still means the feature is not `passing`.
 
-Other runtimes do not inject that prompt. The `--live` command is still mandatory before handoff (see the enforcement matrix in [README → How a session works](https://github.com/eencinasq/asdd-harness-kit#how-a-session-works)).
+Other runtimes do not inject that prompt. The `--live` command is still mandatory before handoff, and a failing `--live` run is recorded as a learning signal on every runtime ([Learning Gate](./quality-gates.md#learning-gate)) (see the enforcement matrix in [README → How a session works](https://github.com/eencinasq/asdd-harness-kit#how-a-session-works)).
 
 Session close, and what wins when a control disagrees with this file, is in [controls.md](./controls.md). Gold-plating in this file still decides which files may change.

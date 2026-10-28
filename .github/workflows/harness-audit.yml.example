@@ -2,6 +2,7 @@
 # Copy to .github/workflows/harness-audit.yml to enable. The runner is the project's choice; see
 # https://github.com/eencinasq/asdd-harness-kit#codebase-auditor
 # The inferential pass (codebase-audit skill) needs an agent runtime and is not run here.
+# It also records failing invariants as learning signals (author `ci`) and commits the weekly summary.
 name: harness-audit
 
 on:
@@ -26,10 +27,17 @@ jobs:
         run: node .harness/scripts/sync-state.mjs
       - name: Audit
         run: node .harness/scripts/audit-codebase.mjs
+      - name: Learning signals (CI failures on the default branch)
+        env:
+          HARNESS_RUNTIME: ci
+          HARNESS_AUTHOR: ci
+        run: |
+          node .harness/scripts/check-invariants.mjs --record || true
+          node .harness/scripts/learn.mjs --all
       - name: Commit report
         run: |
           git config user.name 'harness-audit'
           git config user.email 'harness-audit@users.noreply.github.com'
-          git add .harness/audits/
+          git add .harness/audits/ .harness/state/learning/
           git diff --cached --quiet || git commit -m 'chore(audit): scheduled codebase audit'
           git push

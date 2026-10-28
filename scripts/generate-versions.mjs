@@ -66,12 +66,12 @@ function collectArtifacts() {
     record(relative(root, path));
   }
 
-  // Bindings
+  // Binding stubs (the kit's own .harness/steering bindings are never shipped)
   for (const f of [
     'product.md', 'structure.md', 'tech.md', 'domain-layer.project.md',
     'quality-gates.project.md', 'design-system.md',
   ]) {
-    record(`.harness/steering/${f}`);
+    record(`scripts/templates/bindings/${f}`);
   }
 
   // Harness scripts
@@ -86,6 +86,7 @@ function collectArtifacts() {
     'sync-knowledge.mjs', 'sync-knowledge.test.mjs',
     'drift-lib.mjs', 'drift-lib.test.mjs', 'check-spec-drift.mjs',
     'audit-lib.mjs', 'audit-codebase.mjs', 'audit-codebase.test.mjs', 'audit-triage.mjs',
+    'learning-lib.mjs', 'learning-lib.test.mjs', 'learn.mjs',
     'semgrep-lib.mjs', 'semgrep-lib.test.mjs',
   ]) {
     record(`.harness/scripts/${f}`);
@@ -121,7 +122,6 @@ function collectArtifacts() {
 
   // Docs
   for (const f of [
-    'self-healing-log.md',
     'knowledge-base/README.md',
   ]) {
     record(`docs/${f}`);

@@ -28,6 +28,7 @@ Tools (MCP):
 | `knowledge_trace(id, depth?)` | Graph BFS from any node: REQ→spec→feature→file, DEPENDS_ON chains, sessions |
 | `knowledge_slice(slice_id)` | JIT bundle: slice node + spec docs + REQs + features + session/log counts — **context pack without opening files** |
 | `knowledge_status()` | Index freshness, counts, active backend (sqlite/jsonl), search mode, and `warnings` when the index is degraded |
+| `knowledge_patterns(status?)` | Learning loop: repeated failures, overrides, and dismissals grouped as `LP-*` patterns with their `SP-*` proposals and measured effect. Computed live; needs no index ([Learning Gate](./quality-gates.md#learning-gate)) |
 
 Node ids: `slice:<id>`, `req:<slice>:<REQ-…>`, `ac:<slice>:<AC-…>`, `feature:<slice>:<TASK-…>`,
 `spec:<slice>:<doc>`, `file:<path>`, `session:<slice>:<file>`, `log:failure_log`, `log:dissent_log`.
@@ -43,6 +44,7 @@ Node ids: `slice:<id>`, `req:<slice>:<REQ-…>`, `ac:<slice>:<AC-…>`, `feature
   `knowledge_trace` on task nodes for DEPENDS_ON order and OWNS file scopes.
 - **QA / Refactor:** `knowledge_trace` for coverage (REQ→feature→file);
   `knowledge_search` for similar past failures (`log:*` nodes).
+- **Knowledge:** `knowledge_patterns` for open patterns before closing a slice (QG-LEARN-04).
 - **Knowledge Agent:** all four — dedupe detection, blast radius, failure mining.
   It also runs the `codebase-audit` skill, which uses `knowledge_trace` on hotspot
   files; `audit_finding` on the `spec-drift-auditor` server returns the same trace

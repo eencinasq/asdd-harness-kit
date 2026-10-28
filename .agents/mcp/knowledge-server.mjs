@@ -12,6 +12,7 @@
  *   knowledge_trace   — BFS over traceability edges (req→feature→file, etc.)
  *   knowledge_slice   — context bundle for one slice (specs, features, sessions)
  *   knowledge_status  — index counts + generated_at + embedding coverage
+ *   knowledge_patterns — self-improving harness patterns and steering proposals (QG-LEARN)
  *
  * Protocol: MCP over line-delimited JSON-RPC 2.0 on stdio
  *   (initialize / notifications/initialized / ping / tools/list / tools/call).
@@ -19,6 +20,7 @@
 import { createInterface } from 'node:readline';
 import { openStore } from '../../.harness/scripts/knowledge-store.mjs';
 import { loadEnv } from '../../.harness/scripts/env-loader.mjs';
+import { derivePatterns, failureSignatures } from '../../.harness/scripts/learning-lib.mjs';
 
 loadEnv(); // KNOWLEDGE_EMBEDDINGS_* may live in .env/.env.local
 
@@ -69,6 +71,21 @@ const TOOLS = [
     name: 'knowledge_status',
     description: 'Index stats: node/edge/chunk counts, generated_at, embedding coverage.',
     inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'knowledge_patterns',
+    description:
+      'Self-improving harness: repeated failures, overrides, and dismissals grouped into patterns (LP-*), with their steering proposals (SP-*) and measured effect. Use before proposing a guide or sensor change.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['open', 'watching', 'proposed', 'accepted', 'rejected', 'applied', 'verified'],
+          description: 'Only patterns in this status (default: everything except watching)',
+        },
+      },
+    },
   },
 ];
 
@@ -309,6 +326,22 @@ async function handleToolCall(id, params) {
         ...counts,
         search_mode: counts.embedded_chunks > 0 && embeddingsConfigured() ? 'semantic' : 'lexical',
         warnings,
+      })
+    );
+    return;
+  }
+
+  if (name === 'knowledge_patterns') {
+    // Computed live from the sources of truth; needs no knowledge index.
+    const { patterns, unsigned_failures } = derivePatterns(process.cwd());
+    const status = typeof args.status === 'string' ? args.status : null;
+    reply(
+      id,
+      toolResult({
+        patterns: patterns.filter((p) => (status ? p.status === status : p.status !== 'watching')),
+        unsigned_failures,
+        // Reuse one of these verbatim in a new failure-log entry so repeats are counted (QG-DEB-05).
+        failure_signatures: failureSignatures(process.cwd()),
       })
     );
     return;

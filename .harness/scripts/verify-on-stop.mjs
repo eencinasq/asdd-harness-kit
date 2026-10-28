@@ -7,6 +7,9 @@
  * Cursor:       `.cursor/hooks.json` → stop hook. Output `{}` or `{ "followup_message": "..." }`.
  * Claude Code:  `.claude/settings.json` → Stop hook. Output `{}` or `{ "decision": "block", "reason": "..." }`
  *               (respects `stop_hook_active` to avoid infinite loops).
+ *
+ * `--live` also records each failing run as a learning signal (QG-LEARN-01);
+ * HARNESS_RUNTIME tells check-invariants which runtime blocked.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
@@ -70,6 +73,7 @@ const result = spawnSync(process.execPath, [script, '--live'], {
   cwd: root,
   encoding: 'utf8',
   timeout: 30000,
+  env: { ...process.env, HARNESS_RUNTIME: isClaude ? 'claude' : 'cursor' },
 });
 
 if (result.error || result.status === null) {

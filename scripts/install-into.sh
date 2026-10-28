@@ -468,6 +468,8 @@ install_portable_steering() {
   copy_tree "$KIT_DIR/.harness/steering/templates" "$TARGET/.harness/steering/templates" refresh
 }
 
+# Binding stubs live in scripts/templates/bindings/: the kit's own .harness/steering bindings
+# describe the kit itself and are never copied into a project.
 install_bindings() {
   [[ "$SKIP_BINDINGS" -eq 1 ]] && { info "Skipping bindings"; return 0; }
   local f
@@ -475,10 +477,10 @@ install_bindings() {
     if [[ "$FORCE_BINDINGS" -eq 1 ]]; then
       local old_force=$FORCE
       FORCE=1
-      copy_file "$KIT_DIR/.harness/steering/$f" "$TARGET/.harness/steering/$f" refresh
+      copy_file "$KIT_DIR/scripts/templates/bindings/$f" "$TARGET/.harness/steering/$f" refresh
       FORCE=$old_force
     else
-      copy_file "$KIT_DIR/.harness/steering/$f" "$TARGET/.harness/steering/$f" create
+      copy_file "$KIT_DIR/scripts/templates/bindings/$f" "$TARGET/.harness/steering/$f" create
     fi
   done
 }
@@ -493,6 +495,8 @@ install_harness_scaffold() {
   copy_file "$KIT_DIR/.harness/scripts/audit-lib.mjs" "$TARGET/.harness/scripts/audit-lib.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/audit-codebase.mjs" "$TARGET/.harness/scripts/audit-codebase.mjs" refresh
   copy_file "$KIT_DIR/.harness/scripts/audit-triage.mjs" "$TARGET/.harness/scripts/audit-triage.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/learning-lib.mjs" "$TARGET/.harness/scripts/learning-lib.mjs" refresh
+  copy_file "$KIT_DIR/.harness/scripts/learn.mjs" "$TARGET/.harness/scripts/learn.mjs" refresh
   copy_file "$KIT_DIR/.harness/audits/README.md" "$TARGET/.harness/audits/README.md" refresh
   # Examples only: the target's .github/ is never touched
   copy_file "$KIT_DIR/.github/CODEOWNERS.harness.example" "$TARGET/.harness/examples/CODEOWNERS.harness.example" refresh
@@ -720,7 +724,6 @@ install_docs_root() {
   copy_file "$KIT_DIR/docs/architecture/domain-model.md" "$TARGET/docs/architecture/domain-model.md" create
   copy_file "$KIT_DIR/docs/agent-failure-log.md" "$TARGET/docs/agent-failure-log.md" create
   copy_file "$KIT_DIR/docs/dissent-log.md" "$TARGET/docs/dissent-log.md" create
-  copy_file "$KIT_DIR/docs/self-healing-log.md" "$TARGET/docs/self-healing-log.md" create
   copy_file "$KIT_DIR/docs/knowledge-base/README.md" "$TARGET/docs/knowledge-base/README.md" create
 }
 
@@ -1246,6 +1249,8 @@ PKGEOF
   fi
   ensure_gitignore ".harness/node_modules"
   ensure_gitignore ".harness/knowledge"
+  # raw learning signals are local; learn.mjs commits weekly summaries instead
+  ensure_gitignore ".harness/state/learning/signals"
   # integration keys (Jev, embeddings) are loaded from these files — never commit
   ensure_gitignore ".env.local"
   [[ "$SKIP_DEPS" -eq 1 ]] && { info "Skipping knowledge deps install"; return 0; }

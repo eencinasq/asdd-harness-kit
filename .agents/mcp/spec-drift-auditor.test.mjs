@@ -151,6 +151,7 @@ test('REQ-012 REQ-019: audit_diff author mode reports drift and the summary', wi
   assert.equal(payload.summary.files_analyzed, 2);
   assert.equal(payload.summary.drift_level, 'blocking');
   assert.ok('spec_compliance' in payload.summary);
+  assert.equal(typeof payload.learning?.open, 'number', 'audit_diff carries the learning view');
   const arch = payload.findings.filter((f) => f.check === 'ARCH');
   assert.deepEqual(arch.map((f) => f.paths[0]), ['src/a.js'], 'architecture findings are scoped to changed files');
 }));

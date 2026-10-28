@@ -13,8 +13,12 @@
   "escalation_required": true,
   "escalated_from_lite": false,
   "created_at": "2026-10-27T00:34:19.645Z",
-  "updated_at": "2026-10-27T01:01:15.370Z",
-  "paths": {},
+  "updated_at": "2026-10-28T00:18:02.428Z",
+  "paths": {
+    "specs": ".harness/specs/drift-consistency",
+    "tasks": ".harness/specs/drift-consistency/tasks.md",
+    "features": ".harness/features/drift-consistency.features.json"
+  },
   "gates": {},
   "active_features": [
     {

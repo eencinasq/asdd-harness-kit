@@ -8,6 +8,7 @@
 ```
 - **Date:** YYYY-MM-DD
 - **Slice:** <slice-id>
+- **Signature:** <check-or-area>:<short-kebab-cause>   (reuse the same value for the same failure)
 - **Agent:** <agent-id>
 - **Phase:** <phase>
 - **Failure:** <what happened>

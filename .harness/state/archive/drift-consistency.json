@@ -1,0 +1,12 @@
+{
+  "slice_id": "drift-consistency",
+  "archived_at": "2026-10-28T00:55:07.735Z",
+  "status": "ABANDONED",
+  "final_phase": "discovery",
+  "mode": "lite",
+  "escalation_signals": [
+    "E1-scope-spread"
+  ],
+  "reason": "Work done outside the pipeline before the kit was developed with the kit; committed in the baseline. Archived to keep its history and learning evidence.",
+  "location": ".harness/state/archive/drift-consistency/"
+}

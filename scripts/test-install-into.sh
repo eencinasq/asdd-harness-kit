@@ -90,6 +90,28 @@ test -f "$TMP/existing-app/.harness/examples/CODEOWNERS.harness.example"
 test -f "$TMP/existing-app/.harness/examples/harness-audit.yml.example"
 test -f "$TMP/existing-app/.agents/skills/codebase-audit/SKILL.md"
 (cd "$TMP/existing-app" && node .harness/scripts/audit-codebase.mjs --no-write >/dev/null)
+(cd "$TMP/existing-app" && node .harness/scripts/learn.mjs >/dev/null)
+test -f "$TMP/existing-app/.harness/state/learning/patterns.json"
+test -f "$TMP/existing-app/.harness/steering/templates/steering-proposal.md"
+# Kit development artifacts never reach a project: not by the installer, not by the npm package
+! grep -rqs 'Project binding for the kit itself' "$TMP/existing-app/.harness" "$TMP/existing-app/docs"
+test -z "$(find "$TMP/existing-app/.harness/specs" "$TMP/existing-app/.harness/state/archive" -mindepth 1 -not -name README.md 2>/dev/null)"
+test ! -e "$TMP/existing-app/docs/knowledge-base/steering-proposals"
+for kit_slice in "$ROOT"/.harness/specs/*/ "$ROOT"/.harness/state/archive/*/; do
+  [[ -d "$kit_slice" ]] || continue
+  name="$(basename "$kit_slice")"
+  test ! -e "$TMP/existing-app/.harness/specs/$name"
+  test ! -e "$TMP/existing-app/.harness/state/slices/$name"
+  test ! -e "$TMP/existing-app/.harness/features/$name.features.json"
+done
+(cd "$ROOT" && npm pack --dry-run --json 2>/dev/null) | node -e '
+  const files = JSON.parse(require("fs").readFileSync(0, "utf8"))[0].files.map((f) => f.path);
+  const kitOnly = /^\.harness\/(specs|state\/slices|state\/archive|state\/learning)\/.+\/|^\.harness\/state\/archive\/.+\.json$|^\.harness\/features\/.+\.features\.json$|^\.harness\/state\/registry\.json$|^\.harness\/config\/project\.json$|^\.harness\/audits\/.+\.json$|^docs\/knowledge-base\/steering-proposals\/|^\.harness\/steering\/(product|structure|tech|design-system|domain-layer\.project|quality-gates\.project)\.md$/;
+  const leaked = files.filter((f) => kitOnly.test(f));
+  if (leaked.length) throw new Error(`npm package ships kit-only files: ${leaked.join(", ")}`);
+  for (const f of ["scripts/templates/bindings/product.md", ".harness/specs/README.md"])
+    if (!files.includes(f)) throw new Error(`npm package misses ${f}`);
+'
 (cd "$TMP/existing-app" && printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | node .agents/mcp/spec-drift-auditor.mjs 2>/dev/null) | grep -q '"audit_diff"'
 # kit-owned (refresh) files are recorded so spec drift exempts them; project-owned seeds are not
 node -e '

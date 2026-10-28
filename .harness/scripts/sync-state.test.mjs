@@ -82,3 +82,21 @@ test('contractFindings: passing needs evidence as well as evidence_commit', asyn
   assert.deepEqual(contractFindings({ ...base, evidence: 'npm test: 12/12' }), []);
   assert.match(contractFindings({ ...base, evidence: '  ' })[0], /passing without evidence/);
 });
+
+test('sync-state rewrites the registry when every slice is gone', async () => {
+  const { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join, dirname } = await import('node:path');
+  const { spawnSync } = await import('node:child_process');
+  const { fileURLToPath } = await import('node:url');
+  const root = mkdtempSync(join(tmpdir(), 'sync-'));
+  try {
+    mkdirSync(join(root, '.harness/state/slices'), { recursive: true });
+    writeFileSync(join(root, '.harness/state/registry.json'), JSON.stringify({ slices: [{ slice_id: 'old' }] }));
+    const script = join(dirname(fileURLToPath(import.meta.url)), 'sync-state.mjs');
+    spawnSync(process.execPath, [script], { cwd: root, encoding: 'utf8' });
+    assert.deepEqual(JSON.parse(readFileSync(join(root, '.harness/state/registry.json'), 'utf8')).slices, []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

@@ -12,8 +12,10 @@
  *     → stdout {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "allow"|"deny", "permissionDecisionReason": "..."}}
  *   Always exits 0 with a JSON verdict; hooks should set failClosed: true
  *   so a gate crash blocks the command instead of letting it through.
+ *   A hook denial is recorded as a learning signal by pattern label (never the command text).
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const DANGEROUS_PATTERNS = [
   /^rm\s+-rf/,
@@ -54,6 +56,30 @@ export function isDangerousCommand(command) {
   return false;
 }
 
+/** Which dangerous pattern a command hit, as a short label (`git push --force`, `sudo`), or null. */
+export function deniedLabel(command) {
+  const text = String(command || '').trim();
+  if (!text) return 'empty';
+  if (ALLOWED_COMMANDS.some((pattern) => pattern.test(text))) return null;
+  for (const pattern of DANGEROUS_PATTERNS) {
+    const m = text.match(pattern);
+    if (m) return m[0].trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+  return text.startsWith('sudo ') ? 'sudo' : null;
+}
+
+// Learning is best-effort and lazy: a missing lib must never change the verdict.
+async function recordDenial(command, runtime) {
+  try {
+    const root = process.cwd();
+    if (!existsSync(join(root, '.harness/scripts/learning-lib.mjs'))) return;
+    const { writeCommandSignal } = await import('./learning-lib.mjs');
+    writeCommandSignal(root, deniedLabel(command) ?? 'unknown', { runtime });
+  } catch {
+    // ignore
+  }
+}
+
 export async function checkCommandSafety(command, { override = false } = {}) {
   if (override) {
     return { allowed: true, method: 'override', reason: 'Manual override specified' };
@@ -88,6 +114,7 @@ async function runHook() {
   const verdict = command
     ? await checkCommandSafety(command, { override: input.override === true })
     : { allowed: true, method: 'no-command', reason: 'no command in hook payload' };
+  if (!verdict.allowed) await recordDenial(command, isClaude ? 'claude' : 'cursor');
 
   if (isClaude) {
     const output = {

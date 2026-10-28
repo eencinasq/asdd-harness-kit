@@ -27,6 +27,7 @@ Practice behind this layout: [Harness engineering for coding agent users](https:
 | Command pattern gate | Sensor | Pattern allow/deny before dangerous bash (no Jev) | Safety | `jev-command-gate.mjs` |
 | CI invariants | Sensor | Computational, after integration; repeats the left check | Harness state | `.github/workflows/harness-invariants.yml` |
 | Full suite (SP-002) | Sensor | Computational, before a new spec enters Task Planning | Behaviour | [quality-gates.project.md](./quality-gates.project.md) |
+| Learning loop (`QG-LEARN-*`) | Sensor on the controls themselves | Computational (`learn.mjs`, `validators/learning.mjs`), every sync and stop; proposals inferential, decided by the Tech Lead | The guides and sensors in this table | [quality-gates.md](./quality-gates.md#learning-gate), `docs/knowledge-base/steering-proposals/` |
 | Human review | Sensor | Inferential, after the agent loop | Intent the sensors cannot see | Tech Lead, dissent log |
 
 Fast sensors run before the session ends. The pipeline repeats the invariants check. The full suite stays at the Task Planning gate because it is the more expensive behaviour sensor.
@@ -39,7 +40,7 @@ ASDD-Lite skips the confidence scores and the numeric phase gates (`QG-DEC-07`, 
 2. **Numbers.** [quality-gates.md](./quality-gates.md) is the only cutoff. An agent prompt shall not invent a second confidence or coverage threshold, and shall not combine confidence scores across phases (`QG-DEC-10`).
 3. **Skills.** [skills.md](./skills.md) decides when a skill body is read.
 4. **Done.** A feature is `passing` only after its `verification` evidence is recorded and the left sensors for this session exit 0. A green narrative is not evidence.
-5. **Repeat.** When the same failure has three log entries, change the guide or sensor that missed it ([QG-DEB-06](./quality-gates.md)). Do not only patch the product code.
+5. **Repeat.** When a failure, override, or dismissal reaches the occurrence threshold, `learn.mjs` opens a pattern; change the guide or sensor that missed it (escape) or that fires without cause (noise) through a steering proposal ([Learning Gate](./quality-gates.md#learning-gate)). Do not only patch the product code.
 
 ## Session close
 

@@ -99,3 +99,17 @@ for (const s of slices) {
 }
 
 console.log('');
+console.log('== Learning (QG-LEARN) ==');
+const learning = readJson('.harness/state/learning/patterns.json');
+const watched = (learning?.patterns || []).filter((p) => p.status !== 'watching');
+if (watched.length === 0) {
+  console.log('  (no patterns at threshold)');
+} else {
+  for (const p of watched) {
+    const props = p.proposals.length ? ` ${p.proposals.map((x) => `${x.id}:${x.status}`).join(', ')}` : '';
+    console.log(`  ${pad(p.id, 12)} ${pad(p.status, 11)} ${pad(p.kind, 7)} x${pad(String(p.occurrences), 4)} ${p.signature}${props}`);
+  }
+  if (watched.some((p) => p.status === 'open')) console.log('  → node .harness/scripts/learn.mjs --propose <LP-id>');
+}
+
+console.log('');

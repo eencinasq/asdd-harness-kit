@@ -14,6 +14,8 @@
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const root = process.cwd();
 const slicesDir = join(root, '.harness/state/slices');
@@ -354,6 +356,21 @@ async function syncKnowledgeIndex() {
   }
 }
 
+// Learning patterns are a derived projection too (QG-LEARN-*); a failure never breaks the sync.
+// Run as a child: learning-lib imports this module, and importing it from inside
+// this module's top-level await would deadlock.
+function syncLearning() {
+  const script = fileURLToPath(new URL('./learn.mjs', import.meta.url));
+  if (!existsSync(script)) return;
+  const result = spawnSync(process.execPath, [script, '--summary'], { cwd: root, encoding: 'utf8', timeout: 60000 });
+  try {
+    const summary = JSON.parse(result.stdout);
+    console.log(`SYNC  learning → ${summary.patterns} patterns (${summary.open} open)`);
+  } catch {
+    console.warn(`WARN  learning patterns not regenerated: ${(result.stderr || result.error?.message || `exit ${result.status}`).trim()}`);
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const sliceArg = args.indexOf('--slice');
@@ -361,6 +378,7 @@ async function main() {
 
   if (!existsSync(slicesDir)) {
     console.warn('WARN  no slices directory found');
+    syncLearning();
     await syncKnowledgeIndex();
     return;
   }
@@ -390,6 +408,7 @@ async function main() {
         console.log(`SYNC  registry → ${registry.slices.length} slices`);
       }
     }
+    syncLearning();
     await syncKnowledgeIndex();
     return;
   }
@@ -400,11 +419,11 @@ async function main() {
     if (manifest) sliceManifests.push(manifest);
   }
 
-  if (sliceManifests.length > 0) {
-    const registry = generateRegistry(sliceManifests);
-    writeJson(join(stateDir, 'registry.json'), registry);
-    console.log(`SYNC  registry → ${registry.slices.length} slices`);
-  }
+  // Always rewrite: with zero slices left (all archived), a stale registry would keep listing them.
+  const registry = generateRegistry(sliceManifests);
+  writeJson(join(stateDir, 'registry.json'), registry);
+  console.log(`SYNC  registry → ${registry.slices.length} slices`);
+  syncLearning();
   await syncKnowledgeIndex();
 }
 

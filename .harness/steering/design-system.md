@@ -5,21 +5,8 @@ tags:
   - ui
 ---
 
-# Design system (stub)
+# Design system — asdd-harness-kit
 
-> **Optional (module: web-ui).** Delete or leave empty if the project has no shared UI kit.
+> **Project binding for the kit itself.** Never shipped: projects get the stub from `scripts/templates/bindings/design-system.md`.
 
-## Location
-
-**Package / folder:** …
-
-**Storybook / docs:** … (port, MCP URL if any)
-
-## Tokens
-
-- Brand / primary: …
-- Typography: …
-
-## Interactive elements
-
-- Prefer project conventions for test selectors (e.g. `data-testid`) when E2E automation is enabled.
+The kit has no shared UI kit. The only UI is the MCP App dashboard built from `tools/drift-dashboard/` into `.agents/mcp/ui/drift-dashboard.html`; it follows the host's theme.

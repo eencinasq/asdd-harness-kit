@@ -365,6 +365,13 @@ grep -q 'DRIFT-01 src/rogue/file.js changed but is not mapped' /tmp/asdd-lifecyc
 DRIFT_OUT="$(printf '{"status":"completed","loop_count":0}' | env -u JEV_API_KEY node .harness/scripts/verify-on-stop.mjs)"
 grep -q 'followup_message' <<<"$DRIFT_OUT"
 grep -q 'DRIFT-01' <<<"$DRIFT_OUT"
+echo "== learning loop (QG-LEARN-01): the failing stop run is a signal, compacted into a weekly summary =="
+ls .harness/state/learning/signals/*.json >/dev/null
+grep -q '"runtime": "cursor"' .harness/state/learning/signals/*.json
+HARNESS_AUTHOR=e2e node .harness/scripts/learn.mjs --all | grep -q 'sensor:DRIFT-01:src'
+ls .harness/state/learning/summaries/*-e2e.json >/dev/null
+test -z "$(ls .harness/state/learning/signals)"
+grep -qxF '.harness/state/learning/signals' .gitignore
 node .harness/scripts/check-spec-drift.mjs --json >/tmp/asdd-lifecycle-drift.json && exit 1
 grep -q '"drift_level": "blocking"' /tmp/asdd-lifecycle-drift.json
 mkdir -p src/api && mv src/rogue/file.js src/api/file.js && rmdir src/rogue

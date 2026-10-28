@@ -4,7 +4,7 @@ A portable process layer for **Agent Specification-Driven Development (ASDD)** a
 
 It gives AI agents a governed pipeline — from shaping an idea through implementation, QA, and knowledge capture — with feature trackers, file-scope enforcement, verification evidence, spec-drift sensors, and traceability. You bring your own stack (Python, Go, Rails, Next.js, Nest, …). The kit brings the process.
 
-**Contents:** [What this is](#what-this-is) · [Install](#install) · [How a session works](#how-a-session-works) · [Delivery pipeline](#delivery-pipeline) · [Jev (skill-scoped)](#jev-skill-scoped) · [Spec drift and codebase audit](#spec-drift-and-codebase-audit) · [Principles](#principles) · [What's inside](#whats-inside) · [Requirements](#requirements) · [Documentation](#documentation)
+**Contents:** [What this is](#what-this-is) · [Install](#install) · [How a session works](#how-a-session-works) · [Delivery pipeline](#delivery-pipeline) · [Jev (skill-scoped)](#jev-skill-scoped) · [Spec drift and codebase audit](#spec-drift-and-codebase-audit) · [Self-improving harness](#self-improving-harness) · [Principles](#principles) · [What's inside](#whats-inside) · [Requirements](#requirements) · [Documentation](#documentation) · [Developing the kit](#developing-the-kit)
 
 ---
 
@@ -132,7 +132,7 @@ node .harness/scripts/harness-status.mjs
 
 ### Kit tests
 
-- `npm test` — installer smoke test (all runtimes and modules), lifecycle e2e (slice state machine with negative invariant cases), and unit tests for drift, audit, Semgrep, knowledge, Jev, and the MCP servers.
+- `npm test` — installer smoke test (all runtimes and modules), lifecycle e2e (slice state machine with negative invariant cases), and unit tests for drift, audit, Semgrep, knowledge, the learning loop, Jev, and the MCP servers.
 - `npm run test:full-flow` — Shape Up → Product Delivery → lite slice → evidence → escalation → DONE → Verify-on-Stop. With `JEV_API_KEY` set, the Jev gates run live; without it those stages are skipped (Harness stages still run).
 
 ---
@@ -156,7 +156,7 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 |---------|------------------------|----------------|
 | Cursor | `beforeShellExecution` hook (fail-closed) | `stop` hook (fail-closed) |
 | Claude Code | `PreToolUse`/`Bash` hook | `Stop` hook (loop-safe) |
-| OpenCode, Kimi, Junie, Devin, Kiro | Advisory — run `node .harness/scripts/jev-command-gate.mjs` before dangerous commands, or expose the `check_command_safety` MCP tool (no System One) | Run `node .harness/scripts/check-invariants.mjs --live` before marking `passing` (no `JEV_API_KEY` required) |
+| OpenCode, Kimi, Junie, Devin, Kiro | Advisory — run `node .harness/scripts/jev-command-gate.mjs` before dangerous commands, or expose the `check_command_safety` MCP tool (no System One) | Run `node .harness/scripts/check-invariants.mjs --live` before marking `passing` (no `JEV_API_KEY` required); a failing run is recorded as a learning signal |
 
 | Command | Purpose |
 |---|---|
@@ -168,6 +168,7 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 | `check-spec-drift.mjs [--json]` | The drift checks on their own |
 | `audit-codebase.mjs` | Whole-codebase audit report |
 | `sync-knowledge.mjs [--embed]` | Rebuild the knowledge index |
+| `learn.mjs [--all \| --signatures \| --export \| --propose <LP-id>]` | Learning patterns; signatures in use; lessons for the kit; scaffold a steering proposal |
 
 All commands live in `.harness/scripts/` and run with `node`.
 
@@ -192,7 +193,7 @@ A guide steers the agent before it edits. A sensor checks the result and, on fai
 | Pull request | `.github/workflows/harness-invariants.yml` runs unit tests, installer smoke, lifecycle e2e with negative cases, config/skills checks, and `sync-state` + invariants (with the PR branch and body for `DRIFT-07`) | CI |
 | On a schedule | `audit-codebase.mjs` (drift over all slices, unowned code, audit commands, hotspots) and the `codebase-audit` skill; the Tech Lead triages | `.harness/audits/` |
 | Before a new spec enters Task Planning | The full-suite command in `quality-gates.project.md` must report zero failures | `QG-DEB-*` |
-| Same failure logged three times | Record which guide or sensor must change. Do not close it as an observation only | `QG-DEB-06` |
+| Same failure, override, or dismissal three times | `learn.mjs` opens a pattern; a steering proposal names the guide or sensor to change. WARN while open, FAIL when the slice closes Knowledge | `QG-DEB-06`, `QG-LEARN-*` |
 
 Fast checks stay at session stop. The more expensive suite stays on the Task Planning gate. CI repeats the invariants check after integration.
 
@@ -447,7 +448,7 @@ Every feature carries the contract the checks need:
 The inferential pass is the `codebase-audit` skill: for the top hotspots it traces each file to its requirements (`knowledge_trace`), reads the EARS criteria and the code, and judges each `satisfied`, `violated`, or `unclear` with file and line evidence. `unclear` is never reported as `satisfied`.
 
 - The auditor never edits code. A confirmed finding becomes a new slice or a task in the owning slice.
-- Findings have stable IDs and occurrence counts. At three occurrences, `QG-DEB-06` applies: change the guide or sensor that let it through.
+- Findings have stable IDs and occurrence counts. At three occurrences the finding becomes a [learning signal](#self-improving-harness): change the guide or sensor that let it through.
 - Inferential findings are advisory until the Tech Lead confirms them.
 - Dismissals live in `.harness/audits/triage.json` (finding ID, reason, who, when, and a hash of the files). Any change to that code brings the finding back. `audit-triage.mjs` records them; the MCP server never writes.
 - The runner is the project's choice. An example GitHub Actions workflow installs to `.harness/examples/harness-audit.yml.example`; whichever runner is used must commit or upload `.harness/audits/`.
@@ -484,6 +485,70 @@ Resources: `spec://manifest`, `spec://rules/architecture`, `spec://drift/latest-
 5. The engineer fixes it in a normal session.
 
 Engineers work in separate slices, or in one slice with disjoint `scope_paths`. A check that is dismissed repeatedly is producing false positives — tune or remove it. Make the Tech Lead code owner of the gate files, bindings, `controls.md`, and hook config so an agent cannot loosen them without review (example: `.harness/examples/CODEOWNERS.harness.example`).
+
+---
+
+## Self-improving harness
+
+Sensors catch a failure once. The learning loop catches the *same* failure coming back, and changes the guide or sensor that let it through — then checks that the change worked. Every step is deterministic except writing the proposal, and humans decide every change.
+
+```text
+signals ──► learn.mjs ──► LP-* pattern ──► SP-* proposal ──► Tech Lead ──► applied
+   ▲                                                                       │
+   └──────────── recurrence after the change → ineffective, pattern reopens ┘
+                 10 quiet sessions in its area → verified
+```
+
+**Signals** are read where they already live; recorded invariants runs and command-gate denials are the only new writers. A `passing` feature reopened by `DRIFT-02` shows up as `sensor:DRIFT-02:<area>`.
+
+| Source | Signature | Kind |
+|---|---|---|
+| Failing `check-invariants.mjs --live` or `--record` run — Verify-on-Stop, an agent on a runtime without hooks, or CI | check code + area, e.g. `sensor:DRIFT-01:docs`; runs within 30 min count once | escape |
+| A WARN from a recorded run, counted by distinct days (opens at 5 days) | `warn:<check>:<area>` | noise |
+| Command denied by the command gate (pattern label only, never the command text) | `command:git push --force` | escape |
+| Agent failure log entry with a `**Signature:**` line (`QG-DEB-05`) | `failure:<signature>` | escape |
+| Session `phase_blocked` / `feature_blocked` | `blocked:phase:design`, `blocked:feature:<area>` | escape |
+| Session `dissent` | `dissent:<phase>` | escape |
+| Lite escalation signal, once per slice | `escalation:E1-scope-spread` | escape |
+| Recurring audit finding | `audit:<AUD-id>` | escape |
+| Session `override` of a gate | `override:<phase>` | noise |
+| Tech Lead dismissal in `triage.json` | `dismissed:<check>` | noise |
+
+An **escape** means a guide or sensor let a failure through; **noise** means a sensor fires without catching a defect, which is what teaches a team to ignore a harness. Noise proposals loosen, tune, or remove the sensor.
+
+**Storage.** A failing run writes a raw file to `.harness/state/learning/signals/` (gitignored). Every `learn.mjs` run — so every `sync-state.mjs` — folds those into `.harness/state/learning/summaries/<ISO-week>-<author>.json`, which is committed. Only that author writes that file, so summaries never conflict in git and the team shares one count. The author is `HARNESS_AUTHOR`, else your git user name. Pull-request CI records and prints patterns but cannot persist them; the scheduled audit workflow (`.harness/examples/harness-audit.yml.example`) records failures on the default branch as author `ci` and commits them.
+
+**Patterns.** `learn.mjs` (also run by every `sync-state.mjs`) groups signals by signature into `LP-*` patterns in `.harness/state/learning/patterns.json` (generated). A pattern is `open` at three occurrences.
+
+**Proposals.** `node .harness/scripts/learn.mjs --propose <LP-id>` scaffolds `docs/knowledge-base/steering-proposals/SP-NNN.md` from the template. Its frontmatter is the contract:
+
+```yaml
+id: SP-004
+pattern: LP-a9dc05fe
+status: proposed            # proposed → accepted | rejected → applied (TL only)
+control: .harness/steering/asdd-lite.md
+change: tighten-guide       # add-guide | tighten-guide | add-sensor | tighten-sensor | loosen-sensor | remove-sensor | product-code
+success: no escalation:E1-scope-spread in the next 10 sessions
+decided_by: tl
+applied_commit: 3f2c1ab     # must change the control file (checked with git)
+```
+
+`rejected` is a recorded "won't fix" and closes the pattern. A pattern about an area (`sensor:DRIFT-01:docs`) is verified only by sessions whose `scope_paths` touch that area. To keep failure-log repeats countable, reuse an existing signature: `learn.mjs --signatures` (or `failure_signatures` in `knowledge_patterns`). `product-code` proposals are implemented by the Refactor agent as Self-Healing PRs.
+
+**Gate** (`validators/learning.mjs`, inside `check-invariants.mjs`):
+
+| Rule | Result |
+|---|---|
+| A pattern is `open` with no proposal, or its applied proposal is `ineffective` | WARN |
+| A proposal is malformed (unknown pattern, missing control file, unfilled success, decided without `decided_by`, applied without `applied_commit`) | FAIL |
+| `applied_commit` is not a commit, or does not change the `control` file | FAIL |
+| A slice completes Knowledge while a pattern it contributed to is `open` | FAIL |
+
+**In review.** `audit_diff` returns a `learning` block — open patterns, marked `relevant` when they are about a changed area or a linked slice — and the `pr-review` prompt turns relevant ones into advisory comments. It never blocks a PR.
+
+**Back to the kit.** `learn.mjs --export --out lessons.md` writes the verified and ineffective proposals on kit-owned controls, with generic fields only (no examples, slice names, proposal text, or commands), and prints the `gh issue create` command to send it to the kit. Nothing is sent automatically.
+
+Rules: `QG-LEARN-01`…`09` in [`quality-gates.md`](.harness/steering/quality-gates.md). See open patterns with `harness-status.mjs`, `learn.mjs`, or the `knowledge_patterns` MCP tool.
 
 ---
 
@@ -527,7 +592,7 @@ Engineers work in separate slices, or in one slice with disjoint `scope_paths`. 
 
 **Harness** (`.harness/`) — `scripts/` (invariants, drift, audit, state, knowledge, Jev), `scripts/validators/`, `state/`, `specs/`, `features/`, `audits/`, and `PROGRESS.md`.
 
-**MCP servers** (`.agents/mcp/`) — `knowledge` (`knowledge_search`, `knowledge_trace`, `knowledge_slice`, `knowledge_status` over a SQLite index of specs, requirements, features, and sessions; semantic search when `KNOWLEDGE_EMBEDDINGS_URL` and `KNOWLEDGE_EMBEDDINGS_MODEL` are set, lexical otherwise), `spec-drift-auditor`, `jev-gate`, and `codegraph`.
+**MCP servers** (`.agents/mcp/`) — `knowledge` (`knowledge_search`, `knowledge_trace`, `knowledge_slice`, `knowledge_status` over a SQLite index, plus `knowledge_patterns` for the learning loop of specs, requirements, features, and sessions; semantic search when `KNOWLEDGE_EMBEDDINGS_URL` and `KNOWLEDGE_EMBEDDINGS_MODEL` are set, lexical otherwise), `spec-drift-auditor`, `jev-gate`, and `codegraph`.
 
 **Modules** (`.agents/modules/`, opt-in) — `bruno` (integration testing agent), `playwright-e2e` (end-to-end testing agent), `web-ui` (UI skills), and `http-api` (API design skills and the `openapi` compliance adapter).
 
@@ -551,6 +616,17 @@ Engineers work in separate slices, or in one slice with disjoint `scope_paths`. 
 |---|---|
 | [`AGENTS.md`](AGENTS.md) | Operational map — read every session |
 | [`runtimes/README.md`](runtimes/README.md) | Per-runtime wiring |
+
+---
+
+## Developing the kit
+
+The kit is developed with the kit: every change goes through a slice in this repository, and `node .harness/scripts/check-invariants.mjs` must pass before a commit.
+
+- **Mode.** Use `init-slice.mjs <id> --full`. Almost every kit change touches `.harness/`, `scripts/`, and `.agents/`, so a lite slice would raise E1 on its first feature (see `docs/knowledge-base/steering-proposals/SP-001.md`).
+- **Bindings.** `.harness/steering/{product,structure,tech,domain-layer.project,quality-gates.project,design-system}.md` describe the kit itself. The stubs that projects receive live in `scripts/templates/bindings/`.
+- **Kit-only artifacts.** This repo's slices, specs, features, sessions, archive, learning state, audits, `project.json`, bindings, and steering proposals are never installed into a project and never published to npm (`files` negations in `package.json`). `scripts/test-install-into.sh` fails if one leaks.
+- **Closed work.** A slice that will not reach DONE is moved to `.harness/state/archive/<id>/` with a `<id>.json` record; the learning loop still reads its sessions.
 
 ---
 

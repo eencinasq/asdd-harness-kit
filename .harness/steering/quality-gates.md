@@ -9,7 +9,7 @@ tags:
 
 # Quality Gates
 
-Portable acceptance criteria for the phase chain, discovery, spec, validation, domain, spec coverage, design readiness, task planning readiness, domain placement, spec drift, and tech debt. These criteria are normative. The agent applying a gate shall apply them as written.
+Portable acceptance criteria for the phase chain, discovery, spec, validation, domain, spec coverage, design readiness, task planning readiness, domain placement, spec drift, tech debt, and the learning loop. These criteria are normative. The agent applying a gate shall apply them as written.
 
 **Project binding (mandatory):** test commands, domain-placement findings, and stack paths live in [quality-gates.project.md](quality-gates.project.md). The agent shall apply this contract and that binding together.
 
@@ -190,6 +190,22 @@ This gate is mandatory before any new spec enters Task Planning.
 - **QG-DEB-02.** When that command reports one or more test failures, the agent shall return BLOCK.
 - **QG-DEB-03.** When the suite contains one or more pre-existing failures in specs unrelated to the current spec, the agent shall return BLOCK.
 - **QG-DEB-04.** When that command reports zero failures, the agent shall record zero failures for this gate and shall return PASS for this gate.
-- **QG-DEB-05.** If the agent records a failure or an `OBS-xxx` observation, then the agent shall append it to the agent failure log path in [quality-gates.project.md](quality-gates.project.md).
-- **QG-DEB-06.** When the same failure has three entries in that log, the agent shall open an investigation and shall record which guide or sensor in [controls.md](controls.md) must change so that failure is less likely. The agent shall not close the entry as an observation only.
+- **QG-DEB-05.** If the agent records a failure or an `OBS-xxx` observation, then the agent shall append it to the agent failure log path in [quality-gates.project.md](quality-gates.project.md) with a `**Signature:**` line (`<check-or-area>:<short-kebab-cause>`, reused verbatim for the same failure) so the learning loop can count it.
+- **QG-DEB-06.** When the same failure reaches the occurrence threshold, the [Learning Gate](#learning-gate) applies: the agent shall record which guide or sensor in [controls.md](controls.md) must change so that failure is less likely. The agent shall not close the entry as an observation only.
 - **QG-DEB-07.** The agent shall exclude an unrelated pre-existing failure from the Spec Coverage Gate and shall include that same failure in this gate.
+
+## Learning Gate
+
+Computational sensor: `node .harness/scripts/learn.mjs` (also run by `sync-state.mjs`; the gate runs inside `check-invariants.mjs`, so Verify-on-Stop and CI apply it). It groups repeated signals into patterns (`LP-*`) in `.harness/state/learning/patterns.json` and links them to steering proposals (`SP-*`) in `docs/knowledge-base/steering-proposals/`. Details: [README → Self-improving harness](https://github.com/eencinasq/asdd-harness-kit#self-improving-harness).
+
+### Acceptance criteria
+
+- **QG-LEARN-01.** The harness shall record a signal for every failing `check-invariants.mjs --live` or `--record` run (Verify-on-Stop, an agent on a runtime without hooks, or CI), every command the command gate denies (by pattern label, never the command text), every signed failure-log entry, every `phase_blocked`, `feature_blocked`, and `dissent` session, every gate `override` session, every Tech Lead dismissal in `.harness/audits/triage.json`, every recurring audit finding, and every lite escalation signal. Repeated failing runs with the same signature within 30 minutes shall count as one occurrence. Raw run files stay local; `learn.mjs` folds them into one committed summary per author and ISO week (`.harness/state/learning/summaries/<week>-<author>.json`), which only that author writes.
+- **QG-LEARN-02.** When a signature reaches 3 occurrences, the harness shall mark its pattern `open`. A pattern whose signals all come from overrides or dismissals is `noise` (a sensor fires without catching a defect); any other pattern is an `escape` (a guide or sensor let the failure through).
+- **QG-LEARN-03.** While a pattern is `open`, the invariants shall WARN, and the Knowledge agent shall add a steering proposal from `.harness/steering/templates/steering-proposal.md` that names the pattern, the control to change, the change type, a measurable success criterion, and a rollback. A malformed proposal shall FAIL the invariants.
+- **QG-LEARN-04.** If a slice completes the Knowledge phase while a pattern it contributed to is `open`, then the invariants shall FAIL. A `rejected` proposal records a decision not to change the control and closes the pattern.
+- **QG-LEARN-05.** Only the Tech Lead shall set a proposal to `accepted`, `rejected`, or `applied`, and shall fill `decided_by`; `applied` needs `applied_commit`, a commit that changes the `control` file (FAIL otherwise). Agents shall not merge steering changes. When the signature recurs after the change (`applied_at`, else the date of `applied_commit`), the proposal shall become `ineffective` and the pattern shall reopen.
+- **QG-LEARN-06.** When 10 sessions have been recorded after the change with no recurrence — for a pattern with an area (`sensor:<code>:<area>`), only sessions whose `scope_paths` touch that area — the proposal shall become `verified`.
+- **QG-LEARN-08.** A recorded run shall also record its WARN lines, except learning and lite-escalation WARNs, which are signals of their own. When the same WARN signature appears on 5 distinct days, its pattern shall open as `noise`: a WARN that fires every day without action shall be fixed, made a FAIL, or removed.
+- **QG-LEARN-09.** `learn.mjs --export` shall include only verified or ineffective proposals on kit-owned controls, and only generic fields (signature, kind, counts, control, change, success, result). Nothing shall be sent upstream automatically.
+- **QG-LEARN-07.** For a `noise` pattern, the proposal shall loosen, tune, or remove the sensor. The agent shall not raise a threshold in an agent prompt instead (`controls.md` precedence 2).

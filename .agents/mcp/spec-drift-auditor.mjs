@@ -26,6 +26,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { changedFiles, harnessManaged, isExempt, isGitRepo, readBinding, resolveBase, runDrift } from '../../.harness/scripts/drift-lib.mjs';
 import { loadArchitectureSources, resolveSemgrepConfig, runSemgrepScan } from '../../.harness/scripts/semgrep-lib.mjs';
 import { applyTriage, latestReport, listReports } from '../../.harness/scripts/audit-lib.mjs';
+import { learningForReview } from '../../.harness/scripts/learning-lib.mjs';
 
 const PROTOCOL_VERSION = '2024-11-05';
 const SERVER_INFO = { name: 'spec-drift-auditor', version: '1.0.0' };
@@ -294,6 +295,8 @@ export function auditDiff({ base_branch, target_branch, mode = 'author', pr_body
       drift_level: all.some((f) => f.severity === 'fail') ? 'blocking' : all.length ? 'warning' : 'clean',
     },
     notes: res.notes,
+    // Self-improving harness: patterns this change touches (advisory, never a finding).
+    learning: learningForReview(ROOT, { changed, slices: linked }),
     generated_at: new Date().toISOString(),
   };
   lastDiffReport = report;
@@ -607,6 +610,7 @@ const PROMPTS = [
 2. For each linked slice in summary.linked_slices, run the spec-alignment prompt steps.
 3. Run the architecture-review prompt steps on the changed files.
 4. Findings already dismissed in .harness/audits/triage.json are suppressed; do not raise them again.
+   If report.learning lists relevant open patterns, add one advisory comment per pattern: it is a repeat failure this PR touches. Suggest node .harness/scripts/learn.mjs --propose <LP-id>; never block the PR on it.
 5. Output draft review comments ordered by severity (fail, warn, advisory), each with file, line, and the REQ or rule it cites. Do not post them and do not edit code. To record a dismissal, use: node .harness/scripts/audit-triage.mjs <finding-id> --dismiss --reason "<why>".${a.pr_body ? `\n\nPR body:\n${a.pr_body}` : ''}`,
   },
 ];
