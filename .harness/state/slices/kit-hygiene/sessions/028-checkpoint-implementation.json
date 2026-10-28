@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-028",
+  "timestamp": "2026-10-28T01:28:26.468Z",
+  "agent": "asdd-implementation",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "shared file ownership across serial tasks (fourth occurrence)",
+    "DRIFT-05 cannot express a moved file"
+  ],
+  "event_type": "checkpoint",
+  "phase": "implementation",
+  "evidence": "DRIFT-02 on TASK-001/003/005 after TASK-006 -> re-verified at 9a45bdd. DRIFT-05 on TASK-006 (moved file) -> scope_paths note."
+}
