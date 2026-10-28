@@ -36,7 +36,7 @@
       "id": "TASK-002",
       "title": "Core harness without Jev",
       "user_visible_behavior": "Remove the Jev import from `check-invariants.mjs`; make `capabilities.jev` optional in `check-project-config.mjs` (required when `modules.jev` is true, existing checks when present); delete the no-op `jev-gold-plating.mjs`..",
-      "status": "blocked",
+      "status": "passing",
       "priority": 2,
       "owner": "claude",
       "req_ids": [
@@ -51,18 +51,19 @@
       "verification": [
         "bash scripts/test-lifecycle.sh"
       ],
-      "evidence": "Code committed; test-lifecycle OK and check-project-config/check-invariants pass without Jev. Cannot be set passing yet: invariants FAIL with DRIFT-02 on DONE kit-hygiene features (shared test/installer files), and two of them verify through test-install-into, which stays red until TASK-003.",
+      "evidence": "bash scripts/test-lifecycle.sh OK; default installs pass check-project-config and check-invariants without capabilities.jev, and no installed .mjs imports Jev code (test-install-into at 6489de5). OCR review 1: CR-002 LOW.",
       "scope_paths": [
         ".harness/scripts/check-invariants.mjs",
-        ".harness/scripts/check-project-config.mjs",
-        ".harness/scripts/validators/jev-gold-plating.mjs"
-      ]
+        ".harness/scripts/check-project-config.mjs"
+      ],
+      "evidence_commit": "6489de5",
+      "notes": "Deleted .harness/scripts/validators/jev-gold-plating.mjs in 7f65ac8 (removed from scope_paths: DRIFT-05 cannot express a deletion)."
     },
     {
       "id": "TASK-003",
       "title": "Installer: Jev as a module",
       "user_visible_behavior": "Move the Jev copies, `jev.md`, MCP entry, and `capabilities.jev` into `enable_one_module jev`; include `jev` in `all` and the picker; add `detect_installed_modules` and `--remove-modules=jev`; stop seeding Jev in the project.json template and upgrade patcher; move the `jev-gate` MCP entry to `.agents/modules/jev/mcp.json`; record it in versions..",
-      "status": "blocked",
+      "status": "passing",
       "priority": 3,
       "owner": "claude",
       "req_ids": [
@@ -78,7 +79,7 @@
       "verification": [
         "bash scripts/test-install-into.sh"
       ],
-      "evidence": "Code @6b7cc07: default install passes all no-Jev assertions and log-leak checks in test-install-into; manual --modules=jev install has files, MCP entry, capabilities.jev, modules.jev. Full verification blocked on TASK-004 (jev.md inclusion: auto).",
+      "evidence": "bash scripts/test-install-into.sh exit 0 at 6489de5: default install without Jev (files, MCP entry, capabilities.jev), --modules=jev and all, upgrade keeps Jev, legacy install detected, --remove-modules=jev drops it and a re-run keeps it off, kit logs not seeded, npm excludes kit logs. OCR review 1: CR-001/002 LOW.",
       "scope_paths": [
         "scripts/install-into.sh",
         ".agents/mcp/mcp.json",
@@ -89,13 +90,14 @@
         "scripts/templates/docs/dissent-log.md",
         "package.json"
       ],
-      "notes": "Scope extended during implementation: a module test install showed the kit's own docs/agent-failure-log.md (with kit slice entries) is seeded into projects; logs now seed from scripts/templates/docs/ and the kit logs are excluded from npm (REQ-010 spirit: kit artifacts never ship)."
+      "notes": "Scope extended during implementation: a module test install showed the kit's own docs/agent-failure-log.md (with kit slice entries) is seeded into projects; logs now seed from scripts/templates/docs/ and the kit logs are excluded from npm (REQ-010 spirit: kit artifacts never ship).",
+      "evidence_commit": "6489de5"
     },
     {
       "id": "TASK-004",
       "title": "Skills and Jev steering work with or without the module",
       "user_visible_behavior": "Add a \"Gate mode\" block to `shape-up` and `product-delivery` (Jev tools with the module; same criteria as a human checklist with `decided_by` without it); make `jev.md` `inclusion: auto` and describe it as the module's steering..",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 4,
       "owner": "claude",
       "req_ids": [
@@ -108,12 +110,13 @@
       "verification": [
         "bash scripts/test-install-into.sh"
       ],
-      "evidence": "",
+      "evidence": "bash scripts/test-install-into.sh exit 0 at 6489de5 (jev.md inclusion auto in module installs; stale/cutoff sensors green on installed skills). Skills read: both name modules.jev, keep 'never fake a pass' for the module branch, record decided_by otherwise. Markdown only.",
       "scope_paths": [
         ".agents/skills/shape-up/SKILL.md",
         ".agents/skills/product-delivery/SKILL.md",
         ".harness/steering/jev.md"
-      ]
+      ],
+      "evidence_commit": "6489de5"
     },
     {
       "id": "TASK-005",

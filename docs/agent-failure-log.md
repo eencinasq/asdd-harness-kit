@@ -105,3 +105,35 @@
 - **Failure:** learning-lib counts lite escalation signals (E1…E5) for every slice; the full-mode kit-hygiene slice raised escalation:E1-scope-spread to ×4, inflating LP-a9dc05fe (SP-001).
 - **Remediation:** Recorded; fix in a follow-up slice (count escalation signals only while the slice is lite).
 
+- **Date:** 2026-10-28
+- **Slice:** jev-module
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** drift:done-slice-features-reopened
+- **Failure:** Editing scripts/test-install-into.sh (jev-module TASK-001) reopened passing features of the DONE slice kit-hygiene through DRIFT-02; jev-module could not mark features passing until the old slice was re-verified.
+- **Remediation:** Re-verified kit-hygiene features at the new commit.
+
+- **Date:** 2026-10-28
+- **Slice:** jev-module
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** drift:done-slice-features-reopened
+- **Failure:** Editing scripts/install-into.sh, package.json (jev-module TASK-003) reopened passing features of the DONE slice kit-hygiene through DRIFT-02; jev-module could not mark features passing until the old slice was re-verified.
+- **Remediation:** Re-verified kit-hygiene features at the new commit.
+
+- **Date:** 2026-10-28
+- **Slice:** jev-module
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** drift:done-slice-features-reopened
+- **Failure:** Editing scripts/test-install-into.sh (jev-module TASK-001, log-leak assertions) reopened passing features of the DONE slice kit-hygiene through DRIFT-02; jev-module could not mark features passing until the old slice was re-verified.
+- **Remediation:** Re-verified kit-hygiene features at the new commit.
+
+- **Date:** 2026-10-28
+- **Slice:** jev-module
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** distribution:kit-log-seeded-into-projects
+- **Failure:** The installer seeded the kit's own docs/agent-failure-log.md (with kit slice history) into projects, so a fresh project's learning loop warned about the kit's patterns.
+- **Remediation:** Logs seed from scripts/templates/docs/; kit logs excluded from npm (jev-module TASK-003).
+

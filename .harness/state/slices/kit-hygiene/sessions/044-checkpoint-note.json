@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-044",
+  "timestamp": "2026-10-28T13:18:21.382Z",
+  "agent": "asdd-implementation",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "DRIFT-02 keeps reopening features of a DONE slice whenever a later slice edits a shared file"
+  ],
+  "event_type": "checkpoint",
+  "evidence": "DRIFT-02 from slice jev-module on TASK-001/003/005/006/008 -> re-verified at 6489de5."
+}
