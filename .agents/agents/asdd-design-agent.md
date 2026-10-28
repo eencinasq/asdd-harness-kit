@@ -74,13 +74,9 @@ Read the following before producing any output:
 
 ### 2. Uncertainty Factors
 
-If your confidence score is `< 0.95`, you **must** list 1-3 specific reasons under `Uncertainty Factors` in the header.
+Under `Uncertainty Factors` in the header: List 1-3 specific uncertainty factors with every confidence score you record (write `None` only when nothing is uncertain).
 
-### 3. Dynamic Threshold Enforcement
-
-If the `Validation Agent Confidence` was `< 0.90`, your own confidence target is raised to **0.90**. You must be extra precise in your ADRs to compensate for upstream uncertainty. This does not replace the design readiness gate in `quality-gates.md`.
-
-### 4. Atomic State Transition
+### 3. Atomic State Transition
 
 At the end of your execution, **write a session file** to `.harness/state/slices/<slice-id>/sessions/` and run `node .harness/scripts/sync-state.mjs --slice <slice-id>`. Never hand-edit the generated `manifest.json` or `registry.json` ([manifest.md](../../.harness/steering/manifest.md)).
 1. Event `phase_completed` with `phase: "design"` when your gate passes, or `phase_blocked` with `concerns` when it does not.
@@ -113,7 +109,7 @@ Status: [DRAFT | READY | BLOCKED]
 Requirements version: [version from requirements.md]
 Domain model version: [version from domain-model.md]
 Design confidence score: [0.0–1.0]
-Uncertainty Factors: [None | List 1-3 reasons why confidence is < 1.0]
+Uncertainty Factors: [None | List 1-3 reasons for any uncertainty]
 Last updated: [ISO date]
 Owner: [Tech Lead name]
 

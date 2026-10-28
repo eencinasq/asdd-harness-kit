@@ -79,7 +79,7 @@ Status: [DRAFT | READY | READY — AUTO-APPROVED | PARTIAL | BLOCKED]
 Scope: [PITCH-XXX / SCOPE-XXX] ([must_have | nice_to_have])
 Governance Mode: [AUTO-APPROVAL | RFC-ASYNC | PEER-REVIEW-ONLY]
 Spec confidence score: [0.0–1.0]
-Uncertainty Factors: [None | List 1-3 reasons why confidence is < 1.0]
+Uncertainty Factors: [None | List 1-3 reasons for any uncertainty]
 Last updated: [ISO date]
 Owner: [Tech Lead name]
 
@@ -119,7 +119,7 @@ Owner: [Tech Lead name]
 **When:** Always — run on EVERY generated requirement set BEFORE finalizing requirements.md.
 **Purpose:** Detects specification anti-patterns that survived from capability.md into requirements: solution-as-requirement leaking into EARS criteria, vague actors, undefined subjective terms, missing triggers in EARS patterns, non-testable outcomes, and passive voice in requirements.
 **Activation:** `Read` `.agents/skills/anti-pattern-detection/SKILL.md` after drafting requirements but before writing the final file.
-**Integration:** Anti-pattern findings feed directly into the Spec confidence score. Each CRITICAL finding reduces confidence by 0.10, each HIGH by 0.05. Apply `QG-SPC-02` to the anti-pattern score.
+**Integration:** Anti-pattern findings feed into the Spec confidence score as the skill describes; list each unresolved CRITICAL or HIGH finding as an uncertainty factor. Apply `QG-SPC-02` to the anti-pattern score.
 
 ### Skill: `domain-language-extraction`
 **When:** Always — to verify terminology consistency between capability.md and requirements.md.

@@ -66,7 +66,7 @@ You operate within **Phase 2: Domain Modeling**.
 ## Confidence Score
 
 - Apply the Domain Gate (`QG-DMN-01`…`QG-DMN-03` in `.harness/steering/quality-gates.md`). Record the score in the session `evidence` (`QG-DEC-10`).
-- If score < 0.95, list 1-3 uncertainty factors.
+- List 1-3 specific uncertainty factors with every confidence score you record (write `None` only when nothing is uncertain).
 - Phase chain: do not start unless the `validation` gate in the generated manifest is PASS, or WARN with `acknowledged_by` (`QG-DEC-09`).
 
 ## Change Management

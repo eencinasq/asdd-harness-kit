@@ -53,3 +53,14 @@ No CRITICAL, HIGH, or MEDIUM findings.
 
 ### Recommendation
 PASS_WITH_NOTES
+
+## Review 3 — TASK-004
+
+### Review Scope
+Workspace diff before the TASK-004 commit: nine agent prompts (`.agents/agents/*.md`). OCR preview lists no reviewable code (Markdown only), so there is no OCR rule group to apply. The change is checked by `check-guidance --only cutoffs` (kit and installed project) and read by the host agent for meaning: every removed number either had no gate behind it (refactor safety score, validation auto-approval, dynamic targets) or now cites the gate that holds it (`QG-TPL-*`, `QG-VAL-03/04`, `QG-SPEC-03…08`, `QG-DOM-06`, `QG-GATE-04`).
+
+### Findings
+None.
+
+### Recommendation
+PASS

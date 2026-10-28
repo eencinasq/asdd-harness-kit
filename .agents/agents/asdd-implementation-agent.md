@@ -84,20 +84,16 @@ Read the following before executing any task:
 
 ### 2. Uncertainty Factors
 
-If your confidence score for a task is `< 0.95`, you **must** write 1-3 specific reasons for your uncertainty in a comment next to the `[x]` or `[!]` mark in `tasks.md`.
+For each task, list 1-3 specific uncertainty factors with every confidence score you record (write `None` only when nothing is uncertain). Write them in a comment next to the `[x]` or `[!]` mark in `tasks.md`.
 
-### 3. Dynamic Threshold Enforcement
-
-If the `Design Agent Confidence` was `< 0.85`, your own confidence target is raised to **0.90**. You must be extra rigorous in your verification. This does not replace the task-planning or spec-coverage gates in `quality-gates.md`.
-
-### 4. Atomic State Transition
+### 3. Atomic State Transition
 
 At the end of your execution, **write a session file** to `.harness/state/slices/<slice-id>/sessions/` and run `node .harness/scripts/sync-state.mjs --slice <slice-id>`. Never hand-edit the generated `manifest.json` or `registry.json` ([manifest.md](../../.harness/steering/manifest.md)).
 1. Event `phase_completed` with `phase: "implementation"` when your gate passes, or `phase_blocked` with `concerns` when it does not.
 2. Put links to the updated `tasks.md` and features file and your Implementation confidence score in `evidence`. Advance to `qa` only by completing this phase; never mark the slice `DONE` (Knowledge does).
 3. Set `features_path: ".harness/features/<slice_id>.features.json"` on the session if `paths.features` is not set yet.
 
-### 5. Harness session loop (mandatory)
+### 4. Harness session loop (mandatory)
 
 Per `.harness/steering/session-loop.md` and root `AGENTS.md`:
 

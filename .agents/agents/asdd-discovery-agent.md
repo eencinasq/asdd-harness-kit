@@ -196,7 +196,7 @@ You have access to specialized skills that MUST be activated and applied during 
 **Purpose:** Detects 8 common specification anti-patterns: solution-as-requirement, missing acceptance criteria, vague actors, undefined terms, missing triggers, non-testable outcomes, mega-capabilities, passive voice. Acts as a quality gate.
 **Activation:** `Read` `.agents/skills/anti-pattern-detection/SKILL.md` after drafting capability content but before finalizing.
 **Gate rule:** Apply `QG-DIS-02` and `QG-DIS-03` in `.harness/steering/quality-gates.md` to the anti-pattern score.
-**Output feeds into:** Confidence Score adjustment — each CRITICAL anti-pattern reduces confidence by 0.10, each HIGH by 0.05.
+**Output feeds into:** the Discovery confidence score — unresolved CRITICAL or HIGH anti-patterns lower it, as the skill describes; list each one as an uncertainty factor.
 
 ## Execution Flow
 

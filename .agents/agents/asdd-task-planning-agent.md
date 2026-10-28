@@ -87,8 +87,8 @@ Group tasks into four standard waves:
 
 You must append a confidence assessment:
 
-- **Threshold:** If `score < 0.85`, Implementation Agent must not proceed.
-- **Action:** If `< 0.70`, return to Design Agent for architectural clarification.
+- Apply `QG-TPL-01`…`QG-TPL-04` in `.harness/steering/quality-gates.md` to the score: PASS lets Implementation start; WARN lists each uncertainty factor; BLOCK returns the slice to the Design Agent.
+- Record the score and its uncertainty factors in the session `evidence` (`QG-DEC-10`).
 
 ## Execution Flow
 

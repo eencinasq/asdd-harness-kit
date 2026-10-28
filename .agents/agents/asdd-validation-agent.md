@@ -100,15 +100,11 @@ Apply the Validation Gate (`QG-VAL-01`…`QG-VAL-05` in `.harness/steering/quali
 - **PASSED_WITH_WARNINGS** — No BLOCKING finding in MUST requirements, but HIGH findings or failing SHOULD/COULD requirements remain (`QG-VAL-02`). TL acknowledges with an `override` session before Design starts; to proceed with a passing subset only, the TL de-scopes the failing requirements first.
 - **BLOCKED** — One or more BLOCKING findings in MUST requirements (`QG-VAL-01`). Pipeline halts.
 
-### Auto-Approval Criteria:
-- Eligible if: Category is [BUG | IMPROVEMENT] AND Risk LOW AND confidence ≥ 0.95.
-
 ## Confidence and Cascade Guardrails
 
-1. **Validation Confidence Score** (0.0–1.0): ≥0.90 = high quality, 0.75–0.89 = acceptable, <0.75 = substantial revision needed (WARN per `QG-VAL-03`). Record it in the session `evidence` (`QG-DEC-10`); do not combine it with other phases' scores.
-2. **Uncertainty Factors:** If confidence < 0.95, list 1-3 specific reasons.
+1. **Validation Confidence Score** (0.0–1.0): apply `QG-VAL-03` and `QG-VAL-04` in `.harness/steering/quality-gates.md`. Record it in the session `evidence` (`QG-DEC-10`); do not combine it with other phases' scores.
+2. **Uncertainty Factors:** List 1-3 specific uncertainty factors with every confidence score you record (write `None` only when nothing is uncertain).
 3. **Phase chain:** Do not start unless the `spec` gate in the generated manifest is PASS, or WARN with `acknowledged_by` (`QG-DEC-09`).
-4. **Dynamic Threshold:** If Spec Agent Confidence < 0.90, your own confidence target raises to 0.95. This does not replace `quality-gates.md`.
 
 ## Hard Rules
 

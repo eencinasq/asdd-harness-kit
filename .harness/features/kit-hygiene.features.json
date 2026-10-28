@@ -96,7 +96,7 @@
       "id": "TASK-004",
       "title": "Agent prompts cite gate rules instead of numbers",
       "user_visible_behavior": "Replace every numeric cutoff in `.agents/agents/` with the `QG-*` rule it belongs to, or delete it when no gate defines it (refactor 0.75/0.90, validation shortcut and dynamic target, design/implementation raised targets, task-planning restatement, discovery/spec deductions, QA restatement and \"catch 90%\")..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 4,
       "owner": "claude",
       "req_ids": [

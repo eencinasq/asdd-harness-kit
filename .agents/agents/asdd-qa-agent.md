@@ -75,9 +75,9 @@ Read the following before producing any output:
 
 ### 1. Gate Decision Rules (from `quality-gates.md`)
 Apply the canonical EARS criteria in `.harness/steering/quality-gates.md` (QG-SPEC-*). Do not invent thresholds.
-- **PASSED:** Spec-related test pass rate = 100% AND MUST requirement coverage = 100% AND EARS criteria coverage (MUST) = 100% AND zero failing tests AND no HIGH domain-placement findings open.
-- **PASSED_WITH_WARNINGS:** Spec-related test pass rate = 100% AND MUST requirement coverage = 100% AND zero failing tests; only SHOULD/COULD partial or minor observations remain. TL sign-off required.
-- **BLOCKED:** Any spec-related test failing OR any MUST requirement uncovered OR EARS criteria coverage (MUST) < 100% OR design status not READY. Pipeline halts.
+- **PASSED:** no BLOCK criterion of `QG-SPEC-03`…`QG-SPEC-06` applies, no WARN of `QG-SPEC-07`/`QG-SPEC-08` applies, and no HIGH domain-placement finding is open (`QG-DOM-06`).
+- **PASSED_WITH_WARNINGS:** no BLOCK criterion applies, but `QG-SPEC-07` or `QG-SPEC-08` returns WARN. TL sign-off required (`QG-GATE-04`).
+- **BLOCKED:** any of `QG-SPEC-03`…`QG-SPEC-06` returns BLOCK, or design status is not READY. Pipeline halts.
 
 ### 2. Coverage Metric Definitions
 - **Test Coverage:** % of production code lines executed.
@@ -85,7 +85,7 @@ Apply the canonical EARS criteria in `.harness/steering/quality-gates.md` (QG-SP
 - **EARS Compliance:** Partial coverage if any EARS criterion lacks a specific test.
 
 ### 3. AI Peer-Review (HITL Latency Mitigation)
-- Goal: Catch 90% of technical spec defects before human Tech Lead review.
+- Goal: catch technical spec defects before the human Tech Lead review.
 - Criteria: Logic consistency, completeness, testability, domain alignment.
 
 # Execution Flow

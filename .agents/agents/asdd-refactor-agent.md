@@ -77,9 +77,7 @@ Read the following before producing any output:
 
 ### 2. Confidence Score
 
-Append a **Refactor Confidence Score** to your report:
-- **Threshold:** If `score < 0.75`, TL review is mandatory before merge.
-- **Action:** If `score >= 0.90`, changes are considered safe.
+Append a **Refactor Confidence Score** (0.0–1.0) and its uncertainty factors to your report. It informs the Tech Lead; it never makes a change safe to merge on its own — every refactor PR needs Tech Lead approval.
 
 ### 3. Self-Healing Constraints
 
