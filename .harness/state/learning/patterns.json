@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T00:55:23.752Z",
+  "generated_at": "2026-10-28T01:06:50.412Z",
   "threshold": 3,
   "summary": {
-    "patterns": 1,
+    "patterns": 3,
     "open": 0,
     "in_flight": 1,
     "verified": 0,
@@ -42,6 +42,48 @@
           "recurrences": 0
         }
       ]
+    },
+    {
+      "id": "LP-130d8d22",
+      "signature": "blocked:phase:validation",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:01:34.634Z",
+      "last_seen": "2026-10-28T01:01:34.634Z",
+      "sources": [
+        "blocked"
+      ],
+      "slices": [
+        "kit-hygiene"
+      ],
+      "examples": [
+        "Validation Gate BLOCK (QG-VAL-01): VAL-001 BLOCKING on MUST REQ-008 - upgrade behavior for existing hook configs undefined; installer substring match would keep the old path forever. Validation confidence 0.80. Report: .harness/specs/kit-hygiene/spec-validation-report.md"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-c6b5318f",
+      "signature": "failure:tests:negated-assertion-ignored-by-errexit",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28",
+      "last_seen": "2026-10-28",
+      "sources": [
+        "failure"
+      ],
+      "slices": [
+        "kit-hygiene"
+      ],
+      "examples": [
+        "Seeding the kit's domain model in docs/architecture/ during Domain leaked it into installed projects, and `npm test` still passed: `! grep …` lines in scripts/test-install-into.sh (2) and scripts/test-lifecycle.sh (1) never fail under `set -e`."
+      ],
+      "proposals": []
     }
   ]
 }

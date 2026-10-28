@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-010",
+  "timestamp": "2026-10-28T01:04:51.739Z",
+  "agent": "asdd-task-planning",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [],
+  "event_type": "checkpoint",
+  "phase": "task_planning",
+  "evidence": "Tech Debt Cleanup Gate (QG-DEB-01) check found the suite green but unreliable: bare `!` assertions are ignored under set -e, so the Domain-phase domain model leaked into installs undetected. Remediation: kit domain model staged at .harness/specs/kit-hygiene/domain-model.md until REQ-011; failure logged (QG-DEB-05, signature tests:negated-assertion-ignored-by-errexit); fix planned in TASK-002."
+}

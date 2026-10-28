@@ -2,5 +2,14 @@
   "schema_version": "3.0",
   "_note": "Global manifest — use sync-state.mjs to regenerate from session logs",
   "domain_model_version": "0.0.0",
-  "active_slices": []
+  "active_slices": [
+    {
+      "slice_id": "kit-hygiene",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/kit-hygiene/manifest.json",
+      "features": ".harness/features/kit-hygiene.features.json"
+    }
+  ]
 }

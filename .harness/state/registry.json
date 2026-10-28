@@ -1,5 +1,29 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-10-28T00:55:23.716Z",
-  "slices": []
+  "generated_at": "2026-10-28T01:06:50.375Z",
+  "slices": [
+    {
+      "slice_id": "kit-hygiene",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-10-28T01:06:50.373Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-discovery",
+        "asdd-spec",
+        "asdd-validation",
+        "asdd-domain",
+        "asdd-design",
+        "asdd-task-planning"
+      ]
+    }
+  ]
 }

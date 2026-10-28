@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-001",
+  "timestamp": "2026-10-28T00:58:57.207Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "kit-hygiene",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "full",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

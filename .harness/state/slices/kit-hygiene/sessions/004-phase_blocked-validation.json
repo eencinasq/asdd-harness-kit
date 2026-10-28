@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-004",
+  "timestamp": "2026-10-28T01:01:34.634Z",
+  "agent": "asdd-validation",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "VAL-001: REQ-008 upgrade rule for existing hook entries"
+  ],
+  "event_type": "phase_blocked",
+  "phase": "validation",
+  "evidence": "Validation Gate BLOCK (QG-VAL-01): VAL-001 BLOCKING on MUST REQ-008 - upgrade behavior for existing hook configs undefined; installer substring match would keep the old path forever. Validation confidence 0.80. Report: .harness/specs/kit-hygiene/spec-validation-report.md"
+}

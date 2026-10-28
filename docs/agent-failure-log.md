@@ -17,3 +17,11 @@
 
 ## Incidents
 
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-task-planning
+- **Phase:** task_planning
+- **Signature:** tests:negated-assertion-ignored-by-errexit
+- **Failure:** Seeding the kit's domain model in docs/architecture/ during Domain leaked it into installed projects, and `npm test` still passed: `! grep …` lines in scripts/test-install-into.sh (2) and scripts/test-lifecycle.sh (1) never fail under `set -e`.
+- **Remediation:** Domain model staged in .harness/specs/kit-hygiene/ until REQ-011 lands; the negated assertions are rewritten in the REQ-002 task, and check-guidance rejects bare `!` assertions in kit test scripts.
+
