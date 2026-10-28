@@ -69,7 +69,7 @@ export function checkStale(root) {
 }
 
 const CUTOFFS = [
-  [/(?:<=|>=|≤|≥|<|>)\s*\**`?\s*(?:0?\.\d+|1(?:\.0+)?(?![\d.])|\d+(?:\.\d+)?\s*%)/, 'agent-defined cutoff (cite the QG-* rule instead)'],
+  [/(?:<=|>=|≤|≥|<|>)\s*\**`?\s*(?:0?\.\d+|1\.0+|\d+(?:\.\d+)?\s*%)/, 'agent-defined cutoff (cite the QG-* rule instead)'],
   [/raised? to \**\s*0?\.\d/i, 'agent-defined dynamic target (cite the QG-* rule instead)'],
   [/reduces? [\w ]{0,24}by 0?\.\d/i, 'agent-defined score arithmetic (cite the QG-* rule instead)'],
 ];

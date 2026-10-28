@@ -58,9 +58,11 @@ test('REQ-007 AC-005: agent cutoffs fail; ranges and latency targets do not', wi
     'Each CRITICAL finding reduces confidence by 0.10.',
     'MUST requirement coverage < 100% blocks.',
     'Apply `QG-DES-02`.',
+    'Lite allows > 1 `in_progress` feature only after escalation; ≤1 new domain concept.',
+    'A score >= 1.0 is perfect.',
   ].join('\n'));
   const findings = checkCutoffs(root);
-  assert.deepEqual(findings.map((f) => f.match(/:(\d+) /)[1]), ['2', '5', '6', '7']);
+  assert.deepEqual(findings.map((f) => f.match(/:(\d+) /)[1]), ['2', '5', '6', '7', '10'], 'counts like > 1 are not cutoffs; 1.0 is');
 }));
 
 test('REQ-010 AC-007: budget passes at or below the binding, fails above or when unfilled', withDir((root, write) => {
