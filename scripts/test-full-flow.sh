@@ -13,7 +13,7 @@ trap 'rm -rf "$TMP"' EXIT
 
 APP="$TMP/orderflow-app"
 mkdir -p "$APP"
-"$ROOT/scripts/install-into.sh" "$APP" --runtime=cursor,claude --no-interactive >/dev/null
+"$ROOT/scripts/install-into.sh" "$APP" --runtime=cursor,claude --modules=jev --no-interactive >/dev/null
 cd "$APP"
 git init -q
 git config user.email "test@asdd.local"

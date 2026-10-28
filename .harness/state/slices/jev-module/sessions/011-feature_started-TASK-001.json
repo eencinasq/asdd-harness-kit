@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-jev-module-011",
+  "timestamp": "2026-10-28T13:09:49.787Z",
+  "agent": "asdd-implementation",
+  "human": "eencinas",
+  "slice_id": "jev-module",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "scripts/test-install-into.sh",
+    "scripts/test-full-flow.sh"
+  ],
+  "evidence": "Start TASK-001 (tests first)"
+}

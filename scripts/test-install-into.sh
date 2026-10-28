@@ -59,16 +59,40 @@ grep -q '"project_id": "existing-app"' "$TMP/existing-app/.harness/config/projec
 KIT_VER="$(node -e "process.stdout.write(require('$ROOT/package.json').version)")"
 grep -q "\"harness_version\": \"$KIT_VER\"" "$TMP/existing-app/.harness/config/project.json"
 grep -q "\"version\": \"$KIT_VER\"" "$TMP/existing-app/.harness/config/project.json"
-# Jev is skill-scoped in scaffolded project config (key via env only)
-grep -q '"jev"' "$TMP/existing-app/.harness/config/project.json"
-node -e 'const j=require(process.argv[1]).capabilities.jev; if (j.required !== false || String(j.required_by) !== "shape-up,product-delivery") process.exit(1)' "$TMP/existing-app/.harness/config/project.json"
-grep -q '"apiKey": ""' "$TMP/existing-app/.harness/config/project.json"
-test -f "$TMP/existing-app/.harness/scripts/jev-client.mjs"
-test -f "$TMP/existing-app/.harness/scripts/jev-gates.mjs"
+# Jev is an optional module (jev-module REQ-001, REQ-002, REQ-007): a default install has none of it
+assert_no_jev() {
+  local app="$1"
+  for f in .harness/scripts/jev-client.mjs .harness/scripts/jev-gates.mjs .agents/mcp/jev-gate-server.mjs .harness/steering/jev.md; do
+    if [[ -e "$app/$f" ]]; then echo "Jev file without the jev module: $f" >&2; exit 1; fi
+  done
+  node -e '
+    const [project, mcp] = process.argv.slice(1).map((p) => require(p));
+    if (project.capabilities && "jev" in project.capabilities) throw new Error("capabilities.jev without the jev module");
+    if ("jev-gate" in (mcp.mcpServers ?? {})) throw new Error("jev-gate MCP entry without the jev module");
+  ' "$app/.harness/config/project.json" "$app/.agents/mcp/mcp.json"
+}
+assert_jev() {
+  local app="$1"
+  for f in .harness/scripts/jev-client.mjs .harness/scripts/jev-gates.mjs .agents/mcp/jev-gate-server.mjs .harness/steering/jev.md; do
+    test -f "$app/$f"
+  done
+  grep -q '^inclusion: auto' "$app/.harness/steering/jev.md"
+  node -e '
+    const [project, mcp] = process.argv.slice(1).map((p) => require(p));
+    const j = project.capabilities?.jev;
+    if (!j || j.enabled !== true || j.required !== false || String(j.required_by) !== "shape-up,product-delivery" || j.apiKey !== "")
+      throw new Error(`capabilities.jev not as expected: ${JSON.stringify(j)}`);
+    if (project.modules?.jev !== true) throw new Error("modules.jev is not true");
+    if (!mcp.mcpServers?.["jev-gate"]) throw new Error("jev-gate MCP entry missing");
+  ' "$app/.harness/config/project.json" "$app/.agents/mcp/mcp.json"
+}
+assert_no_jev "$TMP/existing-app"
+(cd "$TMP/existing-app" && node .harness/scripts/check-project-config.mjs >/dev/null && env -u JEV_API_KEY node .harness/scripts/check-invariants.mjs >/dev/null)
+if grep -rlE "from ['\"][^'\"]*jev-(client|gates)\.mjs['\"]|import\(['\"][^'\"]*jev-(client|gates)\.mjs" --include='*.mjs' "$TMP/existing-app/.harness" "$TMP/existing-app/.agents"; then
+  echo "a default install imports Jev code" >&2; exit 1
+fi
 test -f "$TMP/existing-app/.harness/scripts/command-gate.mjs"
-test -f "$TMP/existing-app/.harness/scripts/jev-command-gate.mjs"  # deprecated shim
-test -f "$TMP/existing-app/.agents/mcp/jev-gate-server.mjs"
-test -f "$TMP/existing-app/.harness/steering/jev.md"
+test -f "$TMP/existing-app/.harness/scripts/jev-command-gate.mjs"  # deprecated command-gate shim, not Jev
 # Knowledge index (vector/graph-lite projection of specs + state)
 test -f "$TMP/existing-app/.harness/scripts/knowledge-lib.mjs"
 test -f "$TMP/existing-app/.harness/scripts/knowledge-store.mjs"
@@ -111,6 +135,9 @@ if grep -rqs 'Project binding for the kit itself' "$TMP/existing-app/.harness" "
 fi
 test -z "$(find "$TMP/existing-app/.harness/specs" "$TMP/existing-app/.harness/state/archive" -mindepth 1 -not -name README.md 2>/dev/null)"
 test ! -e "$TMP/existing-app/docs/knowledge-base/steering-proposals"
+# jev-module REQ-010: this slice's own artifacts never land in a project (the loop below covers every kit slice)
+test ! -e "$TMP/existing-app/.harness/specs/jev-module"
+test ! -e "$TMP/existing-app/.harness/features/jev-module.features.json"
 for kit_slice in "$ROOT"/.harness/specs/*/ "$ROOT"/.harness/state/archive/*/; do
   [[ -d "$kit_slice" ]] || continue
   name="$(basename "$kit_slice")"
@@ -349,7 +376,7 @@ done
 # ------------------------------------------------------------------
 MTMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-mod-test.XXXXXX")"
 
-for mod in bruno playwright-e2e web-ui http-api; do
+for mod in bruno playwright-e2e web-ui http-api jev; do
   echo "== module $mod =="
   mkdir -p "$MTMP/$mod-app"
   "$ROOT/scripts/install-into.sh" "$MTMP/$mod-app" --modules="$mod" --no-interactive --skip-deps >/dev/null 2>&1
@@ -362,6 +389,20 @@ for mod in bruno playwright-e2e web-ui http-api; do
       ;;
     web-ui)
       test -d "$MTMP/$mod-app/.agents/skills/frontend-ui-engineering"
+      ;;
+    jev)
+      # jev-module REQ-003, REQ-009
+      assert_jev "$MTMP/$mod-app"
+      (cd "$MTMP/$mod-app" && node .harness/scripts/check-project-config.mjs >/dev/null)
+      # upgrade keeps it (REQ-005), removal drops it for good (REQ-014, AC-007)
+      "$ROOT/scripts/install-into.sh" "$MTMP/$mod-app" --no-interactive --skip-deps >/dev/null 2>&1
+      assert_jev "$MTMP/$mod-app"
+      "$ROOT/scripts/install-into.sh" "$MTMP/$mod-app" --remove-modules=jev --no-interactive --skip-deps >/dev/null 2>&1
+      assert_no_jev "$MTMP/$mod-app"
+      node -e 'if (require(process.argv[1]).modules?.jev !== false) throw new Error("modules.jev should be false after removal")' "$MTMP/$mod-app/.harness/config/project.json"
+      (cd "$MTMP/$mod-app" && node .harness/scripts/check-project-config.mjs >/dev/null)
+      "$ROOT/scripts/install-into.sh" "$MTMP/$mod-app" --no-interactive --skip-deps >/dev/null 2>&1
+      assert_no_jev "$MTMP/$mod-app"
       ;;
     http-api)
       test -d "$MTMP/$mod-app/.agents/skills/api-and-interface-design"
@@ -381,6 +422,24 @@ test -f "$MTMP/all-app/.agents/agents/asdd-integration-tester.md"
 test -f "$MTMP/all-app/.agents/agents/asdd-e2e-tester.md"
 test -d "$MTMP/all-app/.agents/skills/frontend-ui-engineering"
 test -d "$MTMP/all-app/.agents/skills/api-and-interface-design"
+assert_jev "$MTMP/all-app"  # jev-module REQ-004
+echo "  OK"
+
+# Upgrade of a project installed before Jev became a module (jev-module REQ-005, AC-003)
+echo "== upgrade: pre-module Jev install keeps Jev; a default install stays without it =="
+mkdir -p "$MTMP/legacy-app"
+"$ROOT/scripts/install-into.sh" "$MTMP/legacy-app" --no-interactive --skip-deps >/dev/null 2>&1
+assert_no_jev "$MTMP/legacy-app"
+"$ROOT/scripts/install-into.sh" "$MTMP/legacy-app" --no-interactive --skip-deps >/dev/null 2>&1
+assert_no_jev "$MTMP/legacy-app"
+cp "$ROOT/.harness/scripts/jev-gates.mjs" "$MTMP/legacy-app/.harness/scripts/jev-gates.mjs"
+node -e '
+  const fs = require("fs"); const p = process.argv[1]; const d = JSON.parse(fs.readFileSync(p, "utf8"));
+  d.capabilities.jev = { enabled: true, required: false, required_by: ["shape-up", "product-delivery"], apiKey: "", endpoint: "https://api.typesafe.ai/v1", fallbackPolicy: "fail-closed" };
+  fs.writeFileSync(p, JSON.stringify(d, null, 2) + "\n");
+' "$MTMP/legacy-app/.harness/config/project.json"
+"$ROOT/scripts/install-into.sh" "$MTMP/legacy-app" --no-interactive --skip-deps >/dev/null 2>&1
+assert_jev "$MTMP/legacy-app"
 echo "  OK"
 
 echo "== versions: one project version; every refreshed file has an entry =="
