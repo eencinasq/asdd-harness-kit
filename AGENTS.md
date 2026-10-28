@@ -5,7 +5,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 - Process: [README → Guides, then sensors](https://github.com/eencinasq/asdd-harness-kit#guides-then-sensors)
 - Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-harness-kit#adopter-checklist)
 - Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit); enable them with the kit installer.
-- Jev (shape-up / product-delivery only): [README → Jev (skill-scoped)](https://github.com/eencinasq/asdd-harness-kit#jev-skill-scoped) · [`.harness/steering/jev.md`](.harness/steering/jev.md)
+- Jev (optional module for shape-up / product-delivery gates): [README → Jev module](https://github.com/eencinasq/asdd-harness-kit#jev-module-optional)
 
 ## INIT (every session)
 
@@ -14,7 +14,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 3. Read features when `paths.features` is set.
 4. **JIT steering loading:**
    - Each steering file has YAML frontmatter with `inclusion` and `tags`.
-   - Load all `inclusion: "always"` files (controls, session-loop, manifest, skills, security-rules, jev, README).
+   - Load all `inclusion: "always"` files (controls, session-loop, manifest, skills, security-rules, README).
    - Load `inclusion: "auto"` files **only when their tags match the current phase** (as named in `sync-state.mjs`, e.g. `task_planning`), the slice `mode` (`lite`), or the active role (`review`, `ui`).
    - Skip auto files whose tags do not intersect those keys — this saves context window. Explicit `Read` instructions in an agent file always apply.
    - **Lite-first:** all slices start in `lite` mode (default in `init-slice.mjs`). Use `--full` only for work known upfront to be cross-cutting/architectural. Growth in a lite slice triggers evidence-based escalation — see [`asdd-lite.md`](.harness/steering/asdd-lite.md).
@@ -52,7 +52,7 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 3. Domain: [domain-layer.md](.harness/steering/domain-layer.md) + [domain-layer.project.md](.harness/steering/domain-layer.project.md).
 4. Gates: [quality-gates.md](.harness/steering/quality-gates.md) + [quality-gates.project.md](.harness/steering/quality-gates.project.md).
 5. Fill project bindings before Discovery — stubs are not product truth.
-6. Jev is required **only** inside `shape-up` and `product-delivery` (prefer `jev-gate` MCP). Set `JEV_API_KEY` for those skills; do not treat `unavailable` as a pass. Harness ASDD must not call Jev.
+6. Jev is an optional module (`modules.jev` in `.harness/config/project.json`). With it, `shape-up` and `product-delivery` require their Jev gates (`jev-gate` MCP, `JEV_API_KEY`) and never treat `unavailable` as a pass; without it, a human decides those gates. Harness ASDD never calls Jev.
 
 ## Baseline steering reads
 

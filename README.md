@@ -4,7 +4,7 @@ A portable process layer for **Agent Specification-Driven Development (ASDD)** a
 
 It gives AI agents a governed pipeline — from shaping an idea through implementation, QA, and knowledge capture — with feature trackers, file-scope enforcement, verification evidence, spec-drift sensors, and traceability. You bring your own stack (Python, Go, Rails, Next.js, Nest, …). The kit brings the process.
 
-**Contents:** [What this is](#what-this-is) · [Install](#install) · [How a session works](#how-a-session-works) · [Delivery pipeline](#delivery-pipeline) · [Jev (skill-scoped)](#jev-skill-scoped) · [Spec drift and codebase audit](#spec-drift-and-codebase-audit) · [Self-improving harness](#self-improving-harness) · [Principles](#principles) · [What's inside](#whats-inside) · [Requirements](#requirements) · [Documentation](#documentation) · [Developing the kit](#developing-the-kit)
+**Contents:** [What this is](#what-this-is) · [Install](#install) · [How a session works](#how-a-session-works) · [Delivery pipeline](#delivery-pipeline) · [Jev module](#jev-module-optional) · [Spec drift and codebase audit](#spec-drift-and-codebase-audit) · [Self-improving harness](#self-improving-harness) · [Principles](#principles) · [What's inside](#whats-inside) · [Requirements](#requirements) · [Documentation](#documentation) · [Developing the kit](#developing-the-kit)
 
 ---
 
@@ -14,7 +14,7 @@ It gives AI agents a governed pipeline — from shaping an idea through implemen
 |---|---|---|
 | **Process** | 9-phase ASDD pipeline, agent definitions, skills catalog, steering contracts | Product intent, domain language, technology choices |
 | **Execution control** | Append-only sessions, feature trackers, generated manifests, invariant checks | Mapped file scopes, verification commands |
-| **Quality gates** | EARS templates, Harness invariants, Jev gates on shaping and delivery | Test suites, failure logs, `JEV_API_KEY` when shaping or delivering |
+| **Quality gates** | EARS templates, Harness invariants, shaping and delivery gates (human-decided, or Jev with the optional module) | Test suites, failure logs, `JEV_API_KEY` only with the Jev modulering |
 | **Spec drift and audit** | Drift checks in the invariants and CI, codebase auditor, `spec-drift-auditor` MCP server with a dashboard | Architecture gate command, audit commands, OpenAPI contract (optional bindings) |
 | **Knowledge** | Generated index of specs, requirements, features, and sessions, queried through the `knowledge` MCP server | Optional embeddings endpoint |
 | **Runtime adapters** | Configs and symlinks for Cursor, Claude Code, OpenCode, Kimi, Junie, Devin, Kiro | Your IDE or agent runtime |
@@ -96,7 +96,7 @@ Do not copy from another product monorepo: specs, `PROGRESS.md` history, filled 
 6. Validate Harness state: `node .harness/scripts/check-invariants.mjs`. This also checks that `.harness/steering/skills.md` lists only the name and description of each folder under `.agents/skills/`.
 7. Fill `quality-gates.project.md` before Discovery: the full-suite command, the failure-log path, and `Active findings` (`none` or real rows). A stub blocks the gate that needs it.
 8. With `--runtime=cursor`, confirm `.cursor/hooks.json` runs `node .harness/scripts/verify-on-stop.mjs` on `stop` and `node .harness/scripts/command-gate.mjs` on `beforeShellExecution`. With `--runtime=claude`, confirm `.claude/settings.json` registers the same two scripts on `Stop` and `PreToolUse` (Bash).
-9. For `shape-up` / `product-delivery`: set `JEV_API_KEY`, keep `capabilities.jev.apiKey` empty, prefer the `jev-gate` MCP server (`jev_status`), shell fallback `node .harness/scripts/jev-gates.mjs health`. Confirm `required: false` and `required_by: ["shape-up","product-delivery"]` ([Jev](#jev-skill-scoped)).
+9. Only with `--modules=jev`: set `JEV_API_KEY`, keep `capabilities.jev.apiKey` empty, prefer the `jev-gate` MCP server (`jev_status`), shell fallback `node .harness/scripts/jev-gates.mjs health`. Confirm `required: false` and `required_by: ["shape-up","product-delivery"]` ([Jev module](#jev-module-optional)).
 10. Optional spec drift and audit bindings in `quality-gates.project.md` (`Test file globs`, `Drift base branch`, `Audit commands`, `Contract command`, `OpenAPI spec`) and the `Gate command` in `domain-layer.project.md`. Unfilled ones report `unconfigured`. Keep `drift.contract: "warn"` in `project.json` until every feature has `scope_paths` and `passing` features have `evidence_commit`, then set `"fail"` ([spec drift](#spec-drift-and-codebase-audit)).
 11. Create the first slice via Discovery or ASDD-Lite.
 
@@ -183,9 +183,9 @@ A guide steers the agent before it edits. A sensor checks the result and, on fai
 | When that task starts | Read `.agents/skills/<name>/SKILL.md`. Do not read `references/` until that body says to | `skills.md` |
 | Before any product edit | Stay inside the files mapped to the active spec. Do not refactor unless the spec, the current task, or the slice phase `refactor` asks for it | `.harness/steering/session-loop.md` |
 | At a full-ASDD phase gate | Apply EARS / coverage criteria in `quality-gates.md`. Lite skips those numeric gates | `.harness/steering/quality-gates.md` |
-| Before a Shape Up bet or writing intents | `jev-gate` MCP (`jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate`) — shape-up / product-delivery only | `.harness/steering/jev.md` |
+| Before a Shape Up bet or writing intents | Shaping and delivery gates: a human decision (`decided_by`), or the `jev-gate` MCP with the Jev module | `.harness/steering/jev.md` |
 | Dangerous bash | `command-gate.mjs` pattern allow/deny (no Jev) — hook-wired on Cursor and Claude Code, both fail-closed; advisory elsewhere | `.harness/scripts/command-gate.mjs` |
-| In-progress diff vs spec | Deterministic scope mapping (`session-loop.md` + `features.mjs`); Jev gold-plating is disabled | `.harness/steering/session-loop.md` |
+| In-progress diff vs spec | Deterministic scope mapping (`session-loop.md` + `features.mjs`) | `.harness/steering/session-loop.md` |
 | Lite slice governance | Serial rule (one `in_progress`, FAIL) + escalation signals block `DONE` while open (`validators/lite-escalation.mjs`, `sync-state.mjs`) | `.harness/steering/asdd-lite.md` |
 | Before `passing` or session end | `node .harness/scripts/check-invariants.mjs` must exit 0. WARN does not block. FAIL does | `session-loop.md` |
 | Session end gate | Cursor stop hook and Claude Code Stop hook run `verify-on-stop.mjs` → `check-invariants.mjs --live` (does **not** require `JEV_API_KEY`); a failing check is returned as the next prompt (Cursor `loop_limit` 3; Claude respects `stop_hook_active`). Abort and error statuses do not continue the loop | `.cursor/hooks.json`, `.claude/settings.json` |
@@ -223,9 +223,9 @@ An idea becomes verified code through [Shape Up](https://basecamp.com/shapeup) a
 
 ```text
 Idea
-  → 1. Shape Up          pitch: appetite, solution, rabbit holes, no-gos   (Jev: jev_shape_up_gates)
+  → 1. Shape Up          pitch: appetite, solution, rabbit holes, no-gos   (gate: human, or Jev module)
   → Betting table        bet for a cycle, or let it go (no backlog)
-  → 2. Product Delivery  scope map → one intent.md per scope               (Jev: jev_scope_choice + jev_ears_gate)
+  → 2. Product Delivery  scope map → one intent.md per scope               (gates: human, or Jev module)
   → 3. ASDD + Harness    per intent: Discovery … Task Planning → Implementation → QA → Knowledge   (no Jev)
   → End of cycle         ship verified scopes; hammer or cut the rest; cooldown
 ```
@@ -254,7 +254,7 @@ A pitch contains:
 
 Must-haves and nice-to-haves (~) separate what the bet needs from what can be cut.
 
-**Betting.** Run `jev_status` then `jev_shape_up_gates` (appetite score ≥ 4, rabbit-hole score ≥ 0.80); `unavailable` stops the bet. The betting table then decides for one cycle:
+**Betting.** The appetite and rabbit-hole gates pass (a human decision, or `jev_shape_up_gates` with the Jev module, where `unavailable` stops the bet). The betting table then decides for one cycle:
 
 | State | Meaning | Next action |
 |---|---|---|
@@ -272,8 +272,8 @@ Bet pitch → scope map (SCOPE-001 … SCOPE-N) → .harness/specs/<slice-id>/in
 ```
 
 - A **scope** is a part that can be built, integrated, and shown working on its own, cut vertically through every layer it needs. A small pitch is one scope; a pitch with independent parts is several.
-- `jev_scope_choice` classifies each scope as `must_have`, `nice_to_have` (~), or `reshape` (out of this bet, back to shaping — never a backlog).
-- Each intent carries the pitch and scope IDs, the bet's appetite, must-have outcomes written as EARS-style statements (checked with `jev_ears_gate` ≥ 0.85, or `# jev-override: accept`), nice-to-haves, no-gos, rabbit holes, and dependencies on other scopes.
+- The scope choice gate (human, or `jev_scope_choice` with the Jev module) classifies each scope as `must_have`, `nice_to_have` (~), or `reshape` (out of this bet, back to shaping — never a backlog).
+- Each intent carries the pitch and scope IDs, the bet's appetite, must-have outcomes written as EARS-style statements (checked by the EARS gate — human, or `jev_ears_gate` with the Jev module, or `# jev-override: accept`), nice-to-haves, no-gos, rabbit holes, and dependencies on other scopes.
 - Intents go to `@asdd-discovery-agent` in dependency order; independent scopes can run in parallel.
 
 Details: [`product-delivery/SKILL.md`](.agents/skills/product-delivery/SKILL.md) and the [handoff reference](.agents/skills/product-delivery/references/asdd-harness-handoff.md). A pitch or scope may also live in a tracker (GitHub Issues, Linear, Jira) through the `external-trackers` skill: a tracker cycle holds the bet, one issue per scope is optional, and the tracker is never the source of truth.
@@ -348,32 +348,30 @@ TASK → REQ → intent (slice) → scope → pitch
 
 ---
 
-## Jev (skill-scoped)
+## Jev module (optional)
 
-TypeSafe **System One** is required **only** by the `shape-up` and `product-delivery` skills. Harness ASDD phases, the invariants, and every other skill never call Jev. Inside those two skills, `unavailable` is never a pass, and no fallback score may look like success.
+TypeSafe **System One** (Jev) is an optional module. Without it, the kit is complete: `shape-up` and `product-delivery` apply their gate criteria as a checklist and a human decides, with `decided_by` recorded. With it, System One decides those gates and `unavailable` is never a pass. Harness ASDD phases, the invariants, and the command gate never call Jev.
 
-| Where | Calls |
+```bash
+npx asdd-harness-kit /path/to/repo --modules=jev          # add (also part of --modules=all)
+npx asdd-harness-kit /path/to/repo --remove-modules=jev   # remove; later runs keep it off
+```
+
+An upgrade keeps Jev in a project that already has it. The module installs:
+
+| File | Role |
 |---|---|
-| Shape Up | `jev_status`, `jev_shape_up_gates` (appetite ≥ 4, rabbit hole ≥ 0.80) |
-| Product Delivery | `jev_status`, `jev_scope_choice` (must_have / nice_to_have / reshape), `jev_ears_gate` (≥ 0.85) |
-| Trackers | None — overlapping `scope_paths` are checked by `validators/features.mjs` |
-| Harness | None — `command-gate.mjs` is a pattern-only command gate; `check-invariants --live` does not need the key |
-
-Prefer the **`jev-gate` MCP server** (`.agents/mcp/jev-gate-server.mjs`): `jev_status`, `jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate`, and `check_command_safety` (hooks; pattern only). Shell fallback when MCP is unavailable:
+| `.harness/scripts/jev-client.mjs` | The only HTTP client: `POST {endpoint}/systemone` |
+| `.harness/scripts/jev-gates.mjs` | Shape Up, scope, EARS, and hill gates (the library behind the MCP server) |
+| `.agents/mcp/jev-gate-server.mjs` + `jev-gate` entry in `mcp.json` | `jev_status`, `jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate` (`check_command_safety` there is deprecated; use `command-gate.mjs`) |
+| `.harness/steering/jev.md` | Pass rules and thresholds (appetite ≥ 4, rabbit hole ≥ 0.80, EARS ≥ 0.85); loaded by the two skills, not on every session |
+| `capabilities.jev` in `.harness/config/project.json` | `apiKey` stays empty; the key comes from the environment |
 
 ```bash
 export JEV_API_KEY="…"                    # or .env / .env.local — never commit it
 node .harness/scripts/jev-client.mjs status
 node .harness/scripts/jev-gates.mjs health
 ```
-
-| Script | Role |
-|---|---|
-| `jev-client.mjs` | The only HTTP client: `POST {endpoint}/systemone` |
-| `jev-gates.mjs` | Shape Up, scope, EARS, and hill gates (the library behind the MCP server) |
-| `command-gate.mjs` | Pattern command safety and the runtime hook entrypoint (`jev-command-gate.mjs` is a deprecated shim for old hook configs; the installer rewrites them) |
-
-Config in `.harness/config/project.json` (`apiKey` stays empty; the key comes from the environment):
 
 ```json
 "jev": {
@@ -385,8 +383,6 @@ Config in `.harness/config/project.json` (`apiKey` stays empty; the key comes fr
   "fallbackPolicy": "fail-closed"
 }
 ```
-
-Steering and thresholds: [`.harness/steering/jev.md`](.harness/steering/jev.md).
 
 ---
 
@@ -587,10 +583,10 @@ Rules: `QG-LEARN-01`…`09` in [`quality-gates.md`](.harness/steering/quality-ga
 | `asdd-lite.md` | Lite mode and escalation |
 | `spec-drift.md`, `knowledge.md`, `codegraph.md` | Drift sensors, knowledge index, code intelligence |
 | `controls.md` | Which guide or sensor wins on a conflict |
-| `jev.md`, `security-rules.md`, `skills.md` | Jev scope, security rules, skills index |
+| `security-rules.md`, `skills.md` | Security rules, skills index (`jev.md` only with the Jev module) |
 | `templates/` | Artifact templates for every phase |
 
-**Harness** (`.harness/`) — `scripts/` (invariants, drift, audit, state, knowledge, Jev), `scripts/validators/`, `state/`, `specs/`, `features/`, `audits/`, and `PROGRESS.md`.
+**Harness** (`.harness/`) — `scripts/` (invariants, drift, audit, state, knowledge, learning; Jev with its module), `scripts/validators/`, `state/`, `specs/`, `features/`, `audits/`, and `PROGRESS.md`.
 
 **MCP servers** (`.agents/mcp/`) — `knowledge` (`knowledge_search`, `knowledge_trace`, `knowledge_slice`, `knowledge_status` over a SQLite index, plus `knowledge_patterns` for the learning loop of specs, requirements, features, and sessions; semantic search when `KNOWLEDGE_EMBEDDINGS_URL` and `KNOWLEDGE_EMBEDDINGS_MODEL` are set, lexical otherwise), `spec-drift-auditor`, `jev-gate`, and `codegraph`.
 

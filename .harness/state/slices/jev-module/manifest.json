@@ -7,13 +7,13 @@
   "escalation_signals": [
     {
       "type": "E1-scope-spread",
-      "evidence": "scope touches 3 top-level modules: .agents, .harness, scripts"
+      "evidence": "scope touches 6 top-level modules: .agents, .harness, AGENTS.md, README.md, runtimes, scripts"
     }
   ],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-10-28T01:49:41.016Z",
-  "updated_at": "2026-10-28T13:18:02.381Z",
+  "updated_at": "2026-10-28T13:18:37.487Z",
   "paths": {
     "specs": ".harness/specs/jev-module",
     "tasks": ".harness/specs/jev-module/tasks.md",
@@ -63,7 +63,25 @@
       "concerns": []
     }
   },
-  "active_features": [],
+  "active_features": [
+    {
+      "id": "TASK-005",
+      "owner": "asdd-implementation",
+      "human": "eencinas",
+      "since": "2026-10-28T13:18:37.463Z",
+      "handoff_from": null,
+      "scope_paths": [
+        "AGENTS.md",
+        ".harness/steering/controls.md",
+        ".harness/steering/README.md",
+        "runtimes/cursor/asdd-steering.mdc",
+        ".agents/modules/README.md",
+        ".agents/mcp/README.md",
+        "README.md",
+        ".agents/mcp/jev-gate-server.mjs"
+      ]
+    }
+  ],
   "open_dissents": 0,
   "source": null,
   "session_log": [
@@ -242,6 +260,14 @@
       "event": "feature_completed",
       "phase": "implementation",
       "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-10-28T13:18:37.463Z",
+      "agent": "asdd-implementation",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
     }
   ],
   "contributors": [

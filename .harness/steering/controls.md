@@ -23,7 +23,7 @@ Practice behind this layout: [Harness engineering for coding agent users](https:
 | Verify-on-Stop invariants | Sensor | Computational, left (agent stop) | Harness state | `node .harness/scripts/check-invariants.mjs` |
 | Spec drift (`DRIFT-01`…`07`) | Sensor | Computational, left (in invariants) and in CI; on demand via `spec-drift-auditor` MCP | Behaviour scope, spec traceability | [spec-drift.md](./spec-drift.md), `check-spec-drift.mjs` |
 | Codebase audit | Sensor | Computational (`audit-codebase.mjs`) plus inferential (`codebase-audit` skill), scheduled | Drift and health outside the change lifecycle | [spec-drift.md](./spec-drift.md), `.harness/audits/` |
-| Jev (shape-up / product-delivery only) | Sensor | Computational (System One) | Betting + EARS/slice quality | [jev.md](./jev.md), `jev-gates.mjs` |
+| Shape Up / Product Delivery gates | Sensor | Computational with the `jev` module (System One), else inferential (human decision, `decided_by`) | Betting, scope choice, EARS quality | `shape-up` and `product-delivery` skills; `jev.md` when the module is installed |
 | Command pattern gate | Sensor | Pattern allow/deny before dangerous bash (no Jev) | Safety | `command-gate.mjs` |
 | CI invariants | Sensor | Computational, after integration; repeats the left check | Harness state | `.github/workflows/harness-invariants.yml` |
 | Full suite (SP-002) | Sensor | Computational, before a new spec enters Task Planning | Behaviour | [quality-gates.project.md](./quality-gates.project.md) |
@@ -32,7 +32,7 @@ Practice behind this layout: [Harness engineering for coding agent users](https:
 
 Fast sensors run before the session ends. The pipeline repeats the invariants check. The full suite stays at the Task Planning gate because it is the more expensive behaviour sensor.
 
-ASDD-Lite skips the confidence scores and the numeric phase gates (`QG-DEC-07`, [asdd-lite.md](./asdd-lite.md)). It still uses feature evidence, invariants, and session close. Jev is not used in ASDD-Lite (skill-scoped to shape-up / product-delivery only).
+ASDD-Lite skips the confidence scores and the numeric phase gates (`QG-DEC-07`, [asdd-lite.md](./asdd-lite.md)). It still uses feature evidence, invariants, and session close.
 
 ## Precedence
 

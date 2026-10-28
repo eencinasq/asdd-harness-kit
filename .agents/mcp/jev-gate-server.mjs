@@ -96,7 +96,7 @@ const TOOLS = [
   {
     name: 'check_command_safety',
     description:
-      'Check if a bash command is safe (pattern whitelist/deny only; does not call Jev).',
+      'Deprecated: use `node .harness/scripts/command-gate.mjs` (hooks already do). Checks a bash command against the pattern allow/deny list; does not call Jev.',
     inputSchema: {
       type: 'object',
       properties: {

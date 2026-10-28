@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T13:18:21.441Z",
+  "generated_at": "2026-10-28T13:18:37.525Z",
   "threshold": 3,
   "summary": {
     "patterns": 15,
@@ -50,7 +50,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T13:18:21.382Z",
+      "last_seen": "2026-10-28T13:18:37.463Z",
       "sources": [
         "escalation"
       ],
@@ -63,7 +63,7 @@
       ],
       "examples": [
         "scope touches 3 top-level modules: .harness, docs, scripts",
-        "scope touches 3 top-level modules: .agents, .harness, scripts",
+        "scope touches 6 top-level modules: .agents, .harness, AGENTS.md, README.md, runtimes, scripts",
         "scope touches 10 top-level modules: .agents, .cursor, .github, .harness, AGENTS.md, README.md, docs, package.json, runtimes, scripts"
       ],
       "proposals": [

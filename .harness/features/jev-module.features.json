@@ -122,7 +122,7 @@
       "id": "TASK-005",
       "title": "Guidance and docs: Jev is optional",
       "user_visible_behavior": "Update `AGENTS.md`, `controls.md`, the steering README, the Cursor rule, the modules and MCP READMEs, the kit README, and the `check_command_safety` description (deprecated; use the CLI)..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 5,
       "owner": "claude",
       "req_ids": [

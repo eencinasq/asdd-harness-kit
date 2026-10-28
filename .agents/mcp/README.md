@@ -1,11 +1,11 @@
 # Shared MCP (kit baseline)
 
-**Canonical:** [`mcp.json`](mcp.json) — codegraph + Jev stdio adapter (zero dependencies, no SDK required).
+**Canonical:** [`mcp.json`](mcp.json) — codegraph, knowledge, and spec-drift-auditor (zero dependencies, no SDK required). The `jev-gate` entry is added only by the `jev` module (`.agents/modules/jev/mcp.json`).
 
-The `jev-gate` MCP server (`.agents/mcp/jev-gate-server.mjs`) exposes:
+With the `jev` module, the `jev-gate` MCP server (`.agents/mcp/jev-gate-server.mjs`) exposes:
 
 - **Skill gates (System One):** `jev_status`, `jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate` — for `shape-up` and `product-delivery` only.
-- **Command safety (no Jev):** `check_command_safety` — pattern allow/deny. Hooks call `.harness/scripts/command-gate.mjs` directly; MCP serves runtimes that prefer a tool call.
+- **Command safety (deprecated here):** `check_command_safety` — kept for existing MCP users. Use the CLI instead: hooks call `.harness/scripts/command-gate.mjs`, and runtimes without hooks run it before dangerous commands.
 
 See `.harness/steering/jev.md`.
 

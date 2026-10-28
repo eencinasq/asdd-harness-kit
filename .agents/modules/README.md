@@ -8,6 +8,7 @@ Opt-in agents and skills. **Not** installed into `.agents/agents` / `.agents/ski
 | **playwright-e2e** | `playwright-e2e/asdd-e2e-tester.md` | `cp` → `.agents/agents/` + enable `playwright` in MCP |
 | **web-ui** | `web-ui/skills/*` | `cp -R` → `.agents/skills/` + fill `design-system.md` + optional Storybook MCP |
 | **http-api** | `http-api/skills/api-and-interface-design`, `http-api/adapters/openapi.mjs` | `cp -R` skills → `.agents/skills/`; adapters → `.agents/mcp/adapters/` |
+| **jev** | `.harness/scripts/jev-client.mjs`, `jev-gates.mjs`, `.agents/mcp/jev-gate-server.mjs`, `.harness/steering/jev.md`, MCP entry in `jev/mcp.json` | Installer only: `--modules=jev` (sources stay at their installed paths); writes `capabilities.jev`; remove with `--remove-modules=jev`. Needs `JEV_API_KEY`. |
 
 Then re-link runtimes ([`runtimes/README.md`](../../runtimes/README.md)).
 
