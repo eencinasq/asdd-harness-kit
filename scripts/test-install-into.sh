@@ -93,6 +93,15 @@ if grep -rlE "from ['\"][^'\"]*jev-(client|gates)\.mjs['\"]|import\(['\"][^'\"]*
 fi
 test -f "$TMP/existing-app/.harness/scripts/command-gate.mjs"
 test -f "$TMP/existing-app/.harness/scripts/jev-command-gate.mjs"  # deprecated command-gate shim, not Jev
+test ! -e "$TMP/existing-app/.harness/scripts/validators/jev-gold-plating.mjs"  # jev-module REQ-011
+# jev-module REQ-008 (AC-005): both skills branch on modules.jev; Jev never fakes a pass; humans are recorded
+for skill in shape-up product-delivery; do
+  for phrase in 'modules.jev' 'never fake a pass' 'decided_by'; do
+    grep -q "$phrase" "$TMP/existing-app/.agents/skills/$skill/SKILL.md" || { echo "$skill skill misses: $phrase" >&2; exit 1; }
+  done
+done
+# jev-module REQ-012: core guidance points to the command-gate CLI
+grep -q 'command-gate.mjs' "$TMP/existing-app/.agents/mcp/README.md"
 # Knowledge index (vector/graph-lite projection of specs + state)
 test -f "$TMP/existing-app/.harness/scripts/knowledge-lib.mjs"
 test -f "$TMP/existing-app/.harness/scripts/knowledge-store.mjs"
@@ -127,7 +136,7 @@ cmp -s "$ROOT/scripts/templates/docs/dissent-log.md" "$TMP/existing-app/docs/dis
 test ! -e "$TMP/existing-app/.harness/state/locks"
 test ! -e "$TMP/existing-app/.harness/progress"
 node -e 'const p = require(process.argv[1]).paths; if ("locks" in p || "progress" in p) throw new Error("project.json declares paths.locks or paths.progress");' "$TMP/existing-app/.harness/config/project.json"
-# Shipped guidance (kit-hygiene REQ-001/002 stale, REQ-006/007 cutoffs, REQ-010/013 budget) is checked where it lands: the installed project
+# Shipped guidance (kit-hygiene REQ-001/002 stale, REQ-006/007 cutoffs, REQ-010/013 budget; jev-module REQ-013 budget without jev.md) is checked where it lands: the installed project
 node "$ROOT/scripts/check-guidance.mjs" --only stale "$TMP/existing-app"
 node "$ROOT/scripts/check-guidance.mjs" --only cutoffs "$TMP/existing-app"
 node "$ROOT/scripts/check-guidance.mjs" --only budget "$TMP/existing-app"
@@ -397,6 +406,15 @@ for mod in bruno playwright-e2e web-ui http-api jev; do
       # jev-module REQ-003, REQ-009
       assert_jev "$MTMP/$mod-app"
       (cd "$MTMP/$mod-app" && node .harness/scripts/check-project-config.mjs >/dev/null)
+      grep -q 'Deprecated' "$MTMP/$mod-app/.agents/mcp/jev-gate-server.mjs"  # jev-module REQ-012
+      # jev-module REQ-006 (AC-004): the config check follows the module
+      CFG="$MTMP/$mod-app/.harness/config/project.json"
+      cp "$CFG" "$CFG.bak"
+      node -e 'const fs=require("fs");const p=process.argv[1];const d=JSON.parse(fs.readFileSync(p,"utf8"));d.capabilities.jev.apiKey="secret";fs.writeFileSync(p,JSON.stringify(d));' "$CFG"
+      if (cd "$MTMP/$mod-app" && node .harness/scripts/check-project-config.mjs >/dev/null 2>&1); then echo "config check accepted capabilities.jev.apiKey" >&2; exit 1; fi
+      node -e 'const fs=require("fs");const p=process.argv[1];const d=JSON.parse(fs.readFileSync(p,"utf8"));delete d.capabilities.jev;d.modules.jev=true;fs.writeFileSync(p,JSON.stringify(d));' "$CFG"
+      if (cd "$MTMP/$mod-app" && node .harness/scripts/check-project-config.mjs >/dev/null 2>&1); then echo "config check accepted modules.jev without capabilities.jev" >&2; exit 1; fi
+      mv "$CFG.bak" "$CFG"
       # upgrade keeps it (REQ-005), removal drops it for good (REQ-014, AC-007)
       "$ROOT/scripts/install-into.sh" "$MTMP/$mod-app" --no-interactive --skip-deps >/dev/null 2>&1
       assert_jev "$MTMP/$mod-app"

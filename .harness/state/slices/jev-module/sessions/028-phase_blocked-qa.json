@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-jev-module-028",
+  "timestamp": "2026-10-28T13:23:19.357Z",
+  "agent": "asdd-qa",
+  "human": "eencinas",
+  "slice_id": "jev-module",
+  "concerns": [
+    "UNCOV-001 REQ-006",
+    "UNCOV-002 REQ-008",
+    "UNCOV-003..005 SHOULD"
+  ],
+  "event_type": "phase_blocked",
+  "phase": "qa",
+  "evidence": "Spec Coverage Gate BLOCK (QG-SPEC-05/06): REQ-006 (AC-004) and REQ-008 (AC-005) have no test; SHOULD REQ-011..013 unnamed. Report: spec-coverage-report.md"
+}

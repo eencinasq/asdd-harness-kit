@@ -7,7 +7,7 @@
       "id": "TASK-001",
       "title": "Install tests for default, module, all, upgrade, remove, kit-only",
       "user_visible_behavior": "Replace the \"Jev on every install\" assertions with: default install has no Jev surface and passes config and invariant checks, no default `.mjs` imports Jev code; `--modules=jev` and `--modules=all` install it with the stated `capabilities.jev`; an upgrade of a pre-module Jev install keeps it; `--remove-modules=jev` removes it and a re-run does not bring it back; this slice's artifacts never land in a project or the npm package.",
-      "status": "passing",
+      "status": "in_progress",
       "priority": 1,
       "owner": "claude",
       "req_ids": [
@@ -25,7 +25,7 @@
       "verification": [
         "bash -n scripts/test-install-into.sh && bash -n scripts/test-full-flow.sh"
       ],
-      "evidence": "bash -n OK; log-leak assertions added (cmp with scripts/templates/docs/*-log.md, npm kit-only regex) and passing; test-install-into still red only at the jev module case (jev.md inclusion, TASK-004).",
+      "evidence": "Reopened by QA (UNCOV-001..005).",
       "scope_paths": [
         "scripts/test-install-into.sh",
         "scripts/test-full-flow.sh"

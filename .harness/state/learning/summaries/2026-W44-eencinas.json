@@ -14,6 +14,18 @@
       "examples": [
         "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification"
       ]
+    },
+    "sensor:DRIFT-01:docs": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-10-28T13:22:35.735Z",
+          "slice_id": "jev-module"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)"
+      ]
     }
   }
 }

@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T13:22:35.244Z",
+  "generated_at": "2026-10-28T13:23:19.659Z",
   "threshold": 3,
   "summary": {
-    "patterns": 15,
+    "patterns": 16,
     "open": 1,
     "in_flight": 2,
     "verified": 0,
@@ -50,7 +50,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T13:22:35.184Z",
+      "last_seen": "2026-10-28T13:23:19.603Z",
       "sources": [
         "escalation"
       ],
@@ -96,6 +96,29 @@
         "Editing scripts/test-install-into.sh (jev-module TASK-001) reopened passing features of the DONE slice kit-hygiene through DRIFT-02; jev-module could not mark features passing until the old slice was re-verified.",
         "Editing scripts/install-into.sh, package.json (jev-module TASK-003) reopened passing features of the DONE slice kit-hygiene through DRIFT-02; jev-module could not mark features passing until the old slice was re-verified.",
         "Editing scripts/test-install-into.sh (jev-module TASK-001, log-leak assertions) reopened passing features of the DONE slice kit-hygiene through DRIFT-02; jev-module could not mark features passing until the old slice was re-verified."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-e9c4ddb0",
+      "signature": "blocked:phase:qa",
+      "kind": "escape",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:33:00.148Z",
+      "last_seen": "2026-10-28T13:23:19.357Z",
+      "sources": [
+        "blocked"
+      ],
+      "slices": [
+        "jev-module",
+        "kit-hygiene"
+      ],
+      "examples": [
+        "Spec Coverage Gate BLOCK (QG-SPEC-05/06): REQ-006 (AC-004) and REQ-008 (AC-005) have no test; SHOULD REQ-011..013 unnamed. Report: spec-coverage-report.md",
+        "Spec Coverage Gate BLOCK (QG-SPEC-05): MUST coverage 10/11, REQ-006 has no test that names it; SHOULD REQ-013 untested (WARN QG-SPEC-07). OBS-001/002 sensor defects logged. Report: spec-coverage-report.md"
       ],
       "proposals": []
     },
@@ -161,27 +184,6 @@
       ],
       "examples": [
         "Code @6b7cc07; verification needs TASK-004 (jev.md auto)."
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-e9c4ddb0",
-      "signature": "blocked:phase:qa",
-      "kind": "escape",
-      "occurrences": 1,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-10-28T01:33:00.148Z",
-      "last_seen": "2026-10-28T01:33:00.148Z",
-      "sources": [
-        "blocked"
-      ],
-      "slices": [
-        "kit-hygiene"
-      ],
-      "examples": [
-        "Spec Coverage Gate BLOCK (QG-SPEC-05): MUST coverage 10/11, REQ-006 has no test that names it; SHOULD REQ-013 untested (WARN QG-SPEC-07). OBS-001/002 sensor defects logged. Report: spec-coverage-report.md"
       ],
       "proposals": []
     },
@@ -329,6 +331,27 @@
       ],
       "examples": [
         "Tech Lead accepts the QG-SPEC-08 WARN: UNCOV-003 (REQ-012 error path) and UNCOV-004 (REQ-013 has no separate error behavior) stay documented in spec-coverage-report.md."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-06528643",
+      "signature": "sensor:DRIFT-01:docs",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T13:22:35.735Z",
+      "last_seen": "2026-10-28T13:22:35.735Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "jev-module"
+      ],
+      "examples": [
+        "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)"
       ],
       "proposals": []
     },

@@ -4,5 +4,5 @@
 
 | Slice | Mode | Phase | Status | Active features |
 |-------|------|-------|--------|-----------------|
-| jev-module | full | implementation | in_progress | 0 |
+| jev-module | full | implementation | in_progress | 1 |
 | kit-hygiene | full | knowledge | DONE | 0 |
