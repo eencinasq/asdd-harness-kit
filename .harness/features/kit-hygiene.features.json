@@ -19,7 +19,7 @@
       "verification": [
         "node --test scripts/check-guidance.test.mjs"
       ],
-      "evidence": "Re-verified after DRIFT-02 from slice jev-module (shared test/installer files): check-guidance and command-gate unit tests pass; bash scripts/test-install-into.sh exit 0 at 6489de5 (stale, cutoffs, budget, asserts green; domain model and logs not leaked; gate shim and upgrade rewrite verified).",
+      "evidence": "Re-verified after DRIFT-02 from slice jev-module (TASK-005 docs, TASK-006 budget binding): npm test 130/130 at f0fd4e5; check-guidance stale/cutoffs/budget/asserts green on kit and installed projects.",
       "scope_paths": [
         "scripts/check-guidance.mjs",
         "scripts/check-guidance.test.mjs",
@@ -28,7 +28,7 @@
         "package.json",
         ".harness/steering/quality-gates.project.md"
       ],
-      "evidence_commit": "6489de5",
+      "evidence_commit": "f0fd4e5",
       "notes": "docs/agent-failure-log.md removed from scope_paths in Knowledge: it is a harness record, not TASK-001 code; listing it made every log entry reopen this feature (DRIFT-02). See lessons."
     },
     {
@@ -72,7 +72,7 @@
       "verification": [
         "bash scripts/test-install-into.sh (stale check green)"
       ],
-      "evidence": "Re-verified after DRIFT-02 from slice jev-module (shared test/installer files): check-guidance and command-gate unit tests pass; bash scripts/test-install-into.sh exit 0 at 6489de5 (stale, cutoffs, budget, asserts green; domain model and logs not leaked; gate shim and upgrade rewrite verified).",
+      "evidence": "Re-verified after DRIFT-02 from slice jev-module (TASK-005 docs, TASK-006 budget binding): npm test 130/130 at f0fd4e5; check-guidance stale/cutoffs/budget/asserts green on kit and installed projects.",
       "scope_paths": [
         "AGENTS.md",
         ".harness/steering/session-loop.md",
@@ -89,7 +89,7 @@
         ".harness/scripts/check-project-config.mjs",
         ".harness/config/project.schema.json"
       ],
-      "evidence_commit": "6489de5",
+      "evidence_commit": "f0fd4e5",
       "notes": "Deleted .harness/scripts/validators/locks.mjs and .harness/state/locks/README.md in 46e42f1 (removed from scope_paths: DRIFT-05 cannot express a deletion). Also added REQ-012 assertions to scripts/test-install-into.sh, a file owned by TASK-001, without listing it in this scope."
     },
     {
@@ -139,7 +139,7 @@
       "verification": [
         "node --test .harness/scripts/command-gate.test.mjs && bash scripts/test-install-into.sh"
       ],
-      "evidence": "Re-verified after DRIFT-02 from slice jev-module (shared test/installer files): check-guidance and command-gate unit tests pass; bash scripts/test-install-into.sh exit 0 at 6489de5 (stale, cutoffs, budget, asserts green; domain model and logs not leaked; gate shim and upgrade rewrite verified).",
+      "evidence": "Re-verified after DRIFT-02 from slice jev-module (TASK-005 docs, TASK-006 budget binding): npm test 130/130 at f0fd4e5; check-guidance stale/cutoffs/budget/asserts green on kit and installed projects.",
       "scope_paths": [
         ".harness/scripts/command-gate.mjs",
         ".harness/scripts/jev-command-gate.mjs",
@@ -157,7 +157,7 @@
         ".harness/steering/controls.md",
         ".agents/agents/asdd-implementation-agent.md"
       ],
-      "evidence_commit": "6489de5"
+      "evidence_commit": "f0fd4e5"
     },
     {
       "id": "TASK-006",
@@ -205,7 +205,7 @@
       "verification": [
         "node scripts/check-guidance.mjs --only budget ."
       ],
-      "evidence": "node scripts/check-guidance.mjs --only budget .: PASS 33922 bytes; test-install-into: budget PASS 34331 bytes on the installed project with modules (budget 34331; was 36627). Review 6: no findings.",
+      "evidence": "Re-verified after DRIFT-02 from slice jev-module (TASK-005 docs, TASK-006 budget binding): npm test 130/130 at f0fd4e5; check-guidance stale/cutoffs/budget/asserts green on kit and installed projects.",
       "scope_paths": [
         ".harness/steering/session-loop.md",
         ".harness/steering/manifest.md",
@@ -213,7 +213,7 @@
         ".harness/steering/README.md",
         ".harness/steering/quality-gates.project.md"
       ],
-      "evidence_commit": "1cc0614"
+      "evidence_commit": "f0fd4e5"
     },
     {
       "id": "TASK-008",

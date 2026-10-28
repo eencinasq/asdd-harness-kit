@@ -137,3 +137,11 @@
 - **Failure:** The installer seeded the kit's own docs/agent-failure-log.md (with kit slice history) into projects, so a fresh project's learning loop warned about the kit's patterns.
 - **Remediation:** Logs seed from scripts/templates/docs/; kit logs excluded from npm (jev-module TASK-003).
 
+- **Date:** 2026-10-28
+- **Slice:** jev-module
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** drift:done-slice-features-reopened
+- **Failure:** jev-module TASK-005 (shared docs) and TASK-006 (budget binding) reopened kit-hygiene TASK-001/003/005/007 through DRIFT-02.
+- **Remediation:** One re-verification pass at f0fd4e5.
+

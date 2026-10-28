@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-10-28T01:49:41.016Z",
-  "updated_at": "2026-10-28T13:20:59.887Z",
+  "updated_at": "2026-10-28T13:22:22.789Z",
   "paths": {
     "specs": ".harness/specs/jev-module",
     "tasks": ".harness/specs/jev-module/tasks.md",
@@ -63,18 +63,7 @@
       "concerns": []
     }
   },
-  "active_features": [
-    {
-      "id": "TASK-006",
-      "owner": "asdd-implementation",
-      "human": "eencinas",
-      "since": "2026-10-28T13:20:59.864Z",
-      "handoff_from": null,
-      "scope_paths": [
-        ".harness/steering/quality-gates.project.md"
-      ]
-    }
-  ],
+  "active_features": [],
   "open_dissents": 0,
   "source": null,
   "session_log": [
@@ -275,6 +264,14 @@
       "agent": "asdd-implementation",
       "human": "eencinas",
       "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-006"
+    },
+    {
+      "timestamp": "2026-10-28T13:22:22.764Z",
+      "agent": "asdd-implementation",
+      "human": "eencinas",
+      "event": "feature_completed",
       "phase": "implementation",
       "feature_id": "TASK-006"
     }
