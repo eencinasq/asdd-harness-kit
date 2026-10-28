@@ -122,7 +122,7 @@
       "id": "TASK-005",
       "title": "Guidance and docs: Jev is optional",
       "user_visible_behavior": "Update `AGENTS.md`, `controls.md`, the steering README, the Cursor rule, the modules and MCP READMEs, the kit README, and the `check_command_safety` description (deprecated; use the CLI)..",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 5,
       "owner": "claude",
       "req_ids": [
@@ -134,7 +134,7 @@
       "verification": [
         "node scripts/check-guidance.mjs --only stale,cutoffs . && bash scripts/test-install-into.sh"
       ],
-      "evidence": "",
+      "evidence": "check-guidance --only stale,cutoffs PASS on the kit; bash scripts/test-install-into.sh exit 0 at 630e125. Review 2: no findings (CR-003 observation).",
       "scope_paths": [
         "AGENTS.md",
         ".harness/steering/controls.md",
@@ -144,13 +144,14 @@
         ".agents/mcp/README.md",
         "README.md",
         ".agents/mcp/jev-gate-server.mjs"
-      ]
+      ],
+      "evidence_commit": "630e125"
     },
     {
       "id": "TASK-006",
       "title": "Lower the always-loaded budget",
       "user_visible_behavior": "Set `Always-loaded steering budget` to the installed size measured by `test-install-into.sh` after `jev.md` leaves the always-loaded set..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 6,
       "owner": "claude",
       "req_ids": [
