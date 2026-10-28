@@ -10,6 +10,14 @@
       "mode": "full",
       "manifest": ".harness/state/slices/kit-hygiene/manifest.json",
       "features": ".harness/features/kit-hygiene.features.json"
+    },
+    {
+      "slice_id": "jev-module",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/jev-module/manifest.json",
+      "features": ".harness/features/jev-module.features.json"
     }
   ]
 }

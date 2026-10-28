@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T01:41:41.791Z",
+  "generated_at": "2026-10-28T01:54:23.956Z",
   "threshold": 3,
   "summary": {
     "patterns": 11,
@@ -76,6 +76,29 @@
       ]
     },
     {
+      "id": "LP-130d8d22",
+      "signature": "blocked:phase:validation",
+      "kind": "escape",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:01:34.634Z",
+      "last_seen": "2026-10-28T01:51:55.237Z",
+      "sources": [
+        "blocked"
+      ],
+      "slices": [
+        "jev-module",
+        "kit-hygiene"
+      ],
+      "examples": [
+        "Validation Gate BLOCK (QG-VAL-01): VAL-001 on MUST REQ-005 - upgrade detection enables Jev on every existing project with no way off. Validation confidence 0.78.",
+        "Validation Gate BLOCK (QG-VAL-01): VAL-001 BLOCKING on MUST REQ-008 - upgrade behavior for existing hook configs undefined; installer substring match would keep the old path forever. Validation confidence 0.80. Report: .harness/specs/kit-hygiene/spec-validation-report.md"
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-e9c4ddb0",
       "signature": "blocked:phase:qa",
       "kind": "escape",
@@ -93,27 +116,6 @@
       ],
       "examples": [
         "Spec Coverage Gate BLOCK (QG-SPEC-05): MUST coverage 10/11, REQ-006 has no test that names it; SHOULD REQ-013 untested (WARN QG-SPEC-07). OBS-001/002 sensor defects logged. Report: spec-coverage-report.md"
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-130d8d22",
-      "signature": "blocked:phase:validation",
-      "kind": "escape",
-      "occurrences": 1,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-10-28T01:01:34.634Z",
-      "last_seen": "2026-10-28T01:01:34.634Z",
-      "sources": [
-        "blocked"
-      ],
-      "slices": [
-        "kit-hygiene"
-      ],
-      "examples": [
-        "Validation Gate BLOCK (QG-VAL-01): VAL-001 BLOCKING on MUST REQ-008 - upgrade behavior for existing hook configs undefined; installer substring match would keep the old path forever. Validation confidence 0.80. Report: .harness/specs/kit-hygiene/spec-validation-report.md"
       ],
       "proposals": []
     },

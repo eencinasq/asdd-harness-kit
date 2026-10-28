@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "jev-module",
+  "source_tasks": ".harness/specs/jev-module/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Install tests for default, module, all, upgrade, remove, kit-only",
+      "user_visible_behavior": "Replace the \"Jev on every install\" assertions with: default install has no Jev surface and passes config and invariant checks, no default `.mjs` imports Jev code; `--modules=jev` and `--modules=all` install it with the stated `capabilities.jev`; an upgrade of a pre-module Jev install keeps it; `--remove-modules=jev` removes it and a re-run does not bring it back; this slice's artifacts never land in a project or the npm package.",
+      "status": "not_started",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005",
+        "REQ-007",
+        "REQ-009",
+        "REQ-010",
+        "REQ-014"
+      ],
+      "depends_on": [],
+      "verification": [
+        "bash -n scripts/test-install-into.sh && bash -n scripts/test-full-flow.sh"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "scripts/test-install-into.sh",
+        "scripts/test-full-flow.sh"
+      ]
+    },
+    {
+      "id": "TASK-002",
+      "title": "Core harness without Jev",
+      "user_visible_behavior": "Remove the Jev import from `check-invariants.mjs`; make `capabilities.jev` optional in `check-project-config.mjs` (required when `modules.jev` is true, existing checks when present); delete the no-op `jev-gold-plating.mjs`..",
+      "status": "not_started",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002",
+        "REQ-006",
+        "REQ-007",
+        "REQ-011"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "bash scripts/test-lifecycle.sh"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        ".harness/scripts/check-invariants.mjs",
+        ".harness/scripts/check-project-config.mjs",
+        ".harness/scripts/validators/jev-gold-plating.mjs"
+      ]
+    },
+    {
+      "id": "TASK-003",
+      "title": "Installer: Jev as a module",
+      "user_visible_behavior": "Move the Jev copies, `jev.md`, MCP entry, and `capabilities.jev` into `enable_one_module jev`; include `jev` in `all` and the picker; add `detect_installed_modules` and `--remove-modules=jev`; stop seeding Jev in the project.json template and upgrade patcher; move the `jev-gate` MCP entry to `.agents/modules/jev/mcp.json`; record it in versions..",
+      "status": "not_started",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005",
+        "REQ-014"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "bash scripts/test-install-into.sh"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "scripts/install-into.sh",
+        ".agents/mcp/mcp.json",
+        ".agents/modules/jev/mcp.json",
+        "scripts/generate-versions.mjs",
+        ".harness/config/versions.json"
+      ]
+    },
+    {
+      "id": "TASK-004",
+      "title": "Skills and Jev steering work with or without the module",
+      "user_visible_behavior": "Add a \"Gate mode\" block to `shape-up` and `product-delivery` (Jev tools with the module; same criteria as a human checklist with `decided_by` without it); make `jev.md` `inclusion: auto` and describe it as the module's steering..",
+      "status": "not_started",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-008",
+        "REQ-009"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "bash scripts/test-install-into.sh"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        ".agents/skills/shape-up/SKILL.md",
+        ".agents/skills/product-delivery/SKILL.md",
+        ".harness/steering/jev.md"
+      ]
+    },
+    {
+      "id": "TASK-005",
+      "title": "Guidance and docs: Jev is optional",
+      "user_visible_behavior": "Update `AGENTS.md`, `controls.md`, the steering README, the Cursor rule, the modules and MCP READMEs, the kit README, and the `check_command_safety` description (deprecated; use the CLI)..",
+      "status": "not_started",
+      "priority": 5,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-012"
+      ],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "verification": [
+        "node scripts/check-guidance.mjs --only stale,cutoffs . && bash scripts/test-install-into.sh"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "AGENTS.md",
+        ".harness/steering/controls.md",
+        ".harness/steering/README.md",
+        "runtimes/cursor/asdd-steering.mdc",
+        ".agents/modules/README.md",
+        ".agents/mcp/README.md",
+        "README.md",
+        ".agents/mcp/jev-gate-server.mjs"
+      ]
+    },
+    {
+      "id": "TASK-006",
+      "title": "Lower the always-loaded budget",
+      "user_visible_behavior": "Set `Always-loaded steering budget` to the installed size measured by `test-install-into.sh` after `jev.md` leaves the always-loaded set..",
+      "status": "not_started",
+      "priority": 6,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-013"
+      ],
+      "depends_on": [
+        "TASK-003",
+        "TASK-004",
+        "TASK-005"
+      ],
+      "verification": [
+        "bash scripts/test-install-into.sh"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        ".harness/steering/quality-gates.project.md"
+      ]
+    }
+  ]
+}

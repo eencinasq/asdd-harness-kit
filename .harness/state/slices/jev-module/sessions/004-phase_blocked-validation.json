@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-jev-module-004",
+  "timestamp": "2026-10-28T01:51:55.237Z",
+  "agent": "asdd-validation",
+  "human": "eencinas",
+  "slice_id": "jev-module",
+  "concerns": [
+    "VAL-001: no way to remove the jev module from existing projects"
+  ],
+  "event_type": "phase_blocked",
+  "phase": "validation",
+  "evidence": "Validation Gate BLOCK (QG-VAL-01): VAL-001 on MUST REQ-005 - upgrade detection enables Jev on every existing project with no way off. Validation confidence 0.78."
+}

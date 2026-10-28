@@ -1,7 +1,7 @@
 # Domain Model — asdd-harness-kit
 
 > Project binding for the kit itself. Never shipped: projects get the stub from `scripts/templates/docs/domain-model.md`.
-> Ubiquitous Language of the harness. Seeded by the `kit-hygiene` slice (Domain phase).
+> Ubiquitous Language of the harness. Seeded by the `kit-hygiene` slice (Domain phase); Module and Gate decision added by `jev-module`.
 
 ## Core Entities
 
@@ -18,6 +18,8 @@
 | **Hook config** | A runtime file naming hook scripts (`.cursor/hooks.json`, `.claude/settings.json`) | entries per event | project-owned; merged by the Installer |
 | **Installer** | `scripts/install-into.sh` / `npx asdd-harness-kit` | policy per file: `refresh` (kit-owned) or `create` (project-owned seed) | writes an Installed project |
 | **Installed project** | A repository the installer wrote into | `installed-versions.json` (managed and seeded files) | receives shipped Guidance documents, never kit-only artifacts |
+| **Module** | An opt-in set of kit files the Installer copies only when enabled (`--modules=<id>`), recorded in `project.json` → `modules` (`true` on, `false` explicitly off) | id, files, config it adds | enabled per Installed project; `--remove-modules` deletes its files |
+| **Gate decision** | The outcome of a Shape Up betting gate or a Product Delivery EARS/scope gate | decided by Jev (module) or by a human (`decided_by`) | belongs to a pitch or an intent |
 | **Pattern / Proposal** | Learning loop: a repeated signal (`LP-*`) and the change that answers it (`SP-*`) | signature, occurrences, status; control, change, success | see README → Self-improving harness |
 
 ## Value Objects
