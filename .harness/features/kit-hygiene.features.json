@@ -19,7 +19,7 @@
       "verification": [
         "node --test scripts/check-guidance.test.mjs"
       ],
-      "evidence": "Re-verified after DRIFT-02 (TASK-006 edited test-install-into.sh, install-into.sh, package.json): unit tests pass; bash scripts/test-install-into.sh exit 0 at 9a45bdd.",
+      "evidence": "Re-verified after DRIFT-02 (TASK-007 set the budget in quality-gates.project.md): check-guidance tests 5/5; all checks PASS on the kit; test-install-into exit 0 at 1cc0614.",
       "scope_paths": [
         "scripts/check-guidance.mjs",
         "scripts/check-guidance.test.mjs",
@@ -29,7 +29,7 @@
         ".harness/steering/quality-gates.project.md",
         "docs/agent-failure-log.md"
       ],
-      "evidence_commit": "9a45bdd"
+      "evidence_commit": "1cc0614"
     },
     {
       "id": "TASK-002",
@@ -72,7 +72,7 @@
       "verification": [
         "bash scripts/test-install-into.sh (stale check green)"
       ],
-      "evidence": "Re-verified after DRIFT-02 (TASK-006 edited test-install-into.sh, install-into.sh, package.json): unit tests pass; bash scripts/test-install-into.sh exit 0 at 9a45bdd.",
+      "evidence": "Re-verified after DRIFT-02 (TASK-007 trimmed session-loop.md): stale PASS on the kit and the installed project at 1cc0614.",
       "scope_paths": [
         "AGENTS.md",
         ".harness/steering/session-loop.md",
@@ -89,7 +89,7 @@
         ".harness/scripts/check-project-config.mjs",
         ".harness/config/project.schema.json"
       ],
-      "evidence_commit": "9a45bdd",
+      "evidence_commit": "1cc0614",
       "notes": "Deleted .harness/scripts/validators/locks.mjs and .harness/state/locks/README.md in 46e42f1 (removed from scope_paths: DRIFT-05 cannot express a deletion). Also added REQ-012 assertions to scripts/test-install-into.sh, a file owned by TASK-001, without listing it in this scope."
     },
     {
@@ -191,7 +191,7 @@
       "id": "TASK-007",
       "title": "Trim always-loaded steering and set the budget",
       "user_visible_behavior": "Trim history and duplicated text from `inclusion: always` steering; set `Always-loaded steering budget` to the measured size (below 36,627 bytes)..",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 7,
       "owner": "claude",
       "req_ids": [
@@ -205,14 +205,15 @@
       "verification": [
         "node scripts/check-guidance.mjs --only budget ."
       ],
-      "evidence": "",
+      "evidence": "node scripts/check-guidance.mjs --only budget .: PASS 33922 bytes; test-install-into: budget PASS 34331 bytes on the installed project with modules (budget 34331; was 36627). Review 6: no findings.",
       "scope_paths": [
         ".harness/steering/session-loop.md",
         ".harness/steering/manifest.md",
         ".harness/steering/controls.md",
         ".harness/steering/README.md",
         ".harness/steering/quality-gates.project.md"
-      ]
+      ],
+      "evidence_commit": "1cc0614"
     }
   ]
 }
