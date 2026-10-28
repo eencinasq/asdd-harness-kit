@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T13:26:18.243Z",
+  "generated_at": "2026-10-28T13:26:42.546Z",
   "threshold": 3,
   "summary": {
     "patterns": 16,
@@ -50,7 +50,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T13:26:18.185Z",
+      "last_seen": "2026-10-28T13:26:42.488Z",
       "sources": [
         "escalation"
       ],
