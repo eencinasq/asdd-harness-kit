@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T13:23:19.659Z",
+  "generated_at": "2026-10-28T13:26:18.243Z",
   "threshold": 3,
   "summary": {
     "patterns": 16,
@@ -50,7 +50,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T13:23:19.603Z",
+      "last_seen": "2026-10-28T13:26:18.185Z",
       "sources": [
         "escalation"
       ],
@@ -80,7 +80,7 @@
       "id": "LP-b5774134",
       "signature": "failure:drift:done-slice-features-reopened",
       "kind": "escape",
-      "occurrences": 4,
+      "occurrences": 5,
       "threshold": 3,
       "status": "open",
       "reopened": false,

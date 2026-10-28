@@ -145,3 +145,11 @@
 - **Failure:** jev-module TASK-005 (shared docs) and TASK-006 (budget binding) reopened kit-hygiene TASK-001/003/005/007 through DRIFT-02.
 - **Remediation:** One re-verification pass at f0fd4e5.
 
+- **Date:** 2026-10-28
+- **Slice:** jev-module
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** drift:done-slice-features-reopened
+- **Failure:** jev-module QA coverage tests in scripts/test-install-into.sh reopened kit-hygiene TASK-001/005/006/008 through DRIFT-02.
+- **Remediation:** Re-verified at 5eb0933.
+
