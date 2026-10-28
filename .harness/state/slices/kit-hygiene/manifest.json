@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-10-28T00:58:57.231Z",
-  "updated_at": "2026-10-28T01:14:17.860Z",
+  "updated_at": "2026-10-28T01:17:09.186Z",
   "paths": {
     "specs": ".harness/specs/kit-hygiene",
     "tasks": ".harness/specs/kit-hygiene/tasks.md",
@@ -65,19 +65,15 @@
   },
   "active_features": [
     {
-      "id": "TASK-001",
+      "id": "TASK-002",
       "owner": "asdd-implementation",
       "human": "eencinas",
-      "since": "2026-10-28T01:14:17.837Z",
+      "since": "2026-10-28T01:16:47.550Z",
       "handoff_from": null,
       "scope_paths": [
-        "scripts/check-guidance.mjs",
-        "scripts/check-guidance.test.mjs",
-        "scripts/test-install-into.sh",
-        "scripts/test-lifecycle.sh",
-        "package.json",
-        ".harness/steering/quality-gates.project.md",
-        "docs/agent-failure-log.md"
+        ".harness/scripts/sync-state.mjs",
+        ".harness/scripts/sync-state.test.mjs",
+        ".harness/scripts/init-slice.mjs"
       ]
     }
   ],
@@ -179,6 +175,22 @@
       "event": "feature_started",
       "phase": "implementation",
       "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-10-28T01:16:27.110Z",
+      "agent": "asdd-implementation",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-10-28T01:16:47.550Z",
+      "agent": "asdd-implementation",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
     }
   ],
   "contributors": [
