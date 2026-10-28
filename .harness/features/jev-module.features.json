@@ -7,7 +7,7 @@
       "id": "TASK-001",
       "title": "Install tests for default, module, all, upgrade, remove, kit-only",
       "user_visible_behavior": "Replace the \"Jev on every install\" assertions with: default install has no Jev surface and passes config and invariant checks, no default `.mjs` imports Jev code; `--modules=jev` and `--modules=all` install it with the stated `capabilities.jev`; an upgrade of a pre-module Jev install keeps it; `--remove-modules=jev` removes it and a re-run does not bring it back; this slice's artifacts never land in a project or the npm package.",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 1,
       "owner": "claude",
       "req_ids": [
@@ -25,12 +25,12 @@
       "verification": [
         "bash -n scripts/test-install-into.sh && bash -n scripts/test-full-flow.sh"
       ],
-      "evidence": "Reopened: add log-leak assertions found during TASK-003.",
+      "evidence": "bash -n OK; log-leak assertions added (cmp with scripts/templates/docs/*-log.md, npm kit-only regex) and passing; test-install-into still red only at the jev module case (jev.md inclusion, TASK-004).",
       "scope_paths": [
         "scripts/test-install-into.sh",
         "scripts/test-full-flow.sh"
       ],
-      "evidence_commit": "e7d48b0"
+      "evidence_commit": "6b7cc07"
     },
     {
       "id": "TASK-002",
@@ -62,7 +62,7 @@
       "id": "TASK-003",
       "title": "Installer: Jev as a module",
       "user_visible_behavior": "Move the Jev copies, `jev.md`, MCP entry, and `capabilities.jev` into `enable_one_module jev`; include `jev` in `all` and the picker; add `detect_installed_modules` and `--remove-modules=jev`; stop seeding Jev in the project.json template and upgrade patcher; move the `jev-gate` MCP entry to `.agents/modules/jev/mcp.json`; record it in versions..",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": 3,
       "owner": "claude",
       "req_ids": [
@@ -78,7 +78,7 @@
       "verification": [
         "bash scripts/test-install-into.sh"
       ],
-      "evidence": "",
+      "evidence": "Code @6b7cc07: default install passes all no-Jev assertions and log-leak checks in test-install-into; manual --modules=jev install has files, MCP entry, capabilities.jev, modules.jev. Full verification blocked on TASK-004 (jev.md inclusion: auto).",
       "scope_paths": [
         "scripts/install-into.sh",
         ".agents/mcp/mcp.json",
@@ -95,7 +95,7 @@
       "id": "TASK-004",
       "title": "Skills and Jev steering work with or without the module",
       "user_visible_behavior": "Add a \"Gate mode\" block to `shape-up` and `product-delivery` (Jev tools with the module; same criteria as a human checklist with `decided_by` without it); make `jev.md` `inclusion: auto` and describe it as the module's steering..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 4,
       "owner": "claude",
       "req_ids": [

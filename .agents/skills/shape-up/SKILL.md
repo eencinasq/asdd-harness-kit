@@ -22,24 +22,12 @@ Shape Up inverts traditional estimation:
 
 **See:** [`references/methodology.md`](./references/methodology.md) for the full philosophy.
 
-## Required Jev gates (MCP)
+## Gate mode (Jev module optional)
 
-Jev is **required for this skill** (and `product-delivery`). Other skills and harness ASDD must not call Jev.
+Before betting, the pitch passes two gates: **appetite fit** (fits the appetite, no hidden complexity, feasible with the team's resources) and **rabbit holes** (every known rabbit hole is patched, cut by a no-go, or a reason to reject the bet). Read `.harness/config/project.json` → `modules.jev` to choose who decides:
 
-Use the **`jev-gate` MCP** (`project-*-jev-gate` in Cursor). Do not shell out to `jev-gates.mjs` when MCP is available.
-
-1. **`jev_status`** — confirm `JEV_API_KEY` is usable (`health: true` optional).
-2. After the pitch draft, before betting: **`jev_shape_up_gates`** with `{ pitch, appetite? }`.
-
-- `acceptPitch` false / appetite score &lt; 4 → refine or reject. Do not bet.
-- `noRabbitHole` false / rabbit-hole noul &lt; 0.80 → patch no-gos or stop.
-- `unavailable` / `isError` → stop. Set `JEV_API_KEY`. Do not fake a pass.
-
-Fallback only if MCP is unavailable:
-
-```bash
-node --input-type=module -e "import { assertJevConfigured, shapeUpGates } from './.harness/scripts/jev-gates.mjs'; console.log(assertJevConfigured({ skillRequired: true })); console.log(await shapeUpGates({ pitch: { text: '...' }, appetite: '2 weeks' }))"
-```
+- **`modules.jev: true` (Jev module):** call `jev_status`, then `jev_shape_up_gates` `{ pitch, appetite? }` on the `jev-gate` MCP server. Apply the pass rules in `.harness/steering/jev.md`. `unavailable` or `isError` stops the bet — set `JEV_API_KEY`; never fake a pass. Shell fallback only when MCP is down: `node .harness/scripts/jev-gates.mjs health`.
+- **Otherwise:** present each criterion above to the human with the pitch evidence, ask for pass or fail, and record the answer and who gave it (`decided_by`) next to the betting decision. A failed criterion means refine, patch the no-gos, or reject — never bet.
 
 ---
 
@@ -437,7 +425,7 @@ Shaping produces options; the betting table decides. Use this flow when a pitch 
 | State | Meaning | Next step |
 |---|---|---|
 | `needs_shaping` | Not concrete enough to bet on | Back to Flow 1 or Flow 2 |
-| `ready_for_bet` | Shaped, Jev gates passed, waiting for the betting table | Betting table decides |
+| `ready_for_bet` | Shaped, appetite and rabbit-hole gates passed, waiting for the betting table | Betting table decides |
 | `bet` | Chosen for the coming cycle (six-week big batch or one-to-two-week small batch) | Hand off to `product-delivery` |
 | `no_bet` | Not chosen this cycle | Let it go; no backlog. Re-pitch later only if it still matters |
 

@@ -41,15 +41,12 @@ Shaping and betting stay upstream in the `shape-up` skill. Requirements, design,
 
 If the `shape-up` skill is installed, its [`references/conversions.md`](../shape-up/references/conversions.md) defines the scope map format this skill fills.
 
-## Required Jev gates (MCP)
+## Gate mode (Jev module optional)
 
-Jev is required for this skill and `shape-up` only. Other skills and the ASDD agents must not call Jev. Use the **`jev-gate` MCP**:
+Two gates: **scope choice** — each scope is `must_have`, `nice_to_have`, or `reshape` (a `reshape` scope leaves this bet and returns to shaping; it never goes to a backlog) — and **EARS quality** — each must-have outcome written into an intent has one trigger, one observable response, and no ambiguous term. Read `.harness/config/project.json` → `modules.jev` to choose who decides:
 
-1. **`jev_status`** before any other `jev_*` call.
-2. **`jev_scope_choice`** `{ scope }` for each scope: `must_have`, `nice_to_have`, or `reshape`. A `reshape` result removes the scope from this bet and returns it to shaping. It never goes to a backlog.
-3. **`jev_ears_gate`** `{ requirement }` for each must-have outcome written into an intent. Rewrite when `ok=false` (`prob_yes` < 0.85), or record `# jev-override: accept` with a reason.
-
-`unavailable` or `isError` blocks the handoff. Do not fake a pass. Shell fallback (`.harness/scripts/jev-gates.mjs`) only when the MCP server is down.
+- **`modules.jev: true` (Jev module):** call `jev_status`, then `jev_scope_choice` `{ scope }` per scope and `jev_ears_gate` `{ requirement }` per must-have on the `jev-gate` MCP server. Apply the pass rules in `.harness/steering/jev.md`; rewrite a failing outcome or record `# jev-override: accept` with a reason. `unavailable` or `isError` blocks the handoff — never fake a pass. Shell fallback (`.harness/scripts/jev-gates.mjs`) only when MCP is down.
+- **Otherwise:** propose the classification and review each outcome against the criteria above, then ask the human to confirm; record each decision and who made it (`decided_by`) in the scope map and the intent.
 
 ## Entry gate
 
@@ -58,7 +55,7 @@ Start only when all are true:
 - a canonical pitch exists with a stable `pitch_id`;
 - the betting state is `bet`;
 - the pitch has problem, appetite, solution, rabbit holes, and no-gos;
-- `jev_shape_up_gates` passed when the pitch was shaped.
+- the pitch passed its shaping gates (Jev or a recorded human decision).
 
 Otherwise stop. A raw idea, request, or unshaped problem goes to `shape-up` first. `needs_shaping`, `ready_for_bet`, and `no_bet` pitches do not enter ASDD.
 
@@ -66,9 +63,9 @@ Otherwise stop. A raw idea, request, or unshaped problem goes to `shape-up` firs
 
 1. **Intake.** Read the pitch and record `pitch_id`, betting state, appetite, cycle, problem, desired outcome, solution elements, rabbit holes, no-gos, must-haves, and nice-to-haves. Read [`references/shape-up-input.md`](./references/shape-up-input.md).
 2. **Map the scopes.** Split the pitch into as many scopes as it needs: one scope when the pitch is small and coherent, several when it has parts that can be finished and shown independently. Split by working outcome, never by layer (UI / API / database). Every must-have and nice-to-have lands in exactly one scope.
-3. **Classify.** Run `jev_scope_choice` per scope. Keep `must_have` and `nice_to_have (~)` scopes; return `reshape` scopes to shaping.
+3. **Classify.** Apply the scope choice gate per scope. Keep `must_have` and `nice_to_have (~)` scopes; return `reshape` scopes to shaping.
 4. **Check the map.** No unplaced pitch item, no dependency cycle, every scope has one observable outcome, and the scopes together fit the appetite. If they do not fit, cut nice-to-haves or return `RE-SHAPING_REQUIRED`. Never extend the appetite.
-5. **Write the intents.** One `intent.md` per kept scope, from `.harness/steering/templates/intent.md`. Must-haves are written as observable EARS-style outcomes and pass `jev_ears_gate`. Read [`references/asdd-harness-handoff.md`](./references/asdd-harness-handoff.md).
+5. **Write the intents.** One `intent.md` per kept scope, from `.harness/steering/templates/intent.md`. Must-haves are written as observable EARS-style outcomes and pass the EARS quality gate. Read [`references/asdd-harness-handoff.md`](./references/asdd-harness-handoff.md).
 6. **Create the slices.** `node .harness/scripts/init-slice.mjs <slice-id>` per intent (lite by default; `--full` only for a scope known upfront to be cross-cutting).
 7. **Hand off.** Hand each intent to `@asdd-discovery-agent`, in dependency order. Independent scopes may run in parallel with separate owners.
 

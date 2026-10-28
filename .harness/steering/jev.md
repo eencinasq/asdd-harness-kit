@@ -1,11 +1,12 @@
 ---
-inclusion: always
+inclusion: auto
+tags:
+  - discovery
 ---
 
-# Jev (skill-scoped)
+# Jev module (optional)
 
-TypeSafe System One is **required only** for the `shape-up` and `product-delivery` skills.
-Harness ASDD phases, invariants, command gates, and other skills must **not** call Jev.
+Installed only with `--modules=jev` (`modules.jev: true` in `.harness/config/project.json`); remove it with `--remove-modules=jev`. TypeSafe System One then decides the gates of the `shape-up` and `product-delivery` skills; without the module, those skills apply the same criteria and a human decides. Harness ASDD phases, invariants, the command gate, and other skills never call Jev.
 
 Key lives in `JEV_API_KEY`, never in git.
 Load order: real env → `.env.local` → `.env` (loader: `.harness/scripts/env-loader.mjs`).

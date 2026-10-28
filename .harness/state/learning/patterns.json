@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T13:11:28.735Z",
+  "generated_at": "2026-10-28T13:15:43.944Z",
   "threshold": 3,
   "summary": {
-    "patterns": 12,
+    "patterns": 13,
     "open": 0,
     "in_flight": 2,
     "verified": 0,
@@ -50,7 +50,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T13:11:28.664Z",
+      "last_seen": "2026-10-28T13:15:43.887Z",
       "sources": [
         "escalation"
       ],
@@ -117,6 +117,27 @@
       ],
       "examples": [
         "Blocked on TASK-003: DRIFT-02 reopened DONE kit-hygiene features; re-verification needs test-install-into green."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-29e9abcf",
+      "signature": "blocked:feature:scripts",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T13:15:43.733Z",
+      "last_seen": "2026-10-28T13:15:43.733Z",
+      "sources": [
+        "blocked"
+      ],
+      "slices": [
+        "jev-module"
+      ],
+      "examples": [
+        "Code @6b7cc07; verification needs TASK-004 (jev.md auto)."
       ],
       "proposals": []
     },
