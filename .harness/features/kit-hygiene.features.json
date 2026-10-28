@@ -191,7 +191,7 @@
       "id": "TASK-007",
       "title": "Trim always-loaded steering and set the budget",
       "user_visible_behavior": "Trim history and duplicated text from `inclusion: always` steering; set `Always-loaded steering budget` to the measured size (below 36,627 bytes)..",
-      "status": "not_started",
+      "status": "in_progress",
       "priority": 7,
       "owner": "claude",
       "req_ids": [

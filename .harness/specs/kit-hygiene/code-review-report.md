@@ -92,3 +92,14 @@ None. The stub is byte-identical to the previously shipped file (`cmp` in AC-008
 
 ### Recommendation
 PASS
+
+## Review 6 — TASK-007
+
+### Review Scope
+`.harness/steering/session-loop.md` (Markdown; no OCR rule group) and the budget slot in the kit's `quality-gates.project.md`. Host-agent read for meaning: removed text is duplicated verbatim elsewhere in always-loaded files (`AGENTS.md` INIT; `manifest.md` session format and event types) or in `jev.md`; the Verify-on-Stop paragraph keeps every rule (automatic hooks, loop limit, FAIL means not passing, mandatory `--live` on other runtimes, learning signal).
+
+### Findings
+None.
+
+### Recommendation
+PASS

@@ -29,13 +29,7 @@ If two agents write sessions for the same slice simultaneously, both files exist
 
 ## INIT order
 
-1. Read generated `.harness/state/registry.json` for squad state.
-2. Read generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice.
-3. Read features when `paths.features` is set.
-4. Read steering for the phase (JIT loading per [`_runtime-template.md`](../../.agents/agents/_runtime-template.md)).
-5. Pick work:
-   - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.
-   - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners and disjoint file scopes; otherwise work serially.
+See `AGENTS.md` → INIT (registry, slice manifest, features, JIT steering, then pick work).
 
 ## Feature item shape
 
@@ -71,36 +65,7 @@ Each item in `.features.json`:
 
 ## Session files (append-only)
 
-At the end of every significant action, write a session file:
-
-```bash
-node .harness/scripts/sync-state.mjs --slice <slice-id>
-```
-
-After writing sessions, run `sync-state` to regenerate the manifest and registry.
-
-Session file format (one JSON file per action, never edited):
-
-```json
-{
-  "schema_version": "1.0",
-  "session_id": "sess-auth-v2-003",
-  "timestamp": "2026-10-02T14:30:22Z",
-  "agent": "asdd-implementation",
-  "human": "bob",
-  "slice_id": "auth-v2",
-  "event_type": "feature_started",
-  "phase": "implementation",
-  "feature_id": "auth-login",
-  "scope_paths": ["src/auth/login.ts"],
-  "evidence": "Tests passed: 12/12",
-  "concerns": [],
-  "handoff_from": "alice",
-  "handoff_note": "Taking over login implementation."
-}
-```
-
-**Event types:** `phase_started`, `phase_completed`, `phase_blocked`, `feature_started`, `feature_completed`, `feature_blocked`, `dissent`, `override`, `checkpoint`.
+At the end of every significant action, write one session file (format and event types: [manifest.md](./manifest.md)), then run `node .harness/scripts/sync-state.mjs --slice <slice-id>` to regenerate the manifest, registry, and `PROGRESS.md`.
 
 ## Waves, dependencies, and concurrency
 
@@ -116,7 +81,7 @@ Modify only the files mapped to the active specification `.harness/specs/<slice>
 
 Mapped files are the paths named by that `intent.md` and by the slice `design.md` and `tasks.md` that trace to it, plus `scope_paths` on the in-progress feature, plus any test file (per the `Test file globs` binding) that names a REQ of that slice. Slice harness records (session files, features) stay writable. Any other product file is out of scope. A refactor inside a mapped file is in scope only when that spec, the current task, or the slice phase `refactor` requests it.
 
-Harness invariants do not call Jev. Scope control is deterministic (this file's mapping + `features.mjs`). Jev is skill-scoped to `shape-up` / `product-delivery` only ([jev.md](./jev.md)).
+Scope control is deterministic: this file's mapping plus `features.mjs`.
 
 ## Verify-on-Stop
 
@@ -128,8 +93,6 @@ node .harness/scripts/check-invariants.mjs --live
 
 Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The agent shall fix every FAIL and shall not mark the feature `passing` while the command exits non-zero. Live mode does not require `JEV_API_KEY` (Jev is not a harness gate).
 
-Both Cursor and Claude Code run this automatically. `.cursor/hooks.json` binds `stop` to `node .harness/scripts/verify-on-stop.mjs` (`loop_limit` 3, `failClosed` true); `.claude/settings.json` binds `Stop` to the same script. When the invariants run exits non-zero, the hook submits the FAIL output as the next prompt (Cursor) or a `decision: block` reason (Claude, respecting `stop_hook_active`) so the agent corrects the harness state before the session ends. When the command exits 0, the hook returns `{}` and the session may end. The hook does not inject a follow-up when `status` is `aborted` or `error`. After `loop_limit`, a remaining FAIL still means the feature is not `passing`.
-
-Other runtimes do not inject that prompt. The `--live` command is still mandatory before handoff, and a failing `--live` run is recorded as a learning signal on every runtime ([Learning Gate](./quality-gates.md#learning-gate)) (see the enforcement matrix in [README → How a session works](https://github.com/eencinasq/asdd-harness-kit#how-a-session-works)).
+Cursor (`stop`) and Claude Code (`Stop`) run this automatically through `verify-on-stop.mjs`: a FAIL comes back as the next prompt (Cursor `loop_limit` 3; Claude respects `stop_hook_active`), and the session ends only on exit 0. After the loop limit, a remaining FAIL still means the feature is not `passing`. Other runtimes do not inject the prompt; the `--live` run is still mandatory before handoff. Every failing `--live` run is recorded as a learning signal ([Learning Gate](./quality-gates.md#learning-gate)).
 
 Session close, and what wins when a control disagrees with this file, is in [controls.md](./controls.md). Gold-plating in this file still decides which files may change.
