@@ -26,10 +26,10 @@
         "scripts/test-install-into.sh",
         "scripts/test-lifecycle.sh",
         "package.json",
-        ".harness/steering/quality-gates.project.md",
-        "docs/agent-failure-log.md"
+        ".harness/steering/quality-gates.project.md"
       ],
-      "evidence_commit": "c14842e"
+      "evidence_commit": "c14842e",
+      "notes": "docs/agent-failure-log.md removed from scope_paths in Knowledge: it is a harness record, not TASK-001 code; listing it made every log entry reopen this feature (DRIFT-02). See lessons."
     },
     {
       "id": "TASK-002",

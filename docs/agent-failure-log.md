@@ -49,3 +49,59 @@
 - **Failure:** OBS-002 — the requirement parser reports 13 MUST requirements; two are SHOULD in the priority matrix.
 - **Remediation:** Recorded; fix belongs with OBS-001 in a drift slice.
 
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** planning:shared-files-across-serial-tasks
+- **Failure:** TASK-003 edited files owned by TASK-001 (scripts/test-install-into.sh); DRIFT-02 reopened the earlier feature(s) and forced re-verification.
+- **Remediation:** Re-verified and moved evidence_commit forward.
+
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** planning:shared-files-across-serial-tasks
+- **Failure:** TASK-004 edited files owned by TASK-003 (asdd-implementation-agent.md, asdd-discovery-agent.md); DRIFT-02 reopened the earlier feature(s) and forced re-verification.
+- **Remediation:** Re-verified and moved evidence_commit forward.
+
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** planning:shared-files-across-serial-tasks
+- **Failure:** TASK-005 edited files owned by TASK-001, TASK-003, TASK-004 (test-install-into.sh, package.json, install-into.sh, implementation agent); DRIFT-02 reopened the earlier feature(s) and forced re-verification.
+- **Remediation:** Re-verified and moved evidence_commit forward.
+
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** planning:shared-files-across-serial-tasks
+- **Failure:** TASK-006 edited files owned by TASK-001, TASK-003, TASK-005 (test-install-into.sh, install-into.sh, package.json); DRIFT-02 reopened the earlier feature(s) and forced re-verification.
+- **Remediation:** Re-verified and moved evidence_commit forward.
+
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** planning:shared-files-across-serial-tasks
+- **Failure:** TASK-007 edited files owned by TASK-001, TASK-003 (quality-gates.project.md, session-loop.md); DRIFT-02 reopened the earlier feature(s) and forced re-verification.
+- **Remediation:** Re-verified and moved evidence_commit forward.
+
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-implementation
+- **Phase:** implementation
+- **Signature:** planning:shared-files-across-serial-tasks
+- **Failure:** TASK-008 edited files owned by TASK-001, TASK-005, TASK-006 (check-guidance.test.mjs, test-install-into.sh); DRIFT-02 reopened the earlier feature(s) and forced re-verification.
+- **Remediation:** Re-verified and moved evidence_commit forward.
+
+- **Date:** 2026-10-28
+- **Slice:** kit-hygiene
+- **Agent:** asdd-knowledge
+- **Phase:** knowledge
+- **Signature:** learning:escalation-counted-for-full-slices
+- **Failure:** learning-lib counts lite escalation signals (E1…E5) for every slice; the full-mode kit-hygiene slice raised escalation:E1-scope-spread to ×4, inflating LP-a9dc05fe (SP-001).
+- **Remediation:** Recorded; fix in a follow-up slice (count escalation signals only while the slice is lite).
+

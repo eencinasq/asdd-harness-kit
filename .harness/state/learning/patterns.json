@@ -1,15 +1,46 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T01:35:16.588Z",
+  "generated_at": "2026-10-28T01:41:41.791Z",
   "threshold": 3,
   "summary": {
-    "patterns": 8,
+    "patterns": 11,
     "open": 0,
-    "in_flight": 1,
+    "in_flight": 2,
     "verified": 0,
     "unsigned_failures": 0
   },
   "patterns": [
+    {
+      "id": "LP-0e072262",
+      "signature": "failure:planning:shared-files-across-serial-tasks",
+      "kind": "escape",
+      "occurrences": 6,
+      "threshold": 3,
+      "status": "proposed",
+      "reopened": false,
+      "first_seen": "2026-10-28",
+      "last_seen": "2026-10-28",
+      "sources": [
+        "failure"
+      ],
+      "slices": [
+        "kit-hygiene"
+      ],
+      "examples": [
+        "TASK-003 edited files owned by TASK-001 (scripts/test-install-into.sh); DRIFT-02 reopened the earlier feature(s) and forced re-verification.",
+        "TASK-004 edited files owned by TASK-003 (asdd-implementation-agent.md, asdd-discovery-agent.md); DRIFT-02 reopened the earlier feature(s) and forced re-verification.",
+        "TASK-005 edited files owned by TASK-001, TASK-003, TASK-004 (test-install-into.sh, package.json, install-into.sh, implementation agent); DRIFT-02 reopened the earlier feature(s) and forced re-verification."
+      ],
+      "proposals": [
+        {
+          "id": "SP-002",
+          "file": "docs/knowledge-base/steering-proposals/SP-002.md",
+          "declared": "proposed",
+          "status": "proposed",
+          "recurrences": 0
+        }
+      ]
+    },
     {
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
@@ -19,7 +50,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-10-28T01:35:16.519Z",
+      "last_seen": "2026-10-28T01:41:41.715Z",
       "sources": [
         "escalation"
       ],
@@ -150,6 +181,27 @@
       "proposals": []
     },
     {
+      "id": "LP-a69eb8d9",
+      "signature": "failure:learning:escalation-counted-for-full-slices",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28",
+      "last_seen": "2026-10-28",
+      "sources": [
+        "failure"
+      ],
+      "slices": [
+        "kit-hygiene"
+      ],
+      "examples": [
+        "learning-lib counts lite escalation signals (E1…E5) for every slice; the full-mode kit-hygiene slice raised escalation:E1-scope-spread to ×4, inflating LP-a9dc05fe (SP-001)."
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-c6b5318f",
       "signature": "failure:tests:negated-assertion-ignored-by-errexit",
       "kind": "escape",
@@ -167,6 +219,27 @@
       ],
       "examples": [
         "Seeding the kit's domain model in docs/architecture/ during Domain leaked it into installed projects, and `npm test` still passed: `! grep …` lines in scripts/test-install-into.sh (2) and scripts/test-lifecycle.sh (1) never fail under `set -e`."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-262b4267",
+      "signature": "override:qa",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:40:26.144Z",
+      "last_seen": "2026-10-28T01:40:26.144Z",
+      "sources": [
+        "override"
+      ],
+      "slices": [
+        "kit-hygiene"
+      ],
+      "examples": [
+        "Tech Lead accepts the QG-SPEC-08 WARN: UNCOV-003 (REQ-012 error path) and UNCOV-004 (REQ-013 has no separate error behavior) stay documented in spec-coverage-report.md."
       ],
       "proposals": []
     },

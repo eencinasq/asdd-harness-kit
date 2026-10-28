@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-040",
+  "timestamp": "2026-10-28T01:40:26.144Z",
+  "agent": "human",
+  "human": "eencinas",
+  "slice_id": "kit-hygiene",
+  "concerns": [],
+  "event_type": "override",
+  "phase": "qa",
+  "note": "Tech Lead accepts the QG-SPEC-08 WARN: UNCOV-003 (REQ-012 error path) and UNCOV-004 (REQ-013 has no separate error behavior) stay documented in spec-coverage-report.md.",
+  "evidence": "TL decision in chat, 2026-10-28"
+}
