@@ -1,0 +1,15 @@
+{
+  "id": "050",
+  "slice": "kit-hygiene",
+  "type": "checkpoint-note",
+  "phase": "implementation",
+  "summary": "Phase-2 G-4: split oversized shape-up skill. Extracted Flows 2-6 to references/flows.md and tracker/command integration + common-mistakes content to references/shaping-guidance.md. SKILL.md keeps Core Philosophy, Gate mode, Entry Point, Product Mode Check, and Flow 1 verbatim; extracted sections remain reachable via pointer headings under the Entry Point routing step and the Resources list. Extraction verified verbatim: all 8 removed bodies present in destination files; all kept sections byte-identical. Result: 333 -> 335 lines, 21894 -> 14205 bytes; S-008 PASS under caps (<=500 lines, <=15360 bytes); 8 grandfathered findings still waived. versions.json regenerated (148 artifacts). npm test 142/142.",
+  "verification": "node scripts/test-install-into.sh PASS; node --test .harness/scripts/check-skill-profile.test.mjs PASS (12/12); npm test 142/142; lintBundle(.agents/skills/shape-up) S-008=none; check-skills-index PASS; git-diff section extraction check: all moved bodies verbatim, kept bodies unchanged",
+  "drift": "DRIFT-02 reopened kit-hygiene TASK-003 (skills paths, evidence 649043b) and jev-module TASK-004 (shape-up in scope_paths, evidence 6489de5). Standard cycle: commit -> re-verify -> passing + new evidence_commit.",
+  "files_touched": [
+    ".agents/skills/shape-up/SKILL.md",
+    ".agents/skills/shape-up/references/flows.md",
+    ".agents/skills/shape-up/references/shaping-guidance.md",
+    ".harness/config/versions.json"
+  ]
+}
