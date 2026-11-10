@@ -22,6 +22,7 @@ export const HARNESS_FILES = [
   ['.harness/features/feature.schema.json', 'cli/scaffold/features/feature.schema.json'],
   ['.harness/config/versions.json', 'cli/versions.json'],
   ['.harness/config/models.json', 'cli/scaffold/config/models.json'],
+  ['.harness/config/skill-profile-waivers.json', 'cli/scaffold/config/skill-profile-waivers.json'],
 ];
 /** READMEs of the project's own folders: written once, then the project's. */
 const FOLDER_READMES = ['specs', 'features', 'state/slices', 'state/archive'];

@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "note": "Grandfathered bundles (D-6, conform-on-touch): check-skill-profile.mjs skips these dirs. Remove an entry when its bundle is retrofitted in Phase 2 (v7 G-2/G-3/G-4/G-8 — 0 unwaived errors is the exit criterion). Any bundle NOT listed here must pass the profile linter.",
+  "waived": [
+    ".agents/skills/anti-pattern-detection",
+    ".agents/skills/business-model-canvas",
+    ".agents/skills/capability-discovery",
+    ".agents/skills/codebase-audit",
+    ".agents/skills/codegraph",
+    ".agents/skills/create-mcp-app",
+    ".agents/skills/documentation-and-adrs",
+    ".agents/skills/domain-language-extraction",
+    ".agents/skills/external-trackers",
+    ".agents/skills/product-delivery",
+    ".agents/skills/shape-up",
+    ".agents/skills/test-driven-development",
+    ".agents/modules/http-api/skills/api-and-interface-design",
+    ".agents/modules/web-ui/skills/browser-testing-with-devtools",
+    ".agents/modules/web-ui/skills/frontend-ui-engineering",
+    ".agents/skills/api-and-interface-design",
+    ".agents/skills/browser-testing-with-devtools",
+    ".agents/skills/frontend-ui-engineering",
+    ".agents/skills/bruno-api-testing",
+    ".agents/skills/playwright-e2e-testing"
+  ]
+}

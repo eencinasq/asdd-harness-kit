@@ -50,6 +50,7 @@
     "cli/scaffold/config/models.json": "3.10.0",
     "cli/scaffold/config/project.schema.json": "3.10.0",
     "cli/scaffold/config/README.md": "3.10.0",
+    "cli/scaffold/config/skill-profile-waivers.json": "3.10.0",
     "cli/scaffold/features/feature.schema.json": "3.10.0",
     "cli/scaffold/features/README.md": "3.10.0",
     "cli/scaffold/specs/README.md": "3.10.0",

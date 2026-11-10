@@ -31,13 +31,30 @@ cat >"$TMP/existing-app/.harness/config/installed-versions.json" <<'EOF'
 {"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/skills/product-delivery/agents/sprint-planning.md",".agents/skills/user-story-decomposition/SKILL.md",".agents/skills/open-code-review/SKILL.md","scripts/migrate-v2-v3.mjs"]}
 EOF
 # Consumer-authored skill at a NON-colliding name — must survive the whole install
-mkdir -p "$TMP/existing-app/.agents/skills/my-local-skill"
-cat >"$TMP/existing-app/.agents/skills/my-local-skill/SKILL.md" <<'EOF'
+# (conforming: the profile linter also gates non-waived consumer bundles)
+mkdir -p "$TMP/existing-app/.agents/skills/local-notes"
+cat >"$TMP/existing-app/.agents/skills/local-notes/SKILL.md" <<'EOF'
 ---
-name: my-local-skill
-description: consumer authored
+name: local-notes
+description: >-
+  Local helper for this project. Use when running the local helper flow.
+  Do NOT use for anything else.
 ---
-# consumer authored
+# My Local Skill
+
+Overview: operational boundary — writes nothing.
+
+### Step 1 [C1·Remember×Factual] — Read
+Action: read. Target: input. IA: read done.
+
+## Verification
+Manual check.
+
+## Escalation Gate
+Context: failure. Options: listed. Recommendation: pick. Decision Needed: human.
+
+## Handoff & Convergence
+None (terminal).
 EOF
 # A pre-CLI install kept the harness in .harness/scripts/: the kit's files go, a project's own script stays
 mkdir -p "$TMP/existing-app/.harness/scripts/validators"
@@ -93,7 +110,7 @@ test ! -e "$TMP/existing-app/.agents/skills/user-story-decomposition"
 test ! -e "$TMP/existing-app/.agents/skills/capability-prioritization"
 test ! -e "$TMP/existing-app/.agents/skills/open-code-review"  # the open-code-review skill is retired
 # Consumer-authored skill at a non-colliding name survives untouched
-grep -q 'consumer authored' "$TMP/existing-app/.agents/skills/my-local-skill/SKILL.md"
+grep -q 'My Local Skill' "$TMP/existing-app/.agents/skills/local-notes/SKILL.md"
 if grep -q 'open-code-review' "$TMP/existing-app/.harness/steering/skills.md"; then echo "skills index still lists open-code-review" >&2; exit 1; fi
 
 # project.json derives name from directory
