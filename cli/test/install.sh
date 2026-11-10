@@ -25,6 +25,20 @@ echo '# Sprint Planning Agent' >"$TMP/existing-app/.agents/skills/product-delive
 echo '---' >"$TMP/existing-app/.agents/skills/user-story-decomposition/SKILL.md"
 mkdir -p "$TMP/existing-app/.agents/skills/open-code-review" && printf -- '---\nname: open-code-review\n---\n' >"$TMP/existing-app/.agents/skills/open-code-review/SKILL.md"
 mkdir -p "$TMP/existing-app/scripts" && echo '// old kit copy' >"$TMP/existing-app/scripts/migrate-v2-v3.mjs"
+# Prior install tracked those scrum-era files as kit-managed (the collision guard reads this manifest)
+mkdir -p "$TMP/existing-app/.harness/config"
+cat >"$TMP/existing-app/.harness/config/installed-versions.json" <<'EOF'
+{"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/skills/product-delivery/agents/sprint-planning.md",".agents/skills/user-story-decomposition/SKILL.md",".agents/skills/open-code-review/SKILL.md","scripts/migrate-v2-v3.mjs"]}
+EOF
+# Consumer-authored skill at a NON-colliding name — must survive the whole install
+mkdir -p "$TMP/existing-app/.agents/skills/my-local-skill"
+cat >"$TMP/existing-app/.agents/skills/my-local-skill/SKILL.md" <<'EOF'
+---
+name: my-local-skill
+description: consumer authored
+---
+# consumer authored
+EOF
 # A pre-CLI install kept the harness in .harness/scripts/: the kit's files go, a project's own script stays
 mkdir -p "$TMP/existing-app/.harness/scripts/validators"
 echo '// old kit copy' >"$TMP/existing-app/.harness/scripts/check-invariants.mjs"
@@ -78,6 +92,8 @@ test ! -e "$TMP/existing-app/.agents/skills/product-delivery/agents"
 test ! -e "$TMP/existing-app/.agents/skills/user-story-decomposition"
 test ! -e "$TMP/existing-app/.agents/skills/capability-prioritization"
 test ! -e "$TMP/existing-app/.agents/skills/open-code-review"  # the open-code-review skill is retired
+# Consumer-authored skill at a non-colliding name survives untouched
+grep -q 'consumer authored' "$TMP/existing-app/.agents/skills/my-local-skill/SKILL.md"
 if grep -q 'open-code-review' "$TMP/existing-app/.harness/steering/skills.md"; then echo "skills index still lists open-code-review" >&2; exit 1; fi
 
 # project.json derives name from directory
@@ -596,5 +612,58 @@ node -e '
   if (missing.length) throw new Error(`refreshed but never versioned (add to cli/src/kit/versions.mjs): ${missing.join(", ")}`);
 ' "$ROOT/package.json" "$ROOT/cli/versions.json" "$VTMP/refresh.log"
 rm -rf "$VTMP"
+
+echo "== collision guard: unmanaged same-name files halt (baseline + module sites); dry-run reports; legacy halts =="
+CTMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-guard-test.XXXXXX")"
+
+# Baseline site: consumer file inside a kit-shipped dir, not in managed_files → halt, file untouched
+mkdir -p "$CTMP/app/.agents/skills/shape-up" "$CTMP/app/.harness/config"
+echo '# consumer notes' >"$CTMP/app/.agents/skills/shape-up/notes.md"
+cat >"$CTMP/app/.harness/config/installed-versions.json" <<'EOF'
+{"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/skills/shape-up/SKILL.md"]}
+EOF
+if asdd install "$CTMP/app" --no-interactive --skip-deps >"$CTMP/baseline.log" 2>&1; then
+  echo "expected collision guard to halt on baseline site" >&2; exit 1
+fi
+grep -q 'collision' "$CTMP/baseline.log"
+grep -q 'consumer notes' "$CTMP/app/.agents/skills/shape-up/notes.md"
+# --force never bypasses the guard
+if asdd install "$CTMP/app" --no-interactive --skip-deps --force >/dev/null 2>&1; then
+  echo "expected collision guard to halt even with --force" >&2; exit 1
+fi
+# --dry-run reports without halting
+asdd install "$CTMP/app" --no-interactive --dry-run --skip-deps >"$CTMP/dry.log" 2>&1
+grep -qi 'collision' "$CTMP/dry.log"
+grep -qi 'dry-run' "$CTMP/dry.log"
+
+# Module site: consumer-authored dir colliding with an http-api skill → halt only when the module copies
+mkdir -p "$CTMP/app2/.agents/skills/api-and-interface-design" "$CTMP/app2/.harness/config"
+cat >"$CTMP/app2/.agents/skills/api-and-interface-design/SKILL.md" <<'EOF'
+---
+name: api-and-interface-design
+description: consumer skill
+---
+# consumer skill
+EOF
+cat >"$CTMP/app2/.harness/config/installed-versions.json" <<'EOF'
+{"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/skills/shape-up/SKILL.md"]}
+EOF
+asdd install "$CTMP/app2" --no-interactive --skip-deps >/dev/null 2>&1   # no module → name not copied → proceeds
+if asdd install "$CTMP/app2" --no-interactive --modules=http-api --skip-deps >"$CTMP/module.log" 2>&1; then
+  echo "expected collision guard to halt on module site" >&2; exit 1
+fi
+grep -q 'collision' "$CTMP/module.log"
+grep -q '# consumer skill' "$CTMP/app2/.agents/skills/api-and-interface-design/SKILL.md"
+
+# Legacy: colliding tree + no manifest → documented halt
+mkdir -p "$CTMP/app3/.agents/skills/shape-up"
+echo '# consumer' >"$CTMP/app3/.agents/skills/shape-up/notes.md"
+if asdd install "$CTMP/app3" --no-interactive --skip-deps >"$CTMP/legacy.log" 2>&1; then
+  echo "expected legacy halt" >&2; exit 1
+fi
+grep -q 'LEGACY INSTALL' "$CTMP/legacy.log"
+
+rm -rf "$CTMP"
+echo "  OK"
 
 echo "OK asdd install smoke test"

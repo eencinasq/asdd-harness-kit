@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-047",
+  "timestamp": "2026-11-10T21:16:09.000Z",
+  "agent": "devin",
+  "human": "ougarte",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "Phase 1 landing of the skill-authoring proposal (skills/v7): capability-authoring bundle + skill collision guard in install-into.sh + skills.md index pointer",
+    "DRIFT-02 reopened TASK-001/003/005/006/008: install-into.sh and test-install-into.sh are in passing features' scope_paths; no active slice owns this direct-commit landing",
+    "Always-loaded steering budget raised 31962 -> 32600 (maintainer decision): headroom was 14 bytes; any new indexed skill row would have tripped it"
+  ],
+  "event_type": "checkpoint",
+  "evidence": "npm test 130/130 incl. new collision-guard cases (baseline+module halt, --force no bypass, --dry-run reports, legacy halt, consumer skill survives); skills index PASS; versions.json regenerated (144 artifacts). DRIFT-02 pending re-verify + evidence_commit update after this work commits."
+}
