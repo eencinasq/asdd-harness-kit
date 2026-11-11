@@ -151,7 +151,7 @@ function checkEnumerationDrift(ctx, entries) {
           .filter(([, e]) => e.inclusion === 'auto')
           .map(([p]) => p.split('/').pop()),
       );
-      const listedMd = [...bypass.matchAll(/`([\w-]+\.md)`/g)].map((x) => x[1]);
+      const listedMd = [...bypass.matchAll(/`([\w.-]+\.md)`/g)].map((x) => x[1]);
       const mandated = listedMd.filter((n) => auto.has(n));
       if (mandated.length) {
         warn(`asdd-steering.mdc mandates reads for auto files bypassing tags: ${mandated.join(', ')} (recorded G-6 — Phase-2 generated projections)`);
@@ -171,7 +171,7 @@ function checkEnumerationDrift(ctx, entries) {
     const text = readFileSync(readme, 'utf8');
     const sec = text.split(/^## /m).find((s) => /^Portable contracts/.test(s));
     if (sec) {
-      const listed = new Set([...sec.matchAll(/`([\w-]+\.md)`/g)].map((x) => x[1]));
+      const listed = new Set([...sec.matchAll(/`([\w.-]+\.md)`/g)].map((x) => x[1]));
       const expected = portableSet(entries);
       expected.delete('README.md'); // the index does not list itself
       const missing = [...expected].filter((n) => !listed.has(n));

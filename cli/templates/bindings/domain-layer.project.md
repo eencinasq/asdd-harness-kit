@@ -1,7 +1,13 @@
 ---
 inclusion: auto
 tags:
+  - discovery
   - domain
+  - design
+  - task_planning
+  - implementation
+  - qa
+  - refactor
 classification: binding
 ---
 

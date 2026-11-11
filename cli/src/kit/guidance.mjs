@@ -14,6 +14,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readBinding } from '../harness/drift-lib.mjs';
+import { PHASES } from '../harness/sync-state.mjs';
 import { parseSteeringFrontmatter } from '../harness/validators/steering-tags.mjs';
 
 const KIT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -114,6 +115,33 @@ export function checkBudget(root, kitRoot = KIT_ROOT) {
   return size > budget ? [`budget always-loaded steering is ${size} bytes > budget ${budget} bytes`] : [];
 }
 
+/**
+ * D-5 effectively-always tier: `auto` steering files whose tags cover every PHASE —
+ * they load on any phase-keyed turn, so their bytes are part of a typical active turn.
+ */
+export function effectivelyAlwaysFiles(root) {
+  const dir = join(root, '.harness/steering');
+  if (!existsSync(dir)) return [];
+  const out = [];
+  for (const n of readdirSync(dir).filter((x) => x.endsWith('.md'))) {
+    const text = readFileSync(join(dir, n), 'utf8');
+    const fm = parseSteeringFrontmatter(text);
+    if (fm?.inclusion === 'auto' && PHASES.every((p) => (fm.tags ?? []).includes(p))) {
+      out.push({ name: n, bytes: Buffer.byteLength(text) });
+    }
+  }
+  return out.sort((a, b) => b.bytes - a.bytes);
+}
+
+export function effectivelyAlwaysBytes(root) {
+  return effectivelyAlwaysFiles(root).reduce((t, f) => t + f.bytes, 0);
+}
+
+/** Active-turn measurement: always-loaded + effectively-always bytes on a phase-keyed turn. */
+export function activeTurnBytes(root) {
+  return alwaysLoadedBytes(root) + effectivelyAlwaysBytes(root);
+}
+
 export function checkAsserts(root) {
   const dir = join(root, 'cli/test');
   if (!existsSync(dir)) return [];
@@ -141,7 +169,14 @@ export function run(argv) {
     return CHECKS[name](dir);
   });
   for (const f of findings) console.error(`FAIL  ${f}`);
-  if (findings.length) return 1;
-  console.log(`PASS  guidance (${only.join(', ')}) — always-loaded ${alwaysLoadedBytes(dir)} bytes`);
+  const tier = effectivelyAlwaysFiles(dir);
+  const tierNote = tier.length
+    ? `; effectively-always ${tier.reduce((t, f) => t + f.bytes, 0)} bytes (${tier.map((f) => f.name).join(', ')})`
+    : '';
+  if (findings.length) {
+    console.error(`FAIL  ${only.join(', ')} — always-loaded ${alwaysLoadedBytes(dir)} bytes${tierNote}; active-turn ${activeTurnBytes(dir)} bytes`);
+    return 1;
+  }
+  console.log(`PASS  guidance (${only.join(', ')}) — always-loaded ${alwaysLoadedBytes(dir)} bytes${tierNote}; active-turn ${activeTurnBytes(dir)} bytes`);
   return 0;
 }

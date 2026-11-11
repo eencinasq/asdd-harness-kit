@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "author": "osmar-ugarte",
+  "week": "2026-W46",
+  "signatures": {
+    "sensor:DRIFT-02": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-11T04:44:07.820Z",
+          "slice_id": null,
+          "last_at": "2026-11-11T04:53:28.637Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-02 passing feature TASK-001 changed after evidence_commit 67f5a59; set it back to in_progress and rerun verification"
+      ]
+    },
+    "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-11T04:44:07.820Z",
+          "slice_id": null,
+          "last_at": "2026-11-11T04:53:28.637Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ]
+    },
+    "warn:asdd-steering.mdc mandates reads for auto files bypassing tags: structure.md, pr": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-11T04:44:07.820Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "asdd-steering.mdc mandates reads for auto files bypassing tags: structure.md, product.md, codegraph.md (recorded G-6 — Phase-2 generated projections)"
+      ]
+    },
+    "sensor:<path>: missing portable slot(s): enforcement (kit_steering_rule profile)": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-11T04:52:58.875Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        ".harness/steering/session-loop.md: missing portable slot(s): enforcement (kit_steering_rule profile)"
+      ]
+    }
+  }
+}

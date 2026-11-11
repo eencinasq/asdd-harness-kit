@@ -45,6 +45,15 @@ const REGENERATED = new Set(['.harness/steering/skills.md']);
 /** Files a kit tree never installs: OS junk and the kit's own tests. */
 const SKIPPED = /^(\.DS_Store|\._.*|.*\.test\..*|.*\.spec\..*)$/;
 
+/**
+ * Files the PREVIOUS install recorded as kit-managed (`managed_files` in installed-versions.json), or null when the
+ * manifest is missing, empty, or unparseable — i.e. when kit ownership cannot be proven (legacy install).
+ */
+export function previousManaged(installedVersionsFile) {
+  const m = readJson(installedVersionsFile)?.managed_files;
+  return Array.isArray(m) && m.length ? new Set(m) : null;
+}
+
 /** Every file under `dir` (recursively, sorted), relative to it. Symlinks are not files. */
 export function filesUnder(dir) {
   const out = [];

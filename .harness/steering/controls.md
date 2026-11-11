@@ -9,7 +9,7 @@ Index of guides and sensors. This file does not restate their rules. On a confli
 
 The repository under `.harness/` is the system of record. `AGENTS.md` stays a map. Skill bodies stay out of the initial index ([skills.md](./skills.md)). A feature is a harness primitive ([session-loop.md](./session-loop.md)). A session is not done when the story sounds finished.
 
-Practice behind this layout: [Harness engineering for coding agent users](https://martinfowler.com/articles/harness-engineering.html) (guides, sensors, quality left, one coherent control system) and [Learn Harness Engineering](https://walkinglabs.github.io/learn-harness-engineering/en/) (system of record, feature lists, initialization, no early victory, clean session end).
+Practice behind this layout: [Harness engineering](https://martinfowler.com/articles/harness-engineering.html) and [Learn Harness Engineering](https://walkinglabs.github.io/learn-harness-engineering/en/).
 
 ## Guides and sensors
 
@@ -22,31 +22,38 @@ Practice behind this layout: [Harness engineering for coding agent users](https:
 | Domain placement | Guide, plus the project boundary command | Computational when the binding supplies a command | Architecture fitness | [domain-layer.md](./domain-layer.md), [quality-gates.project.md](./quality-gates.project.md) |
 | Feature `verification` + `evidence` | Sensor | Computational | Behaviour | [session-loop.md](./session-loop.md) |
 | Verify-on-Stop invariants | Sensor | Computational, left (agent stop) | Harness state | `asdd check` |
-| Spec drift (`DRIFT-01`…`07`) | Sensor | Computational, left (in invariants) and in CI; on demand via `asdd drift` | Behaviour scope, spec traceability | [spec-drift.md](./spec-drift.md), `asdd drift` |
+| Spec drift (`DRIFT-01`…`07`) | Sensor | Computational, left (in invariants) and in CI; on demand via `spec-drift` MCP | Behaviour scope, spec traceability | [spec-drift.md](./spec-drift.md), `asdd drift` |
 | Codebase audit | Sensor | Computational (`asdd audit`) plus inferential (`codebase-audit` skill), scheduled | Drift and health outside the change lifecycle | [spec-drift.md](./spec-drift.md), `.harness/audits/` |
 | Shape Up / Product Delivery gates | Sensor | Inferential (human decision, `decided_by`) | Betting, scope choice, EARS quality | `shape-up` and `product-delivery` skills when the module is installed |
-| Command pattern gate | Sensor | Pattern allow/deny before dangerous bash | Safety | `asdd gate` |
+| Command pattern gate | Sensor | Pattern allow/deny before dangerous bash (no Jev) | Safety | `asdd gate` |
 | CI invariants | Sensor | Computational, after integration; repeats the left check | Harness state | `.github/workflows/harness-invariants.yml` |
 | Full suite (SP-002) | Sensor | Computational, before a new spec enters Task Planning | Behaviour | [quality-gates.project.md](./quality-gates.project.md) |
-| Learning loop (`QG-LEARN-*`) | Sensor on the controls themselves | Computational (`asdd learn`, `validators/learning.mjs`), every sync and stop; proposals inferential, decided by the Tech Lead | The guides and sensors in this table | [quality-gates.md](./quality-gates.md#learning-gate), `docs/knowledge-base/steering-proposals/` |
+| Learning loop (`QG-LEARN-*`) | Sensor on the controls themselves | Computational (`asdd learn`, `validators/learning.mjs`), every sync and stop; proposals inferential, decided by the Tech Lead | The guides and sensors in this table | [quality-gates.md](./quality-gates.learn.md), `docs/knowledge-base/steering-proposals/` |
 | Human review | Sensor | Inferential, after the agent loop | Intent the sensors cannot see | Tech Lead, dissent log |
 
 Fast sensors run before the session ends. The pipeline repeats the invariants check. The full suite stays at the Task Planning gate because it is the more expensive behaviour sensor.
 
 ASDD-Lite skips the confidence scores and the numeric phase gates (`QG-DEC-07`, [asdd-lite.md](./asdd-lite.md)). It still uses feature evidence, invariants, and session close.
 
-## Precedence
+## Precedence (invariants)
 
-1. **Edits.** [session-loop.md](./session-loop.md) gold-plating decides which files may change.
-2. **Numbers.** [quality-gates.md](./quality-gates.md) is the only cutoff. An agent prompt shall not invent a second confidence or coverage threshold, and shall not combine confidence scores across phases (`QG-DEC-10`).
-3. **Skills.** [skills.md](./skills.md) decides when a skill body is read.
-4. **Done.** A feature is `passing` only after its `verification` evidence is recorded and the left sensors for this session exit 0. A green narrative is not evidence.
-5. **Repeat.** When a failure, override, or dismissal reaches the occurrence threshold, `asdd learn` opens a pattern; change the guide or sensor that missed it (escape) or that fires without cause (noise) through a steering proposal ([Learning Gate](./quality-gates.md#learning-gate)). Do not only patch the product code.
+- **CTL-01.** **Edits.** [session-loop.md](./session-loop.md) gold-plating decides which files may change.
+- **CTL-02.** **Numbers.** [quality-gates.md](./quality-gates.md) is the only cutoff. An agent prompt shall not invent a second confidence or coverage threshold, and shall not combine confidence scores across phases (`QG-DEC-10`).
+- **CTL-03.** **Skills.** [skills.md](./skills.md) decides when a skill body is read.
+- **CTL-04.** **Done.** A feature is `passing` only after its `verification` evidence is recorded and the left sensors for this session exit 0. A green narrative is not evidence.
+- **CTL-05.** **Repeat.** When a failure, override, or dismissal reaches the occurrence threshold, `asdd learn` opens a pattern; change the guide or sensor that missed it (escape) or that fires without cause (noise) through a steering proposal ([Learning Gate](./quality-gates.learn.md)). Do not only patch the product code.
 
-## Prohibitions
+## Negative space
 
-Never skip, waive, or widen a sensor to pass a gate; dismiss findings only through `asdd triage` with a reason.
-When the precedence above does not settle a conflict: HALT and escalate to the Tech Lead.
+This file does not restate row rules (each links its contract), defines no thresholds (`quality-gates.md` is the only cutoff, CTL-02), and enumerates no file lists (`steering.registry.json`, `README.md` own those).
+
+## Enforcement
+
+`asdd check` (Verify-on-Stop + CI), `asdd gate`, `asdd learn` / `validators/learning.mjs`.
+
+## Escalation
+
+A control that repeatedly misses or misfires → `asdd learn` pattern → steering proposal (CTL-05); an unsettlable precedence conflict → Tech Lead `dissent` session, not an agent edit.
 
 ## Session close
 

@@ -41,7 +41,7 @@ Match keys = slice **phases** + optional **`refactor`** phase + slice **mode** +
 
 ```text
 discovery, spec, validation, domain, design, task_planning, implementation, qa,
-knowledge   ← PHASES (source of truth: .harness/scripts/sync-state.mjs export PHASES)
+knowledge   ← PHASES (source of truth: cli/src/harness/sync-state.mjs export PHASES)
 refactor    ← optional phase
 lite        ← slice mode
 review, ui  ← active roles
@@ -57,7 +57,7 @@ addition.
 |-------|-------|-------------|------------|----------------|-------------|------------|
 | `portable` | cross-cutting contracts | required | required, numbered, falsifiable | **required** | named check or `reviewer-enforced` | required for gate/rule files |
 | `binding` | `*.project.md`, `product`/`structure`/`tech`/`design-system` | required + `> **Project binding**` marker | optional | optional | optional | optional |
-| `module` | module-gated contracts (e.g. `jev.md`) | required + module note in SCOPE | required | required | required | required |
+| `module` | module-gated contracts | required + module note in SCOPE | required | required | required | required |
 | `index` | `README.md` | required | N/A — carries layer/file tables | N/A | N/A | N/A |
 | `hybrid-index` | `skills.md` | required | disclosure rules | optional | named regen check | optional |
 | `contract-doc` | `_*.md` (registry class) | no frontmatter, not JIT-loaded, exempt from rule slots |
@@ -77,7 +77,7 @@ addition.
 - **Per-file cap:** 24,000 bytes (`rule.spec` `R-004`, verbatim).
 - **Always-loaded budget:** `AGENTS.md` + `inclusion: always` steering ≤ the recorded
   binding in `quality-gates.project.md` (currently `34000`; measured by
-  `scripts/check-guidance.mjs`). Raised only by recorded decision — see proposal `v1` `D-5`.
+  `asdd kit guidance`). Raised only by recorded decision — see proposal `v1` `D-5`.
 - **Ordering guardrail:** the effectively-always sensor tier (files whose tags cover
   all 9 `PHASES`) lands before any `auto`→`always` reclassification.
 
@@ -103,7 +103,7 @@ An undeclared `_`-file carrying `## Invariants` / `## Negative Space` /
 
 ## Enforcement & transitional states
 
-`check-invariants.mjs` → `validators/steering-tags.mjs` enforces:
+`asdd check` → `validators/steering-tags.mjs` enforces:
 
 | Check | State |
 |-------|-------|
@@ -118,7 +118,7 @@ An undeclared `_`-file carrying `## Invariants` / `## Negative Space` /
 | `x`/`x.project` tag asymmetry | warn |
 | `AGENTS.md` always-list ≠ registry | warn — doc drift |
 | `README.md` table / `asdd-steering.mdc` lists ≠ registry | **fail** — kit-managed projections |
-| `asdd-steering.mdc` mandated reads for `auto` files | warn — recorded `G-6` bypass |
+| `asdd-steering.mdc` marked sections ≠ `generate-runtime-steering.mjs` output | **fail** — `D-12` generated projection (`G-6` resolved: phase rows are tag-derived; no row may mandate `auto` reads) |
 
 ## Authoring & change path
 
@@ -128,6 +128,8 @@ An undeclared `_`-file carrying `## Invariants` / `## Negative Space` /
 - The installer copies files by install surface: portable contract files + this profile
   ship to consumers; `*.project.md`/`product`/`structure`/`tech`/`design-system` kit
   files describe the kit itself and are never shipped (stubs ship instead);
-  `jev.md` ships only with `--modules=jev`.
+  `module`-class files ship only when their module is enabled.
 - All changes to steering content flow through a steering proposal
   (`templates/steering-proposal.md`).
+- `templates/` scaffolds are `artifact_template` — outside this grammar; their
+  contract lives in [_template-profile.md](_template-profile.md) (`D-9`).

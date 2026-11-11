@@ -5,11 +5,13 @@ import { basename, dirname, join } from 'node:path';
 
 import { CliError, KIT_REF, KIT_REMOTE, TEMPLATES } from '../paths.mjs';
 import { c, info, log, warn } from '../ui.mjs';
-import { filesUnder, isSymlink } from './context.mjs';
+import { filesUnder, isSymlink, previousManaged } from './context.mjs';
 
 const STEERING = [
-  'domain-layer.md', 'quality-gates.md', 'manifest.md', 'session-loop.md', 'asdd-lite.md', 'knowledge.md',
-  'skills.md', 'security-rules.md', 'controls.md', 'spec-drift.md', 'README.md', '_steering-profile.md',
+  'domain-layer.md', 'quality-gates.md', 'quality-gates.phases.md', 'quality-gates.exec.md',
+  'quality-gates.learn.md', 'manifest.md', 'session-loop.md', 'asdd-lite.md', 'knowledge.md',
+  'skills.md', 'security-rules.md', 'controls.md', 'spec-drift.md', 'README.md',
+  '_steering-profile.md', '_template-profile.md',
 ];
 
 /** Where the shipped steering lives in the kit: the CLI. The kit's own .harness/steering holds only its bindings (and links). */
@@ -464,10 +466,27 @@ const RETIRED_KIT_PATHS = [
 const LEGACY_INSTALLER = 'scripts/install-into.sh';
 const LEGACY_INSTALLER_MARK = 'Install / upgrade asdd-harness-kit into an existing project.';
 
+/**
+ * A retired path is removed only when the previous install's managed_files proves the kit wrote it: the path itself is
+ * managed, or (for a directory) every file under it is. A consumer's file at a retired path is never deleted — it is
+ * warned and left for manual reconciliation (the kit never silently deletes unmanaged files).
+ */
+function provablyKitOwned(ctx, rel) {
+  const managed = previousManaged(ctx.installedVersionsFile);
+  if (managed === null) return false;
+  if (managed.has(rel)) return true;
+  const p = join(ctx.target, rel);
+  if (!statSync(p).isDirectory()) return managed.has(rel);
+  const files = filesUnder(p);
+  return files.length > 0 && files.every((f) => managed.has(`${rel}/${f}`));
+}
+
 export function removeRetiredKitFiles(ctx) {
   for (const rel of RETIRED_KIT_PATHS) {
     const path = join(ctx.target, rel);
-    if (existsSync(path)) ctx.remove(path, 'retired kit file');
+    if (!existsSync(path)) continue;
+    if (provablyKitOwned(ctx, rel)) ctx.remove(path, 'retired kit file');
+    else warn(`${rel} exists but is not kit-managed — the kit retired this path; reconcile or remove it manually`);
   }
   const legacy = join(ctx.target, LEGACY_INSTALLER);
   // Recorded as managed, so deleting a committed copy is not slice drift (DRIFT-01).

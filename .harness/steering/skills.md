@@ -5,23 +5,20 @@ classification: hybrid-index
 
 # ASDD skills index (kit)
 
-Name and description of each folder under `.agents/skills/`; choose a skill here.
+Initial catalog for folders under `.agents/skills/`. Each folder exposes only its name and description here. The skill body stays in `SKILL.md` until the matching task starts.
 
-- When you start the task a description matches, `Read` `.agents/skills/<name>/SKILL.md` and follow it. Before that,
-  do not `Read` the `SKILL.md`, its `references/`, or its `agents/`.
-- Never copy a skill body here. After adding or editing a skill, run `asdd skills-index --write`.
-- Authoring a skill? Follow `.agents/skills/capability-authoring/SKILL.md` (profile: `references/skill-profile.md`).
+## Disclosure (invariants)
 
-## Markers and escalation
+- **SKL-01.** Read this file to choose a skill. This is the initial index.
+- **SKL-02.** When you start the task that matches a description, `Read` `.agents/skills/<name>/SKILL.md` and follow that file.
+- **SKL-03.** Until that task starts, do not `Read` that `SKILL.md` or its `references/`.
+- **SKL-04.** Do not copy a skill body into this index. After adding or editing a skill folder, regenerate the catalog with `asdd skills-index --write`.
+- **SKL-05.** Authoring a skill? Follow `.agents/skills/capability-authoring/SKILL.md` (profile: `references/skill-profile.md`).
+- **SKL-06.** A skill that is not yet copied into `.agents/skills/` is not part of this index.
 
-Mark what the source does not settle; never write it as fact or drop a marker before its decision:
-`PENDING_DEFINITION` (a required fact is missing; its gate stays open), `ASSUMPTION — CONFIRMATION REQUIRED` (inferred,
-not stated), `PROPOSED — VALIDATION REQUIRED` (agent-generated; a human decides, `decided_by`), `DERIVED` (carried into
-a derived artifact with its `source_*` ID).
+## Enforcement
 
-When a precondition, step, or invariant cannot be met: HALT — no guessing, blind retries, or workarounds — and report
-Context → Options → Recommendation → Decision Needed. A `redirect` to the producer of a missing input is recovery,
-not escalation. Sensors: `asdd check` (index), `asdd kit skills-lint` (skill grammar).
+`asdd skills-index` FAILs on index↔folder drift (SKL-04); `check-skill-profile` / `check-skill-fleet` lint bundles. SKL-02/SKL-03 are reviewer-enforced disclosure economy.
 
 <!-- skills-index:start -->
 | Name | Description |

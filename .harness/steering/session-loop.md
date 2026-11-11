@@ -5,6 +5,8 @@ classification: portable
 
 # Session loop (Harness Engineering ∩ ASDD)
 
+> **Protocol file** (`kit_steering_rule` variant) — this file IS the rule-guarded lifecycle; its ordered steps are normative protocol, not a runbook (`_steering-profile.md`, `D-6`).
+
 Closes the gap between **ASDD phases** (manifest + specs) and **coding sessions** (scoped task execution, verification, handoff). Explainer: [README → Guides, then sensors](https://github.com/eencinasq/asdd-harness-kit#guides-then-sensors).
 
 ## Artifacts
@@ -76,7 +78,7 @@ The coordinator alone writes `.features.json`, session files, and updates shared
 
 ASDD-Lite remains single-worker and serial (machine-enforced: a lite slice with more than one `in_progress` feature fails invariants). Lite slices are the default; growth evidence forces escalation — see [asdd-lite.md](./asdd-lite.md).
 
-## Gold-plating
+## Gold-plating (negative space)
 
 Modify only the files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors.
 
@@ -84,7 +86,7 @@ Mapped files are the paths named by that `intent.md` and by the slice `design.md
 
 Scope control is deterministic: this file's mapping plus `features.mjs`.
 
-## Verify-on-Stop
+## Verify-on-Stop (enforcement)
 
 Before the session ends, and before a feature is marked `passing`, the agent shall run:
 
@@ -92,8 +94,10 @@ Before the session ends, and before a feature is marked `passing`, the agent sha
 asdd check --live
 ```
 
-Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The agent shall fix every FAIL and shall not mark the feature `passing` while the command exits non-zero.
+Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The agent shall fix every FAIL and shall not mark the feature `passing` while the command exits non-zero. Live mode does not require `JEV_API_KEY` (Jev is not a harness gate).
 
-Cursor (`stop`) and Claude Code (`Stop`) run this automatically through `asdd verify`: a FAIL comes back as the next prompt (Cursor `loop_limit` 3; Claude respects `stop_hook_active`), and the session ends only on exit 0. After the loop limit, a remaining FAIL still means the feature is not `passing`. Other runtimes do not inject the prompt; the `--live` run is still mandatory before handoff. Every failing `--live` run is recorded as a learning signal ([Learning Gate](./quality-gates.md#learning-gate)).
+Cursor (`stop`) and Claude Code (`Stop`) run this automatically through `asdd verify`: a FAIL comes back as the next prompt (Cursor `loop_limit` 3; Claude respects `stop_hook_active`), and the session ends only on exit 0. After the loop limit, a remaining FAIL still means the feature is not `passing`. Other runtimes do not inject the prompt; the `--live` run is still mandatory before handoff. Every failing `--live` run is recorded as a learning signal ([Learning Gate](./quality-gates.learn.md)).
 
-Session close, and what wins when a control disagrees with this file, is in [controls.md](./controls.md). Gold-plating in this file still decides which files may change.
+## Escalation
+
+A gold-plating violation → revert or map the file (`DRIFT-01` remedies), never silent scope widening; a Verify-on-Stop FAIL past the loop limit → not `passing`, escalate to the Tech Lead. Session close and conflict precedence: [controls.md](./controls.md).

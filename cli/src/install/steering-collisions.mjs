@@ -9,17 +9,9 @@ import { basename, join } from 'node:path';
 
 import { CliError } from '../paths.mjs';
 import { log, warn } from '../ui.mjs';
+import { previousManaged } from './context.mjs';
 
 const INSTALLABLE = new Set(['portable', 'index', 'hybrid-index', 'contract-doc', 'artifact_template']);
-
-function managedSet(ctx) {
-  try {
-    const m = JSON.parse(readFileSync(ctx.installedVersionsFile, 'utf8')).managed_files;
-    return Array.isArray(m) && m.length ? new Set(m) : null;
-  } catch {
-    return null;
-  }
-}
 
 function report({ legacy, collisions }) {
   log('');
@@ -45,7 +37,7 @@ export function guardSteeringCollisions(ctx) {
   if (!existsSync(registryPath)) return; // pre-registry kit: nothing to compare
 
   const kit = JSON.parse(readFileSync(registryPath, 'utf8')).kit ?? {};
-  const managed = managedSet(ctx);
+  const managed = previousManaged(ctx.installedVersionsFile);
   const legacy = managed === null;
   const collisions = [];
   for (const [rel, entry] of Object.entries(kit)) {

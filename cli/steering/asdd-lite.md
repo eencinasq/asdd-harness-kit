@@ -46,7 +46,7 @@ This resumes `in_progress` and writes `.harness/specs/<id>/amendments/<stamp>.md
 | E4 | Architectural contention | any `dissent` session | signal → blocks DONE |
 | E5 | Implementation blockage | `phase_blocked` in `implementation` | signal → blocks DONE |
 
-Open signals are WARN during work (`asdd status` lists them). A
+Open signals are WARN during work (`harness-status.mjs` lists them). A
 `phase_completed` for `qa`/`knowledge` while signals are open is a FAIL:
 `sync-state` also refuses to derive `DONE` for such a slice.
 
@@ -80,16 +80,17 @@ The slice's `spec.md`, `design.md`, `tasks.md` remain — full artifacts are add
 |-----------|-----------|
 | intent.md, capability.md, requirements.md, spec-validation-report.md, domain-model updates, design.md, tasks.md, features.json, spec-coverage-report.md, completion notes | `spec.md`, `design.md`, `tasks.md`, `features.json` |
 
-## Non-negotiables (unchanged from full ASDD)
+## Non-negotiables (invariants — unchanged from full ASDD)
 
-1. **TDD** — every behavioral task is RED-first.
-2. **Verification** — no `passing` without evidence.
-3. **Traceability** — requirements → tasks → features.
-4. **Codegraph first** — before edits in unfamiliar modules.
-5. **Serial execution** — ASDD-Lite allows at most one `in_progress` feature in `.features.json`; the parallel task contract is for fully planned slices only.
-6. **No gold-plating** — modify only files mapped to `.harness/specs/<slice>/spec.md`, as in [session-loop.md](./session-loop.md). Do not perform unrequested refactors.
+- **LITE-01.** **TDD** — every behavioral task is RED-first.
+- **LITE-02.** **Verification** — no `passing` without evidence.
+- **LITE-03.** **Traceability** — requirements → tasks → features.
+- **LITE-04.** **Codegraph first** — before edits in unfamiliar modules.
+- **LITE-05.** **Serial execution** — ASDD-Lite allows at most one `in_progress` feature in `.features.json`; the parallel task contract is for fully planned slices only.
+- **LITE-06.** **No gold-plating** — modify only files mapped to `.harness/specs/<slice>/spec.md`, as in [session-loop.md](./session-loop.md). Do not perform unrequested refactors.
+- **LITE-07.** **No external gates** — ASDD-Lite has no `shape-up`/`product-delivery` gate dependency; a human decides those gates when the work comes from them.
 
-## Dropped from full ASDD
+## Dropped from full ASDD (negative space)
 
 - Per-phase confidence scoring (`QG-DIS`, `QG-SPC`, `QG-VAL`, `QG-DMN`, `QG-DES`, `QG-TPL`)
 - Formal quality gates (BLOCK/WARN thresholds)
@@ -127,11 +128,15 @@ ASDD-Lite slices do **not** populate `gates` in the per-slice manifest. Use sess
 }
 ```
 
+## Enforcement
+
+`asdd sync` detects escalation signals (`E1`–`E5`) from session evidence and refuses `DONE` while they are open; `asdd check` FAILs on `>1 in_progress` in lite (E2) and on `phase_completed` for `qa`/`knowledge` with open signals; `harness-status.mjs` surfaces open signals as WARN during work; `escalate-slice.mjs` is the only sanctioned transition to `escalated`.
+
 ## Escalation
 
 See [Escalation triggers](#escalation-triggers-machine-enforced) and
 [How to escalate](#how-to-escalate) above — the transition is triggered by
-session evidence and performed with `asdd slice escalate`, not by hand-editing
+session evidence and performed with `escalate-slice.mjs`, not by hand-editing
 sessions or manifests.
 
 ## Agent

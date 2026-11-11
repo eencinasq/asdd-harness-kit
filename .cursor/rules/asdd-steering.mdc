@@ -11,15 +11,21 @@ Index: `.harness/steering/README.md` · Skills: `.harness/steering/skills.md` ·
 
 ## When to load steering
 
-**INIT:** Read `.harness/PROGRESS.md` → generated `.harness/state/registry.json` → `.harness/state/slices/<slice-id>/manifest.json` → `paths.features` (if set) → `.harness/steering/` (always files: `README`, `controls`, `session-loop`, `manifest`, `skills`, `security-rules`; auto files by tag per `.agents/agents/_runtime-template.md`). Pick one feature **only** when `phase` is `implementation`. If every slice is `DONE`/`PARKED`/`ABANDONED` and the human named no slice: stop — ask for new intent or explicit unpark.
+**INIT:** Read `.harness/PROGRESS.md` → generated `.harness/state/registry.json` → `.harness/state/slices/<slice-id>/manifest.json` → `paths.features` (if set) → `.harness/steering/` <!-- steering-gen:always -->
+(always files: `controls`, `manifest`, `README`, `security-rules`, `session-loop`, `skills`; auto files by tag per `.agents/agents/_runtime-template.md`)
+<!-- steering-gen:end -->. Pick one feature **only** when `phase` is `implementation`. If every slice is `DONE`/`PARKED`/`ABANDONED` and the human named no slice: stop — ask for new intent or explicit unpark.
 
+<!-- steering-gen:table -->
 | Work | Read (minimum) |
 |------|----------------|
-| Any ASDD work | `structure.md`, `product.md` + the always files (`README.md`, `controls.md`, `session-loop.md`, `manifest.md`, `skills.md`, `security-rules.md`) |
-| Spec, validation | + `quality-gates.md` (+ `quality-gates.project.md` when judging gates); HTTP/API → skill `api-and-interface-design` if installed |
-| Design, tasks, implementation | + `tech.md`, `domain-layer.md` + `domain-layer.project.md`; UI → `design-system.md` if present + frontend skill if installed |
-| QA, refactor | + both quality-gates files, domain-layer + binding |
-| Domain | + `domain-layer.md` + `domain-layer.project.md` |
+| Every turn | the always files above + auto files whose `tags` intersect the phase, `lite`, `review`, or `ui` keys (JIT rule; do not read untagged-for-phase autos) |
+| Discovery | + `domain-layer.md`, `domain-layer.project.md`, `knowledge.md`, `product.md`, `quality-gates.md`, `quality-gates.phases.md`, `structure.md`, `tech.md` |
+| Spec, validation | + `knowledge.md`, `quality-gates.md`, `quality-gates.phases.md` |
+| Domain | + `domain-layer.md`, `domain-layer.project.md`, `knowledge.md`, `quality-gates.md`, `quality-gates.phases.md` |
+| Design, tasks, implementation | + `design-system.md`, `domain-layer.md`, `domain-layer.project.md`, `knowledge.md`, `quality-gates.exec.md`, `quality-gates.md`, `quality-gates.phases.md`, `quality-gates.project.md`, `spec-drift.md`, `structure.md`, `tech.md` |
+| QA, refactor | + `domain-layer.md`, `domain-layer.project.md`, `knowledge.md`, `quality-gates.exec.md`, `quality-gates.md`, `quality-gates.project.md`, `spec-drift.md` |
+| Knowledge | + `knowledge.md`, `quality-gates.learn.md`, `quality-gates.md` |
+<!-- steering-gen:end -->
 
 ## Conventions
 

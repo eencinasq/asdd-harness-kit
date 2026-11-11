@@ -25,7 +25,7 @@ Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-ha
 | File | Contents |
 |------|----------|
 | `domain-layer.md` | Domain placement contract |
-| `quality-gates.md` | Phase gates, phase chain, coverage / readiness (Lite skips the numeric gates) |
+| `quality-gates.md` + `quality-gates.phases.md` / `quality-gates.exec.md` / `quality-gates.learn.md` | Phase gates, phase chain, coverage / readiness (Lite skips the numeric gates) |
 | `manifest.md` | Manifest schema v3 (generated from sessions) |
 | `session-loop.md` | Features + evidence (no v2 locks) |
 | `controls.md` | Guides, sensors, precedence |
@@ -47,12 +47,6 @@ Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-ha
 | `design-system.md` | Optional (module web-ui) |
 
 Optional: [`templates/slice-manifest.stub.json`](templates/slice-manifest.stub.json) for new slices.
-
-## Prohibitions
-
-A stub binding is not product truth; generated files (`PROGRESS.md`, manifests, registry, skills index) are never
-hand-edited. When a phase needs a stub binding: HALT and ask the Tech Lead. Sensor: `asdd doctor` (stub bindings);
-`asdd sync` rewrites generated files.
 
 ## Baseline reads
 

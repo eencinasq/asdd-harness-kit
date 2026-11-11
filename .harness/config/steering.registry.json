@@ -14,34 +14,40 @@
     ".harness/steering/controls.md": {
       "class": "portable",
       "inclusion": "always",
-      "coverage": "always"
+      "coverage": "always",
+      "note": "G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/manifest.md": {
       "class": "portable",
       "inclusion": "always",
-      "coverage": "always"
+      "coverage": "always",
+      "note": "G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/security-rules.md": {
       "class": "portable",
       "inclusion": "always",
-      "coverage": "always"
+      "coverage": "always",
+      "note": "G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/session-loop.md": {
       "class": "portable",
       "inclusion": "always",
-      "coverage": "always"
+      "coverage": "always",
+      "note": "D-6 protocol variant — declared `protocol` marker; lifecycle steps stay (normative protocol, not runbook). G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/skills.md": {
       "class": "hybrid-index",
       "inclusion": "always",
-      "coverage": "always"
+      "coverage": "always",
+      "note": "G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/asdd-lite.md": {
       "class": "portable",
       "inclusion": "auto",
       "coverage": [
         "lite"
-      ]
+      ],
+      "note": "G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/design-system.md": {
       "class": "binding",
@@ -60,9 +66,10 @@
         "design",
         "task_planning",
         "implementation",
-        "qa"
+        "qa",
+        "refactor"
       ],
-      "note": "G-3 starvation — duties span 6 keys, tagged 2"
+      "note": "G-3 resolved: retagged to duty span +refactor (QG-DOM-05 refactor-agent placement). G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/domain-layer.project.md": {
       "class": "binding",
@@ -73,9 +80,10 @@
         "design",
         "task_planning",
         "implementation",
-        "qa"
+        "qa",
+        "refactor"
       ],
-      "note": "G-3 starvation — binding must track contract coverage"
+      "note": "G-3 resolved: binding tracks contract coverage (D-4 symmetry)."
     },
     ".harness/steering/knowledge.md": {
       "class": "portable",
@@ -83,6 +91,7 @@
       "coverage": [
         "discovery",
         "spec",
+        "validation",
         "domain",
         "design",
         "task_planning",
@@ -92,7 +101,7 @@
         "refactor",
         "lite"
       ],
-      "note": "G-1 pseudo-always — Phase 2 decides reclass-always (recorded budget decision) vs retag"
+      "note": "effectively-always: indexes artifacts of every phase incl. Validation (KNO-02); D-4b recorded posture. G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/product.md": {
       "class": "binding",
@@ -117,16 +126,50 @@
         "refactor",
         "lite"
       ],
-      "note": "G-2 starvation — gates defined for untagged phases (QG-DIS/SPEC/DES); QG-DEC-09 chain applies at every phase transition; QG-LEARN is the knowledge-phase gate; G-14 split planned"
+      "note": "G-14 RESOLVED: gate tables split to .phases/.exec/.learn; core machinery (DEC+GATE) is legitimately effectively-always (~5KB) — recorded D-4b posture, not a defect. G-9: invariants numbered, NEG/ENF/ESC slots added."
+    },
+    ".harness/steering/quality-gates.phases.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "discovery",
+        "spec",
+        "validation",
+        "domain",
+        "design",
+        "task_planning"
+      ],
+      "note": "G-14 split: per-phase gates (DIS/SPC/VAL/DMN/DES/TPL) G-9: invariants numbered, NEG/ENF/ESC slots added."
+    },
+    ".harness/steering/quality-gates.exec.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "task_planning",
+        "implementation",
+        "qa",
+        "refactor"
+      ],
+      "note": "G-14 split: execution gates (SPEC/DOM/DRIFT/DEB) G-9: invariants numbered, NEG/ENF/ESC slots added."
+    },
+    ".harness/steering/quality-gates.learn.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "knowledge"
+      ],
+      "note": "G-14 split: learning gate (LEARN) G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/quality-gates.project.md": {
       "class": "binding",
       "inclusion": "auto",
       "coverage": [
-        "validation",
-        "qa"
+        "implementation",
+        "qa",
+        "task_planning",
+        "refactor"
       ],
-      "note": "GT-1/AR-5 — gate-eval timing unverified; audit in Phase-2 before retag"
+      "note": "AR-5 RESOLVED: Domain Placement evaluated at implementation/qa/refactor (QG-DOM actor :17); Tech Debt at task_planning boundary (QG-DEB :186). validation never backed a binding gate."
     },
     ".harness/steering/spec-drift.md": {
       "class": "portable",
@@ -136,7 +179,8 @@
         "qa",
         "refactor",
         "review"
-      ]
+      ],
+      "note": "G-9: invariants numbered, NEG/ENF/ESC slots added."
     },
     ".harness/steering/structure.md": {
       "class": "binding",
@@ -186,6 +230,12 @@
     },
     ".harness/steering/templates/tasks.md": {
       "class": "artifact_template"
+    },
+    ".harness/steering/_template-profile.md": {
+      "class": "contract-doc",
+      "inclusion": "none",
+      "coverage": "none",
+      "note": "D-9 artifact_template grammar owner — templates exempt from rule-slot lint"
     }
   },
   "project": {}

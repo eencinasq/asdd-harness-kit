@@ -6,7 +6,7 @@ import { basename, join } from 'node:path';
 
 import { CliError } from '../paths.mjs';
 import { log, warn } from '../ui.mjs';
-import { filesUnder } from './context.mjs';
+import { filesUnder, previousManaged } from './context.mjs';
 import { list, MODULES } from './options.mjs';
 
 const readJson = (file) => {
@@ -77,9 +77,8 @@ export function guardSkillCollisions(ctx) {
   }
   if (!colliding.size) return;
 
-  const managed = readJson(ctx.installedVersionsFile)?.managed_files;
-  const legacy = !Array.isArray(managed) || !managed.length;
-  const managedSet = legacy ? null : new Set(managed);
+  const managedSet = previousManaged(ctx.installedVersionsFile);
+  const legacy = managedSet === null;
 
   const collisions = [];
   for (const name of colliding) {
