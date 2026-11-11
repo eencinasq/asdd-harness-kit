@@ -654,13 +654,38 @@ grep -qi 'collision' "$CTMP/dry.log"
 grep -qi 'dry-run' "$CTMP/dry.log"
 
 # Module site: consumer-authored dir colliding with an http-api skill → halt only when the module copies
+# (the consumer variant must itself pass the installed profile/fleet linters —
+#  the guard checks provenance, not conformance)
 mkdir -p "$CTMP/app2/.agents/skills/api-and-interface-design" "$CTMP/app2/.harness/config"
 cat >"$CTMP/app2/.agents/skills/api-and-interface-design/SKILL.md" <<'EOF'
 ---
 name: api-and-interface-design
-description: consumer skill
+description: >-
+  Consumer-maintained API conventions for this repo. Use when reviewing
+  local endpoint conventions. Do NOT use for kit-managed API design work.
 ---
-# consumer skill
+
+# Consumer API conventions
+
+Boundary: records local endpoint conventions only — it does not design new
+contracts or replace the kit skill.
+
+### Step 1: Record Convention [C1×Remember]
+
+Write the local convention as a checklist entry.
+
+## Verification
+
+- Conventions listed match the endpoints in this repo.
+
+## Escalation Gate
+
+Halt and report **Context → Options → Recommendation → Decision Needed** when
+a convention conflicts with the kit API design skill.
+
+## Handoff & Convergence
+
+`None (terminal)` — findings return to the invoking session.
 EOF
 cat >"$CTMP/app2/.harness/config/installed-versions.json" <<'EOF'
 {"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/skills/shape-up/SKILL.md"]}
@@ -670,7 +695,7 @@ if asdd install "$CTMP/app2" --no-interactive --modules=http-api --skip-deps >"$
   echo "expected collision guard to halt on module site" >&2; exit 1
 fi
 grep -q 'collision' "$CTMP/module.log"
-grep -q '# consumer skill' "$CTMP/app2/.agents/skills/api-and-interface-design/SKILL.md"
+grep -q '# Consumer API conventions' "$CTMP/app2/.agents/skills/api-and-interface-design/SKILL.md"
 
 # Legacy: colliding tree + no manifest → documented halt
 mkdir -p "$CTMP/app3/.agents/skills/shape-up"
@@ -679,6 +704,28 @@ if asdd install "$CTMP/app3" --no-interactive --skip-deps >"$CTMP/legacy.log" 2>
   echo "expected legacy halt" >&2; exit 1
 fi
 grep -q 'LEGACY INSTALL' "$CTMP/legacy.log"
+
+# Recovery UX: --rehome-colliding-skills moves the colliding dir aside and proceeds
+mkdir -p "$CTMP/app4/.agents/skills/shape-up" "$CTMP/app4/.harness/config"
+cat >"$CTMP/app4/.agents/skills/shape-up/SKILL.md" <<'EOF'
+---
+name: shape-up
+description: consumer variant
+---
+# consumer variant
+EOF
+cat >"$CTMP/app4/.harness/config/installed-versions.json" <<'EOF'
+{"kit_version":"3.0.0","artifacts":{},"managed_files":[]}
+EOF
+asdd install "$CTMP/app4" --no-interactive --skip-deps --rehome-colliding-skills >"$CTMP/rehome.log" 2>&1 \
+  || { echo "expected rehome run to succeed" >&2; tail -5 "$CTMP/rehome.log" >&2; exit 1; }
+grep -q 'consumer variant' "$CTMP/app4/.agents/skills.local/shape-up/SKILL.md" \
+  || { echo "consumer skill not preserved under .agents/skills.local/" >&2; exit 1; }
+[[ -f "$CTMP/app4/.agents/skills/shape-up/SKILL.md" ]] \
+  || { echo "kit shape-up not installed after rehome" >&2; exit 1; }
+grep -q 'name: shape-up' "$CTMP/app4/.agents/skills/shape-up/SKILL.md" \
+  || { echo "kit SKILL.md missing after rehome" >&2; exit 1; }
+grep -qi 'rehomed' "$CTMP/rehome.log"
 
 rm -rf "$CTMP"
 echo "  OK"

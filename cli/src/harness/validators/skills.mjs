@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 export default function validate(ctx) {
   const { root, fail } = ctx;
   const here = dirname(fileURLToPath(import.meta.url));
-  for (const script of ['check-skills-index.mjs', 'check-skill-profile.mjs']) {
+  for (const script of ['check-skills-index.mjs', 'check-skill-profile.mjs', 'check-skill-fleet.mjs']) {
     const res = spawnSync(process.execPath, [join(here, '..', script)], {
       cwd: root,
       encoding: 'utf8',

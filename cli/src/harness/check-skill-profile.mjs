@@ -111,8 +111,8 @@ export function lintBundle(dir) {
   }
   const hand = section(body, 'Handoff & Convergence');
   if (hand === null) fail('S-021', 'missing `## Handoff & Convergence`');
-  else if (!/None \(terminal\)/.test(hand) && !/\b(skill|agent|human)\s*:/.test(hand)) {
-    fail('S-021', 'must declare `None (terminal)` or a routed `skill:` | `agent:` | `human:` target');
+  else if (!/None \(terminal\)/.test(hand) && !/\b(skill|agent|human|redirect)\s*:|\bredirect\s*→/.test(hand)) {
+    fail('S-021', 'must declare `None (terminal)` or a routed `skill:` | `agent:` | `human:` | `redirect →` target');
   }
 
   // S-005/S-011 relative links only

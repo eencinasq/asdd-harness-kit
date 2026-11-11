@@ -1,8 +1,8 @@
 // Skill collision guard: fail closed before ANY .agents/skills copy site overwrites a consumer-authored same-name
 // directory. Runs once before the first skill copy (baseline cli/skills + enabled module skills). Never bypassed by
 // --force; --dry-run reports without halting.
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync } from 'node:fs';
+import { basename, join } from 'node:path';
 
 import { CliError } from '../paths.mjs';
 import { log, warn } from '../ui.mjs';
@@ -53,7 +53,8 @@ function reportCollisions({ legacy, collisions }) {
     if (unmanaged.length > 10) log(`    … +${unmanaged.length - 10} more`);
   }
   log('');
-  log('Resolution path:');
+  log('Resolution paths:');
+  log('  • Rehome (one command): re-run with --rehome-colliding-skills — moves the colliding dirs to .agents/skills.local/<name>/ and proceeds;');
   log('  • Move consumer-authored skill directories out of .agents/skills/ (or rename them) and re-run; or');
   log('  • If these files WERE kit-installed, repair .harness/config/installed-versions.json managed_files, then re-run.');
   log('The kit never silently overwrites unmanaged files.');
@@ -95,6 +96,27 @@ export function guardSkillCollisions(ctx) {
   if (!legacy && !collisions.length) return;
 
   reportCollisions({ legacy, collisions });
+
+  // Recovery UX: --rehome-colliding-skills moves each colliding dir to .agents/skills.local/<name>/ and proceeds.
+  if (ctx.rehomeColliding) {
+    if (ctx.dryRun) {
+      warn('skill collision(s) detected — dry-run: would rehome colliding dirs to .agents/skills.local/ and proceed');
+      return;
+    }
+    const dest = join(ctx.target, '.agents/skills.local');
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    warn('skill collision(s) — rehomed consumer-authored dirs to .agents/skills.local/:');
+    for (const { name } of collisions) {
+      let dst = join(dest, name);
+      if (existsSync(dst)) dst = `${dst}.rehomed-${stamp}`;
+      mkdirSync(dest, { recursive: true });
+      renameSync(join(skillsTarget, name), dst);
+      warn(`  - ${name} → ${basename(dst)}`);
+    }
+    warn('rehomed skills are preserved but inactive; rename the dir and its frontmatter name: to re-enable under a non-colliding name');
+    return;
+  }
+
   if (ctx.dryRun) {
     warn('skill collision(s) detected — dry-run, not halting');
     return;

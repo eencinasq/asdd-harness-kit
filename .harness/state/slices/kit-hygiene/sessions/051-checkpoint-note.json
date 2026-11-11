@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-051",
+  "timestamp": "2026-11-11T00:40:00.000Z",
+  "agent": "devin",
+  "human": "ougarte",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "Phase-2 remainder landed: G-10 module-skill indexing (check-skills-index scans .agents/modules/*/skills), fleet retrofit G-2/3/8 (all 16 bundles conform unwaived; waivers file emptied), SL-* fleet linter (SL-101/102/105/301/302/307 decidable subset) wired into validators+tests+installer+versions",
+    "Conditional-reference grammar added: `(when present)` / `, when present` marks optional module-provided routes — exempt from SL-302 dangling checks and legitimizes SL-307 redirects; applied to TDD→browser-testing, frontend-ui→{browser-testing,api-design,tdd}, documentation-and-adrs→api-design",
+    "AR-1 recovery UX: --rehome-colliding-skills flag moves colliding unmanaged dirs to .agents/skills.local/<name>/ (timestamped suffix on repeat), preserves files outside the scanned tree, proceeds; fail-closed default retained; halt message now lists 3 concrete resolution paths",
+    "Description length discipline: retrofit descriptions trimmed to ~250-300 chars after skills.md hit 8467B (budget 32600); regenerated index 6602B keeps consumer installs at 32563B — under budget without binding change",
+    "DRIFT-02 reopened 8 features across kit-hygiene and jev-module — standard cycle, resolves post-commit"
+  ],
+  "event_type": "checkpoint",
+  "evidence": "npm test 150/150 (incl. 8 fleet-linter tests + rehome smoke case); check-skill-profile PASS 16 linted 0 waived; check-skill-fleet PASS 16 bundles 0 warnings; check-skills-index PASS (module trees indexed); all module combos (web-ui/http-api/all) install with PASS invariants consumer-side"
+}

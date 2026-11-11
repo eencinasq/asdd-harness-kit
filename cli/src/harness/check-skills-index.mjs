@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
  * Skills index is name + description only.
- * Catalog source: `.agents/skills/<folder>/SKILL.md` frontmatter.
+ * Catalog sources: `.agents/skills/<folder>/SKILL.md` and
+ * `.agents/modules/<module>/skills/<folder>/SKILL.md` frontmatter
+ * (module skills install flat into `.agents/skills/` consumer-side).
  * Run from repo root:
  *   asdd skills-index
  *   asdd skills-index --write
@@ -11,6 +13,7 @@ import { join } from 'node:path';
 
 const root = process.cwd();
 const skillsDir = join(root, '.agents/skills');
+const modulesDir = join(root, '.agents/modules');
 const indexPath = join(root, '.harness/steering/skills.md');
 const start = '<!-- skills-index:start -->';
 const end = '<!-- skills-index:end -->';
@@ -65,13 +68,29 @@ function parseDescription(text) {
 }
 
 function catalog() {
-  if (!existsSync(skillsDir)) fail('missing .agents/skills');
-  const folders = readdirSync(skillsDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(join(skillsDir, entry.name, 'SKILL.md')))
-    .map((entry) => entry.name)
-    .sort();
-  return folders.map((folder) => {
-    const text = readFileSync(join(skillsDir, folder, 'SKILL.md'), 'utf8');
+  const dirs = [skillsDir];
+  if (existsSync(modulesDir)) {
+    for (const mod of readdirSync(modulesDir, { withFileTypes: true })) {
+      const modSkills = join(modulesDir, mod.name, 'skills');
+      if (mod.isDirectory() && existsSync(modSkills)) dirs.push(modSkills);
+    }
+  }
+  const entries = [];
+  for (const dir of dirs) {
+    if (!existsSync(dir)) fail(`missing ${dir}`);
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const skillPath = join(dir, entry.name, 'SKILL.md');
+      if (entry.isDirectory() && existsSync(skillPath)) {
+        entries.push({ folder: entry.name, skillPath });
+      }
+    }
+  }
+  entries.sort((a, b) => a.folder.localeCompare(b.folder));
+  const seen = new Set();
+  return entries.map(({ folder, skillPath }) => {
+    if (seen.has(folder)) fail(`${folder}: skill name is declared more than once across .agents/skills and .agents/modules/*/skills`);
+    seen.add(folder);
+    const text = readFileSync(skillPath, 'utf8');
     const name = parseName(text);
     if (name !== folder) fail(`${folder}: SKILL.md name "${name}" must match its folder name`);
     const description = parseDescription(text);
