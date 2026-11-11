@@ -24,7 +24,7 @@ PASSED | PASSED_WITH_WARNINGS | BLOCKED
 | [path] | [description] | HIGH / MEDIUM / LOW |
 
 ## Code Review Notes
-[From open-code-review skill, if run]
+[From the slice's `code-review-report.md`, if a review ran]
 
 ## Recommendation
 [PROCEED | RETURN_TO_IMPLEMENTATION | RETURN_TO_DESIGN]

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "spec-drift-merge",
+  "concerns": [],
+  "session_id": "sess-spec-drift-merge-002",
+  "timestamp": "2026-11-10T02:50:43.000Z",
+  "event_type": "phase_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "evidence": "Lite spec.md, design.md, tasks.md written (REQ-001..006)."
+}

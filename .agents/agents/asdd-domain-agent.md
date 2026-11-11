@@ -27,7 +27,7 @@ You operate after the Validation Gate passes. The Validation Agent's report will
 
 ## Code Intelligence (mandatory)
 
-Read `.harness/steering/codegraph.md`. Use `codegraph_explore` before adding entities — align with real code. List tools/commands in your final output.
+Use the `codegraph` skill (`.agents/skills/codegraph/SKILL.md`): `codegraph explore` before adding entities — align with real code. List tools/commands in your final output.
 
 
 ## Project Context

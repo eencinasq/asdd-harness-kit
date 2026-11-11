@@ -27,7 +27,7 @@
 [The bet's appetite, e.g. six weeks for the whole pitch. A boundary, not an estimate. Shared by every scope of the bet.]
 
 ## Must-have outcomes
-> Written as observable EARS-style statements and checked with `jev_ears_gate`. Discovery turns them into capabilities; Spec turns them into EARS requirements.
+> Written as observable EARS-style statements and checked against the EARS criteria by a human (`decided_by`). Discovery turns them into capabilities; Spec turns them into EARS requirements.
 
 - **MH-01:** When [trigger], the [actor] shall [observable outcome].
 - **MH-02:** If [condition], then the [actor] shall [observable outcome].

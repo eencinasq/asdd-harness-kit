@@ -1,0 +1,38 @@
+---
+description: ASDD pipeline — load project steering from .harness/steering before spec, design, or implementation work
+alwaysApply: true
+---
+
+# ASDD project steering
+
+**Source of truth:** `.harness/steering/` — parent and every ASDD subagent must **`Read`** these files directly (no `.kiro/steering`).
+
+Index: `.harness/steering/README.md` · Skills: `.harness/steering/skills.md` · Portability: https://github.com/eencinasq/asdd-harness-kit#adopter-checklist · Modules: https://github.com/eencinasq/asdd-harness-kit/tree/main/cli/modules
+
+## When to load steering
+
+**INIT:** Read `.harness/PROGRESS.md` → generated `.harness/state/registry.json` → `.harness/state/slices/<slice-id>/manifest.json` → `paths.features` (if set) → `.harness/steering/` (always files: `README`, `controls`, `session-loop`, `manifest`, `skills`, `security-rules`; auto files by tag per `.agents/agents/_runtime-template.md`). Pick one feature **only** when `phase` is `implementation`. If every slice is `DONE`/`PARKED`/`ABANDONED` and the human named no slice: stop — ask for new intent or explicit unpark.
+
+| Work | Read (minimum) |
+|------|----------------|
+| Any ASDD work | `structure.md`, `product.md` + the always files (`README.md`, `controls.md`, `session-loop.md`, `manifest.md`, `skills.md`, `security-rules.md`) |
+| Spec, validation | + `quality-gates.md` (+ `quality-gates.project.md` when judging gates); HTTP/API → skill `api-and-interface-design` if installed |
+| Design, tasks, implementation | + `tech.md`, `domain-layer.md` + `domain-layer.project.md`; UI → `design-system.md` if present + frontend skill if installed |
+| QA, refactor | + both quality-gates files, domain-layer + binding |
+| Domain | + `domain-layer.md` + `domain-layer.project.md` |
+
+## Conventions
+
+- Domain language path from `structure.md` — do not invent entities.
+- Business logic: portable `domain-layer.md` + `domain-layer.project.md` (run the binding's gate).
+- Specs: EARS; traceability to `capability.md`.
+- API/UI conventions from project bindings and enabled modules — never hardcode another product's stack.
+- Skills: `.harness/steering/skills.md` is name and description only. `Read` a `SKILL.md` body only when that task starts.
+- Codegraph first: the `codegraph` skill (`codegraph explore …`).
+- Gold-plating: modify only files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors. See `session-loop.md`.
+- Quality: numeric gates come only from `quality-gates.md` + `.project.md`. Do not invent a second confidence cutoff or combine scores across phases. Before starting a phase, check the preceding phase gate (`QG-DEC-09`).
+- Spec drift: before `passing`, `asdd drift` shows no `fail`; Tech Lead reviews add `--base`/`--target`/`--pr-body` (`spec-drift.md`).
+
+## State
+
+At the end of every significant action, write a session file to `.harness/state/slices/<slice-id>/sessions/` and run `asdd sync --slice <slice-id>`. Never hand-edit the generated `manifest.json` or `registry.json`. Implementation follows `session-loop.md`.

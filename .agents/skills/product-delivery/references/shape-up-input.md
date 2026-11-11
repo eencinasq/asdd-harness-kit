@@ -63,7 +63,7 @@ The building team may discover new scopes during the cycle. A new scope that kee
 
 ## Classifying scopes
 
-Run `jev_scope_choice` `{ scope }` for each scope:
+Propose a class for each scope and have the shapers confirm it (`decided_by`):
 
 | Class | Meaning | Action |
 |---|---|---|
@@ -71,7 +71,7 @@ Run `jev_scope_choice` `{ scope }` for each scope:
 | `nice_to_have` (~) | Valuable, but cuttable when the appetite tightens (scope hammering) | Keep; mark `~` in the intent |
 | `reshape` | Does not fit this bet | Remove from the map; return to shaping. Never park it in a backlog |
 
-If Jev and the shapers disagree, the shapers decide and record the reason in the scope map.
+The shapers decide and record the reason for each class in the scope map.
 
 ## Dependencies
 

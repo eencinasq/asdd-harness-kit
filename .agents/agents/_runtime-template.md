@@ -16,13 +16,13 @@ This file is the **same ASDD role as** the corresponding `.agents/agents/asdd-*-
    - Do not use `.kiro/steering`.
 2. **Skills:** Read `.harness/steering/skills.md` (name and description only). `Read` `.agents/skills/<name>/SKILL.md` only when you start the task that matches that description. Do not read that body, its `references/`, or its `agents/` before the task starts. Skip a skill whose folder is absent. List skill bodies you loaded in the final message.
 3. **Edits:** Use the runtime's file-write, file-edit, and shell tools (e.g. Cursor `Write` / `StrReplace` / `Shell`, Claude Code `Write` / `Edit` / `Bash`, Kiro `fsWrite`).
-4. **Codegraph:** Use the `codegraph` MCP server through the runtime's MCP tools. Primary tool: `codegraph_explore`. Read `.harness/steering/codegraph.md` + `.harness/steering/codegraph-agents.md`. List tools used in the final message.
-5. **Knowledge:** Use the `knowledge` MCP (`knowledge_search`, `knowledge_trace`, `knowledge_slice`, `knowledge_status`, `knowledge_patterns`) for process memory — prior specs, REQs, features, sessions, failure logs. Read `.harness/steering/knowledge.md` for per-role usage. If `knowledge_status` reports no index, run `node .harness/scripts/sync-knowledge.mjs` once.
+4. **Codegraph:** Use the `codegraph` skill (`.agents/skills/codegraph/SKILL.md`): run `codegraph explore "<question>"` (and `node`, `impact`, `affected` as it describes) before grep/Read. List the codegraph commands you ran in the final message.
+5. **Knowledge:** Run `asdd knowledge` (`search`, `trace`, `slice`, `status`, `patterns`) for process memory — prior specs, REQs, features, sessions, failure logs. Read `.harness/steering/knowledge.md` for per-role usage. If `status` reports no index, run `asdd knowledge sync` once. Agents use the harness scripts, not the MCP servers.
 6. **State (v3.0 session logs):**
    - Read generated `.harness/state/registry.json` at start to see squad state.
    - Read generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice.
    - At the end of every significant action (phase complete, feature start, dissent, override), **write a session file** to `.harness/state/slices/<slice-id>/sessions/`. Session files are append-only — never edit an existing session.
-   - After writing sessions, run `node .harness/scripts/sync-state.mjs --slice <slice-id>` to regenerate the manifest and registry.
+   - After writing sessions, run `asdd sync --slice <slice-id>` to regenerate the manifest and registry.
    - For implementation, also update features per `.harness/steering/session-loop.md`.
    - Gates are PASS / WARN / BLOCK per phase (`quality-gates.md`). Check the preceding phase gate before starting (`QG-DEC-09`). Confidence scores stay per phase in session `evidence`; never combine them across phases (`QG-DEC-10`).
 7. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via the runtime's subagent tool.

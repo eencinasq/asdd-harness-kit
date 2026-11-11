@@ -23,17 +23,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      # asdd is the asdd-harness-kit package, at the version this project installed (kit.version)
+      - name: Install asdd
+        run: npm i -g "asdd-harness-kit@$(node -p "require('./.harness/config/project.json').kit.version")"
       - name: Sync state
-        run: node .harness/scripts/sync-state.mjs
+        run: asdd sync
       - name: Audit
-        run: node .harness/scripts/audit-codebase.mjs
+        run: asdd audit
       - name: Learning signals (CI failures on the default branch)
         env:
           HARNESS_RUNTIME: ci
           HARNESS_AUTHOR: ci
         run: |
-          node .harness/scripts/check-invariants.mjs --record || true
-          node .harness/scripts/learn.mjs --all
+          asdd check --record || true
+          asdd learn --all
       - name: Commit report
         run: |
           git config user.name 'harness-audit'

@@ -1,25 +1,26 @@
 {
   "mcpServers": {
-    "codegraph": {
-      "type": "stdio",
-      "command": "node",
-      "args": [
-        ".agents/mcp/bin/codegraph-mcp.cjs"
-      ]
-    },
     "knowledge": {
       "type": "stdio",
       "command": "node",
       "args": [
-        ".agents/mcp/knowledge-server.mjs"
+        "tools/knowledge/bin/knowledge.mjs"
       ],
       "enabled": true
     },
-    "spec-drift-auditor": {
+    "spec-drift": {
       "type": "stdio",
       "command": "node",
       "args": [
-        ".agents/mcp/spec-drift-auditor.mjs"
+        "tools/spec-drift/bin/spec-drift.mjs"
+      ],
+      "enabled": true
+    },
+    "jev-gate": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "tools/jev-gate/bin/jev-gate.mjs"
       ],
       "enabled": true
     }

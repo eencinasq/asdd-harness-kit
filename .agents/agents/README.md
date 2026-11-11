@@ -2,7 +2,7 @@
 
 Project subagents for the **ASDD** pipeline. `.agents/agents/asdd-*.md` is the single source for every role (responsibilities, inputs, outputs, gates). Runtime folders link to these files; the portable runtime contract is [`_runtime-template.md`](_runtime-template.md).
 
-All agents use SoT under [`.harness/`](../../.harness/). They write session files to `.harness/state/slices/<slice-id>/sessions/` and run `sync-state.mjs`, which generates the per-slice `manifest.json` and the global `.harness/state/registry.json` — see [`manifest.md`](../../.harness/steering/manifest.md). Agents never hand-edit generated files.
+All agents use SoT under [`.harness/`](../../.harness/). They write session files to `.harness/state/slices/<slice-id>/sessions/` and run `asdd sync`, which generates the per-slice `manifest.json` and the global `.harness/state/registry.json` — see [`manifest.md`](../../.harness/steering/manifest.md). Agents never hand-edit generated files.
 
 ## Pipeline
 
@@ -20,7 +20,7 @@ Ask the parent agent to delegate, or reference by name, e.g. `@asdd-spec-agent` 
 
 ## Project steering
 
-**Parent and every subagent** must **`Read`** files under [`.harness/steering/`](../../.harness/steering/) directly (SoT), with JIT loading per [`_runtime-template.md`](_runtime-template.md). Index: [steering README](../../.harness/steering/README.md), [skills index](../../.harness/steering/skills.md). On Cursor, the parent chat also loads `.cursor/rules/asdd-steering.mdc` (`alwaysApply`), installed from `runtimes/cursor/asdd-steering.mdc`.
+**Parent and every subagent** must **`Read`** files under [`.harness/steering/`](../../.harness/steering/) directly (SoT), with JIT loading per [`_runtime-template.md`](_runtime-template.md). Index: [steering README](../../.harness/steering/README.md), [skills index](../../.harness/steering/skills.md). On Cursor, the parent chat also loads `.cursor/rules/asdd-steering.mdc` (`alwaysApply`), installed from the kit's `cli/runtimes/cursor/asdd-steering.mdc`.
 
 ## Runtime adapters
 
@@ -29,12 +29,12 @@ Ask the parent agent to delegate, or reference by name, e.g. `@asdd-spec-agent` 
 | Role body | Same file for every runtime; edit under `.agents/agents/` once |
 | Steering | Explicit `Read` of `.harness/steering/` (never `.kiro/steering`) |
 | Skills | Read [`skills.md`](../../.harness/steering/skills.md) (name and description). `Read` [`.agents/skills/<name>/SKILL.md`](../skills/) only when that task starts |
-| Verify-on-Stop | Cursor: `.cursor/hooks.json` `stop`; Claude Code: `.claude/settings.json` `Stop` → `node .harness/scripts/verify-on-stop.mjs`. FAIL output from `check-invariants.mjs` is the next prompt |
-| State | Session file + `sync-state.mjs` after every significant action — see `manifest.md` |
+| Verify-on-Stop | Cursor: `.cursor/hooks.json` `stop`; Claude Code: `.claude/settings.json` `Stop` → `asdd verify`. FAIL output from `asdd check` is the next prompt |
+| State | Session file + `asdd sync` after every significant action — see `manifest.md` |
 | Context-fresh sub-agents | The runtime's task/subagent tool for parallel waves |
-| Code exploration | **Mandatory** Codegraph MCP — [`codegraph.md`](../../.harness/steering/codegraph.md) + [`codegraph-agents.md`](../../.harness/steering/codegraph-agents.md) |
+| Code exploration | **Mandatory** the [`codegraph`](../skills/codegraph/SKILL.md) skill (`codegraph explore …`, the codegraph CLI) |
 
-Optional stack modules (Bruno, Playwright, web-UI, HTTP API): [`.agents/modules/README.md`](../modules/README.md). The installer copies enabled module agents into this folder. Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-harness-kit#adopter-checklist).
+Optional stack modules (Bruno, Playwright, web-UI, HTTP API): [`modules/README.md`](https://github.com/eencinasq/asdd-harness-kit/tree/main/cli/modules) in the kit. The installer copies enabled module agents into this folder. Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-harness-kit#adopter-checklist).
 
 ## Runtimes
 

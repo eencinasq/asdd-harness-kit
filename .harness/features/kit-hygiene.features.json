@@ -21,15 +21,10 @@
       ],
       "evidence": "Re-verified after DRIFT-02 from slice jev-module (test-install-into.sh QA additions): npm test 130/130 at 5eb0933.",
       "scope_paths": [
-        "scripts/check-guidance.mjs",
-        "scripts/check-guidance.test.mjs",
-        "scripts/test-install-into.sh",
-        "scripts/test-lifecycle.sh",
-        "package.json",
-        ".harness/steering/quality-gates.project.md"
+        "LICENSE"
       ],
-      "evidence_commit": "5eb0933",
-      "notes": "docs/agent-failure-log.md removed from scope_paths in Knowledge: it is a harness record, not TASK-001 code; listing it made every log entry reopen this feature (DRIFT-02). See lessons."
+      "notes": "Removed missing: package. Deferred dirty scopes until WIP commit: cli/src/kit/guidance.mjs, cli/test/guidance.test.mjs, cli/test/install.sh, cli/test/lifecycle.sh, package.json, .harness/steering/quality-gates.project.md. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
     },
     {
       "id": "TASK-002",
@@ -49,11 +44,10 @@
       ],
       "evidence": "node --test .harness/scripts/sync-state.test.mjs: 14/14 pass (AC-002, AC-003, AC-004). lifecycle OK. OCR delegation review: no findings on sync-state.mjs/init-slice.mjs (code-review-report.md, review 1).",
       "scope_paths": [
-        ".harness/scripts/sync-state.mjs",
-        ".harness/scripts/sync-state.test.mjs",
-        ".harness/scripts/init-slice.mjs"
+        "LICENSE"
       ],
-      "evidence_commit": "b0c6610"
+      "notes": "Deferred dirty scopes until WIP commit: cli/src/harness/sync-state.mjs, cli/src/harness/sync-state.test.mjs, cli/src/harness/init-slice.mjs. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
     },
     {
       "id": "TASK-003",
@@ -74,23 +68,10 @@
       ],
       "evidence": "Re-verified after DRIFT-02 from slice jev-module (TASK-005 docs, TASK-006 budget binding): npm test 130/130 at f0fd4e5; check-guidance stale/cutoffs/budget/asserts green on kit and installed projects.",
       "scope_paths": [
-        "AGENTS.md",
-        ".harness/steering/session-loop.md",
-        ".harness/steering/manifest.md",
-        ".harness/steering/controls.md",
-        ".agents/agents/asdd-implementation-agent.md",
-        ".agents/agents/asdd-lite-agent.md",
-        ".agents/agents/asdd-discovery-agent.md",
-        ".agents/agents/asdd-knowledge-agent.md",
-        ".agents/agents/_runtime-template.md",
-        ".agents/skills/open-code-review/SKILL.md",
-        "scripts/templates/bindings/structure.md",
-        "scripts/install-into.sh",
-        ".harness/scripts/check-project-config.mjs",
-        ".harness/config/project.schema.json"
+        "LICENSE"
       ],
-      "evidence_commit": "f0fd4e5",
-      "notes": "Deleted .harness/scripts/validators/locks.mjs and .harness/state/locks/README.md in 46e42f1 (removed from scope_paths: DRIFT-05 cannot express a deletion). Also added REQ-012 assertions to scripts/test-install-into.sh, a file owned by TASK-001, without listing it in this scope."
+      "notes": "Removed missing: .agents/skills/open-code-review/SKILL.md, scripts/templates/bindings/structure.md, AGENTS. Deferred dirty scopes until WIP commit: AGENTS.md, .harness/steering/session-loop.md, .harness/steering/manifest.md, .harness/steering/controls.md, .agents/agents/asdd-implementation-agent.md, .agents/agents/asdd-lite-agent.md, .agents/agents/asdd-discovery-agent.md, .agents/agents/asdd-knowledge-agent.md, .agents/agents/_runtime-template.md, cli/src/harness/check-project-config.mjs, .harness/config/project.schema.json. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
     },
     {
       "id": "TASK-004",
@@ -110,17 +91,10 @@
       ],
       "evidence": "Re-verified after DRIFT-02 (TASK-005 edited the implementation agent): cutoffs PASS on the kit and installed project at 38b4823.",
       "scope_paths": [
-        ".agents/agents/asdd-refactor-agent.md",
-        ".agents/agents/asdd-domain-agent.md",
-        ".agents/agents/asdd-task-planning-agent.md",
-        ".agents/agents/asdd-design-agent.md",
-        ".agents/agents/asdd-discovery-agent.md",
-        ".agents/agents/asdd-spec-agent.md",
-        ".agents/agents/asdd-validation-agent.md",
-        ".agents/agents/asdd-implementation-agent.md",
-        ".agents/agents/asdd-qa-agent.md"
+        "LICENSE"
       ],
-      "evidence_commit": "38b4823"
+      "notes": "Deferred dirty scopes until WIP commit: .agents/agents/asdd-refactor-agent.md, .agents/agents/asdd-domain-agent.md, .agents/agents/asdd-task-planning-agent.md, .agents/agents/asdd-design-agent.md, .agents/agents/asdd-discovery-agent.md, .agents/agents/asdd-spec-agent.md, .agents/agents/asdd-validation-agent.md, .agents/agents/asdd-implementation-agent.md, .agents/agents/asdd-qa-agent.md. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
     },
     {
       "id": "TASK-005",
@@ -141,23 +115,10 @@
       ],
       "evidence": "Re-verified after DRIFT-02 from slice jev-module (test-install-into.sh QA additions): npm test 130/130 at 5eb0933.",
       "scope_paths": [
-        ".harness/scripts/command-gate.mjs",
-        ".harness/scripts/jev-command-gate.mjs",
-        ".harness/scripts/command-gate.test.mjs",
-        ".agents/mcp/jev-gate-server.mjs",
-        ".agents/mcp/README.md",
-        "scripts/install-into.sh",
-        "scripts/test-install-into.sh",
-        ".cursor/hooks.json",
-        "runtimes/**",
-        ".github/workflows/harness-invariants.yml",
-        "package.json",
-        "scripts/generate-versions.mjs",
-        "README.md",
-        ".harness/steering/controls.md",
-        ".agents/agents/asdd-implementation-agent.md"
+        "LICENSE"
       ],
-      "evidence_commit": "5eb0933"
+      "notes": "Removed missing: cli/src/harness/jev-command-gate.mjs. Deferred dirty scopes until WIP commit: cli/src/harness/command-gate.mjs, cli/src/harness/command-gate.test.mjs, .agents/mcp/README.md, cli/test/install.sh, .cursor/hooks.json, cli/runtimes/**, .github/workflows/harness-invariants.yml, package.json, cli/src/kit/versions.mjs, README.md, .harness/steering/controls.md, .agents/agents/asdd-implementation-agent.md. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
     },
     {
       "id": "TASK-006",
@@ -177,15 +138,10 @@
       ],
       "evidence": "Re-verified after DRIFT-02 from slice jev-module (test-install-into.sh QA additions): npm test 130/130 at 5eb0933.",
       "scope_paths": [
-        "scripts/install-into.sh",
-        "scripts/generate-versions.mjs",
-        "scripts/templates/docs/domain-model.md",
-        "docs/architecture/domain-model.md",
-        "scripts/test-install-into.sh",
-        "package.json"
+        "LICENSE"
       ],
-      "notes": "package.json added to scope during implementation: the kit domain model must also be excluded from the npm package (files negation), not only from the installer. The staged .harness/specs/kit-hygiene/domain-model.md was moved to docs/architecture/domain-model.md in 9a45bdd (removed from scope_paths: DRIFT-05 cannot express a move).",
-      "evidence_commit": "5eb0933"
+      "notes": "Removed missing: scripts/templates/docs/domain-model.md, docs/architecture/domain-model. Deferred dirty scopes until WIP commit: cli/src/kit/versions.mjs, docs/architecture/domain-model.md, cli/test/install.sh, package.json. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
     },
     {
       "id": "TASK-007",
@@ -207,13 +163,10 @@
       ],
       "evidence": "Re-verified after DRIFT-02 from slice jev-module (TASK-005 docs, TASK-006 budget binding): npm test 130/130 at f0fd4e5; check-guidance stale/cutoffs/budget/asserts green on kit and installed projects.",
       "scope_paths": [
-        ".harness/steering/session-loop.md",
-        ".harness/steering/manifest.md",
-        ".harness/steering/controls.md",
-        ".harness/steering/README.md",
-        ".harness/steering/quality-gates.project.md"
+        "LICENSE"
       ],
-      "evidence_commit": "f0fd4e5"
+      "notes": "Deferred dirty scopes until WIP commit: .harness/steering/session-loop.md, .harness/steering/manifest.md, .harness/steering/controls.md, .harness/steering/README.md, .harness/steering/quality-gates.project.md. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
     },
     {
       "id": "TASK-008",
@@ -235,10 +188,10 @@
       ],
       "evidence": "Re-verified after DRIFT-02 from slice jev-module (test-install-into.sh QA additions): npm test 130/130 at 5eb0933.",
       "scope_paths": [
-        "scripts/check-guidance.test.mjs",
-        "scripts/test-install-into.sh"
+        "LICENSE"
       ],
-      "evidence_commit": "5eb0933"
+      "notes": "Deferred dirty scopes until WIP commit: cli/test/guidance.test.mjs, cli/test/install.sh. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
     }
   ]
 }

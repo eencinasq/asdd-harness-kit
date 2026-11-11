@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "modules-top-level",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-modules-top-level-004",
+  "timestamp": "2026-11-10T20:50:00.000Z",
+  "event_type": "feature_completed",
+  "feature_id": "TASK-001",
+  "evidence": "TASK-001 passing (uncommitted): git mv .agents/modules modules (13 files). npm test exit 0 (vendor check, install smoke with --modules=all from modules/, lifecycle, unit 94/94 incl. modules/http-api/adapters/openapi.test.mjs); versions.json records 12 modules/ entries, none under .agents/modules; spec-drift tsc clean, unit 108/108, audit e2e 18/18 (module adapters loaded from modules/<name>/adapters)."
+}

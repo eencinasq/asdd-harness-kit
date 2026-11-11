@@ -28,7 +28,7 @@ Rabbit holes: price changes since the original order — patched: always use the
 current price and show it in the cart.
 ```
 
-`jev_shape_up_gates` passed when the pitch was shaped.
+The appetite and rabbit-hole gates passed when the pitch was shaped (human decision, recorded with `decided_by`).
 
 ## 2. Scope map
 
@@ -48,7 +48,7 @@ scopes:
   - id: SCOPE-001
     name: Quick reorder
     outcome: Tapping Reorder on a past order fills the cart with its items at current prices.
-    class: must_have            # jev_scope_choice
+    class: must_have            # scope choice (decided_by: shapers)
     must_haves:
       - reorder a past order into the cart
       - skip items no longer sold and say so
@@ -58,7 +58,7 @@ scopes:
   - id: SCOPE-002
     name: Reorder edit step
     outcome: Before adding, the customer can change quantities or drop items.
-    class: nice_to_have         # jev_scope_choice
+    class: nice_to_have         # scope choice (decided_by: shapers)
     must_haves: [edit quantities before adding to the cart]
     depends_on: [SCOPE-001]
     slice_id: orders-reorder-edit
@@ -67,7 +67,7 @@ validation: { all_items_placed: true, unplaced_items: [], cycles: [], fits_appet
 
 ## 3. Intents
 
-`node .harness/scripts/init-slice.mjs orders-quick-reorder`, then `.harness/specs/orders-quick-reorder/intent.md`:
+`asdd slice init orders-quick-reorder`, then `.harness/specs/orders-quick-reorder/intent.md`:
 
 ```markdown
 # Intent: orders-quick-reorder
@@ -110,7 +110,7 @@ Six weeks for the whole pitch (shared with orders-reorder-edit).
 - none
 ```
 
-Each must-have passed `jev_ears_gate`. `orders-reorder-edit` gets its own intent the same way, with `Scope class: nice_to_have` and `Depends on: orders-quick-reorder`.
+Each must-have passed the EARS criteria (confirmed by a human). `orders-reorder-edit` gets its own intent the same way, with `Scope class: nice_to_have` and `Depends on: orders-quick-reorder`.
 
 ## 4. Handoff
 

@@ -1,0 +1,31 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:recommended", "helpers:pinGitHubActionDigests", ":pinAllExceptPeerDependencies"],
+	"minimumReleaseAge": "7 days",
+	"internalChecksFilter": "strict",
+	"prConcurrentLimit": 5,
+	"packageRules": [
+		{
+			"description": "NestJS and its MCP module move together; @nestjs/mcp is pre-1.0, so review its upgrades by hand.",
+			"groupName": "nestjs",
+			"matchPackageNames": ["@nestjs/{/,}**"]
+		},
+		{
+			"description": "MCP SDK packages and MCP Apps share protocol types.",
+			"groupName": "mcp sdk",
+			"matchPackageNames": ["@modelcontextprotocol/{/,}**"]
+		},
+		{
+			"matchPackageNames": ["@nestjs/mcp"],
+			"automerge": false,
+			"dependencyDashboardApproval": true
+		},
+		{
+			"description": "Dev tooling can merge on green CI.",
+			"matchDepTypes": ["devDependencies"],
+			"matchUpdateTypes": ["minor", "patch"],
+			"automerge": true
+		}
+	],
+	"lockFileMaintenance": { "enabled": true, "schedule": ["before 6am on monday"] }
+}

@@ -4,7 +4,9 @@
   "kit": {
     "name": "asdd-harness-kit",
     "source": "https://github.com/eencinasq/asdd-harness-kit",
-    "ref": "main"
+    "ref": "main",
+    "version": "3.8.1",
+    "installed_at": "2026-11-11T01:09:30Z"
   },
   "harness_version": "2.0",
   "mode": "full",
@@ -26,9 +28,9 @@
     "quality_gates": ".harness/steering/quality-gates.project.md"
   },
   "commands": {
-    "invariants": "node .harness/scripts/check-invariants.mjs",
-    "verify_on_stop": "node .harness/scripts/verify-on-stop.mjs",
-    "spec_drift": "node .harness/scripts/check-spec-drift.mjs"
+    "invariants": "node cli/bin/asdd.mjs check",
+    "verify_on_stop": "node cli/bin/asdd.mjs verify",
+    "spec_drift": "node cli/bin/asdd.mjs drift"
   },
   "modules": {},
   "drift": {
@@ -38,18 +40,9 @@
     "codegraph": {
       "enabled": true,
       "required": false
-    },
-    "orca": {
-      "enabled": false,
-      "experimental": true
-    },
-    "jev": {
-      "enabled": true,
-      "required": true,
-      "apiKey": "",
-      "endpoint": "https://api.typesafe.ai/v1",
-      "fallbackPolicy": "fail-closed"
     }
   },
-  "runtimes": []
+  "runtimes": [
+    "cursor"
+  ]
 }

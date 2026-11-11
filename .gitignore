@@ -13,3 +13,6 @@ coverage/
 .codegraph/
 .harness/knowledge/
 .harness/state/learning/signals/
+.harness/knowledge
+.harness/state/learning/signals
+.env.local

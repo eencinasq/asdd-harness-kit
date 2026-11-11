@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-cli-harness-020",
+  "timestamp": "2026-11-11T13:00:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-008",
+  "evidence": "Reopened by DRIFT-02: the Jev removal (TASK-009) edited files in its scope (cli/src/install/index.mjs, phases.mjs, doctor.mjs); re-verifying."
+}

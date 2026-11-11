@@ -17,7 +17,6 @@ Catalog: `.harness/steering/skills.md` (name and description only). `Read` a ski
 
 - When you start spec peer review: `Read` `.agents/skills/anti-pattern-detection/SKILL.md`
 - When you start test generation or coverage analysis: `Read` `.agents/skills/test-driven-development/SKILL.md`
-- When you start Spec Coverage Analysis (Mode B) defect review: `Read` `.agents/skills/open-code-review/SKILL.md`. Delegation Mode is the default. If `ocr` is missing, ask a human. Do not invent findings.
 - When you start UI review, and the folder exists: `Read` `.agents/skills/frontend-ui-engineering/SKILL.md`
 - When you start live browser verification of UI, and the folder exists: `Read` `.agents/skills/browser-testing-with-devtools/SKILL.md`. Use Chrome DevTools MCP. Hand E2E automation to `@asdd-e2e-tester`.
 - When you start HTTP or API review, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
@@ -37,9 +36,9 @@ You operate in three distinct modes:
 
 ## Code Intelligence (mandatory)
 
-Read `.harness/steering/codegraph.md`. Use `codegraph_explore` to map REQ-NNN → tests/code paths. List tools/commands in your final output.
+Use the `codegraph` skill (`.agents/skills/codegraph/SKILL.md`): `codegraph explore` to map REQ-NNN → tests/code paths. List tools/commands in your final output.
 
-**Knowledge (mandatory):** `knowledge_trace` on REQ nodes for coverage (REQ→feature→file) before writing spec-coverage reports; `knowledge_search` for similar past failures in `log:*` nodes. Contract: `.harness/steering/knowledge.md`.
+**Knowledge (mandatory):** `asdd knowledge trace req:<slice>:<REQ-…>` for coverage (REQ→feature→file) before writing spec-coverage reports, with `asdd drift --slice <id> --requirements` for MUST requirements lacking a feature or a test (DRIFT-03/04); `asdd knowledge search` for similar past failures in `log:*` nodes. Contract: `.harness/steering/knowledge.md`.
 
 # Project Context
 
@@ -100,7 +99,7 @@ Generate `spec-coverage-report.md`:
 - **Gate Decision:** PASSED | PASSED_WITH_WARNINGS | BLOCKED.
 - **Summary:** Metric targets vs. actuals.
 - **Uncovered Detail:** Severity and missing coverage types for `UNCOV-NNN`.
-- **Defect review (adjunct):** Follow skill `open-code-review` when the skill file exists. Produce or update `code-review-report.md` under the slice spec dir. OCR does **not** replace MUST/EARS coverage; unresolved CRITICAL/HIGH → flag in the coverage report / handoff to Refactor. If `ocr` is absent, record skipped + ask human — never invent findings.
+- **Defect review (adjunct):** When the slice has a `code-review-report.md`, carry its unresolved CRITICAL/HIGH findings into the coverage report / handoff to Refactor. It never replaces MUST/EARS coverage; never invent findings.
 
 ### Mode C: Spec Peer-Review (Phase 1)
 Generate `spec-peer-review.md`:

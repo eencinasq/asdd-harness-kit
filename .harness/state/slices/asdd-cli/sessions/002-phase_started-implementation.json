@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-cli",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-asdd-cli-002",
+  "timestamp": "2026-11-10T21:00:00.000Z",
+  "event_type": "phase_started",
+  "mode": "lite",
+  "evidence": "Lite spec.md, tasks.md written (REQ-001..006)."
+}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Spec drift audit</title>
+	</head>
+	<body>
+		<div class="app" id="app" aria-busy="true">
+			<header class="header">
+				<div class="header-text">
+					<p class="eyebrow" id="mode-label">Harness audit</p>
+					<h1 id="title">Spec drift</h1>
+					<p class="meta" id="meta">Waiting for the tool result…</p>
+				</div>
+				<div class="toolbar">
+					<button type="button" id="refresh" class="btn" hidden>Refresh</button>
+				</div>
+			</header>
+
+			<div id="loading" class="skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+
+			<main id="content" class="stack"></main>
+
+			<p id="status" class="status"></p>
+		</div>
+		<script type="module" src="./audit-dashboard/main.ts"></script>
+	</body>
+</html>

@@ -1,0 +1,331 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "cli-harness",
+  "source_tasks": ".harness/specs/cli-harness/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Harness in the asdd CLI",
+      "user_visible_behavior": "Harness commands are asdd commands; projects run a pinned copy in .harness/cli; upgrades move off .harness/scripts; the kit runs itself as installed.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-006"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test",
+        "bash cli/test/full-flow.sh (vs HEAD)"
+      ],
+      "evidence": "npm test exit 0: kit vendor --check OK; cli/test/install.sh OK (CLI runtime in .harness/cli with its version, no install/kit/tests; project copy runs status and refuses install; legacy .harness/scripts kit files removed, own script kept, empty validators/ pruned; project.json commands on the CLI; cursor+claude hooks rewritten from .harness/scripts/(jev-)command-gate.mjs and verify-on-stop.mjs to asdd.mjs gate/verify, project hook kept; jev only with the module; legacy jev detected); lifecycle OK; unit 107/107 incl. harness tests under cli/src/harness, cli.test.mjs global hand-off to .harness/cli from a subfolder. Kit self-install: .harness/cli -> ../cli, project.json commands; CI and hooks call node .harness/cli/bin/asdd.mjs. full-flow stops at the pre-existing DRIFT-01 test/reorder.test.mjs as on HEAD.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: cli/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Guidance and servers name asdd commands",
+      "user_visible_behavior": "Agents, skills, steering, examples, and MCP messages say asdd <command>.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-005"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "npm test",
+        "pnpm typecheck && pnpm lint && pnpm test in tools/*"
+      ],
+      "evidence": "No agent, skill, steering, AGENTS.md, runtime, or shipped example names .harness/scripts; guidance budget 31677 <= 31962; MCP servers: jev-gate 9/9, knowledge 8/8 (message: asdd knowledge sync), spec-drift 108/108 + audit e2e 18/18 (CI gate templates run asdd.mjs sync/check), tsc and biome clean (spec-drift 1 info as before).",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: cli/agents/**, cli/skills/**, cli/mcp/**, cli/modules/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Modules and runtimes in the CLI",
+      "user_visible_behavior": "Optional modules and runtime recipes ship as part of the CLI (cli/modules, cli/runtimes); the installer, versions, package, and spec-drift read them there.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-007"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "npm test",
+        "cd tools/spec-drift && pnpm test && node --import tsx --test test/audit.e2e-spec.ts"
+      ],
+      "evidence": "git mv modules cli/modules, runtimes cli/runtimes. npm test exit 0 (install smoke incl. every module and runtime from cli/, lifecycle, unit 107/107 incl. cli/modules/http-api/adapters/openapi.test.mjs); versions.json: 13 cli/modules|cli/runtimes entries, none at the old paths; spec-drift 108/108 + audit e2e 18/18 (module adapters from cli/modules/<name>/adapters), lint clean.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: cli/modules/**, cli/runtimes/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Steering and .harness skeleton ship from the CLI; the kit installs itself by copy",
+      "user_visible_behavior": "Everything a project receives under .harness/ comes from cli/; the kit .harness/ holds copies refreshed by asdd kit self.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-008"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "npm test",
+        "node cli/bin/asdd.mjs kit self --check"
+      ],
+      "evidence": "Steering, templates, scaffold (config schema/README, models.json, feature schema, folder READMEs) and versions.json moved into cli/ (cli/steering, cli/scaffold, cli/versions.json; jev.md in cli/modules/jev/steering). The kit installs itself by COPY (asdd kit self): .harness/cli and .harness/steering etc. are real copies, no symlinks; only the copies are in installed-versions.json. npm package drops .harness/** and ships cli/{steering,scaffold,versions.json}. npm test exit 0: vendor check, kit self --check, install smoke (package ships cli/steering, cli/scaffold, cli/versions.json and no .harness/), lifecycle, unit 107/107; guidance asserts now bash -n each test script (a quote bug had made install.sh stop at a syntax error with exit 0 during this task; fixed and covered by guidance.test.mjs). Follow-up: the kit has no .harness/cli (it runs node cli/bin/asdd.mjs in hooks, CI, project.json commands); the shipped Cursor hooks template moved to cli/runtimes/cursor/hooks.json and the kit .cursor/ no longer ships; npm test exit 0 (108/108).",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: cli/steering/**, cli/scaffold/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-005",
+      "title": "Agents, skills, MCP config, and AGENTS.md ship from the CLI",
+      "user_visible_behavior": "The installer copies cli/agents, cli/skills, cli/mcp, and cli/AGENTS.md into a project; the kit holds copies refreshed by asdd kit self.",
+      "status": "passing",
+      "priority": 5,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-009"
+      ],
+      "depends_on": [
+        "TASK-004"
+      ],
+      "verification": [
+        "npm test",
+        "node cli/bin/asdd.mjs kit self --check"
+      ],
+      "evidence": "git mv .agents/{agents,skills,mcp} and AGENTS.md into cli/ (cli/agents, cli/skills, cli/mcp, cli/AGENTS.md); asdd install copies them into a project (.agents/…, AGENTS.md); the kit gets them back as copies via asdd kit self (no links). npm package ships cli/{agents,skills,mcp} and cli/AGENTS.md, no .agents/ or root AGENTS.md. npm test exit 0 (kit self --check, install smoke, lifecycle, unit 108/108).",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: cli/agents/**, cli/skills/**, cli/mcp/**, cli/AGENTS. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-006",
+      "title": "Codegraph as a skill; doctor checks it",
+      "user_visible_behavior": "Agents and skills explore code through the codegraph skill (the codegraph CLI); no codegraph MCP server; asdd doctor reports the binary and the index.",
+      "status": "passing",
+      "priority": 6,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-010"
+      ],
+      "depends_on": [
+        "TASK-005"
+      ],
+      "verification": [
+        "npm test",
+        "node --test cli/test/cli.test.mjs"
+      ],
+      "evidence": "Codegraph is a skill (cli/skills/codegraph: codegraph explore/node/query/callers/callees/impact/affected/files/status/sync, rules, per-agent minimum, setup), replacing the MCP server and the codegraph.md/codegraph-agents.md steering. 12 agents, 2 module agents, capability-discovery, AGENTS.md, the Cursor rule, models.json, steering README, MCP README, and the kit README use the skill. Installer drops the kit codegraph MCP entry (only the one launching .agents/mcp/bin/codegraph-mcp.cjs), the launcher, and the two steering files on upgrade; uninstall likewise. asdd doctor checks the codegraph binary and .codegraph/ (warn; fail when capabilities.codegraph.required). Guidance stale check flags codegraph_explore/codegraph-mcp.cjs/codegraph.md. Skill description trimmed to keep the always-loaded budget (31841 <= 31962). npm test exit 0 (108/108 + smoke with upgrade from the MCP entry + lifecycle); cli.test 8/8 incl. doctor codegraph fail when required and missing.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-007",
+      "title": "evidence_hash replaces evidence_commit",
+      "user_visible_behavior": "A feature becomes passing without a commit SHA; asdd sync records evidence_hash and DRIFT-02 reopens it when its scope files change.",
+      "status": "passing",
+      "priority": 7,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-011"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test",
+        "node --test cli/src/harness/drift-lib.test.mjs"
+      ],
+      "evidence": "evidence_commit replaced by evidence_hash: asdd sync stamps sha256 of the files scope_paths cover when a feature is passing (no commit needed), clears it when it leaves passing, drops evidence_commit. DRIFT-02 recomputes the hash (works without git); DRIFT-06 no longer asks for a SHA (scope_paths + evidence remain). scope-lib.mjs holds globs, file listing, and the hash (breaks a drift-lib -> features -> sync-state import cycle that hung asdd sync). Tests: drift-lib unit (stamp, new file, edit, unstamped, no git), lifecycle (stamp, DRIFT-02 on edit and on a file added to a passing scope, unstamp on in_progress); npm test exit 0 (109/109); spec-drift 108/108, knowledge 8/8, jev-gate 9/9 on the vendored copies. Kit migration: asdd sync stamped 35 passing features, no evidence_commit key left.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: cli/src/harness/scope-lib.mjs, cli/src/harness/drift-lib.mjs, cli/src/harness/sync-state.mjs, cli/src/harness/validators/features.mjs, cli/src/harness/knowledge-lib.mjs, cli/src/harness/drift-lib.test.mjs, cli/src/harness/sync-state.test.mjs, cli/test/lifecycle.sh, cli/scaffold/features/feature.schema.json, cli/scaffold/config/project.schema.json, cli/scaffold/config/README.md, cli/steering/quality-gates.md, cli/steering/session-loop.md, cli/steering/spec-drift.md, cli/steering/knowledge.md, cli/agents/asdd-implementation-agent.md, cli/agents/asdd-lite-agent.md, README.md. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-008",
+      "title": "No npm packages in .harness: sqlite-vec removed",
+      "user_visible_behavior": "asdd install installs no npm packages in the project; knowledge search runs on node:sqlite and exact cosine; upgrades remove the old .harness/node_modules.",
+      "status": "passing",
+      "priority": 8,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-012"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test",
+        "cd tools/knowledge && pnpm test"
+      ],
+      "evidence": "No npm packages in projects: sqlite-vec (ANN) removed; knowledge uses node:sqlite (built in) and exact cosine; knowledge.db rebuilt from scratch on each sync (drops an old vec0 table). asdd install no longer writes .harness/package.json or runs npm; an upgrade removes .harness/package.json, package-lock.json, node_modules (only when the package is the kit asdd-harness-deps) and the .harness/node_modules .gitignore line; --skip-deps accepted as a no-op. doctor reports node:sqlite and leftover .harness/node_modules. Root package.json and tools/knowledge drop sqlite-vec (locks updated). npm test exit 0 (109/109, smoke asserts a fresh install and an upgrade leave no .harness/node_modules); knowledge 8/8 (semantic-cosine), spec-drift 108/108, jev-gate 9/9. Re-verified after DRIFT-02 (Jev removal touched its scope): npm test exit 0 (103/103, smoke still asserts no .harness/node_modules), knowledge 8/8. Re-verified again after the module/runtime validation change in cli/src/install/index.mjs: npm test exit 0 (103/103). Re-verified after cli/README.md changed (cli/dist build docs): npm test exit 0 (103/103, incl. cli/dist build), knowledge 8/8. Re-verified after package.json changed (cli/dist build, devDependencies): still no sqlite-vec in package.json, package-lock.json, or tools/knowledge/package.json; npm test exit 0 (103/103, incl. cli/dist build); knowledge 8/8. Re-verified after the README.md / cli/README.md update: npm test exit 0 (105/105), asdd kit guidance PASS. Re-verified after TASK-010/011: npm test exit 0 (108/108; smoke includes the packed-tarball global install and the hooks via devDependency, global, and none).",
+      "scope_paths": [
+        "cli/src/harness/knowledge-store-sqlite.mjs",
+        "cli/src/harness/knowledge-query.mjs",
+        "cli/src/harness/sync-knowledge.mjs",
+        "cli/src/install/index.mjs",
+        "cli/src/install/options.mjs",
+        "cli/src/install/pr.mjs",
+        "cli/src/doctor.mjs",
+        "cli/src/uninstall.mjs",
+        "cli/test/install.sh",
+        "cli/README.md",
+        "README.md",
+        "package.json",
+        "package-lock.json",
+        "tools/knowledge/package.json",
+        "tools/knowledge/pnpm-lock.yaml",
+        "tools/knowledge/test/knowledge.e2e-spec.ts",
+        "tools/knowledge/src/knowledge/knowledge.service.ts",
+        "tools/knowledge/README.md",
+        "tools/spec-drift/src/audit/harness-libs.ts"
+      ],
+      "evidence_hash": "c9703431b3558fd595fd47727902ab8a2cf4a22b73ba6865153865f93a493cac"
+    },
+    {
+      "id": "TASK-009",
+      "title": "Jev only as an MCP server",
+      "user_visible_behavior": "No asdd command, skill, agent, hook, or install uses Jev; the jev-gate MCP server offers it to people in chat.",
+      "status": "passing",
+      "priority": 9,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-013"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test",
+        "cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test"
+      ],
+      "evidence": "Jev removed from the harness and the ASDD pipeline; kept only as the jev-gate MCP server (chat). Gate logic moved into tools/jev-gate/src/jev/gates (no longer vendored), configured by JEV_API_KEY/JEV_ENDPOINT only (no capabilities.jev). Removed: asdd jev command, jev module (cli/modules/jev, --modules=jev, --remove-modules), capabilities.jev/modules.jev validation, doctor Jev check, Jev branches in shape-up/product-delivery (human decides, decided_by), jev.md steering (rules moved to the server README), AGENTS.md rule, steering/README mentions. Upgrade retires the old module files (project CLI jev-*.mjs, legacy .harness/scripts jev-*.mjs, jev.md), capabilities.jev, modules.jev, jev-gate MCP entry. Kit mcp.json keeps jev-gate for chat. npm test exit 0 (103/103; smoke: no install has Jev, --modules=jev refused, upgrade from the old module removes it); jev-gate 14/14 (incl. moved System One client tests), knowledge 8/8, spec-drift 108/108, lint clean. full-flow without Jev stages stops at the pre-existing DRIFT-01 test/reorder.test.mjs. Follow-up: Jev is not installable and not in the npm package (tools/jev-gate dropped from files; clone the repo to use it, documented in tools/jev-gate/README.md#get-it). asdd install validates --modules/--runtime before writing anything, so --modules=jev fails with that guidance and leaves the folder untouched (it used to leave the .installing marker). npm test exit 0 (103/103; smoke: empty folder after --modules=jev and --runtime=vim, no jev file in npm pack). Re-verified after cli/README.md changed and tools/jev-gate/README.md was reformatted for biome (the Get it JSON block): npm test exit 0 (103/103); jev-gate typecheck + lint clean, 14/14. Re-verified after dropping the regenerated .harness/config/project.json from scope_paths: npm test exit 0 (103/103); jev-gate typecheck + lint clean, 14/14. Re-verified after the README.md / cli/README.md update: npm test exit 0 (105/105), asdd kit guidance PASS. Re-verified after TASK-010/011: npm test exit 0 (108/108; smoke includes the packed-tarball global install and the hooks via devDependency, global, and none).",
+      "scope_paths": [
+        "cli/src/install/**",
+        "cli/src/harness/commands.mjs",
+        "cli/src/harness/check-project-config.mjs",
+        "cli/src/harness/check-invariants.mjs",
+        "cli/src/harness/command-gate.mjs",
+        "cli/src/harness/env-loader.mjs",
+        "cli/src/doctor.mjs",
+        "cli/src/kit/vendor.mjs",
+        "cli/src/kit/versions.mjs",
+        "cli/modules/**",
+        "cli/skills/shape-up/SKILL.md",
+        "cli/skills/product-delivery/**",
+        "cli/agents/asdd-spec-agent.md",
+        "cli/agents/asdd-lite-agent.md",
+        "cli/agents/asdd-implementation-agent.md",
+        "cli/AGENTS.md",
+        "cli/steering/**",
+        "cli/mcp/**",
+        "cli/README.md",
+        "cli/test/**",
+        "tools/jev-gate/**",
+        "README.md",
+        "package.json",
+        ".github/workflows/harness-invariants.yml",
+        ".harness/steering/structure.md"
+      ],
+      "evidence_hash": "f7e23434a90ba2faf4d11f4aa79b178f1cb1060b7b27b2bab23057fec473fad8"
+    },
+    {
+      "id": "TASK-010",
+      "title": "Lessons from the eminzo CLI",
+      "user_visible_behavior": "In the kit asdd never runs a stale cli/dist; install refuses a repo whose ignore rules hide committed harness files; doctor reports it; npm publish runs the tests.",
+      "status": "passing",
+      "priority": 10,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-014"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test"
+      ],
+      "evidence": "bin/asdd.mjs compares dist/build.json sourceFingerprint with cli/src (shared cli/src/kit/fingerprint.mjs) and runs src/ when stale (unit test: stale dist ignored, current dist runs, package without src runs dist). cli/src/install/ignored.mjs: git check-ignore before writing; .harness/ ignored -> refused, folder untouched (--force installs, doctor FAIL gitignore); .cursor/ ignored -> warning, doctor warn; node_modules/ + dist/ fine. prepublishOnly: npm test. npm test exit 0 (108/108).",
+      "scope_paths": [
+        "cli/bin/asdd.mjs",
+        "cli/src/kit/fingerprint.mjs",
+        "cli/src/kit/build.mjs",
+        "cli/src/install/ignored.mjs",
+        "cli/test/cli.test.mjs"
+      ],
+      "evidence_hash": "44c5a65d66f36190afc6ae2367c9491d38dcec222e1afd16c98f236832405549"
+    },
+    {
+      "id": "TASK-011",
+      "title": "The CLI as a Node package only",
+      "user_visible_behavior": "Projects get no copy of the CLI: asdd is installed once per machine (npm i -g, or npm pack from the repo) or as a devDependency; hooks find it and fail closed without it.",
+      "status": "passing",
+      "priority": 11,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-015"
+      ],
+      "depends_on": [
+        "TASK-010"
+      ],
+      "verification": [
+        "npm test",
+        "cd tools/spec-drift && pnpm typecheck && pnpm test"
+      ],
+      "evidence": "Installer no longer copies .harness/cli (retireProjectCli removes an old copy and legacy .harness/scripts); hooks and the Cursor template run the POSIX resolver (node_modules/.bin/asdd, else asdd on PATH, else exit 2 \"asdd is not installed: npm i -D asdd-harness-kit (or npm i -g ...)\"); old .harness/cli hooks migrate. main.mjs hands harness commands to node_modules/asdd-harness-kit (signals forwarded) and, without it, checks kit.version (cli/src/pin.mjs: other major refuses, other minor warns on stderr, gate/verify quiet). The installer runs its own asdd for checks (ASDD_DELEGATED). doctor: cli = devDependency | global | none (FAIL), legacy-cli warn. project.json commands: asdd check|verify|drift. CI templates (workflow example, spec-drift generate_ci_gate) install asdd-harness-kit@kit.version. npm package now includes the .github/*.example files the installer copies (an npm install used to fail: missing kit file). README Getting started rewritten like the eminzo guide (once per machine: npm i -g or clone + npm install + npm pack + npm i -g tgz; doctor; asdd install; update; remove; troubleshooting); cli/README \"Where asdd comes from\". npm test exit 0 (108/108; smoke: no .harness/cli, hooks via none/global/devDependency, legacy .harness/cli upgrade, packed tarball global install + asdd install + hook + check); cli.test: handoff to devDependency, version fit; lifecycle passes; spec-drift typecheck + 108/108. full-flow stops at the pre-existing DRIFT-01 test/reorder.test.mjs.",
+      "scope_paths": [
+        "cli/src/pin.mjs",
+        "cli/src/main.mjs",
+        "cli/src/paths.mjs",
+        "cli/src/install/phases.mjs",
+        "cli/src/install/runtimes.mjs",
+        "cli/src/install/context.mjs",
+        "cli/src/install/index.mjs",
+        "cli/src/install/modules.mjs",
+        "cli/src/uninstall.mjs",
+        "cli/src/doctor.mjs",
+        "cli/src/kit/versions.mjs",
+        "cli/runtimes/**",
+        "cli/mcp/README.md",
+        "cli/AGENTS.md",
+        "cli/README.md",
+        "cli/test/install.sh",
+        "cli/test/lifecycle.sh",
+        "cli/test/full-flow.sh",
+        "cli/test/install-lifecycle.test.mjs",
+        "tools/spec-drift/src/audit/ci-templates.ts",
+        "tools/spec-drift/src/audit/audit.service.ts",
+        "tools/spec-drift/src/audit/audit.prompts.ts",
+        ".github/CODEOWNERS.harness.example",
+        ".github/workflows/harness-audit.yml.example",
+        "README.md",
+        "package.json"
+      ],
+      "evidence_hash": "d4206087f01fc475fd73cad905e3c40a33085cf4c263cc98c935577f41146594"
+    }
+  ]
+}

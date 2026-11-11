@@ -1,0 +1,43 @@
+#!/bin/sh
+# stdio launcher for MCP clients (Cursor, Claude Desktop, Claude Code, Inspector).
+#
+# GUI clients do not load nvm and start servers from an arbitrary working directory, so this script
+# resolves everything itself and keeps stdout reserved for the MCP protocol (diagnostics → stderr).
+#
+# Node resolution: $MCP_NODE → the .nvmrc version under $NVM_DIR → `node` on PATH.
+set -eu
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+WANTED="$(tr -d ' \n\r' < "$ROOT/.nvmrc" 2>/dev/null || true)"
+WANTED="${WANTED#v}"
+
+if [ -n "${MCP_NODE:-}" ]; then
+	NODE="$MCP_NODE"
+elif [ -n "$WANTED" ] && [ -x "$NVM_DIR/versions/node/v$WANTED/bin/node" ]; then
+	NODE="$NVM_DIR/versions/node/v$WANTED/bin/node"
+elif command -v node >/dev/null 2>&1; then
+	NODE="$(command -v node)"
+	echo "mcp-stdio: Node v$WANTED not found under $NVM_DIR; using $NODE ($("$NODE" -v))" >&2
+else
+	echo "mcp-stdio: no Node found. Run 'nvm install' in $ROOT or set MCP_NODE=/path/to/node" >&2
+	exit 1
+fi
+
+if [ ! -f "$ROOT/node_modules/tsx/dist/cli.mjs" ]; then
+	echo "mcp-stdio: dependencies missing. Run 'pnpm install' in $ROOT" >&2
+	exit 1
+fi
+if [ ! -f "$ROOT/dist/analysis-dashboard.html" ]; then
+	echo "mcp-stdio: dashboards not built (tools still work). Run 'pnpm build' in $ROOT" >&2
+fi
+
+# tsx looks for tsconfig.json in the working directory; clients start servers elsewhere (often /),
+# which would drop experimentalDecorators and break every Nest decorator.
+export TSX_TSCONFIG_PATH="$ROOT/tsconfig.json"
+
+# A stale GITHUB_TOKEN in the GUI environment overrides gh's keyring login (HTTP 401).
+unset GITHUB_TOKEN
+unset GH_TOKEN
+
+exec "$NODE" "$ROOT/node_modules/tsx/dist/cli.mjs" "$ROOT/src/main.ts" --stdio

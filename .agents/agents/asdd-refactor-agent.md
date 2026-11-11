@@ -16,7 +16,7 @@ The portable runtime contract is defined in `.agents/agents/_runtime-template.md
 Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts.
 
 - When you start a refactor that can change behavior: `Read` `.agents/skills/test-driven-development/SKILL.md`
-- When you start from a diff or security-findings feed: `Read` `.agents/skills/open-code-review/SKILL.md`. If `ocr` is missing, ask a human. Do not invent findings. Still honor CRITICAL/HIGH already recorded in `ocr-result.json` or `code-review-report.md`.
+- When you start from a diff or security-findings feed: honor the CRITICAL/HIGH findings already recorded in the slice's `code-review-report.md`. Do not invent findings.
 - When you start a UI refactor, and the folder exists: `Read` `.agents/skills/frontend-ui-engineering/SKILL.md`
 - When you start a browser regression check, and the folder exists: `Read` `.agents/skills/browser-testing-with-devtools/SKILL.md`. Use Chrome DevTools MCP. Leave Playwright automation to `@asdd-e2e-tester`.
 - When you start an ADR or decision-record update: `Read` `.agents/skills/documentation-and-adrs/SKILL.md`
@@ -34,9 +34,9 @@ You operate after implementation tasks complete or when triggered by the Knowled
 
 ## Code Intelligence (mandatory)
 
-Read `.harness/steering/codegraph.md`. Use `codegraph_explore` before proposing moves. List tools/commands in your final output.
+Use the `codegraph` skill (`.agents/skills/codegraph/SKILL.md`): `codegraph explore` before proposing moves. List tools/commands in your final output.
 
-**Knowledge (mandatory):** `knowledge_trace` for blast radius (which features/specs own a path) before moves; `knowledge_search` for prior refactor findings. Contract: `.harness/steering/knowledge.md`.
+**Knowledge (mandatory):** `asdd knowledge trace file:<path>` for blast radius (which features/specs own a path) before moves; `asdd knowledge search` for prior refactor findings. Contract: `.harness/steering/knowledge.md`.
 
 ## Project Context
 
@@ -83,7 +83,7 @@ Append a **Refactor Confidence Score** (0.0–1.0) and its uncertainty factors t
 
 - Start only from a proposal with `status: accepted` and `change: product-code`; its `control` names the code to change.
 - Use the proposal's rollback procedure; add one if it is missing before opening the PR.
-- Must be approved by TL and at least one Engineer. The TL sets the proposal to `applied` with `applied_at`; `learn.mjs` then measures whether the pattern stops (QG-LEARN-05, QG-LEARN-06).
+- Must be approved by TL and at least one Engineer. The TL sets the proposal to `applied` with `applied_at`; `asdd learn` then measures whether the pattern stops (QG-LEARN-05, QG-LEARN-06).
 
 ## Execution Flow
 

@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "asdd-cli",
+  "source_tasks": ".harness/specs/asdd-cli/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "asdd CLI replaces scripts/",
+      "user_visible_behavior": "asdd install|doctor|migrate|kit run the kit; install keeps every option and behavior of install-into.sh; scripts/ is gone.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test",
+        "bash cli/test/full-flow.sh (compared with HEAD)",
+        "wizard with piped answers"
+      ],
+      "evidence": "npm test exit 0: asdd kit vendor --check OK; cli/test/install.sh OK (all prior assertions, now via asdd install, plus: CLI version/help/unknown command, legacy scripts/install-into.sh removed, no cli/ in the project, npm pack ships cli/bin and templates but no cli/test or scripts/); cli/test/lifecycle.sh OK; unit 100/100 incl. cli/test/cli.test.mjs (options, runtimes, project id, dispatch, pre-CLI form, doctor --json). Wizard with piped answers wires claude and records playwright-e2e; --from-git --dry-run uses the local kit; doctor runs. cli/test/full-flow.sh fails at DRIFT-01 test/reorder.test.mjs exactly as HEAD scripts/test-full-flow.sh does (pre-existing).",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: cli/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Package, CI, versions, docs on the CLI",
+      "user_visible_behavior": "npx asdd-harness-kit runs the CLI; CI and npm test call cli/; docs show asdd commands.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-006"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "npm test",
+        "asdd kit versions",
+        "asdd kit vendor --check"
+      ],
+      "evidence": "asdd kit versions: 397 artifacts @ 3.8.1 (templates under cli/templates, no scripts/ entries); vendored headers regenerated and --check OK; CI runs cli/test/install.sh, cli/test/lifecycle.sh, asdd kit vendor --check; npm pack check in install.sh passes; docs point at asdd install/doctor/migrate/kit.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Install ownership, guards, --json, --pr, uninstall",
+      "user_visible_behavior": "asdd install protects kit files the project changed, refuses interrupted installs and downgrades, prints JSON for tools, can open the install as a pull request; asdd uninstall removes only what the kit added.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-007",
+        "REQ-008",
+        "REQ-009",
+        "REQ-010",
+        "REQ-011"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/test/install-lifecycle.test.mjs",
+        "npm test"
+      ],
+      "evidence": "cli/test/install-lifecycle.test.mjs 8/8 (semver; edited kit files skipped on upgrade + recorded + doctor warns, --force overwrites; unedited file updated; interrupted-install marker and downgrade refused unless --force; --json result and error objects; uninstall keeps changed files/specs/project.json/filled binding, removes kit files, links, hooks, kit mcp servers and gitignore lines; pr preflight codes; --pr against a local bare origin with a fake gh: branch from origin/main, commit, push, PR URL, back on main with a clean tree; failed install mid-PR rolled back; branch-exists refused). npm test exit 0: vendor check, install smoke, lifecycle, unit 108/108.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: cli/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    }
+  ]
+}

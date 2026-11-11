@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-cli-harness-004",
+  "timestamp": "2026-11-11T03:00:00.000Z",
+  "event_type": "feature_completed",
+  "feature_id": "TASK-001",
+  "evidence": "TASK-001 passing (uncommitted): npm test exit 0: kit vendor --check OK; cli/test/install.sh OK (CLI runtime in .harness/cli with its version, no install/kit/tests; project copy runs status and refuses install; legacy .harness/scripts kit files removed, own script kept, empty validators/ pruned; project.json commands on the CLI; cursor+claude hooks rewritten from .harness/scripts/(jev-)command-gate.mjs and verify-on-stop.mjs to asdd.mjs gate/verify, project hook kept; jev only with the module; legacy jev detected); lifecycle OK; unit 107/107 incl. harness tests under cli/src/harness, cli.test.mjs global hand-off to .harness/cli from a subfolder. Kit self-install: .harness/cli -> ../cli, project.json commands; CI and hooks call node .harness/cli/bin/asdd.mjs. full-flow stops at the pre-existing DRIFT-01 test/reorder.test.mjs as on HEAD."
+}

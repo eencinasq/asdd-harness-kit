@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "modules-top-level",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-modules-top-level-003",
+  "timestamp": "2026-11-10T20:30:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "modules/**",
+    "scripts/install-into.sh",
+    "scripts/generate-versions.mjs",
+    "package.json",
+    ".github/workflows/harness-invariants.yml",
+    ".harness/config/versions.json",
+    "tools/spec-drift/src/audit/audit.service.ts",
+    "tools/spec-drift/test/audit.e2e-spec.ts",
+    "README.md",
+    ".agents/agents/README.md",
+    ".agents/mcp/README.md",
+    "runtimes/cursor/asdd-steering.mdc",
+    ".harness/features/jev-module.features.json",
+    ".harness/features/jev-gate-nest.features.json",
+    ".harness/features/spec-drift-merge.features.json"
+  ],
+  "evidence": "Start TASK-001 (REQ-001..004)"
+}

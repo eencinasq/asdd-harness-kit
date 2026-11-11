@@ -15,7 +15,7 @@ Write intents only when:
 
 - the pitch is `bet` and its ID is stable;
 - the scope map passed its gate ([`shape-up-input.md`](./shape-up-input.md));
-- `jev_scope_choice` ran for every scope; `reshape` scopes are removed;
+- every scope has a recorded scope choice (`decided_by`); `reshape` scopes are removed;
 - the project bindings and quality gates under `.harness/steering/` are filled.
 
 `needs_shaping`, `ready_for_bet`, and `no_bet` pitches never enter ASDD. Return them to `shape-up`.
@@ -25,12 +25,12 @@ Write intents only when:
 For each kept scope:
 
 1. **Choose a slice ID.** Lowercase, hyphenated, named after the scope in the project's language (e.g. `orders-quick-reorder`). Do not create a second slice for a scope that already has one.
-2. **Create the slice.** `node .harness/scripts/init-slice.mjs <slice-id>` (lite by default; `--full` only when the scope is known upfront to be cross-cutting).
+2. **Create the slice.** `asdd slice init <slice-id>` (lite by default; `--full` only when the scope is known upfront to be cross-cutting).
 3. **Write `.harness/specs/<slice-id>/intent.md`** from `.harness/steering/templates/intent.md`:
    - Source: `Pitch ID`, `Scope ID`, scope map link, `bet`, cycle, scope class.
    - Problem and desired outcome narrowed to this scope.
    - Appetite: the bet's appetite (shared by all scopes).
-   - Must-have outcomes as EARS-style statements (`MH-01`, …). Run `jev_ears_gate` on each; rewrite or record `# jev-override: accept`.
+   - Must-have outcomes as EARS-style statements (`MH-01`, …). Check each against the EARS criteria (one trigger, one observable response, no ambiguous term) and record who confirmed it (`decided_by`).
    - Nice-to-haves (~), no-gos, rabbit holes, actors, depends on, open questions.
 4. **Record the slice ID** on the scope in the scope map.
 
@@ -71,7 +71,7 @@ If a source ID is unavailable, write `PENDING_DEFINITION` and stop the affected 
 A change stays inside the bet only when it keeps the problem, outcome, appetite, no-gos, and hard quality constraints. Then:
 
 - **Inside an existing scope:** record it in that slice's task or progress evidence.
-- **A newly discovered scope:** add it to the scope map, run `jev_scope_choice`, and write a new intent for it.
+- **A newly discovered scope:** add it to the scope map, record its scope choice, and write a new intent for it.
 
 Return to Shape Up (`RE-SHAPING_REQUIRED`) when a change alters the problem or primary actor, the desired outcome, the appetite, a must-have or no-go, or a security, compliance, or data-integrity constraint.
 
@@ -83,6 +83,6 @@ The handoff is complete when:
 
 - every kept scope has exactly one slice and one `intent.md`;
 - every intent carries `source_pitch_id` and `source_scope_id`;
-- every must-have outcome passed `jev_ears_gate` or has a recorded override;
+- every must-have outcome passed the EARS criteria, confirmed by a human (`decided_by`);
 - dependencies between intents are acyclic and written in `Depends on`;
 - the next agent (`@asdd-discovery-agent`) and the slice order are explicit.

@@ -78,7 +78,7 @@
   "token_optimization_rules": [
     "Load steering JIT (Just-In-Time) per phase — do not preload all steering files. See session-loop.md.",
     "Skills: read only the SKILL.md name/description at startup; read the full body only when that skill's task activates.",
-    "Codegraph first: use codegraph_explore instead of reading large source files directly when exploring unknown code.",
+    "Codegraph first: run codegraph explore (the codegraph skill) instead of reading large source files directly when exploring unknown code.",
     "For tier-s and tier-a agents, compact context aggressively before the final output — remove intermediate reasoning from the response if it is not required by the gate.",
     "Use the Task tool for context-fresh sub-agents instead of maintaining large context windows across unrelated work."
   ]

@@ -6,7 +6,7 @@ tags:
 
 # Domain layer — project binding (asdd-harness-kit)
 
-> **Project binding for the kit itself.** Never shipped: projects get the stub from `scripts/templates/bindings/domain-layer.project.md`.
+> **Project binding for the kit itself.** Never shipped: projects get the stub from `cli/templates/bindings/domain-layer.project.md`.
 
 The kit is a set of scripts and documents, not a layered application. Its "domain" is the harness state model.
 
@@ -15,10 +15,10 @@ The kit is a set of scripts and documents, not a layered application. Its "domai
 | Role | Path / package |
 |------|----------------|
 | Domain model / entities | `docs/architecture/domain-model.md`; slice, session, feature, pattern, proposal |
-| Use cases / domain services | `.harness/scripts/*-lib.mjs` (drift, audit, learning, knowledge) |
+| Use cases / domain services | `cli/src/harness/*-lib.mjs` (drift, audit, learning, knowledge) |
 | Ports | file formats: `.harness/state/**`, `.harness/features/*.features.json`, `feature.schema.json` |
 | Adapters | runtime hooks, MCP servers (`.agents/mcp/`), installer |
-| Delivery (HTTP/UI/CLI) | CLI scripts in `.harness/scripts/` and `scripts/` |
+| Delivery (HTTP/UI/CLI) | the asdd CLI (`cli/`; projects run the asdd-harness-kit package, a devDependency or global, never a copy) |
 
 ## Layer flow
 
@@ -36,7 +36,7 @@ The kit is a set of scripts and documents, not a layered application. Its "domai
 
 | Paths | Must not import |
 |-------|-----------------|
-| `.harness/scripts` | `.agents` |
+| `cli/src/harness` | `.agents` |
 
 ## Exceptions
 

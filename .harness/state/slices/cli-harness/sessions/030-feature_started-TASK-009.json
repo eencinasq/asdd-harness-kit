@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-cli-harness-030",
+  "timestamp": "2026-11-11T16:00:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-009",
+  "evidence": "Reopened by DRIFT-02: .harness/config/project.json (in its scope) is rewritten by every asdd kit self (kit.installed_at). Removed it from scope_paths: it is the kit live config, regenerated on each self-install; Jev absence from project.json is asserted by the install smoke test (assert_no_jev)."
+}

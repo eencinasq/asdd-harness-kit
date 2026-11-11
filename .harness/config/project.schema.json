@@ -36,7 +36,7 @@
     "drift": {
       "type": "object",
       "properties": {
-        "contract": { "enum": ["warn", "fail"], "description": "Severity of DRIFT-06 (scope_paths / evidence_commit contract)." }
+        "contract": { "enum": ["warn", "fail"], "description": "Severity of DRIFT-06 (every feature has scope_paths; passing features have evidence)." }
       }
     },
     "capabilities": { "type": "object" }

@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "jev-gate-nest",
+  "source_tasks": ".harness/specs/jev-gate-nest/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "NestJS jev-gate server",
+      "user_visible_behavior": "tools/jev-gate serves the five jev-gate tools over stdio and HTTP, fail closed, reading the harness at HARNESS_ROOT.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+      ],
+      "evidence": "jev-gate e2e 9/9 (in-memory + stdio with HARNESS_ROOT) on Node 24.22.2; tsc and biome clean; built bin answers initialize and check_command_safety over stdio.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: tools/jev-gate/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Retire jev-gate-server.mjs; jev module installs tools/jev-gate",
+      "user_visible_behavior": "--modules=jev installs tools/jev-gate source and its mcp.json entry; upgrades migrate the old entry and delete the old file; --remove-modules=jev removes tools/jev-gate.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "bash scripts/test-install-into.sh"
+      ],
+      "evidence": "test-install-into.sh OK (module jev, all, legacy upgrade migration, removal, versions trace); lifecycle OK; kit unit tests 95/95.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-cli-harness-032",
+  "timestamp": "2026-11-11T16:30:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-008",
+  "evidence": "Reopened by DRIFT-02: package.json (in its scope) changed at 20:14 by the parallel cli/dist build work (files -> cli/dist, devDependencies esbuild/javascript-obfuscator); re-verifying."
+}

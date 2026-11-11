@@ -6,7 +6,7 @@ tags:
 
 # Product overview — asdd-harness-kit
 
-> **Project binding for the kit itself.** Never shipped: projects get the stub from `scripts/templates/bindings/product.md`.
+> **Project binding for the kit itself.** Never shipped: projects get the stub from `cli/templates/bindings/product.md`.
 
 ## Product name
 
@@ -15,18 +15,18 @@ tags:
 ## Product principles
 
 - The kit brings the process; the adopting project brings its stack.
-- Machine-checkable over prose: a rule that matters gets a sensor in `check-invariants.mjs`.
+- Machine-checkable over prose: a rule that matters gets a sensor in `asdd check`.
 - Project-owned files are created once and never overwritten; kit-owned files refresh on upgrade.
 - Anything used only to develop the kit (its slices, specs, features, sessions, proposals, bindings) is never installed into a project.
 - Small context: every steering line an agent loads on each session must earn its place.
 
 ## Key features
 
-- Installer (`scripts/install-into.sh`, `npx asdd-harness-kit`) with runtimes and opt-in modules.
+- Installer: the `asdd` CLI (`npx asdd-harness-kit install`) with runtimes and opt-in modules.
 - Steering contracts and quality gates (`.harness/steering/`).
 - Agents and skills (`.agents/agents/`, `.agents/skills/`).
-- Harness scripts: state sync, invariants, spec drift, audit, knowledge, learning loop (`.harness/scripts/`).
-- MCP servers: `knowledge`, `spec-drift-auditor`, `jev-gate` (`.agents/mcp/`).
+- Harness scripts: state sync, invariants, spec drift, audit, knowledge, learning loop (`cli/src/harness/`).
+- MCP servers: `knowledge`, `spec-drift`, `jev-gate` (`.agents/mcp/`).
 
 ## Actors / personas
 

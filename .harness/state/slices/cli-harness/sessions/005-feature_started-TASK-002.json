@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-cli-harness-005",
+  "timestamp": "2026-11-11T03:00:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    ".agents/**",
+    "modules/**",
+    ".harness/steering/**",
+    "AGENTS.md",
+    "README.md",
+    "runtimes/**",
+    "tools/spec-drift/**",
+    "tools/jev-gate/**",
+    "tools/knowledge/**",
+    ".github/CODEOWNERS.harness.example",
+    ".github/workflows/harness-audit.yml.example",
+    ".harness/config/README.md",
+    "docs/knowledge-base/README.md",
+    "docs/knowledge-base/steering-proposals/SP-003.md"
+  ],
+  "evidence": "Start TASK-002"
+}

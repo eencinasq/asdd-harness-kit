@@ -1,0 +1,115 @@
+#!/usr/bin/env node
+/**
+ * harness-status.mjs — compact project health dashboard (v3.0).
+ * Reads generated registry.json and per-slice manifests.
+ * Usage: asdd status
+ */
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const root = process.cwd();
+
+function readJson(rel) {
+  const p = join(root, rel);
+  if (!existsSync(p)) return null;
+  try {
+    return JSON.parse(readFileSync(p, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? iso : d.toISOString().slice(0, 16).replace('T', ' ');
+}
+
+function pad(s, w) {
+  return String(s).padEnd(w);
+}
+
+const registry = readJson('.harness/state/registry.json');
+const slices = Array.isArray(registry?.slices) ? registry.slices : [];
+
+console.log('');
+console.log('== Active Slices ==');
+if (slices.length === 0) {
+  console.log('  (none)');
+} else {
+console.log(`  ${pad('Slice', 18)} ${pad('Mode', 10)} ${pad('Phase', 16)} ${pad('Status', 12)} ${pad('Features', 10)} ${pad('Dissents', 10)} Escalation`);
+  for (const s of slices) {
+    const dissents = s.open_dissents ? `${s.open_dissents}` : '—';
+    const esc = s.escalation_required ? `${s.escalation_signals} signal(s) — escalate required` : '—';
+    console.log(`  ${pad(s.slice_id, 18)} ${pad(s.mode || '—', 10)} ${pad(s.phase || '—', 16)} ${pad(s.status || '—', 12)} ${pad(String(s.active_features || 0), 10)} ${pad(dissents, 10)} ${esc}`);
+  }
+}
+
+console.log('');
+console.log('== Active Work (derived from sessions) ==');
+let anyActive = false;
+for (const s of slices) {
+  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+  const active = manifest?.active_features || [];
+  if (active.length === 0) continue;
+  anyActive = true;
+  console.log(`  [${s.slice_id}]`);
+  for (const f of active) {
+    const handoff = f.handoff_from ? ` (from ${f.handoff_from})` : '';
+    console.log(`    • ${f.id} @${f.human || f.owner}${handoff}`);
+  }
+}
+if (!anyActive) console.log('  (none)');
+
+console.log('');
+console.log('== Contributors ==');
+for (const s of slices) {
+  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+  const contributors = manifest?.contributors || [];
+  if (contributors.length === 0) continue;
+  console.log(`  [${s.slice_id}] ${contributors.join(', ')}`);
+}
+
+console.log('');
+console.log('== Escalation Signals ==');
+let anySignal = false;
+for (const s of slices) {
+  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+  const signals = manifest?.escalation_signals || [];
+  if (signals.length === 0) continue;
+  anySignal = true;
+  console.log(`  [${s.slice_id}] mode:${manifest.mode}${manifest.escalation_required ? ' (escalation required)' : ''}`);
+  for (const sig of signals) {
+    console.log(`    • ${sig.type} — ${sig.evidence}`);
+  }
+}
+if (!anySignal) console.log('  (none)');
+
+console.log('');
+console.log('== Gate Summary ==');
+for (const s of slices) {
+  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+  const gates = manifest?.gates || {};
+  const gateStr = Object.entries(gates)
+    .map(([phase, g]) => `${phase}:${g.status}`)
+    .join(' ');
+  if (gateStr) {
+    console.log(`  [${s.slice_id}] ${gateStr}`);
+  }
+}
+
+console.log('');
+console.log('== Learning (QG-LEARN) ==');
+const learning = readJson('.harness/state/learning/patterns.json');
+const watched = (learning?.patterns || []).filter((p) => p.status !== 'watching');
+if (watched.length === 0) {
+  console.log('  (no patterns at threshold)');
+} else {
+  for (const p of watched) {
+    const props = p.proposals.length ? ` ${p.proposals.map((x) => `${x.id}:${x.status}`).join(', ')}` : '';
+    console.log(`  ${pad(p.id, 12)} ${pad(p.status, 11)} ${pad(p.kind, 7)} x${pad(String(p.occurrences), 4)} ${p.signature}${props}`);
+  }
+  if (watched.some((p) => p.status === 'open')) console.log('  → asdd learn --propose <LP-id>');
+}
+
+console.log('');

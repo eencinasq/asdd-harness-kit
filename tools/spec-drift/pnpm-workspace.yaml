@@ -1,0 +1,11 @@
+allowBuilds:
+  esbuild: true
+  # Its postinstall only installs clients in a source checkout; a no-op as a dependency.
+  "@modelcontextprotocol/inspector": false
+minimumReleaseAgeExclude:
+  - "@nestjs/testing@12.4.0"
+  - "@nestjs/core@12.4.0"
+  - "@nestjs/mcp@0.0.4"
+  - "@nestjs/platform-express@12.4.0"
+# Fail fast on the wrong Node (see .nvmrc / package.json engines) instead of a cryptic runtime error.
+engineStrict: true

@@ -1,0 +1,32 @@
+---
+inclusion: always
+---
+
+# ASDD skills index (kit)
+
+Initial catalog for folders under `.agents/skills/`. Each folder exposes only its name and description here. The skill body stays in `SKILL.md` until the matching task starts.
+
+## Disclosure
+
+- Read this file to choose a skill. This is the initial index.
+- When you start the task that matches a description, `Read` `.agents/skills/<name>/SKILL.md` and follow that file.
+- Until that task starts, do not `Read` that `SKILL.md`, its `references/`, or its `agents/`.
+- Do not copy a skill body into this index. After adding or editing a skill folder, regenerate the catalog with `asdd skills-index --write`.
+- A skill that is not yet copied into `.agents/skills/` is not part of this index.
+
+<!-- skills-index:start -->
+| Name | Description |
+| --- | --- |
+| `anti-pattern-detection` | Detects 8 specification anti-patterns in capabilities and requirements. Acts as a quality gate before finalization. |
+| `business-model-canvas` | Parses Business Model Canvas and Lean Canvas inputs into structured product capabilities, personas, and revenue-critical features. |
+| `capability-discovery` | Brownfield onboarding — discovers major capabilities from ANY existing codebase via language-agnostic signals (topology, API/behavior surfaces, persistence entities, tests, docs/trackers), consolidates them into a deduped capability list, and lands them as ASDD slices. Use when onboarding an existing repo that has code but no specs, or when the user asks "what capabilities does this project have?" |
+| `codebase-audit` | Inferential pass of the codebase auditor. Reads the latest .harness/audits/ report, takes the top churn hotspots, traces each to its requirements, and judges every EARS criterion satisfied, violated, or unclear with file and line evidence. Use for scheduled health audits, when the Tech Lead asks "where has the code drifted from the spec?", or after `asdd audit` reports hotspots. Produces findings only; never edits code. |
+| `codegraph` | Code intelligence from the codegraph CLI: explore an area, a symbol's callers and callees, a change's impact, affected tests. Use before grep or broad reads to explore code, map requirements to code, or check blast radius. |
+| `create-mcp-app` | This skill should be used when the user asks to "create an MCP App", "add a UI to an MCP tool", "build an interactive MCP View", "scaffold an MCP App", or needs guidance on MCP Apps SDK patterns, UI-resource registration, MCP App lifecycle, or host integration. Provides comprehensive guidance for building MCP Apps with interactive UIs. |
+| `documentation-and-adrs` | Documents decisions and rationale (ADRs, inline why-comments, README, changelogs, agent context)—not obvious code. Use when making architectural choices, changing public APIs or user-facing behavior, onboarding, or when the same explanation keeps recurring. Loads references/architecture-documentation.md for arc42/C4/layout detail via progressive disclosure. |
+| `domain-language-extraction` | Extracts domain-specific terminology from business documents into a ubiquitous language dictionary. Seeds the domain slice. |
+| `external-trackers` | Handoff contract between Shape Up work recorded in an external tracker (Linear, Jira, GitHub Issues, or a manual pitch document) and ASDD + Harness execution. Defines how a bet pitch and its scopes in a tracker become intents, how agents trace them, and how status syncs back. Use when intent.md references an external source or when the squad needs to sync status back to a tracker. |
+| `product-delivery` | Turns a bet Shape Up pitch into ASDD work. Splits the pitch into as many scopes as it needs, writes one intent.md per scope (one ASDD slice each), and hands every intent to the ASDD Discovery agent to run the pipeline. Use when a pitch has been bet and the team starts building it. |
+| `shape-up` | Shape work using the Shape Up methodology (Ryan Singer, Basecamp). Walk through the 4-step shaping process to create pitches ready for betting. Distinguishes between established product mode (fixed time, variable scope) and new product mode (looser constraints). Use when planning cycle work, writing pitches, or coaching PMs on shaping. |
+| `test-driven-development` | Drives development with tests using the red-green-refactor loop. Use when implementing any logic, fixing any bug, or changing any behavior. Use when you need to prove that code works, when a bug report arrives, or when you're about to modify existing functionality. Combine with browser-testing-with-devtools for UI runtime verification. |
+<!-- skills-index:end -->

@@ -1,0 +1,19 @@
+{
+  "schema_version": "2.0",
+  "slice_id": "example-slice",
+  "phase": "discovery",
+  "status": "in_progress",
+  "mode": "full",
+  "paths": {
+    "spec_dir": ".harness/specs/example-slice",
+    "domain_model": "docs/architecture/domain-model.md",
+    "knowledge_base": "docs/knowledge-base",
+    "progress": ".harness/progress/example-slice.md"
+  },
+  "gates": {},
+  "ccs": null,
+  "confidence_chain": [],
+  "phase_data": {},
+  "agent_heartbeats": {},
+  "_comment": "Copy to .harness/state/slices/<slice-id>/manifest.json and rename fields. Remove this comment."
+}

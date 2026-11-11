@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "b=node_modules/.bin/asdd; [ -x \"$b\" ] || b=asdd; command -v \"$b\" >/dev/null 2>&1 || { echo \"asdd is not installed: npm i -D asdd-harness-kit (or npm i -g asdd-harness-kit)\" >&2; exit 2; }; exec \"$b\" gate",
+        "timeout": 30,
+        "failClosed": true
+      }
+    ],
+    "stop": [
+      {
+        "command": "b=node_modules/.bin/asdd; [ -x \"$b\" ] || b=asdd; command -v \"$b\" >/dev/null 2>&1 || { echo \"asdd is not installed: npm i -D asdd-harness-kit (or npm i -g asdd-harness-kit)\" >&2; exit 2; }; exec \"$b\" verify",
+        "timeout": 60,
+        "loop_limit": 3,
+        "failClosed": true
+      }
+    ]
+  }
+}

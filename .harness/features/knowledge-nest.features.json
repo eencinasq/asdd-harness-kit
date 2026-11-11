@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "knowledge-nest",
+  "source_tasks": ".harness/specs/knowledge-nest/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "NestJS knowledge server",
+      "user_visible_behavior": "tools/knowledge serves the five knowledge tools over stdio and HTTP, reporting degraded indexes, reading the harness at HARNESS_ROOT.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/knowledge && pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+      ],
+      "evidence": "knowledge e2e 8/8 (in-memory: no index, patterns, invalid args, lexical status/search/trace/slice, REQ-004 semantic, REQ-003 fallback + stale sqlite; stdio with HARNESS_ROOT) on Node 24.22.2; tsc and biome clean; built bin answers initialize and knowledge_status over stdio.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: tools/knowledge/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Retire knowledge-server.mjs; install tools/knowledge",
+      "user_visible_behavior": "The installer ships tools/knowledge source and its mcp.json entry; upgrades migrate the old knowledge entry and delete knowledge-server.mjs.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "bash scripts/test-install-into.sh",
+        "bash scripts/test-lifecycle.sh",
+        "npm test unit suite"
+      ],
+      "evidence": "test-install-into.sh OK (tools/knowledge shipped without test/node_modules/dist, launcher not-built message, legacy entry + file migration); lifecycle OK; kit unit tests 92/92 (3 server cases moved to tools/knowledge).",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    }
+  ]
+}

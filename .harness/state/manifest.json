@@ -4,12 +4,36 @@
   "domain_model_version": "0.0.0",
   "active_slices": [
     {
-      "slice_id": "kit-hygiene",
+      "slice_id": "agents-use-scripts",
       "phase": "discovery",
       "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/kit-hygiene/manifest.json",
-      "features": ".harness/features/kit-hygiene.features.json"
+      "mode": "lite",
+      "manifest": ".harness/state/slices/agents-use-scripts/manifest.json",
+      "features": ".harness/features/agents-use-scripts.features.json"
+    },
+    {
+      "slice_id": "asdd-cli",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/asdd-cli/manifest.json",
+      "features": ".harness/features/asdd-cli.features.json"
+    },
+    {
+      "slice_id": "cli-harness",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/cli-harness/manifest.json",
+      "features": ".harness/features/cli-harness.features.json"
+    },
+    {
+      "slice_id": "jev-gate-nest",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/jev-gate-nest/manifest.json",
+      "features": ".harness/features/jev-gate-nest.features.json"
     },
     {
       "slice_id": "jev-module",
@@ -18,6 +42,46 @@
       "mode": "full",
       "manifest": ".harness/state/slices/jev-module/manifest.json",
       "features": ".harness/features/jev-module.features.json"
+    },
+    {
+      "slice_id": "kit-hygiene",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/kit-hygiene/manifest.json",
+      "features": ".harness/features/kit-hygiene.features.json"
+    },
+    {
+      "slice_id": "knowledge-nest",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/knowledge-nest/manifest.json",
+      "features": ".harness/features/knowledge-nest.features.json"
+    },
+    {
+      "slice_id": "mcp-standalone",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/mcp-standalone/manifest.json",
+      "features": ".harness/features/mcp-standalone.features.json"
+    },
+    {
+      "slice_id": "modules-top-level",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/modules-top-level/manifest.json",
+      "features": ".harness/features/modules-top-level.features.json"
+    },
+    {
+      "slice_id": "spec-drift-merge",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/spec-drift-merge/manifest.json",
+      "features": ".harness/features/spec-drift-merge.features.json"
     }
   ]
 }

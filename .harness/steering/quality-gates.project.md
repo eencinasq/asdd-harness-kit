@@ -7,7 +7,7 @@ tags:
 
 # Quality gates — project binding (asdd-harness-kit)
 
-> **Project binding for the kit itself.** Never shipped: projects get the stub from `scripts/templates/bindings/quality-gates.project.md`.
+> **Project binding for the kit itself.** Never shipped: projects get the stub from `cli/templates/bindings/quality-gates.project.md`.
 
 Concrete commands, paths, and findings for [quality-gates.md](quality-gates.md). Fill every `…` slot before Discovery. A stub value does not satisfy a gate.
 
@@ -45,10 +45,10 @@ Before Discovery, replace `unfilled` with `none`, or with a table of one row per
 
 ## Spec drift and audit bindings
 
-Read by `drift-lib.mjs`, `audit-codebase.mjs`, and the `spec-drift-auditor` MCP server. A slot left as `…` uses the default in parentheses, or reports `unconfigured`; it never counts as a pass.
+Read by `drift-lib.mjs`, `asdd audit`, and the `spec-drift` MCP server. A slot left as `…` uses the default in parentheses, or reports `unconfigured`; it never counts as a pass.
 
 - Test file globs: `…` (default: `**/*.test.*`, `**/*.spec.*`, `**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/test-*.sh`)
-- Always-loaded steering budget: `31962` bytes (kit-only: `inclusion: always` steering plus `AGENTS.md`; checked by `scripts/check-guidance.mjs`; lower it when the steering shrinks, never raise it without a decision)
+- Always-loaded steering budget: `31962` bytes (kit-only: `inclusion: always` steering plus `AGENTS.md`; checked by `asdd kit guidance`; lower it when the steering shrinks, never raise it without a decision)
 - Drift base branch: `main` (default: `origin/HEAD`, then `main`, then `master`)
 - Audit commands: `…` (one `name=command` per backtick, for example `deps=npm audit --omit=dev`; unfilled → `unconfigured`)
 - Contract command: `…` (`http-api` module `openapi` adapter; non-zero exit = contract drift)

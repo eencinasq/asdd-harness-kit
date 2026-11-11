@@ -1,0 +1,52 @@
+{
+	"name": "knowledge",
+	"version": "1.0.0",
+	"private": true,
+	"description": "MCP server \u2014 harness knowledge index (search, trace, slice bundles) and learning patterns (asdd-harness-kit)",
+	"type": "module",
+	"engines": {
+		"node": ">=24.22.1"
+	},
+	"packageManager": "pnpm@12.12.1",
+	"bin": {
+		"knowledge": "bin/knowledge.mjs"
+	},
+	"files": [
+		"dist",
+		"bin/knowledge.mjs",
+		"README.md"
+	],
+	"scripts": {
+		"build": "tsc --noEmit && node scripts/build-server.mjs",
+		"start": "tsx watch src/main.ts",
+		"serve": "tsx src/main.ts",
+		"stdio": "tsx src/main.ts --stdio",
+		"typecheck": "tsc --noEmit",
+		"test": "node --import tsx --test \"test/**/*.e2e-spec.ts\"",
+		"serve:prod": "node dist/server/main.js",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write ."
+	},
+	"dependencies": {
+		"@modelcontextprotocol/server": "^2.4.0",
+		"@nestjs/common": "12.3.3",
+		"@nestjs/config": "12.1.0",
+		"@nestjs/core": "12.3.3",
+		"@nestjs/mcp": "0.0.3",
+		"@nestjs/platform-express": "12.3.3",
+		"express": "^5.3.0",
+		"reflect-metadata": "0.2.2",
+		"rxjs": "7.8.2",
+		"zod": "^4.6.7"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.6.4",
+		"@modelcontextprotocol/client": "^2.4.0",
+		"@nestjs/testing": "12.3.3",
+		"@types/express": "^5.0.6",
+		"@types/node": "^26.6.6",
+		"esbuild": "0.28.2",
+		"tsx": "^4.23.15",
+		"typescript": "^7.0.2"
+	}
+}

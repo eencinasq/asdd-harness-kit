@@ -8,9 +8,10 @@
 /.harness/steering/                 @your-org/tech-lead
 /AGENTS.md                          @your-org/tech-lead
 
-# Sensors: invariants, drift, audit
-/.harness/scripts/                  @your-org/tech-lead
+# Sensors: invariants, drift, audit (asdd itself is the asdd-harness-kit package, pinned in package.json)
 /.harness/config/project.json       @your-org/tech-lead
+/.cursor/hooks.json                 @your-org/tech-lead
+/.claude/settings.json              @your-org/tech-lead
 /.agents/mcp/                       @your-org/tech-lead
 
 # TL triage of audit findings

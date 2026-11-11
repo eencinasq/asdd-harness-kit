@@ -22,12 +22,11 @@ Shape Up inverts traditional estimation:
 
 **See:** [`references/methodology.md`](./references/methodology.md) for the full philosophy.
 
-## Gate mode (Jev module optional)
+## Gates
 
-Before betting, the pitch passes two gates: **appetite fit** (fits the appetite, no hidden complexity, feasible with the team's resources) and **rabbit holes** (every known rabbit hole is patched, cut by a no-go, or a reason to reject the bet). Read `.harness/config/project.json` → `modules.jev` to choose who decides:
+Before betting, the pitch passes two gates: **appetite fit** (fits the appetite, no hidden complexity, feasible with the team's resources) and **rabbit holes** (every known rabbit hole is patched, cut by a no-go, or a reason to reject the bet). A human decides them:
 
-- **`modules.jev: true` (Jev module):** call `jev_status`, then `jev_shape_up_gates` `{ pitch, appetite? }` on the `jev-gate` MCP server. Apply the pass rules in `.harness/steering/jev.md`. `unavailable` or `isError` stops the bet — set `JEV_API_KEY`; never fake a pass. Shell fallback only when MCP is down: `node .harness/scripts/jev-gates.mjs health`.
-- **Otherwise:** present each criterion above to the human with the pitch evidence, ask for pass or fail, and record the answer and who gave it (`decided_by`) next to the betting decision. A failed criterion means refine, patch the no-gos, or reject — never bet.
+- Present each criterion above to the human with the pitch evidence, ask for pass or fail, and record the answer and who gave it (`decided_by`) next to the betting decision. A failed criterion means refine, patch the no-gos, or reject — never bet.
 
 ---
 

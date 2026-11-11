@@ -1,7 +1,79 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-10-28T22:30:47.808Z",
+  "generated_at": "2026-11-11T01:11:17.908Z",
   "slices": [
+    {
+      "slice_id": "agents-use-scripts",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-11T01:11:17.853Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "asdd-cli",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-11T01:11:17.858Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "cli-harness",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-11T01:11:17.872Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "jev-gate-nest",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-11T01:11:17.874Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite"
+      ]
+    },
     {
       "slice_id": "jev-module",
       "phase": "knowledge",
@@ -12,7 +84,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-10-28T22:30:47.806Z",
+      "last_activity": "2026-11-11T01:11:17.883Z",
       "contributors": [
         "squad",
         "human",
@@ -38,7 +110,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-10-28T13:26:18.209Z",
+      "last_activity": "2026-11-11T01:11:17.897Z",
       "contributors": [
         "squad",
         "human",
@@ -52,6 +124,78 @@
         "asdd-implementation",
         "asdd-qa",
         "asdd-knowledge"
+      ]
+    },
+    {
+      "slice_id": "knowledge-nest",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-11T01:11:17.900Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "mcp-standalone",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-11T01:11:17.903Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "modules-top-level",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-11T01:11:17.905Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "spec-drift-merge",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-11T01:11:17.908Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite"
       ]
     }
   ]

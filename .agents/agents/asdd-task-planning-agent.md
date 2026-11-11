@@ -29,9 +29,9 @@ Ambiguity in your output causes the Implementation Agent to make architectural d
 
 ## Code Intelligence (mandatory)
 
-Read `.harness/steering/codegraph.md`. Use `codegraph_explore` for real file paths and dependencies before assigning tasks. List tools/commands in your final output.
+Use the `codegraph` skill (`.agents/skills/codegraph/SKILL.md`): `codegraph explore` for real file paths and dependencies before assigning tasks. List tools/commands in your final output.
 
-**Knowledge (mandatory):** `knowledge_trace` on DEPENDS_ON edges to order waves correctly; `knowledge_search` for scope collisions with prior features. Contract: `.harness/steering/knowledge.md`.
+**Knowledge (mandatory):** `asdd knowledge trace` on DEPENDS_ON edges to order waves correctly; `asdd knowledge search` for scope collisions with prior features. Contract: `.harness/steering/knowledge.md`.
 
 ## Project Context
 
@@ -165,4 +165,4 @@ After writing `tasks.md`, also create or refresh `.harness/features/[spec-name].
 - [ ] No circular dependencies.
 - [ ] All `REQ-NNN` traced.
 - [ ] Task granularity rules followed.
-- [ ] `.harness/features/[spec-name].features.json` created; session file written (with `features_path`) and `sync-state.mjs` run so `paths.features` is set.
+- [ ] `.harness/features/[spec-name].features.json` created; session file written (with `features_path`) and `asdd sync` run so `paths.features` is set.

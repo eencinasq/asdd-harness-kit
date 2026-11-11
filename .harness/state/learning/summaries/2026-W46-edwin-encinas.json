@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "author": "edwin-encinas",
+  "week": "2026-W46",
+  "signatures": {
+    "command:rm -rf": {
+      "source": "command",
+      "episodes": [
+        {
+          "at": "2026-11-10T21:37:19.064Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "denied: rm -rf"
+      ]
+    }
+  }
+}

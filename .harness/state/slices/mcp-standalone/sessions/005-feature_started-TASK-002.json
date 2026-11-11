@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "mcp-standalone",
+  "concerns": [],
+  "timestamp": "2026-11-10T14:30:00.000Z",
+  "phase": "implementation",
+  "session_id": "sess-mcp-standalone-005",
+  "event_type": "feature_started",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "scripts/vendor-harness-libs.mjs",
+    "package.json",
+    ".github/workflows/harness-invariants.yml",
+    "scripts/test-install-into.sh",
+    ".harness/config/versions.json",
+    "README.md",
+    ".agents/mcp/README.md",
+    ".harness/steering/structure.md"
+  ],
+  "evidence": "Start TASK-002 (REQ-003)"
+}

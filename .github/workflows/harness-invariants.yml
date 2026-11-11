@@ -15,19 +15,19 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Unit tests (Jev client, command gate, MCP gate server, spec drift, learning loop)
-        run: node --test .harness/scripts/learning-lib.test.mjs .harness/scripts/jev-client.test.mjs .harness/scripts/command-gate.test.mjs .agents/mcp/jev-gate-server.test.mjs .harness/scripts/drift-lib.test.mjs .harness/scripts/audit-codebase.test.mjs .agents/mcp/spec-drift-auditor.test.mjs .agents/modules/http-api/adapters/openapi.test.mjs tools/drift-dashboard/src/model.test.mjs
+      - name: Unit tests (command gate, spec drift, learning loop)
+        run: node --test cli/src/harness/learning-lib.test.mjs cli/src/harness/command-gate.test.mjs cli/src/harness/drift-lib.test.mjs cli/src/harness/audit-codebase.test.mjs cli/modules/http-api/adapters/openapi.test.mjs
 
       - name: Installer smoke test (runtimes + modules)
-        run: bash scripts/test-install-into.sh
+        run: bash cli/test/install.sh
 
       - name: Lifecycle e2e + negative invariant tests
-        run: bash scripts/test-lifecycle.sh
+        run: bash cli/test/lifecycle.sh
 
       - name: Project config and skills index
         run: |
-          node .harness/scripts/check-project-config.mjs
-          node .harness/scripts/check-skills-index.mjs
+          node cli/bin/asdd.mjs check-config
+          node cli/bin/asdd.mjs skills-index
 
       - name: Check harness invariants (registry exercised via sync-state; spec drift incl. DRIFT-07 on PRs)
         env:
@@ -35,11 +35,45 @@ jobs:
           HARNESS_PR_BODY: ${{ github.event.pull_request.body }}
           HARNESS_DRIFT_BASE: ${{ github.event.pull_request.base.sha }}
         run: |
-          node .harness/scripts/sync-state.mjs
-          node .harness/scripts/check-invariants.mjs --record
+          node cli/bin/asdd.mjs sync
+          node cli/bin/asdd.mjs check --record
 
       - name: Learning patterns (CI signals are not persisted from PRs; the scheduled audit commits them)
         if: always()
         env:
           HARNESS_AUTHOR: ci
-        run: node .harness/scripts/learn.mjs --all
+        run: node cli/bin/asdd.mjs learn --all
+
+  mcp-servers:
+    # NestJS MCP servers under tools/ (spec-drift: audit, analysis, PR review; jev-gate: Jev gates; knowledge: index + learning patterns)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tool: [spec-drift, jev-gate, knowledge]
+    defaults:
+      run:
+        working-directory: tools/${{ matrix.tool }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: tools/${{ matrix.tool }}/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: tools/${{ matrix.tool }}/.nvmrc
+          cache: pnpm
+          cache-dependency-path: tools/${{ matrix.tool }}/pnpm-lock.yaml
+      - name: Vendored harness libs match cli/src/harness
+        working-directory: .
+        run: node cli/bin/asdd.mjs kit vendor --check
+
+      - name: The kit installed copies match cli/
+        working-directory: .
+        run: node cli/bin/asdd.mjs kit self --check
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm test
+      - name: Audit tools e2e (spec-drift)
+        if: matrix.tool == 'spec-drift'
+        run: node --import tsx --test test/audit.e2e-spec.ts

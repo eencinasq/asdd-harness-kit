@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-cli",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-asdd-cli-003",
+  "timestamp": "2026-11-10T21:00:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/**",
+    "scripts/**"
+  ],
+  "evidence": "Start TASK-001"
+}
