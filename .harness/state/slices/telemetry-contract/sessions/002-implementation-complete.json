@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-contract-002",
+  "timestamp": "2026-11-11T05:35:00.000Z",
+  "agent": "devin",
+  "human": "",
+  "slice_id": "telemetry-contract",
+  "event_type": "phase_completed",
+  "phase": "implementation",
+  "mode": "lite",
+  "evidence": "Landed harness.profiling v2 Phase-1 contract (commit 468649d): .harness/state/telemetry/telemetry.schema.json (§2.2 verbatim — 9 kinds, env-correlation HARNESS_TRACE_ID/HARNESS_SPAN_ID with trace_source, evaluator-reserved heuristic/trigger_span_id/source, failure_signature, _est honesty) + README.md one-pager with the §2.3 4-line conformance exemplar. Exemplar validated programmatically against the LANDED schema — required keys, enums, id patterns, closed top level, ≤4KB lines, reserved-attr discipline, trace-model consistency (env-child, synthesized phase own-trace, detection self-trace). Zero code/installer/config/gitignore edits per §8.1 — Phase-2 guardrails AR-1..AR-10 stay deferred; no span data exists yet.",
+  "concerns": []
+}
