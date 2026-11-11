@@ -1,6 +1,6 @@
 {
   "name": "asdd-harness-kit",
-  "version": "3.8.1",
+  "version": "3.9.0",
   "description": "Portable process layer for Agent Specification-Driven Development (ASDD) and Harness Engineering",
   "bin": {
     "asdd": "cli/bin/asdd.mjs",
