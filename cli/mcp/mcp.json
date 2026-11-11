@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "knowledge": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "tools/knowledge/bin/knowledge.mjs"
+      ],
+      "enabled": true
+    },
+    "spec-drift": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "tools/spec-drift/bin/spec-drift.mjs"
+      ],
+      "enabled": true
+    },
+    "jev-gate": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "tools/jev-gate/bin/jev-gate.mjs"
+      ],
+      "enabled": true
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://asdd-harness-kit.io/schemas/harness-project.json",
+  "title": "ASDD Harness project configuration",
+  "type": "object",
+  "required": ["schema_version", "project_id", "harness_version", "mode", "paths", "bindings", "modules", "capabilities"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "project_id": { "type": "string", "minLength": 1 },
+    "kit": {
+      "type": "object",
+      "required": ["name", "source", "ref"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "ref": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "installed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "harness_version": { "type": "string", "minLength": 1 },
+    "mode": { "enum": ["full", "lite", "escalated"] },
+    "bindings_complete": { "type": "boolean" },
+    "paths": {
+      "type": "object",
+      "required": ["steering", "specs", "state", "features", "progress_index"],
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "bindings": {
+      "type": "object",
+      "required": ["product", "structure", "tech", "domain_layer", "quality_gates"],
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "commands": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1 } },
+    "modules": { "type": "object", "additionalProperties": { "type": "boolean" } },
+    "drift": {
+      "type": "object",
+      "properties": {
+        "contract": { "enum": ["warn", "fail"], "description": "Severity of DRIFT-06 (every feature has scope_paths; passing features have evidence)." }
+      }
+    },
+    "capabilities": { "type": "object" }
+  }
+}
