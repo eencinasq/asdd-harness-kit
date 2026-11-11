@@ -3,6 +3,7 @@ inclusion: auto
 tags:
   - validation
   - qa
+classification: binding
 ---
 
 # Quality gates — project binding (asdd-harness-kit)
@@ -48,7 +49,7 @@ Before Discovery, replace `unfilled` with `none`, or with a table of one row per
 Read by `drift-lib.mjs`, `asdd audit`, and the `spec-drift` MCP server. A slot left as `…` uses the default in parentheses, or reports `unconfigured`; it never counts as a pass.
 
 - Test file globs: `…` (default: `**/*.test.*`, `**/*.spec.*`, `**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/test-*.sh`)
-- Always-loaded steering budget: `31962` bytes (kit-only: `inclusion: always` steering plus `AGENTS.md`; checked by `asdd kit guidance`; lower it when the steering shrinks, never raise it without a decision)
+- Always-loaded steering budget: `34000` bytes (kit-only: `inclusion: always` steering plus `AGENTS.md`; checked by `asdd kit guidance`; lower it when the steering shrinks, never raise it without a decision. **Recorded decision:** raised `32600`→`34000` per `@asdd/proposals/harness.stearing/v1` `D-5` — effectively-always sensor tier lands before any further raise or any `auto`→`always` reclassification)
 - Drift base branch: `main` (default: `origin/HEAD`, then `main`, then `master`)
 - Audit commands: `…` (one `name=command` per backtick, for example `deps=npm audit --omit=dev`; unfilled → `unconfigured`)
 - Contract command: `…` (`http-api` module `openapi` adapter; non-zero exit = contract drift)

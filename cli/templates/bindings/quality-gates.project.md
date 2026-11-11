@@ -3,6 +3,7 @@ inclusion: auto
 tags:
   - validation
   - qa
+classification: binding
 ---
 
 # Quality gates — project binding

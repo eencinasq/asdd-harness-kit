@@ -9,7 +9,7 @@ import { filesUnder, isSymlink } from './context.mjs';
 
 const STEERING = [
   'domain-layer.md', 'quality-gates.md', 'manifest.md', 'session-loop.md', 'asdd-lite.md', 'knowledge.md',
-  'skills.md', 'security-rules.md', 'controls.md', 'spec-drift.md', 'README.md',
+  'skills.md', 'security-rules.md', 'controls.md', 'spec-drift.md', 'README.md', '_steering-profile.md',
 ];
 
 /** Where the shipped steering lives in the kit: the CLI. The kit's own .harness/steering holds only its bindings (and links). */
@@ -23,6 +23,7 @@ export const HARNESS_FILES = [
   ['.harness/config/versions.json', 'cli/versions.json'],
   ['.harness/config/models.json', 'cli/scaffold/config/models.json'],
   ['.harness/config/skill-profile-waivers.json', 'cli/scaffold/config/skill-profile-waivers.json'],
+  ['.harness/config/steering.registry.json', 'cli/scaffold/config/steering.registry.json'],
 ];
 /** READMEs of the project's own folders: written once, then the project's. */
 const FOLDER_READMES = ['specs', 'features', 'state/slices', 'state/archive'];

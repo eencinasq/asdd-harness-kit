@@ -12,6 +12,7 @@ tags:
   - knowledge
   - refactor
   - lite
+classification: portable
 ---
 
 # Knowledge — process memory (mandatory when indexed)

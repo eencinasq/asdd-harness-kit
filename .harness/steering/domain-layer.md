@@ -3,6 +3,7 @@ inclusion: auto
 tags:
   - discovery
   - domain
+classification: portable
 ---
 
 # Domain logic placement contract

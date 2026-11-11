@@ -5,6 +5,7 @@ tags:
   - qa
   - implementation
   - task_planning
+classification: portable
 ---
 
 # Quality Gates

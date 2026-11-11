@@ -2,6 +2,7 @@
 inclusion: auto
 tags:
   - domain
+classification: binding
 ---
 
 # Domain layer — project binding (stub)

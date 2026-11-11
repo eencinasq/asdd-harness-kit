@@ -18,7 +18,7 @@ mkdir -p "$TMP/existing-app"
 echo '# my product' >"$TMP/existing-app/README.md"
 # Pretend project already has a filled binding that must be kept
 mkdir -p "$TMP/existing-app/.harness/steering"
-echo '# KEEP ME' >"$TMP/existing-app/.harness/steering/product.md"
+printf -- '---\ninclusion: auto\ntags:\n  - discovery\nclassification: binding\n---\n\n# KEEP ME\n' >"$TMP/existing-app/.harness/steering/product.md"
 # Simulate an upgrade from a kit that still shipped Scrum-era files
 mkdir -p "$TMP/existing-app/.agents/skills/product-delivery/agents" "$TMP/existing-app/.agents/skills/user-story-decomposition"
 echo '# Sprint Planning Agent' >"$TMP/existing-app/.agents/skills/product-delivery/agents/sprint-planning.md"

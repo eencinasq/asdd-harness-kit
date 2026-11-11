@@ -27,7 +27,9 @@ test('derivePaths takes features from the latest session with features_path', ()
 
 test('steering frontmatter parser reads inclusion and tags', () => {
   const fm = parseSteeringFrontmatter('---\ninclusion: auto\ntags:\n  - qa\n  - task_planning\n---\n# x\n');
-  assert.deepEqual(fm, { inclusion: 'auto', tags: ['qa', 'task_planning'] });
+  assert.deepEqual(fm, { inclusion: 'auto', tags: ['qa', 'task_planning'], classification: null });
+  const fm2 = parseSteeringFrontmatter('---\ninclusion: always\nclassification: portable\n---\n# x\n');
+  assert.deepEqual(fm2, { inclusion: 'always', tags: [], classification: 'portable' });
   assert.equal(parseSteeringFrontmatter('# no frontmatter'), null);
 });
 

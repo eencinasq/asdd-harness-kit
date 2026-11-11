@@ -1,5 +1,6 @@
 ---
 inclusion: always
+classification: portable
 ---
 
 # State Manifest — schema v3.0 (multi-slice, session-based)

@@ -1,5 +1,6 @@
 ---
 inclusion: always
+classification: portable
 ---
 
 # Session loop (Harness Engineering ∩ ASDD)

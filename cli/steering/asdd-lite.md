@@ -2,6 +2,7 @@
 inclusion: auto
 tags:
   - lite
+classification: portable
 ---
 
 # ASDD-Lite — Default Path (Lite-First)

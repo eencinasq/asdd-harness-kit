@@ -5,6 +5,7 @@ tags:
   - qa
   - refactor
   - review
+classification: portable
 ---
 
 # Spec drift and audit

@@ -1,0 +1,192 @@
+{
+  "kit": {
+    ".harness/steering/_steering-profile.md": {
+      "class": "contract-doc",
+      "inclusion": "none",
+      "coverage": "none",
+      "note": "normative profile doc; no frontmatter by design"
+    },
+    ".harness/steering/README.md": {
+      "class": "index",
+      "inclusion": "always",
+      "coverage": "always"
+    },
+    ".harness/steering/controls.md": {
+      "class": "portable",
+      "inclusion": "always",
+      "coverage": "always"
+    },
+    ".harness/steering/manifest.md": {
+      "class": "portable",
+      "inclusion": "always",
+      "coverage": "always"
+    },
+    ".harness/steering/security-rules.md": {
+      "class": "portable",
+      "inclusion": "always",
+      "coverage": "always"
+    },
+    ".harness/steering/session-loop.md": {
+      "class": "portable",
+      "inclusion": "always",
+      "coverage": "always"
+    },
+    ".harness/steering/skills.md": {
+      "class": "hybrid-index",
+      "inclusion": "always",
+      "coverage": "always"
+    },
+    ".harness/steering/asdd-lite.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "lite"
+      ]
+    },
+    ".harness/steering/design-system.md": {
+      "class": "binding",
+      "inclusion": "auto",
+      "coverage": [
+        "design",
+        "ui"
+      ]
+    },
+    ".harness/steering/domain-layer.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "discovery",
+        "domain",
+        "design",
+        "task_planning",
+        "implementation",
+        "qa"
+      ],
+      "note": "G-3 starvation — duties span 6 keys, tagged 2"
+    },
+    ".harness/steering/domain-layer.project.md": {
+      "class": "binding",
+      "inclusion": "auto",
+      "coverage": [
+        "discovery",
+        "domain",
+        "design",
+        "task_planning",
+        "implementation",
+        "qa"
+      ],
+      "note": "G-3 starvation — binding must track contract coverage"
+    },
+    ".harness/steering/knowledge.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "discovery",
+        "spec",
+        "domain",
+        "design",
+        "task_planning",
+        "implementation",
+        "qa",
+        "knowledge",
+        "refactor",
+        "lite"
+      ],
+      "note": "G-1 pseudo-always — Phase 2 decides reclass-always (recorded budget decision) vs retag"
+    },
+    ".harness/steering/product.md": {
+      "class": "binding",
+      "inclusion": "auto",
+      "coverage": [
+        "discovery"
+      ]
+    },
+    ".harness/steering/quality-gates.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "discovery",
+        "spec",
+        "validation",
+        "domain",
+        "design",
+        "task_planning",
+        "implementation",
+        "qa",
+        "knowledge",
+        "refactor",
+        "lite"
+      ],
+      "note": "G-2 starvation — gates defined for untagged phases (QG-DIS/SPEC/DES); QG-DEC-09 chain applies at every phase transition; QG-LEARN is the knowledge-phase gate; G-14 split planned"
+    },
+    ".harness/steering/quality-gates.project.md": {
+      "class": "binding",
+      "inclusion": "auto",
+      "coverage": [
+        "validation",
+        "qa"
+      ],
+      "note": "GT-1/AR-5 — gate-eval timing unverified; audit in Phase-2 before retag"
+    },
+    ".harness/steering/spec-drift.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "implementation",
+        "qa",
+        "refactor",
+        "review"
+      ]
+    },
+    ".harness/steering/structure.md": {
+      "class": "binding",
+      "inclusion": "auto",
+      "coverage": [
+        "discovery",
+        "design"
+      ]
+    },
+    ".harness/steering/tech.md": {
+      "class": "binding",
+      "inclusion": "auto",
+      "coverage": [
+        "discovery",
+        "design"
+      ]
+    },
+    ".harness/steering/templates/capability.md": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/code-review-report.md": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/design.md": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/intent.md": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/requirements.md": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/slice-manifest.stub.json": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/spec-coverage-report.md": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/spec-peer-review.md": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/spec-validation-report.md": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/steering-proposal.md": {
+      "class": "artifact_template"
+    },
+    ".harness/steering/templates/tasks.md": {
+      "class": "artifact_template"
+    }
+  },
+  "project": {}
+}

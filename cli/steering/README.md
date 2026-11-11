@@ -1,10 +1,13 @@
 ---
 inclusion: always
+classification: index
 ---
 
 # Harness steering (kit)
 
 **SoT** for line-base rules. Agents **Read** files here directly.
+
+Profile: [`_steering-profile.md`](./_steering-profile.md) — the `kit_steering_rule` grammar, tag vocabulary, and budget rules every file here conforms to.
 
 Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-harness-kit#adopter-checklist) · Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit)
 

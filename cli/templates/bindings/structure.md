@@ -3,6 +3,7 @@ inclusion: auto
 tags:
   - discovery
   - design
+classification: binding
 ---
 
 # Project structure (stub)

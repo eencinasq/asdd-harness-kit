@@ -1,5 +1,6 @@
 ---
 inclusion: always
+classification: hybrid-index
 ---
 
 # ASDD skills index (kit)
