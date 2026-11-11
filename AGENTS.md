@@ -34,6 +34,15 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 | `.harness/PROGRESS.md` | **Generated** active slices table for humans (`asdd sync`) |
 | `.harness/knowledge/` | **Generated** knowledge index (graph + chunks via `asdd knowledge sync`; `asdd knowledge` queries it) |
 
+## Modular rules
+
+`.agents/rules/` is the canonical modular-policy root (`modular_policy` profile — normative grammar: [`.agents/rules/_rule-profile.md`](.agents/rules/_rule-profile.md)). A modular rule is unconditional, declarative negative space inside its declared scope; it outranks agents, skills, and prompts. Steering under `.harness/steering/` is a tag-scoped rule subtype — one file, one grammar; a `.agents/rules/` file never carries `inclusion:`/`tags:`.
+
+- Discovery is by reference: when a task falls inside a rule's declared scope, **Read** the rule file by path before acting — rules are never assumed to load ambiently.
+- `_`-prefixed files (e.g. `_rule-profile.md`) are contract documents, not active rules.
+- When dispatching a task inside a rule's scope, include the rule's path in the dispatch contract — a rule binds a mounted subagent only when a reference reaches it.
+- Routing entries for specific rules are added here as rules land.
+
 ## Working rules
 
 1. One `in_progress` by default. Same-slice concurrency must follow ownership, dependency, and scope rules in `.harness/steering/session-loop.md`.
