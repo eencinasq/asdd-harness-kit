@@ -1,20 +1,35 @@
 {
   "schema_version": "3.0",
   "slice_id": "rules-landing",
-  "phase": "discovery",
-  "status": "in_progress",
+  "phase": "knowledge",
+  "status": "DONE",
   "mode": "lite",
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-11T05:14:25.093Z",
-  "updated_at": "2026-11-11T05:14:25.094Z",
+  "updated_at": "2026-11-11T05:15:44.743Z",
   "paths": {
     "specs": ".harness/specs/rules-landing",
     "tasks": ".harness/specs/rules-landing/tasks.md",
     "features": ".harness/features/rules-landing.features.json"
   },
-  "gates": {},
+  "gates": {
+    "implementation": {
+      "status": "PASS",
+      "by": "devin",
+      "at": "2026-11-11T05:20:00.000Z",
+      "evidence": "Landed rules proposal v1 Phase-1 checklist L-1+L-2 (commit 505d820): .agents/rules/_rule-profile.md contract-doc; install_rules_core with [[ -d ]] precondition inside install_agents_core; guard_rule_collisions (file-level, managed_files provenance, legacy halt, --force no bypass, --dry-run reports) invoked in main() before install_agents_core; generate-versions.mjs .agents/rules walk + _rule-profile.md stamped @3.8.1; test-install-into.sh rule-guard parity block — full suite passes. L-3 (commit 89fec10): AGENTS.md ## Modular rules section (D-8 reference discovery + AR-7 interim dispatch-path clause). Phase-2 guardrails AR-1..AR-7 stay deferred; .harness/steering/* untouched (Q-R1). check-invariants DRIFT-02 FAILs verified pre-existing at 1891ace via stash-and-recheck — baseline drift, not introduced by this slice.",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "devin",
+      "at": "2026-11-11T05:21:00.000Z",
+      "evidence": "Slice complete — rules v1 Phase-1 landing done at 505d820 + 89fec10. Two commits per landing checklist (L-1+L-2 atomic, L-3 separate). Ripple for sibling awareness: .agents/rules/ root now exists; guard_rule_collisions landed (agents/v2 D-7 guard_agent_collisions still unlanded — AR-6 parity note recorded in the L-1/L-2 commit message); _runtime-template.md mount-propagation remains Phase-2 AR-7.",
+      "concerns": []
+    }
+  },
   "active_features": [],
   "open_dissents": 0,
   "source": null,
@@ -26,10 +41,27 @@
       "event": "phase_started",
       "phase": "discovery",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-11T05:20:00.000Z",
+      "agent": "devin",
+      "human": "",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-11T05:21:00.000Z",
+      "agent": "devin",
+      "human": "",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
     }
   ],
   "contributors": [
     "squad",
-    "human"
+    "human",
+    "devin"
   ]
 }

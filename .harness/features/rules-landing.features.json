@@ -2,5 +2,38 @@
   "schema_version": "1.0",
   "slice_id": "rules-landing",
   "source_tasks": ".harness/specs/rules-landing/tasks.md",
-  "features": []
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Land L-1+L-2: modular-policy root + installer wiring + version stamping + guard parity tests",
+      "user_visible_behavior": "Consumers installing the kit receive .agents/rules/_rule-profile.md (version-stamped, refresh-managed); a consumer-authored same-name rule file halts the install instead of being clobbered; a missing kit rules dir never hard-fails the install; unique-name consumer rules survive.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "devin",
+      "req_ids": ["D-7", "D-10"],
+      "depends_on": [],
+      "verification": [
+        "bash -n scripts/install-into.sh && node --check scripts/generate-versions.mjs",
+        "node scripts/generate-versions.mjs  # .agents/rules/_rule-profile.md stamped @3.8.1",
+        "bash scripts/test-install-into.sh  # '== rule collision guard ==' OK + all prior blocks"
+      ],
+      "evidence": "test-install-into.sh full pass incl. new rule-guard block (halt on unmanaged same-name, --force no bypass, --dry-run reports, LEGACY INSTALL halt, unique-name payments.md survives, kit _rule-profile.md installs). versions.json artifact count 157 incl. .agents/rules/_rule-profile.md.",
+      "evidence_commit": "505d820"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Land L-3: AGENTS.md ## Modular rules routing section",
+      "user_visible_behavior": "Every kit-supported runtime sees the .agents/rules/ discovery contract via the always-on root rule: reference-based Read, contract-doc note, dispatch-path interim (AR-7), routing entries deferred until real rules land (IC-2).",
+      "status": "passing",
+      "priority": 2,
+      "owner": "devin",
+      "req_ids": ["D-8", "IC-2", "AR-7-interim"],
+      "depends_on": ["TASK-001"],
+      "verification": [
+        "grep -n '## Modular rules' AGENTS.md  # section present, links .agents/rules/_rule-profile.md"
+      ],
+      "evidence": "AGENTS.md +9 lines between System of record and Working rules; names the canonical root, _-prefix contract-doc convention, interim dispatch-path clause, and deferred routing entries.",
+      "evidence_commit": "89fec10"
+    }
+  ]
 }
