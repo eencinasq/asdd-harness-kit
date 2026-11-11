@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-cli",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-asdd-cli-007",
+  "timestamp": "2026-11-10T23:00:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-003",
+  "scope_paths": [
+    "cli/**",
+    "package.json",
+    "README.md",
+    ".harness/config/versions.json"
+  ],
+  "evidence": "Start TASK-003 (REQ-007..011)"
+}

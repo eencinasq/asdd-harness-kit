@@ -1,0 +1,68 @@
+{
+	"name": "spec-drift",
+	"version": "1.0.0",
+	"private": true,
+	"description": "MCP App — Semgrep architecture/standards, project-agnostic GitHub PR review, and asdd-harness spec drift audit",
+	"type": "module",
+	"engines": {
+		"node": ">=24.22.1"
+	},
+	"packageManager": "pnpm@12.12.1",
+	"bin": {
+		"spec-drift": "bin/spec-drift.mjs"
+	},
+	"files": [
+		"dist",
+		"bin/spec-drift.mjs",
+		"README.md",
+		"THIRD_PARTY_NOTICES.md"
+	],
+	"scripts": {
+		"build": "tsc --noEmit && cross-env INPUT=analysis-dashboard.html vite build && cross-env INPUT=pr-review.html vite build && cross-env INPUT=audit-dashboard.html vite build && node scripts/build-server.mjs",
+		"start": "concurrently --raw \"cross-env NODE_ENV=development INPUT=analysis-dashboard.html vite build --watch\" \"cross-env NODE_ENV=development INPUT=pr-review.html vite build --watch\" \"cross-env NODE_ENV=development INPUT=audit-dashboard.html vite build --watch\" \"tsx watch src/main.ts\"",
+		"serve": "tsx src/main.ts",
+		"stdio": "tsx src/main.ts --stdio",
+		"typecheck": "tsc --noEmit",
+		"test": "node --import tsx --test \"src/**/*.spec.ts\" \"ui/**/*.spec.ts\"",
+		"test:e2e": "node --import tsx --test --test-concurrency=1 \"test/**/*.e2e-spec.ts\"",
+		"smoke:analysis": "tsx scripts/analysis-live-scan.mts",
+		"measure:context": "node --import tsx scripts/measure-review-context.mts",
+		"eval": "node --import tsx scripts/eval.mts",
+		"inspect": "mcp-inspector --web --config mcp-inspector.json",
+		"inspect:cli": "mcp-inspector --cli --config mcp-inspector.json --server spec-drift",
+		"build:server": "node scripts/build-server.mjs",
+		"serve:prod": "node dist/server/main.js",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write ."
+	},
+	"dependencies": {
+		"@modelcontextprotocol/client": "^2.4.0",
+		"@modelcontextprotocol/ext-apps": "^2.0.4",
+		"@modelcontextprotocol/server": "^2.4.0",
+		"@nestjs/common": "12.3.3",
+		"@nestjs/config": "12.1.0",
+		"@nestjs/core": "12.3.3",
+		"@nestjs/mcp": "0.0.3",
+		"@nestjs/platform-express": "12.3.3",
+		"express": "^5.3.0",
+		"reflect-metadata": "0.2.2",
+		"rxjs": "7.8.2",
+		"yaml": "2.9.1",
+		"zod": "^4.6.7"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.6.4",
+		"@modelcontextprotocol/inspector": "2.14.0",
+		"@nestjs/testing": "12.3.3",
+		"@types/express": "^5.0.6",
+		"@types/node": "^26.6.6",
+		"concurrently": "^9.2.5",
+		"cross-env": "^10.1.0",
+		"esbuild": "0.28.2",
+		"playwright": "1.64.1",
+		"tsx": "^4.23.15",
+		"typescript": "^7.0.2",
+		"vite": "^8.3.5",
+		"vite-plugin-singlefile": "^2.3.4"
+	}
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "mcp-standalone",
+  "source_tasks": ".harness/specs/mcp-standalone/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Self-contained MCP servers",
+      "user_visible_behavior": "spec-drift, jev-gate and knowledge answer their tools for a project with no .harness/scripts; they load no harness module at runtime.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/<name> && pnpm typecheck && pnpm lint && pnpm test (each server)",
+        "built bins called over stdio with HARNESS_ROOT = a copy of .harness without scripts/"
+      ],
+      "evidence": "spec-drift unit 108/108 + audit e2e 18/18, jev-gate e2e 9/9 (stdio root without scripts), knowledge e2e 8/8 (index built with the vendored writer) on Node 24.22.2; tsc and biome clean; built bins answered knowledge_slice, knowledge_patterns, check_command_safety, jev_status (fail closed), audit_diff, verify_spec_compliance against a root with no .harness/scripts.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: tools/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Vendored-copy parity check",
+      "user_visible_behavior": "npm test and CI fail when a tools/*/src/harness copy differs from .harness/scripts; the installer ships the copies.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node scripts/vendor-harness-libs.mjs --check",
+        "npm test"
+      ],
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "evidence": "npm test exit 0: vendor --check OK, install-into smoke OK (tools/*/src/harness shipped), lifecycle OK, kit unit tests 92/92; CI mcp-servers job runs the same --check.",
+      "notes": "Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    }
+  ]
+}

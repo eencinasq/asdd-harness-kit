@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>PR review</title>
+	</head>
+	<body>
+		<div class="app" id="app" aria-busy="true">
+			<header class="header">
+				<div class="header-text">
+					<p class="eyebrow" id="repo-label">Pull request review</p>
+					<h1 id="pr-title">Waiting for review data…</h1>
+					<p class="meta" id="review-meta"></p>
+				</div>
+				<div class="toolbar">
+					<button type="button" id="open-pr" class="btn btn-ghost" hidden>Open on GitHub ↗</button>
+					<button type="button" id="reload" class="btn" disabled>Reload</button>
+				</div>
+			</header>
+
+			<ol class="stepper" id="stepper" aria-label="Review progress" hidden>
+				<li data-step="prepared"><span>Prepared</span></li>
+				<li data-step="reviewing"><span>Reviewing</span></li>
+				<li data-step="draft"><span>Draft ready</span></li>
+				<li data-step="published"><span>Submitted</span></li>
+			</ol>
+
+			<div id="loading" class="skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+			<div id="empty" hidden></div>
+
+			<section class="kpis" id="kpis" aria-label="Summary" hidden>
+				<div class="kpi">
+					<span class="kpi-label">Coverage</span>
+					<strong class="kpi-value" id="kpi-coverage">—</strong>
+					<div class="meter" id="coverage-meter" role="meter" aria-label="Review coverage" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+						<span id="coverage-bar"></span>
+					</div>
+				</div>
+				<div class="kpi">
+					<span class="kpi-label">Inline comments</span>
+					<strong class="kpi-value" id="kpi-inlines">0</strong>
+					<span class="kpi-hint" id="kpi-inlines-hint"></span>
+				</div>
+				<div class="kpi" id="kpi-req-card" hidden>
+					<span class="kpi-label">Ticket criteria</span>
+					<strong class="kpi-value" id="kpi-req">—</strong>
+					<span class="kpi-hint" id="kpi-req-hint"></span>
+				</div>
+				<div class="kpi" id="kpi-arch-card">
+					<span class="kpi-label">Architecture</span>
+					<strong class="kpi-value" id="kpi-arch">—</strong>
+					<span class="kpi-hint" id="kpi-arch-hint"></span>
+				</div>
+				<div class="kpi">
+					<span class="kpi-label">Revision</span>
+					<strong class="kpi-value" id="kpi-rev">—</strong>
+					<span class="kpi-hint" id="kpi-rev-hint"></span>
+				</div>
+			</section>
+
+			<div id="alerts" class="stack"></div>
+
+			<div class="tabs" role="tablist" aria-label="Review sections" id="tabs" hidden>
+				<button type="button" role="tab" id="tab-comments" data-tab="comments" aria-controls="panel-comments">
+					Comments <span class="count" id="count-comments">0</span>
+				</button>
+				<button type="button" role="tab" id="tab-requirements" data-tab="requirements" aria-controls="panel-requirements" hidden>
+					Requirements <span class="count" id="count-requirements">0</span>
+				</button>
+				<button type="button" role="tab" id="tab-coverage" data-tab="coverage" aria-controls="panel-coverage">
+					Coverage <span class="count" id="count-coverage">0</span>
+				</button>
+				<button type="button" role="tab" id="tab-architecture" data-tab="architecture" aria-controls="panel-architecture">
+					Architecture <span class="count" id="count-architecture">0</span>
+				</button>
+				<button type="button" role="tab" id="tab-report" data-tab="report" aria-controls="panel-report">Report</button>
+			</div>
+
+			<section role="tabpanel" id="panel-comments" aria-labelledby="tab-comments" hidden>
+				<p class="subtle">
+					Edit what will be posted. Keep inline comments under <span id="inline-limit">80</span> words and the
+					summary under <span id="summary-limit">350</span>.
+				</p>
+				<ul class="list" id="inline-list"></ul>
+				<div class="field">
+					<label class="field-label" for="summary">
+						<span>Review summary</span>
+						<span id="summary-words">0 words</span>
+					</label>
+					<textarea id="summary" class="textarea" rows="8" spellcheck="true"></textarea>
+				</div>
+			</section>
+
+			<section role="tabpanel" id="panel-requirements" aria-labelledby="tab-requirements" hidden>
+				<div class="toolbar">
+					<div class="stack" style="gap: 2px">
+						<strong id="ticket-title"></strong>
+						<span class="subtle" id="ticket-meta"></span>
+					</div>
+					<span class="spacer"></span>
+					<button type="button" class="btn btn-ghost" id="open-ticket" hidden>Open ticket ↗</button>
+				</div>
+				<div id="requirements-alert"></div>
+				<ul class="list" id="requirements-list"></ul>
+				<div id="requirements-extra" class="stack"></div>
+				<div class="toolbar">
+					<span class="subtle" id="requirements-dirty" aria-live="polite"></span>
+					<span class="spacer"></span>
+					<button type="button" class="btn" id="save-requirements" disabled>Save verdicts</button>
+				</div>
+			</section>
+
+			<section role="tabpanel" id="panel-coverage" aria-labelledby="tab-coverage" hidden></section>
+
+			<section role="tabpanel" id="panel-architecture" aria-labelledby="tab-architecture" hidden>
+				<div id="architecture-summary" class="stack"></div>
+				<div class="toolbar" id="architecture-actions">
+					<button type="button" class="btn btn-primary" id="generate-rules" hidden>Ask the agent to write rules</button>
+					<button type="button" class="btn" id="import-architecture" hidden>Add selected to comments</button>
+					<button type="button" class="btn btn-ghost" id="import-architecture-all" hidden>Add all</button>
+					<span class="spacer"></span>
+					<button type="button" class="btn btn-ghost" id="rescan-architecture">Rescan</button>
+				</div>
+				<ul class="list" id="architecture-list"></ul>
+			</section>
+
+			<section role="tabpanel" id="panel-report" aria-labelledby="tab-report" hidden>
+				<div class="toolbar">
+					<span class="subtle">The analysis the agent wrote. Not posted to GitHub.</span>
+					<span class="spacer"></span>
+					<div class="segmented" role="group" aria-label="Report view" id="report-mode">
+						<button type="button" data-value="formatted" aria-pressed="true">Formatted</button>
+						<button type="button" data-value="markdown" aria-pressed="false">Markdown</button>
+					</div>
+					<button type="button" class="btn" id="send-agent">Ask the agent to revise</button>
+				</div>
+				<article class="card markdown" id="report-rendered"></article>
+				<pre id="report-view" class="block" hidden></pre>
+			</section>
+
+			<p id="status" class="status"></p>
+
+			<section class="actionbar" id="actionbar" aria-label="Submit review" hidden>
+				<fieldset class="choices" id="event-choices">
+					<legend>Decision</legend>
+					<label class="choice"><input type="radio" name="event" value="APPROVE" /> Approve</label>
+					<label class="choice"><input type="radio" name="event" value="REQUEST_CHANGES" /> Request changes</label>
+					<label class="choice"><input type="radio" name="event" value="COMMENT" /> Comment</label>
+				</fieldset>
+				<div class="toolbar">
+					<span class="subtle" id="dirty-state" aria-live="polite"></span>
+					<span class="spacer"></span>
+					<button type="button" class="btn btn-ghost" id="save" disabled>Save draft</button>
+					<button type="button" class="btn" id="publish-pending" title="Visible only to you on GitHub until you submit it there">
+						Save as pending on GitHub
+					</button>
+					<button type="button" class="btn btn-primary" id="publish" aria-describedby="publish-hint">Submit review…</button>
+				</div>
+				<p class="subtle" id="publish-hint" hidden></p>
+				<div class="callout tone-warning" id="confirm" role="alertdialog" aria-labelledby="confirm-title" hidden>
+					<p class="callout-title" id="confirm-title"></p>
+					<p id="confirm-body"></p>
+					<div class="toolbar">
+						<button type="button" class="btn btn-primary" id="confirm-publish">Submit review</button>
+						<button type="button" class="btn btn-ghost" id="cancel-publish">Cancel</button>
+					</div>
+				</div>
+			</section>
+		</div>
+		<script type="module" src="./pr-review/main.ts"></script>
+	</body>
+</html>

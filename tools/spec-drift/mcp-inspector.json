@@ -1,0 +1,13 @@
+{
+	"mcpServers": {
+		"spec-drift": {
+			"type": "stdio",
+			"command": "bin/mcp-stdio",
+			"args": []
+		},
+		"spec-drift-http": {
+			"type": "streamable-http",
+			"url": "http://localhost:3010/mcp"
+		}
+	}
+}

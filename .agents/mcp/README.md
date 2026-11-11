@@ -1,36 +1,40 @@
 # Shared MCP (kit baseline)
 
-**Canonical:** [`mcp.json`](mcp.json) — codegraph, knowledge, and spec-drift-auditor (zero dependencies, no SDK required). The `jev-gate` entry is added only by the `jev` module (`.agents/modules/jev/mcp.json`).
+**Canonical for the kit repo:** [`mcp.json`](mcp.json) — knowledge (`tools/knowledge`) and spec-drift (`tools/spec-drift`). Both NestJS servers are built once with `pnpm install && pnpm build` in their folder (Node ≥ 24.22.1)., plus `jev-gate` (`tools/jev-gate`): System One gates for people in chat, not part of the harness or the ASDD pipeline.
 
-With the `jev` module, the `jev-gate` MCP server (`.agents/mcp/jev-gate-server.mjs`) exposes:
+**Projects:** `asdd install` does **not** copy `tools/*` and seeds an empty `.agents/mcp/mcp.json`. Agents and skills run the same logic with the CLI (`asdd knowledge …`, `asdd drift`, `asdd audit`) and do not depend on MCP servers. Optional chat MCP stays in a kit checkout (or a path you wire yourself).
 
-- **Skill gates (System One):** `jev_status`, `jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate` — for `shape-up` and `product-delivery` only.
-- **Command safety (deprecated here):** `check_command_safety` — kept for existing MCP users. Use the CLI instead: hooks call `.harness/scripts/command-gate.mjs`, and runtimes without hooks run it before dangerous commands.
+The kit's `jev-gate` MCP server ([`tools/jev-gate/`](../../tools/jev-gate/README.md); `node tools/jev-gate/bin/jev-gate.mjs` after `pnpm install && pnpm build` there) is only for people in chat: no skill, agent, or hook calls it. It exposes:
 
-See `.harness/steering/jev.md`.
+- **System One gates:** `jev_status`, `jev_shape_up_gates`, `jev_scope_choice`, `jev_ears_gate` — a second opinion on the Shape Up / Product Delivery gates a human decides (`JEV_API_KEY`).
+- **Command safety (deprecated here):** `check_command_safety` — kept for existing MCP users. Hooks call `asdd gate`.
 
-The `spec-drift-auditor` MCP server (`.agents/mcp/spec-drift-auditor.mjs`) is the read-only governance view. Every check lives in `.harness/scripts/drift-lib.mjs` and `audit-lib.mjs`, so chat, Verify-on-Stop, and CI give the same answer:
+The `spec-drift` MCP server ([`tools/spec-drift/`](../../tools/spec-drift/README.md), launched with `node tools/spec-drift/bin/spec-drift.mjs`) carries the read-only governance view as its `audit` module. Every check is the logic of the asdd CLI's `drift-lib.mjs`, `semgrep-lib.mjs`, `audit-lib.mjs`, and `learning-lib.mjs`, vendored into the server (`tools/spec-drift/src/harness/`), so chat, Verify-on-Stop, and CI give the same answer; the server reads only the data of the repo at `HARNESS_ROOT` (default: the working directory):
 
-- **Tools:** `audit_diff` (mode `author` for engineers, `review` for the Tech Lead), `verify_architecture_rules`, `verify_spec_compliance` (the `ears` adapter plus enabled module adapters), `generate_ci_gate`, `audit_report`, `audit_finding`. With MCP Apps, results stay under 8 KB so Cursor renders them inline; the dashboard loads the rest by calling the same tool with `page_token`, and source texts with `verify_architecture_rules { source }`.
+- **Tools:** `audit_diff` (mode `author` for engineers, `review` for the Tech Lead), `verify_architecture_rules`, `verify_spec_compliance` (the `ears` adapter plus enabled module adapters), `generate_ci_gate`, `audit_report`, `audit_finding`. Results stay under 8 KB so Cursor renders them inline; the dashboard (and the model) loads the rest by calling the same tool with `page_token`, and source texts with `verify_architecture_rules { source }` (or `include_text: true`).
 - **Learning:** `audit_diff` results carry a `learning` block — open patterns from the self-improving harness, marked `relevant` when they are about a changed area or a linked slice; `pr-review` turns relevant ones into advisory comments.
 - **Resources:** `spec://manifest`, `spec://rules/architecture`, `spec://drift/latest-report`.
 - **Prompts:** `architecture-review`, `spec-alignment`, `pr-review`.
-- **MCP App:** when the host declares the `io.modelcontextprotocol/ui` extension, `audit_diff`, `verify_spec_compliance`, and `audit_report` link the `ui://spec-drift/dashboard` view ([`ui/drift-dashboard.html`](ui/drift-dashboard.html), built from `tools/drift-dashboard/` with `npm run build:ui` in the kit). Its buttons only send chat messages: "Send to agent as task" for engineers, "Draft comment" and "Dismiss…" for the Tech Lead. Every result still carries the full JSON as text. In Cursor, widgets from servers registered in a project's `.cursor/mcp.json` may not render (known issue); register the server in `~/.cursor/mcp.json` to see the view, with an absolute path and the project root:
+- **MCP App:** the audit tools link the `ui://spec-drift/audit-dashboard.html` view (source `tools/spec-drift/ui/audit-dashboard/`, built by `pnpm build`). Its buttons only send chat messages: "Send to agent as task" for engineers, "Draft comment" and "Dismiss…" for the Tech Lead. Every result still carries the full JSON as text. In Cursor, widgets from servers registered in a project's `.cursor/mcp.json` may not render (known issue); register the server in `~/.cursor/mcp.json` to see the view, with an absolute path and the project root:
 
 ```json
-"spec-drift-auditor": {
+"spec-drift": {
   "command": "node",
-  "args": ["/abs/path/to/project/.agents/mcp/spec-drift-auditor.mjs"],
+  "args": ["/abs/path/to/kit/tools/spec-drift/bin/spec-drift.mjs"],
   "env": { "HARNESS_ROOT": "/abs/path/to/project" }
 }
 ```
 
-Design: [README → spec drift and audit](https://github.com/eencinasq/asdd-harness-kit#spec-drift-and-codebase-audit). The installer adds this server to an existing `mcp.json` without changing other entries.
+Design: [README → spec drift and audit](https://github.com/eencinasq/asdd-harness-kit#spec-drift-and-codebase-audit). Older installs that copied `tools/` into the project are cleaned on the next `asdd install` (the tree and the `tools/*` MCP entries go).
 
-The `knowledge` MCP server (`.agents/mcp/knowledge-server.mjs`) serves process memory: `knowledge_search`, `knowledge_trace`, `knowledge_slice`, and `knowledge_status` over the generated index, plus `knowledge_patterns` for the learning loop (patterns, proposals, and the failure-log signatures in use — computed live, no index needed). See `.harness/steering/knowledge.md`.
+The `knowledge` MCP server ([`tools/knowledge/`](../../tools/knowledge/README.md), launched with `node tools/knowledge/bin/knowledge.mjs`) serves process memory: `knowledge_search`, `knowledge_trace`, `knowledge_slice`, and `knowledge_status` over the generated index, plus `knowledge_patterns` for the learning loop (patterns, proposals, and the failure-log signatures in use — computed live, no index needed). See `.harness/steering/knowledge.md`.
+
+These servers are for people in chat in a kit checkout. Agents and skills run the same logic with the `asdd` CLI (`asdd knowledge …`, `asdd drift`, `asdd audit`) and do not depend on them.
+
+The servers under `tools/` are self-contained: they never load the project's harness CLI at runtime. The harness libraries they share with the CLI are copied into each `tools/<name>/src/harness/` by `asdd kit vendor` (kit only); `npm test` fails while a copy is stale.
 
 Servers with `"enabled": false` are skipped by `sync-runtime-mcp.cjs` projections.
 
 ```bash
-node --input-type=module -e "import { checkCommandSafety } from './.harness/scripts/command-gate.mjs'; console.log(await checkCommandSafety('git status'))"
+echo '{"command":"git status"}' | asdd gate
 ```

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-cli-harness-039",
+  "timestamp": "2026-11-11T18:00:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-009",
+  "evidence": "Reopened by DRIFT-02: TASK-010/011 changed files in its scope (install phases, doctor, READMEs, package.json, tests); re-verifying."
+}

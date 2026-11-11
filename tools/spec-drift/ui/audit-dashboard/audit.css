@@ -1,0 +1,39 @@
+/* Audit dashboard additions on top of ../shared/styles.css. */
+
+.chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+}
+
+.notice {
+	margin: 0;
+	color: var(--text-2);
+	font-size: var(--text-sm);
+}
+
+.item pre.block {
+	max-height: 18rem;
+}
+
+.item.sev-advisory {
+	border-left-color: var(--info);
+}
+
+.reason {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	align-items: center;
+}
+
+.trace {
+	display: grid;
+	gap: var(--space-2);
+	font-size: var(--text-sm);
+}
+
+.trace ul {
+	margin: 0;
+	padding-left: 1.2rem;
+}

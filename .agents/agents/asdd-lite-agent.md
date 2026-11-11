@@ -14,12 +14,11 @@ The portable runtime contract is defined in `.agents/agents/_runtime-template.md
 
 Catalog: `.harness/steering/skills.md` (name and description only). `Read` a skill body only when that task starts.
 
-- When you start Shape Up or EARS: `Read` `.agents/skills/shape-up/SKILL.md` or `.agents/skills/product-delivery/SKILL.md`. That skill runs its own Jev gates through the `jev-gate` MCP; do not call Jev outside it.
+- When you start Shape Up or EARS: `Read` `.agents/skills/shape-up/SKILL.md` or `.agents/skills/product-delivery/SKILL.md`. Its gates are decided by a human (`decided_by`).
 - When you start a UI task, and the folder exists: `Read` `.agents/skills/frontend-ui-engineering/SKILL.md`
 - When you start an HTTP or API change, and the folder exists: `Read` `.agents/skills/api-and-interface-design/SKILL.md`
 - When you start live browser verification, and the folder exists: `Read` `.agents/skills/browser-testing-with-devtools/SKILL.md`
 - When you start an ADR: `Read` `.agents/skills/documentation-and-adrs/SKILL.md`
-- When tests are green and you start defect review before `passing`: `Read` `.agents/skills/open-code-review/SKILL.md`
 
 ---
 
@@ -31,18 +30,18 @@ You operate within the **ASDD-Lite** path defined in `.harness/steering/asdd-lit
 
 ## Code Intelligence (mandatory)
 
-Read `.harness/steering/codegraph.md`. Use Codegraph **before** grep/Read when exploring symbols, flows, or impact.
+Use the `codegraph` skill (`.agents/skills/codegraph/SKILL.md`) **before** grep/Read when exploring symbols, flows, or impact.
 
-- **Primary:** `codegraph_explore` on the spec domain before inventing scope.
+- **Primary:** `codegraph explore` on the spec domain before inventing scope.
 - List tools/commands in your final output.
 
-- **Knowledge:** `knowledge_search` before scoping — a matching prior REQ/feature may mean extend-instead-of-new-slice. Contract: `.harness/steering/knowledge.md`.
+- **Knowledge:** `asdd knowledge search` before scoping — a matching prior REQ/feature may mean extend-instead-of-new-slice. Contract: `.harness/steering/knowledge.md`.
 
 ## Project Context
 
 Before producing any output, you MUST discover the project state and constraints:
 
-1. **Steering:** Read `.harness/steering/structure.md`, `product.md`, `codegraph.md`, `manifest.md`, and the domain placement contract plus the mandatory project binding listed in `.harness/steering/README.md`.
+1. **Steering:** Read `.harness/steering/structure.md`, `product.md`, `manifest.md`, and the domain placement contract plus the mandatory project binding listed in `.harness/steering/README.md`.
 2. **Lite path:** Read `.harness/steering/asdd-lite.md`.
 3. **State:** Read `.harness/state/manifest.json` (global index), then `.harness/state/slices/<slice-id>/manifest.json`. Identify the slice and its pipeline phase.
 4. **Domain Model:** Read `docs/architecture/domain-model.md`. This is your Ubiquitous Language.
@@ -92,14 +91,13 @@ Execute tasks one at a time:
 2. **GREEN** — implement minimal code to pass.
 3. **REFACTOR** — clean up, keep tests green.
 4. **Verify** — run the verification command; record evidence.
-5. **Update** — commit the verified code, then flip the feature to `passing` with `evidence` and `evidence_commit` (that commit's SHA) in `.features.json`. Every feature carries `scope_paths` from `spec.md`.
+5. **Update** — flip the feature to `passing` with `evidence` in `.features.json`, then run `asdd sync` (it records `evidence_hash`; no commit needed). Every feature carries `scope_paths` from `spec.md`.
 
 After all tasks pass:
 
 - **QA-Light** — run the full test suite; verify no regressions.
 - **Domain boundaries** — run the required boundary checks from the project's domain placement binding (a failing check means the feature is not passing).
-- **Defect review** — run `ocr` on the diff if available (per `.agents/skills/open-code-review/SKILL.md`).
-- **Update state** — write a session file and run `sync-state.mjs` (manifest, registry, and `PROGRESS.md` are generated).
+- **Update state** — write a session file and run `asdd sync` (manifest, registry, and `PROGRESS.md` are generated).
 - **Handoff** — summary with verification results and next steps.
 
 ## Escalation
@@ -107,7 +105,7 @@ After all tasks pass:
 If scope grows during implementation (new modules, multiple user surfaces, architectural decisions), do **not** hand-edit the manifest — manifests are generated. Run:
 
 ```bash
-node .harness/scripts/escalate-slice.mjs <slice-id> --reasons "<triggers>" --by <owner>
+asdd slice escalate <slice-id> --reasons "<triggers>" --by <owner>
 ```
 
 Then:
@@ -121,5 +119,5 @@ Note: the harness already detects scope spread, domain growth, dissent, and impl
 
 - [ ] All tasks have passing tests with evidence in `.features.json`.
 - [ ] Full test suite green (no regressions).
-- [ ] Manifest synced with `sync-state.mjs` (never hand-edited): `status: "DONE"`, and no open `escalation_signals` (escalate first if present).
-- [ ] `node .harness/scripts/check-invariants.mjs --live` exits 0.
+- [ ] Manifest synced with `asdd sync` (never hand-edited): `status: "DONE"`, and no open `escalation_signals` (escalate first if present).
+- [ ] `asdd check --live` exits 0.

@@ -1,0 +1,4 @@
+allowBuilds:
+  esbuild: true
+# Fail fast on the wrong Node (see .nvmrc / package.json engines) instead of a cryptic runtime error.
+engineStrict: true

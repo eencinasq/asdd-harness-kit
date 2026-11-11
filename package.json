@@ -3,43 +3,43 @@
   "version": "3.8.1",
   "description": "Portable process layer for Agent Specification-Driven Development (ASDD) and Harness Engineering",
   "bin": {
-    "asdd-harness-kit": "scripts/npx-install.cjs"
+    "asdd": "cli/bin/asdd.mjs",
+    "asdd-harness-kit": "cli/bin/asdd.mjs"
   },
   "files": [
-    ".agents/**/*",
-    ".cursor/**/*",
-    ".harness/**/*",
     "docs/**/*",
-    "runtimes/**/*",
-    "scripts/**/*",
-    "AGENTS.md",
+    "cli/{bin,dist,templates,modules,runtimes,steering,scaffold,agents,skills,mcp}/**/*",
+    "cli/README.md",
+    "cli/AGENTS.md",
+    "cli/versions.json",
+    "!cli/**/*.test.mjs",
+    "tools/{spec-drift,knowledge}/{bin,docs,scripts,src,ui}/**/*",
+    "tools/{spec-drift,knowledge}/*.{json,md,yaml,ts}",
+    "tools/{spec-drift,knowledge}/.nvmrc",
+    "!tools/*/**/*.spec.ts",
+    ".github/CODEOWNERS.harness.example",
+    ".github/workflows/harness-audit.yml.example",
     "LICENSE",
     "README.md",
-    "!.harness/knowledge/**",
-    "!.harness/specs/*/**",
-    "!.harness/features/*.features.json",
-    "!.harness/state/slices/*/**",
-    "!.harness/state/archive/*/**",
-    "!.harness/state/archive/*.json",
-    "!.harness/state/learning/**",
-    "!.harness/state/registry.json",
-    "!.harness/audits/*.json",
-    "!.harness/config/project.json",
-    "!.harness/steering/product.md",
-    "!.harness/steering/structure.md",
-    "!.harness/steering/tech.md",
-    "!.harness/steering/domain-layer.project.md",
-    "!.harness/steering/quality-gates.project.md",
-    "!.harness/steering/design-system.md",
     "!docs/knowledge-base/steering-proposals/**",
     "!docs/architecture/domain-model.md",
     "!docs/agent-failure-log.md",
     "!docs/dissent-log.md"
   ],
   "scripts": {
-    "test": "bash scripts/test-install-into.sh && bash scripts/test-lifecycle.sh && node --test scripts/check-guidance.test.mjs .harness/scripts/jev-client.test.mjs .harness/scripts/command-gate.test.mjs .harness/scripts/sync-knowledge.test.mjs .harness/scripts/sync-state.test.mjs .agents/mcp/jev-gate-server.test.mjs .harness/scripts/drift-lib.test.mjs .harness/scripts/semgrep-lib.test.mjs .harness/scripts/audit-codebase.test.mjs .harness/scripts/learning-lib.test.mjs .agents/mcp/spec-drift-auditor.test.mjs .agents/modules/http-api/adapters/openapi.test.mjs tools/drift-dashboard/src/model.test.mjs",
-    "test:full-flow": "bash scripts/test-full-flow.sh",
-    "build:ui": "vite build --config tools/drift-dashboard/vite.config.mjs"
+    "build": "node cli/src/kit/build.mjs",
+    "build:obfuscate": "node cli/src/kit/build.mjs --obfuscate",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm test",
+    "test": "npm run build && node cli/bin/asdd.mjs kit vendor --check && node cli/bin/asdd.mjs kit self --check && bash cli/test/install.sh && bash cli/test/lifecycle.sh && node --test cli/test/guidance.test.mjs cli/test/cli.test.mjs cli/test/install-lifecycle.test.mjs cli/src/harness/command-gate.test.mjs cli/src/harness/sync-knowledge.test.mjs cli/src/harness/sync-state.test.mjs cli/src/harness/drift-lib.test.mjs cli/src/harness/semgrep-lib.test.mjs cli/src/harness/audit-codebase.test.mjs cli/src/harness/learning-lib.test.mjs cli/modules/http-api/adapters/openapi.test.mjs",
+    "test:full-flow": "bash cli/test/full-flow.sh",
+    "vendor:harness": "node cli/bin/asdd.mjs kit vendor",
+    "versions": "node cli/bin/asdd.mjs kit versions",
+    "self": "node cli/bin/asdd.mjs kit self"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "javascript-obfuscator": "^4.1.1"
   },
   "keywords": [
     "asdd",
@@ -58,15 +58,5 @@
   "license": "MIT",
   "engines": {
     "node": ">=22"
-  },
-  "dependencies": {
-    "sqlite-vec": "^0.1.10-alpha.4"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^6.1.2",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "vite": "^8.3.5",
-    "vite-plugin-singlefile": "^2.3.4"
   }
 }

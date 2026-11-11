@@ -65,7 +65,7 @@ properties:
           description: The one observable result a person can try when the scope is done
         class:
           enum: [must_have, nice_to_have]
-          description: Result of jev_scope_choice (reshape scopes are removed from the map)
+          description: Scope choice decided by the shapers (reshape scopes are removed from the map)
         must_haves:
           type: array
           items: { type: string }
@@ -91,7 +91,7 @@ properties:
           description: ASDD slice created for this scope (.harness/specs/<slice_id>/intent.md)
   reshaped:
     type: array
-    description: Scopes removed from the bet by jev_scope_choice or the shapers; returned to shaping
+    description: Scopes removed from the bet by the shapers; returned to shaping
     items:
       type: object
       required: [name, reason]

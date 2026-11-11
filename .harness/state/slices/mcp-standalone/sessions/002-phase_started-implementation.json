@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "mcp-standalone",
+  "concerns": [],
+  "timestamp": "2026-11-10T14:30:00.000Z",
+  "phase": "implementation",
+  "session_id": "sess-mcp-standalone-002",
+  "event_type": "phase_started",
+  "mode": "lite",
+  "evidence": "Lite spec.md, design.md, tasks.md written (REQ-001..004)."
+}

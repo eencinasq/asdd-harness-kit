@@ -1,0 +1,13 @@
+{
+	"id": "python-eval-injection",
+	"description": "A helper evaluates caller input with eval(); the add() change is fine.",
+	"diff": "diff --git a/src/util.py b/src/util.py\n--- a/src/util.py\n+++ b/src/util.py\n@@ -1,2 +1,6 @@\n def add(a, b):\n     return a + b\n+\n+def run(expr):\n+    \"\"\"Evaluate a user-supplied arithmetic expression.\"\"\"\n+    return eval(expr)\n",
+	"expected": [
+		{
+			"path": "src/util.py",
+			"startLine": 6,
+			"ruleId": "python.security-sensitive-code",
+			"note": "eval on user input"
+		}
+	]
+}

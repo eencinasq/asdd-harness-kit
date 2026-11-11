@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "agents-use-scripts",
+  "source_tasks": ".harness/specs/agents-use-scripts/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Script CLIs for knowledge and Jev; servers delegate to them",
+      "user_visible_behavior": "knowledge-query.mjs and jev-gates.mjs answer as JSON CLIs; the knowledge and jev-gate servers return the same payloads from their vendored copies; the installer ships knowledge-query.mjs.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test .harness/scripts/sync-knowledge.test.mjs .harness/scripts/jev-client.test.mjs",
+        "cd tools/knowledge && pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+        "cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+        "CLI vs built MCP stdio parity",
+        "bash scripts/test-install-into.sh"
+      ],
+      "evidence": "New CLI tests pass (knowledge-query status/search/trace/slice/patterns + invalid args; jev-gates fails closed, exit 1). knowledge e2e 8/8, jev-gate 9/9, spec-drift 108/108 + audit 18/18, tsc/biome clean, all built. On this repo the built bins and the CLIs return identical JSON for knowledge_slice/search/trace and jev_status/jev_ears_gate (both fail closed). Install smoke OK (knowledge-query.mjs shipped and versioned).",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Agents and skills use the scripts, not the MCP servers",
+      "user_visible_behavior": "Agent files, skills, AGENTS.md, the Cursor rule and steering tell agents to run knowledge-query.mjs, jev-gates.mjs, check-spec-drift.mjs and audit scripts; no agent or skill requires a knowledge_*, jev_* or audit_* MCP tool.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "grep for knowledge_*/jev_*/audit_*/verify_spec_compliance in .agents/agents .agents/skills runtimes AGENTS.md",
+        "npm test"
+      ],
+      "evidence": "grep finds no MCP tool reference in .agents/agents, .agents/skills, runtimes or AGENTS.md; npm test exit 0 (vendor check, install smoke incl. guidance budget 31948 <= 31962, lifecycle, unit 94/94).",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: cli/agents/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    }
+  ]
+}

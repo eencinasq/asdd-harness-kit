@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "agents-use-scripts",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-agents-use-scripts-003",
+  "timestamp": "2026-11-10T19:00:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    ".harness/scripts/knowledge-query.mjs",
+    ".harness/scripts/jev-gates.mjs",
+    ".harness/scripts/sync-knowledge.test.mjs",
+    ".harness/scripts/jev-client.test.mjs",
+    "scripts/vendor-harness-libs.mjs",
+    "tools/knowledge/**",
+    "tools/jev-gate/**",
+    "scripts/install-into.sh",
+    "scripts/test-install-into.sh",
+    "scripts/generate-versions.mjs",
+    ".harness/config/versions.json"
+  ],
+  "evidence": "Start TASK-001 (REQ-001, REQ-002, REQ-003, REQ-005)"
+}

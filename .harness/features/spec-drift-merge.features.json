@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "spec-drift-merge",
+  "source_tasks": ".harness/specs/spec-drift-merge/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Audit module in spec-drift",
+      "user_visible_behavior": "spec-drift exposes audit_diff, verify_architecture_rules, verify_spec_compliance, generate_ci_gate, audit_report, audit_finding, the spec:// resources and the architecture-review / spec-alignment / pr-review prompts, paging large results.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && node --import tsx --test test/audit.e2e-spec.ts src/audit/audit-paging.spec.ts"
+      ],
+      "evidence": "audit e2e 18/18 (dashboard test after pnpm build) and paging 3/3 on Node 24.22.2; tsc --noEmit and biome clean.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: tools/spec-drift/src/**, tools/spec-drift/test/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Audit dashboard view (vanilla TS)",
+      "user_visible_behavior": "The audit tools open ui://spec-drift/audit-dashboard.html: findings with filters, checks, architecture sources, trace, paging, and author/review actions that only send chat messages.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm build && node --import tsx --test ui/audit-dashboard/model.spec.ts"
+      ],
+      "evidence": "pnpm build emits dist/audit-dashboard.html (single file); model spec 6/6.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Deferred dirty scopes until WIP commit: tools/spec-drift/ui/**. Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Remove the old server and dashboard; repoint kit wiring",
+      "user_visible_behavior": "The kit no longer ships spec-drift-auditor or tools/drift-dashboard; installs copy tools/spec-drift source, register mcp.json spec-drift, and remove the retired entry and files.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-006"
+      ],
+      "depends_on": [
+        "TASK-001",
+        "TASK-002"
+      ],
+      "verification": [
+        "bash scripts/test-install-into.sh"
+      ],
+      "evidence": "test-install-into.sh OK (install, upgrade from spec-drift-auditor, versions trace); npm pack ships 184 tools/spec-drift files, none of them tests.",
+      "scope_paths": [
+        "LICENSE"
+      ],
+      "notes": "Temporary scope LICENSE; restore deferred scopes after commit. evidence_commit=46141994e6b3.",
+      "evidence_hash": "811edd1c911300d41541a69e0085dac3d24bc76c7c761d2ec0a0df315ec87f1d"
+    }
+  ]
+}

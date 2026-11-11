@@ -7,7 +7,7 @@ tags:
 # ASDD-Lite — Default Path (Lite-First)
 
 Lite is the **default entry mode for every slice**. The full 9-phase pipeline is
-opt-in (`init-slice.mjs --full`) for work known upfront to be cross-cutting or
+opt-in (`asdd slice init --full`) for work known upfront to be cross-cutting or
 architectural. Growth in a lite slice is not a judgment call: the harness
 detects escalation evidence from sessions and blocks the slice from completing
 until it is acknowledged.
@@ -29,14 +29,14 @@ concept, serial work (one `in_progress` feature).
 | E4 | Architectural contention | any `dissent` session | signal → blocks DONE |
 | E5 | Implementation blockage | `phase_blocked` in `implementation` | signal → blocks DONE |
 
-Open signals are WARN during work (`harness-status.mjs` lists them). A
+Open signals are WARN during work (`asdd status` lists them). A
 `phase_completed` for `qa`/`knowledge` while signals are open is a FAIL:
 `sync-state` also refuses to derive `DONE` for such a slice.
 
 ## How to escalate
 
 ```bash
-node .harness/scripts/escalate-slice.mjs <slice-id> --reasons "E1-scope-spread,E4-dissent" [--by <owner>]
+asdd slice escalate <slice-id> --reasons "E1-scope-spread,E4-dissent" [--by <owner>]
 ```
 
 This appends a `checkpoint` session with `mode: "escalated"`. Then:
@@ -71,7 +71,6 @@ The slice's `spec.md`, `design.md`, `tasks.md` remain — full artifacts are add
 4. **Codegraph first** — before edits in unfamiliar modules.
 5. **Serial execution** — ASDD-Lite allows at most one `in_progress` feature in `.features.json`; the parallel task contract is for fully planned slices only.
 6. **No gold-plating** — modify only files mapped to `.harness/specs/<slice>/spec.md`, as in [session-loop.md](./session-loop.md). Do not perform unrequested refactors.
-7. **Jev** — not used in ASDD-Lite. Jev is required only inside `shape-up` and `product-delivery` ([jev.md](./jev.md)).
 
 ## Dropped from full ASDD
 
@@ -115,7 +114,7 @@ ASDD-Lite slices do **not** populate `gates` in the per-slice manifest. Use sess
 
 See [Escalation triggers](#escalation-triggers-machine-enforced) and
 [How to escalate](#how-to-escalate) above — the transition is triggered by
-session evidence and performed with `escalate-slice.mjs`, not by hand-editing
+session evidence and performed with `asdd slice escalate`, not by hand-editing
 sessions or manifests.
 
 ## Agent

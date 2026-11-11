@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Architecture &amp; standards</title>
+	</head>
+	<body>
+		<div class="app" id="app" aria-busy="true">
+			<header class="header">
+				<div class="header-text">
+					<p class="eyebrow" id="engine-label">Static analysis</p>
+					<h1>Architecture &amp; standards</h1>
+					<p class="meta" id="scan-meta">Waiting for the scan…</p>
+				</div>
+				<div class="toolbar">
+					<label class="sr-only" for="mode">Rule set</label>
+					<select id="mode" class="select">
+						<option value="spec-drift">All rule packs</option>
+						<option value="architecture">Architecture only</option>
+						<option value="standards">Standards only</option>
+					</select>
+					<button type="button" id="rescan" class="btn btn-primary">Re-scan</button>
+				</div>
+			</header>
+
+			<div id="loading" class="skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+
+			<div id="failure" class="callout tone-danger" role="alert" hidden></div>
+
+			<section id="summary" class="stack" aria-label="Summary" hidden>
+				<div class="kpis">
+					<div class="kpi" id="kpi-findings-card">
+						<span class="kpi-label">Findings</span>
+						<strong class="kpi-value" id="kpi-findings">0</strong>
+						<span class="kpi-hint" id="kpi-findings-hint"></span>
+					</div>
+					<div class="kpi" id="kpi-drift-card">
+						<span class="kpi-label">Drifting rules</span>
+						<strong class="kpi-value" id="kpi-drift">0</strong>
+						<span class="kpi-hint" id="kpi-drift-hint"></span>
+					</div>
+					<div class="kpi">
+						<span class="kpi-label">Clean rules</span>
+						<strong class="kpi-value" id="kpi-clean">0</strong>
+						<div class="meter" id="health-meter" role="meter" aria-label="Rules clean" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+							<span id="health-bar"></span>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="card" id="pack-overview" aria-labelledby="pack-overview-title" hidden>
+				<div class="card-header">
+					<h2 id="pack-overview-title">Rule packs</h2>
+					<span class="subtle" id="pack-overview-meta"></span>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Pack</th>
+								<th scope="col">Result</th>
+								<th scope="col" class="num">Findings</th>
+							</tr>
+						</thead>
+						<tbody id="pack-overview-body"></tbody>
+					</table>
+				</div>
+			</section>
+
+			<div class="tabs" role="tablist" aria-label="Scan results" id="tabs" hidden>
+				<button type="button" role="tab" id="tab-findings" data-tab="findings" aria-controls="panel-findings">
+					Findings <span class="count" id="count-findings">0</span>
+				</button>
+				<button type="button" role="tab" id="tab-drift" data-tab="drift" aria-controls="panel-drift">
+					Spec drift <span class="count" id="count-drift">0</span>
+				</button>
+			</div>
+
+			<section role="tabpanel" id="panel-findings" aria-labelledby="tab-findings" hidden>
+				<div class="toolbar" id="findings-toolbar">
+					<label class="sr-only" for="search">Filter findings</label>
+					<input id="search" class="input input-grow" type="search" placeholder="Filter by file, rule or message" />
+					<div class="segmented" role="group" aria-label="Severity" id="severity-filter"></div>
+					<div class="segmented" role="group" aria-label="Domain" id="domain-filter" hidden>
+						<button type="button" data-value="ALL" aria-pressed="true">All</button>
+						<button type="button" data-value="architecture" aria-pressed="false">Architecture</button>
+						<button type="button" data-value="standards" aria-pressed="false">Standards</button>
+					</div>
+				</div>
+				<p class="subtle" id="findings-count" aria-live="polite"></p>
+				<ul class="list" id="findings-list"></ul>
+				<button type="button" class="btn" id="show-more" hidden>Show more</button>
+			</section>
+
+			<section role="tabpanel" id="panel-drift" aria-labelledby="tab-drift" hidden></section>
+
+			<p id="status" class="status"></p>
+		</div>
+		<script type="module" src="./analysis-dashboard/main.ts"></script>
+	</body>
+</html>

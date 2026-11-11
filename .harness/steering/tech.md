@@ -7,7 +7,7 @@ tags:
 
 # Technology stack — asdd-harness-kit
 
-> **Project binding for the kit itself.** Never shipped: projects get the stub from `scripts/templates/bindings/tech.md`.
+> **Project binding for the kit itself.** Never shipped: projects get the stub from `cli/templates/bindings/tech.md`.
 
 ## Languages & runtimes
 

@@ -1,6 +1,6 @@
 # Domain Model — asdd-harness-kit
 
-> Project binding for the kit itself. Never shipped: projects get the stub from `scripts/templates/docs/domain-model.md`.
+> Project binding for the kit itself. Never shipped: projects get the stub from `cli/templates/docs/domain-model.md`.
 > Ubiquitous Language of the harness. Seeded by the `kit-hygiene` slice (Domain phase); Module and Gate decision added by `jev-module`.
 
 ## Core Entities
@@ -16,7 +16,7 @@
 | **Binding** | A project-specific steering file (`product`, `structure`, `tech`, `domain-layer.project`, `quality-gates.project`, `design-system`) | slots (`…` = unfilled) | one set per project; the kit has its own set |
 | **Command gate** | The pattern allow/deny hook for shell commands | verdict (allow/deny), pattern label | called by Hook configs |
 | **Hook config** | A runtime file naming hook scripts (`.cursor/hooks.json`, `.claude/settings.json`) | entries per event | project-owned; merged by the Installer |
-| **Installer** | `scripts/install-into.sh` / `npx asdd-harness-kit` | policy per file: `refresh` (kit-owned) or `create` (project-owned seed) | writes an Installed project |
+| **Installer** | `asdd install` (`cli/`, `npx asdd-harness-kit install`) | policy per file: `refresh` (kit-owned) or `create` (project-owned seed) | writes an Installed project |
 | **Installed project** | A repository the installer wrote into | `installed-versions.json` (managed and seeded files) | receives shipped Guidance documents, never kit-only artifacts |
 | **Module** | An opt-in set of kit files the Installer copies only when enabled (`--modules=<id>`), recorded in `project.json` → `modules` (`true` on, `false` explicitly off) | id, files, config it adds | enabled per Installed project; `--remove-modules` deletes its files |
 | **Gate decision** | The outcome of a Shape Up betting gate or a Product Delivery EARS/scope gate | decided by Jev (module) or by a human (`decided_by`) | belongs to a pitch or an intent |

@@ -5,7 +5,6 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 - Process: [README → Guides, then sensors](https://github.com/eencinasq/asdd-harness-kit#guides-then-sensors)
 - Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-harness-kit#adopter-checklist)
 - Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit); enable them with the kit installer.
-- Jev (optional module for shape-up / product-delivery gates): [README → Jev module](https://github.com/eencinasq/asdd-harness-kit#jev-module-optional)
 
 ## INIT (every session)
 
@@ -15,9 +14,9 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 4. **JIT steering loading:**
    - Each steering file has YAML frontmatter with `inclusion` and `tags`.
    - Load all `inclusion: "always"` files (controls, session-loop, manifest, skills, security-rules, README).
-   - Load `inclusion: "auto"` files **only when their tags match the current phase** (as named in `sync-state.mjs`, e.g. `task_planning`), the slice `mode` (`lite`), or the active role (`review`, `ui`).
+   - Load `inclusion: "auto"` files **only when their tags match the current phase** (as named in `asdd sync`, e.g. `task_planning`), the slice `mode` (`lite`), or the active role (`review`, `ui`).
    - Skip auto files whose tags do not intersect those keys — this saves context window. Explicit `Read` instructions in an agent file always apply.
-   - **Lite-first:** all slices start in `lite` mode (default in `init-slice.mjs`). Use `--full` only for work known upfront to be cross-cutting/architectural. Growth in a lite slice triggers evidence-based escalation — see [`asdd-lite.md`](.harness/steering/asdd-lite.md).
+   - **Lite-first:** all slices start in `lite` mode (default in `asdd slice init`). Use `--full` only for work known upfront to be cross-cutting/architectural. Growth in a lite slice triggers evidence-based escalation — see [`asdd-lite.md`](.harness/steering/asdd-lite.md).
 5. Pick work:
    - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.
    - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners and disjoint file scopes; otherwise work serially.
@@ -32,18 +31,19 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 | `.harness/state/slices/<id>/manifest.json` | **Generated** per-slice phase machine |
 | `.harness/state/slices/<id>/sessions/*.json` | Append-only session logs (one writer per file) |
 | `.harness/features/` | Session feature tracker |
-| `.harness/PROGRESS.md` | **Generated** active slices table for humans (`sync-state.mjs`) |
-| `.harness/knowledge/` | **Generated** knowledge index (graph + chunks via `sync-knowledge.mjs`; `knowledge` MCP server queries it) |
+| `.harness/PROGRESS.md` | **Generated** active slices table for humans (`asdd sync`) |
+| `.harness/knowledge/` | **Generated** knowledge index (graph + chunks via `asdd knowledge sync`; `asdd knowledge` queries it) |
 
 ## Working rules
 
 1. One `in_progress` by default. Same-slice concurrency must follow ownership, dependency, and scope rules in `.harness/steering/session-loop.md`.
 2. Never `passing` without `verification` + `evidence`.
 3. Write a session file at the end of every significant action, then run `sync-state` to regenerate the manifest ([manifest.md](.harness/steering/manifest.md)).
-4. Codegraph first ([codegraph.md](.harness/steering/codegraph.md)).
-5. On failure: leave `in_progress`/`blocked`; log per path in `structure.md`.
-6. Before session end or `passing`, `node .harness/scripts/check-invariants.mjs` must exit 0. On Cursor, the Verify-on-Stop hook injects FAIL output back into the prompt ([session-loop.md](.harness/steering/session-loop.md)). It includes spec drift; engineers and the Tech Lead also use the `spec-drift-auditor` MCP server ([spec-drift.md](.harness/steering/spec-drift.md)).
-7. Modify only the files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors. Mapping and the lite `spec.md` exception: [session-loop.md](.harness/steering/session-loop.md).
+4. Codegraph first: the `codegraph` skill (`codegraph explore …`).
+5. Agents and skills run `asdd <command>` (the asdd-harness-kit package: the project's devDependency via `npx asdd`, or a global `asdd`), not MCP servers.
+6. On failure: leave `in_progress`/`blocked`; log per path in `structure.md`.
+7. Before session end or `passing`, `asdd check` must exit 0. On Cursor, the Verify-on-Stop hook injects FAIL output back into the prompt ([session-loop.md](.harness/steering/session-loop.md)). It includes spec drift ([spec-drift.md](.harness/steering/spec-drift.md)).
+8. Modify only the files mapped to the active specification `.harness/specs/<slice>/intent.md`. Do not perform unrequested refactors. Mapping and the lite `spec.md` exception: [session-loop.md](.harness/steering/session-loop.md).
 
 ## Non-negotiables
 
@@ -52,7 +52,6 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 3. Domain: [domain-layer.md](.harness/steering/domain-layer.md) + [domain-layer.project.md](.harness/steering/domain-layer.project.md).
 4. Gates: [quality-gates.md](.harness/steering/quality-gates.md) + [quality-gates.project.md](.harness/steering/quality-gates.project.md).
 5. Fill project bindings before Discovery — stubs are not product truth.
-6. Jev is an optional module (`modules.jev` in `.harness/config/project.json`). With it, `shape-up` and `product-delivery` require their Jev gates (`jev-gate` MCP, `JEV_API_KEY`) and never treat `unavailable` as a pass; without it, a human decides those gates. Harness ASDD never calls Jev.
 
 ## Baseline steering reads
 

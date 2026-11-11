@@ -27,8 +27,8 @@ Ordered most-structural to most-semantic:
 | 3 | **Persistence entities** | Schema files: `schema.prisma`, `schema.graphql`, `migrations/`, `drizzle/`, ORM model dirs, SQL DDL. Entity clusters (tables that change together) bound capabilities. |
 | 4 | **Tests** | `*.test.*`/`spec`/`e2e` trees and describe-blocks — test names already describe behaviors = features under capabilities. |
 | 5 | **Docs & trackers** | README/ARCHITECTURE/docs dirs, `docs/architecture`, `docs/discovery`, past pitches and scope issues in external trackers (Linear/Jira/GitHub Issues) via the `external-trackers` skill. |
-| 6 | **Codegraph** | `codegraph_context` / `codegraph_explore` for module graph, top entry points, cluster shapes. Structural questions → codegraph, not grep loops. |
-| 7 | **Knowledge index** | `knowledge_search` — is a capability already specced/imported? Prevents re-discovery. (`knowledge_status` first; if absent, `node .harness/scripts/sync-knowledge.mjs`.) |
+| 6 | **Codegraph** | `codegraph explore`, `codegraph files`, `codegraph impact` (the `codegraph` skill) for module graph, top entry points, cluster shapes. Structural questions → codegraph, not grep loops. |
+| 7 | **Knowledge index** | `asdd knowledge search "<capability>"` — is a capability already specced/imported? Prevents re-discovery. (`asdd knowledge status` first; if absent, `asdd knowledge sync`.) |
 
 ## Procedure
 
@@ -40,7 +40,7 @@ Ordered most-structural to most-semantic:
    sub-capability, not a slice.
 3. **Name.** Use the project's own vocabulary — load
    `domain-language-extraction` if terms are unclear. Never invent names.
-4. **Dedupe.** `knowledge_search` each candidate — a match means *extend the
+4. **Dedupe.** `asdd knowledge search` each candidate — a match means *extend the
    existing slice*, not create a new one.
 5. **Land.** For each surviving capability, write a **draft** `capability.md`
    (or `intent.md` for lite-sized work) in `.harness/specs/<slug>/` containing:

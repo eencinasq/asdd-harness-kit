@@ -3,14 +3,14 @@
   "hooks": {
     "beforeShellExecution": [
       {
-        "command": "node .harness/scripts/command-gate.mjs",
+        "command": "node cli/bin/asdd.mjs gate",
         "timeout": 30,
         "failClosed": true
       }
     ],
     "stop": [
       {
-        "command": "node .harness/scripts/verify-on-stop.mjs",
+        "command": "node cli/bin/asdd.mjs verify",
         "timeout": 60,
         "loop_limit": 3,
         "failClosed": true

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "agents-use-scripts",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-agents-use-scripts-005",
+  "timestamp": "2026-11-10T19:40:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    ".agents/agents/**",
+    ".agents/skills/shape-up/SKILL.md",
+    ".agents/skills/product-delivery/**",
+    ".agents/skills/capability-discovery/SKILL.md",
+    ".agents/skills/codebase-audit/SKILL.md",
+    "AGENTS.md",
+    "runtimes/cursor/asdd-steering.mdc",
+    ".harness/steering/knowledge.md",
+    ".harness/steering/jev.md",
+    ".harness/steering/spec-drift.md",
+    ".harness/steering/controls.md",
+    ".harness/steering/templates/intent.md",
+    "README.md",
+    ".agents/mcp/README.md",
+    "scripts/check-guidance.mjs"
+  ],
+  "evidence": "Start TASK-002 (REQ-004)"
+}

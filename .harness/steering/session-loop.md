@@ -10,11 +10,11 @@ Closes the gap between **ASDD phases** (manifest + specs) and **coding sessions*
 
 | File | Owner | Role |
 |------|-------|------|
-| [`.harness/state/registry.json`](../state/registry.json) | `sync-state.mjs` (generated) | **Global index** — all slices, phases, contributors |
-| [`.harness/state/slices/<id>/manifest.json`](../state/slices/) | `sync-state.mjs` (generated) | Per-slice phase machine — never hand-edited |
+| [`.harness/state/registry.json`](../state/registry.json) | `asdd sync` (generated) | **Global index** — all slices, phases, contributors |
+| [`.harness/state/slices/<id>/manifest.json`](../state/slices/) | `asdd sync` (generated) | Per-slice phase machine — never hand-edited |
 | [`.harness/state/slices/<id>/sessions/*.json`](../state/slices/) | Agent / human (append-only) | Session log — write once, never modify |
 | [`.harness/features/<slice_id>.features.json`](../features/) | Task Planning (create) · Implementation/QA (status+evidence) | Feature tracker |
-| [`.harness/PROGRESS.md`](../PROGRESS.md) | `sync-state.mjs` (generated) | Active slices table for humans — rewritten on every sync, never edited |
+| [`.harness/PROGRESS.md`](../PROGRESS.md) | `asdd sync` (generated) | Active slices table for humans — rewritten on every sync, never edited |
 | [`AGENTS.md`](../../AGENTS.md) | Humans | INIT + definition of done |
 
 ## Concurrent work
@@ -22,7 +22,7 @@ Closes the gap between **ASDD phases** (manifest + specs) and **coding sessions*
 Concurrent work is safe because:
 
 1. **Session logs are append-only** — each writer creates a new file, never modifies an existing one.
-2. **Manifests are generated** — `sync-state.mjs` computes the single source of truth from all session files.
+2. **Manifests are generated** — `asdd sync` computes the single source of truth from all session files.
 3. **Feature scopes are explicit** — concurrent tasks declare `owner` + `scope_paths`; the invariant checker validates non-overlapping scopes.
 
 If two agents write sessions for the same slice simultaneously, both files exist and both are included in the next `sync-state` run.
@@ -43,7 +43,7 @@ Each item in `.features.json`:
 - `status` — `not_started` | `in_progress` | `blocked` | `passing`
 - `verification` — shell/Nx commands or steps to prove it
 - `evidence` — filled only when passing (what ran + result)
-- `evidence_commit` — required when passing; SHA of the commit that contains the verified code
+- `evidence_hash` — written by `asdd sync` when the feature becomes `passing` (never by hand): the hash of the files its `scope_paths` cover
 - `notes` — optional; link REQs / blockers
 - `req_ids` — optional traceability
 - `source_tasks` — repository-relative path to the `tasks.md` that produced these features (required; must exist)
@@ -51,9 +51,9 @@ Each item in `.features.json`:
 - `scope_paths` — required on every feature; non-empty repo-relative files/directories this task may edit (planned paths may not exist yet)
 - `depends_on` — optional task ids; all listed dependencies must be `passing` before dispatch
 
-**Rules:** one `in_progress` by default. Multiple tasks may be `in_progress` only when each has a unique `owner`, non-empty non-overlapping `scope_paths`, and the coordinator has written a session file for the slice. Scope overlap includes a file and its ancestor directory. Workers must not edit shared Harness state, registry, manifests, or session files of other agents. `passing` requires non-empty `evidence`, an `evidence_commit`, and a passing Verify-on-Stop check in the same session; on repeated verify fail → `blocked` + [agent-failure-log](../../docs/agent-failure-log.md).
+**Rules:** one `in_progress` by default. Multiple tasks may be `in_progress` only when each has a unique `owner`, non-empty non-overlapping `scope_paths`, and the coordinator has written a session file for the slice. Scope overlap includes a file and its ancestor directory. Workers must not edit shared Harness state, registry, manifests, or session files of other agents. `passing` requires non-empty `evidence` and a passing Verify-on-Stop check in the same session; on repeated verify fail → `blocked` + [agent-failure-log](../../docs/agent-failure-log.md).
 
-**Evidence commit:** run the verification, commit the verified code, then record that commit's SHA as `evidence_commit` (the features file itself is a harness record and may change afterwards). Spec drift check `DRIFT-02` reopens the feature when any file under its `scope_paths` changes after that commit. Missing `scope_paths`, `evidence`, or `evidence_commit` is reported as `DRIFT-06`, at the severity set by `drift.contract` in `.harness/config/project.json` (`warn` by default, `fail` once slices are migrated).
+**Evidence hash:** run the verification, set `passing` with `evidence`, then run `asdd sync`: it records `evidence_hash`, the hash of the files the feature's `scope_paths` cover. No commit is needed; developers commit when they finish their work. Spec drift check `DRIFT-02` reopens the feature when any of those files changes after that point (set it back to `in_progress`, rerun the verification). Missing `scope_paths` or `evidence` is reported as `DRIFT-06`, at the severity set by `drift.contract` in `.harness/config/project.json` (`warn` by default, `fail` once slices are migrated).
 
 ## When to create / update features.json
 
@@ -65,7 +65,7 @@ Each item in `.features.json`:
 
 ## Session files (append-only)
 
-At the end of every significant action, write one session file (format and event types: [manifest.md](./manifest.md)), then run `node .harness/scripts/sync-state.mjs --slice <slice-id>` to regenerate the manifest, registry, and `PROGRESS.md`.
+At the end of every significant action, write one session file (format and event types: [manifest.md](./manifest.md)), then run `asdd sync --slice <slice-id>` to regenerate the manifest, registry, and `PROGRESS.md`.
 
 ## Waves, dependencies, and concurrency
 
@@ -88,11 +88,11 @@ Scope control is deterministic: this file's mapping plus `features.mjs`.
 Before the session ends, and before a feature is marked `passing`, the agent shall run:
 
 ```bash
-node .harness/scripts/check-invariants.mjs --live
+asdd check --live
 ```
 
-Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The agent shall fix every FAIL and shall not mark the feature `passing` while the command exits non-zero. Live mode does not require `JEV_API_KEY` (Jev is not a harness gate).
+Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The agent shall fix every FAIL and shall not mark the feature `passing` while the command exits non-zero.
 
-Cursor (`stop`) and Claude Code (`Stop`) run this automatically through `verify-on-stop.mjs`: a FAIL comes back as the next prompt (Cursor `loop_limit` 3; Claude respects `stop_hook_active`), and the session ends only on exit 0. After the loop limit, a remaining FAIL still means the feature is not `passing`. Other runtimes do not inject the prompt; the `--live` run is still mandatory before handoff. Every failing `--live` run is recorded as a learning signal ([Learning Gate](./quality-gates.md#learning-gate)).
+Cursor (`stop`) and Claude Code (`Stop`) run this automatically through `asdd verify`: a FAIL comes back as the next prompt (Cursor `loop_limit` 3; Claude respects `stop_hook_active`), and the session ends only on exit 0. After the loop limit, a remaining FAIL still means the feature is not `passing`. Other runtimes do not inject the prompt; the `--live` run is still mandatory before handoff. Every failing `--live` run is recorded as a learning signal ([Learning Gate](./quality-gates.md#learning-gate)).
 
 Session close, and what wins when a control disagrees with this file, is in [controls.md](./controls.md). Gold-plating in this file still decides which files may change.

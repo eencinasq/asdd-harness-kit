@@ -23,12 +23,10 @@ Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-ha
 |------|----------|
 | `domain-layer.md` | Domain placement contract |
 | `quality-gates.md` | Phase gates, phase chain, coverage / readiness (Lite skips the numeric gates) |
-| `jev.md` | Jev module only (`--modules=jev`): System One gates for shape-up / product-delivery |
 | `manifest.md` | Manifest schema v3 (generated from sessions) |
 | `session-loop.md` | Features + evidence (no v2 locks) |
 | `controls.md` | Guides, sensors, precedence |
 | `asdd-lite.md` | 4-phase lite path |
-| `codegraph.md` / `codegraph-agents.md` | Codegraph |
 | `knowledge.md` | Knowledge index (spec/session/feature graph + search) |
 | `spec-drift.md` | Spec drift and audit: entry points and usage by role (engineers, Tech Lead) |
 | `skills.md` | Skills index (name + description only) |
@@ -49,5 +47,5 @@ Optional: [`templates/slice-manifest.stub.json`](templates/slice-manifest.stub.j
 
 ## Baseline reads
 
-`structure.md`, `product.md`, `codegraph.md`, `manifest.md`, `session-loop.md`, `controls.md`.  
+`structure.md`, `product.md`, `manifest.md`, `session-loop.md`, `controls.md`.  
 Domain/Design/Impl/QA/Refactor: also `domain-layer.md` + `domain-layer.project.md`, and both quality-gates files when judging gates.

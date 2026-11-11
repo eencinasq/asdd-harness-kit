@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "spec-drift-merge",
+  "concerns": [],
+  "session_id": "sess-spec-drift-merge-005",
+  "timestamp": "2026-11-10T02:50:43.000Z",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "tools/spec-drift/ui/**",
+    "tools/spec-drift/package.json"
+  ],
+  "evidence": "Start TASK-002 (REQ-004)"
+}

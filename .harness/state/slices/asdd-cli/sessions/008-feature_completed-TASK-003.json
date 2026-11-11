@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-cli",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-asdd-cli-008",
+  "timestamp": "2026-11-11T00:30:00.000Z",
+  "event_type": "feature_completed",
+  "feature_id": "TASK-003",
+  "evidence": "TASK-003 passing (uncommitted): cli/test/install-lifecycle.test.mjs 8/8 (semver; edited kit files skipped on upgrade + recorded + doctor warns, --force overwrites; unedited file updated; interrupted-install marker and downgrade refused unless --force; --json result and error objects; uninstall keeps changed files/specs/project.json/filled binding, removes kit files, links, hooks, kit mcp servers and gitignore lines; pr preflight codes; --pr against a local bare origin with a fake gh: branch from origin/main, commit, push, PR URL, back on main with a clean tree; failed install mid-PR rolled back; branch-exists refused). npm test exit 0: vendor check, install smoke, lifecycle, unit 108/108."
+}

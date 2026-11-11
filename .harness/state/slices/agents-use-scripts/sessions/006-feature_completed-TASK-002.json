@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "agents-use-scripts",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-agents-use-scripts-006",
+  "timestamp": "2026-11-10T20:00:00.000Z",
+  "event_type": "feature_completed",
+  "feature_id": "TASK-002",
+  "evidence": "TASK-002 passing (uncommitted): grep finds no MCP tool reference in .agents/agents, .agents/skills, runtimes or AGENTS.md; npm test exit 0 (vendor check, install smoke incl. guidance budget 31948 <= 31962, lifecycle, unit 94/94)."
+}

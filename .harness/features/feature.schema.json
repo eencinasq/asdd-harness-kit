@@ -76,10 +76,14 @@
           "type": "string",
           "description": "Filled only when status is 'passing'. Describes what ran and the result."
         },
+        "evidence_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Written by asdd sync, never by hand: sha256 of the files scope_paths cover when the feature became 'passing'. Drift check DRIFT-02 recomputes it and reopens the feature when those files changed. No commit is needed."
+        },
         "evidence_commit": {
           "type": "string",
-          "pattern": "^[0-9a-fA-F]{7,40}$",
-          "description": "SHA of the commit containing the verified code. Required when status is 'passing'. Drift check DRIFT-02 compares scope_paths against it."
+          "description": "Deprecated: replaced by evidence_hash. asdd sync removes it."
         },
         "depends_on": {
           "type": "array",

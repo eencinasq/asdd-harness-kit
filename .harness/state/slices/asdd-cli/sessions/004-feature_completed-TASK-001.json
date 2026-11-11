@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-cli",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-asdd-cli-004",
+  "timestamp": "2026-11-10T22:30:00.000Z",
+  "event_type": "feature_completed",
+  "feature_id": "TASK-001",
+  "evidence": "TASK-001 passing (uncommitted): npm test exit 0: asdd kit vendor --check OK; cli/test/install.sh OK (all prior assertions, now via asdd install, plus: CLI version/help/unknown command, legacy scripts/install-into.sh removed, no cli/ in the project, npm pack ships cli/bin and templates but no cli/test or scripts/); cli/test/lifecycle.sh OK; unit 100/100 incl. cli/test/cli.test.mjs (options, runtimes, project id, dispatch, pre-CLI form, doctor --json). Wizard with piped answers wires claude and records playwright-e2e; --from-git --dry-run uses the local kit; doctor runs. cli/test/full-flow.sh fails at DRIFT-01 test/reorder.test.mjs exactly as HEAD scripts/test-full-flow.sh does (pre-existing)."
+}

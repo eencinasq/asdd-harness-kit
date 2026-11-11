@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-cli-harness-042",
+  "timestamp": "2026-11-11T19:00:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-010",
+  "evidence": "Start TASK-010 (REQ-014): lessons from the eminzo CLI."
+}

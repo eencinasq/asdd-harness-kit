@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-agents-use-scripts-007",
+  "timestamp": "2026-11-10T23:18:49.525Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "agents-use-scripts",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Scope spread across top-level modules; escalate lite → full path",
+  "concerns": []
+}

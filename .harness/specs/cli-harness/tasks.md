@@ -1,0 +1,15 @@
+# cli-harness — Tasks
+
+| Task | Requirements | Scope |
+|------|--------------|-------|
+| TASK-001 Harness in the CLI: `cli/src/harness`, `asdd` commands, project copy in `.harness/cli`, upgrade from `.harness/scripts`, global hand-off, kit self-install | REQ-001 REQ-002 REQ-003 REQ-004 REQ-006 | `cli/**`, `.harness/scripts/**`, `.harness/cli`, `.cursor/hooks.json`, `.harness/config/project.json`, `package.json`, `.github/workflows/harness-invariants.yml`, `.harness/config/versions.json` |
+| TASK-002 Guidance, servers, and examples name `asdd` commands | REQ-005 | `.agents/**`, `modules/**`, `.harness/steering/**`, `AGENTS.md`, `README.md`, `runtimes/**`, `tools/**`, `.github/*.example`, `.github/workflows/harness-audit.yml.example`, `.harness/config/README.md`, `docs/knowledge-base/README.md`, `docs/knowledge-base/steering-proposals/SP-003.md`, `.harness/features/*.features.json` |
+| TASK-003 Modules and runtimes move into the CLI (`cli/modules`, `cli/runtimes`) | REQ-007 | `cli/modules/**`, `cli/runtimes/**`, `modules/**`, `runtimes/**`, `cli/src/install/**`, `cli/src/kit/versions.mjs`, `package.json`, CI, spec-drift adapter lookup, docs |
+| TASK-004 Steering and the .harness skeleton ship from `cli/`; the kit installs itself by copy (`asdd kit self`) | REQ-008 | `cli/steering/**`, `cli/scaffold/**`, `cli/versions.json`, `.harness/**` copies, `cli/src/**`, `package.json`, CI |
+| TASK-005 Agents, skills, MCP config, and `AGENTS.md` ship from `cli/`; the kit holds copies | REQ-009 | `cli/agents/**`, `cli/skills/**`, `cli/mcp/**`, `cli/AGENTS.md`, `.agents/**`, `AGENTS.md`, `cli/src/install/phases.mjs`, `cli/src/kit/versions.mjs`, `package.json`, tests, docs |
+| TASK-006 Codegraph as a skill on the CLI (no MCP); every user refactored; `asdd doctor` checks it | REQ-010 | `cli/skills/codegraph/**`, `cli/agents/**`, `cli/modules/**`, `cli/steering/**`, `cli/mcp/**`, `cli/src/**`, `cli/test/**`, `README.md`, kit copies |
+| TASK-007 `evidence_hash` (recorded by `asdd sync`) replaces `evidence_commit`; DRIFT-02 by hash, DRIFT-06 without SHA | REQ-011 | `cli/src/harness/{scope-lib,drift-lib,sync-state,knowledge-lib}.mjs`, `cli/src/harness/validators/features.mjs`, tests, schemas, steering, agents, `README.md` |
+| TASK-008 No npm packages in `.harness/`: `sqlite-vec` removed; upgrades clean `.harness/node_modules` | REQ-012 | knowledge store/query/sync, installer, doctor, uninstall, tests, `package.json`, `tools/knowledge`, docs |
+| TASK-009 Jev only as the `jev-gate` MCP server (out of the CLI, installer, skills, steering) | REQ-013 | `cli/**`, `tools/jev-gate/**`, `README.md`, `package.json`, CI |
+| TASK-010 Lessons from the eminzo CLI: stale `cli/dist` never runs in the kit; `.gitignore` preflight + doctor check; `prepublishOnly` | REQ-014 | `cli/bin/asdd.mjs`, `cli/src/kit/**`, `cli/src/install/**`, `cli/src/doctor.mjs`, `package.json`, `cli/test/**` |
+| TASK-011 The CLI as a Node package only (global or devDependency, never in `.harness/`); hook resolver; version fit; install guide like eminzo's | REQ-015 | `cli/**`, `tools/spec-drift/src/audit/**`, `.github/*.example`, `README.md`, `package.json` |

@@ -9,30 +9,30 @@ tags:
 
 # Spec drift and audit
 
-Spec drift is the gap between what a slice says and what the repository does. The harness checks it with one library (`.harness/scripts/drift-lib.mjs`) behind three entry points, so the stop hook, CI, and chat give the same answer:
+Spec drift is the gap between what a slice says and what the repository does. The harness checks it with one library (`drift-lib.mjs` in the asdd CLI) behind three entry points, so the stop hook, CI, and chat give the same answer. Agents and skills use the scripts; the MCP server is for people in chat:
 
 | Entry point | When | Who |
 |-------------|------|-----|
-| `check-invariants.mjs` (Verify-on-Stop, CI) | Every agent stop and every push | Automatic |
-| `node .harness/scripts/check-spec-drift.mjs [--json] [--base <ref>]` | On demand | Anyone |
-| MCP server `spec-drift-auditor` | In chat, with an optional dashboard | Engineers and the Tech Lead |
+| `asdd check` (Verify-on-Stop, CI) | Every agent stop and every push | Automatic |
+| `asdd drift [--json] [--base <ref>]` | On demand | Agents, engineers, and the Tech Lead |
+| MCP server `spec-drift` (vendors `drift-lib.mjs`) | In chat, with an optional dashboard | People: engineers and the Tech Lead |
 
 Checks `DRIFT-00`…`DRIFT-07` and their gates `QG-DRIFT-01`…`05` are defined in [quality-gates.md](./quality-gates.md). This file does not restate them. Design: [README → spec drift and audit](https://github.com/eencinasq/asdd-harness-kit#spec-drift-and-codebase-audit).
 
 ## Engineers (author)
 
-1. Before marking a feature `passing`: call `audit_diff` (mode `author`) or run `check-spec-drift.mjs`. Fix every `fail`.
+1. Before marking a feature `passing`: run `asdd drift`. Fix every `fail`. (In chat, the MCP tool `audit_diff`, mode `author`, gives the same answer.)
 2. A `DRIFT-01` (unmapped file) means one of two things: the change is out of scope (revert it), or the slice is missing the file (map it in `intent.md`, `design.md`, `tasks.md`, `spec.md`, or the feature's `scope_paths`). Never map a file only to silence the check.
-3. Commit the verified code, then record its SHA as `evidence_commit` ([session-loop.md](./session-loop.md)). Later edits to owned files reopen the feature (`DRIFT-02`).
-4. At `qa`, `verify_spec_compliance` shows which MUST requirements lack a feature or a test that names the REQ ID.
+3. After the verification passes, set `passing` with `evidence` and run `asdd sync`: it records the feature's `evidence_hash` ([session-loop.md](./session-loop.md)). No commit is needed. Later edits to owned files reopen the feature (`DRIFT-02`).
+4. At `qa`, `asdd drift --slice <id> --requirements` shows which MUST requirements lack a feature or a test that names the REQ ID (DRIFT-03/04). In chat, `verify_spec_compliance` adds the project's contract adapters.
 5. Branch as `slice/<slice-id>/<topic>` or put `Slice: <slice-id>` in the PR body (`DRIFT-07`).
 
 ## Tech Lead (review)
 
-1. Review a PR with the `pr-review` prompt, or `audit_diff` with mode `review`, the PR's base and head, and its body.
+1. Review a PR with `asdd drift --base <base> --target <head> --pr-branch <branch> --pr-body "<body>"` (adds DRIFT-07). In chat, the `pr-review` prompt or `audit_diff` mode `review` also applies TL triage.
 2. Findings are drafts for review comments. The dashboard's "Draft comment" and "Dismiss…" only send chat messages; nothing is posted or written by the server.
-3. Dismiss a finding with `node .harness/scripts/audit-triage.mjs <id> --dismiss --reason "<why>"`. The dismissal lasts until the finding's files change. Confirm inferential findings with `--confirm` before they count.
-4. Run `node .harness/scripts/audit-codebase.mjs` on a schedule (runner open: [`.github/workflows/harness-audit.yml.example`](../../.github/workflows/harness-audit.yml.example)) and the `codebase-audit` skill for the inferential pass. The audit runs the same Semgrep scan as `verify_architecture_rules`; `audit_report` shows each problem with its fix on the dashboard. A finding seen three times triggers `QG-DEB-06`.
+3. Dismiss a finding with `asdd triage <id> --dismiss --reason "<why>"`. The dismissal lasts until the finding's files change. Confirm inferential findings with `--confirm` before they count.
+4. Run `asdd audit` on a schedule (runner open: [`.github/workflows/harness-audit.yml.example`](../../.github/workflows/harness-audit.yml.example)) and the `codebase-audit` skill for the inferential pass. The audit runs the same Semgrep scan as the MCP tool `verify_architecture_rules` and writes each problem with its fix to `.harness/audits/<timestamp>.json` (`audit_report` shows it on the dashboard in chat). A finding seen three times triggers `QG-DEB-06`.
 5. The TL owns the rules: steering, bindings, and sensors (example: [`.github/CODEOWNERS.harness.example`](../../.github/CODEOWNERS.harness.example)).
 
 ## Bindings
@@ -41,4 +41,4 @@ Set in [quality-gates.project.md](./quality-gates.project.md): `Test file globs`
 
 Files the kit installer refreshes are listed in `managed_files` in `.harness/config/installed-versions.json`, and drift ignores them: a kit upgrade is not slice work.
 
-`drift.contract` in `.harness/config/project.json` sets whether missing `scope_paths` or `evidence_commit` warns or fails (`DRIFT-06`).
+`drift.contract` in `.harness/config/project.json` sets whether missing `scope_paths` or `evidence` warns or fails (`DRIFT-06`).

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-cli-harness-035",
+  "timestamp": "2026-11-11T17:00:00.000Z",
+  "event_type": "feature_started",
+  "feature_id": "TASK-009",
+  "evidence": "Reopened by DRIFT-02: README.md and cli/README.md updated to the current kit (cli/dist, project CLI copy, repair, Jev not installable, kit dev workflow, tests); re-verifying."
+}

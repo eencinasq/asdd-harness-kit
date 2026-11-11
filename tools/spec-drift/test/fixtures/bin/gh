@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+// Fake `gh` CLI for e2e tests. Serves one PR from $FAKE_GH_STATE and records published reviews.
+//   gh pr view <n> --json ...  → $FAKE_GH_STATE/pr.json
+//   gh pr diff <n>             → $FAKE_GH_STATE/diff.patch
+//   gh issue view <n> --json … → $FAKE_GH_STATE/issue-<n>.json
+//   gh api -X POST repos/<o>/<r>/pulls/<n>/reviews --input -  → appends to reviews.jsonl
+//   gh api repos/<o>/<r>/pulls/<n>/comments --jq …             → $FAKE_GH_STATE/review-comments.json
+// Set FAKE_GH_FAIL=1 to simulate an unauthenticated gh.
+import fs from 'node:fs';
+import path from 'node:path';
+
+const state = process.env.FAKE_GH_STATE;
+const [cmd, sub, ...rest] = process.argv.slice(2);
+const fail = (msg) => {
+	process.stderr.write(`${msg}\n`);
+	process.exit(1);
+};
+
+if (process.env.FAKE_GH_FAIL === '1') fail('gh: To get started with GitHub CLI, please run:  gh auth login');
+if (!state) fail('fake gh: FAKE_GH_STATE is not set');
+const pr = JSON.parse(fs.readFileSync(path.join(state, 'pr.json'), 'utf8'));
+
+if (cmd === 'pr' && sub === 'view') {
+	if (Number(rest[0]) !== pr.number) fail(`GraphQL: Could not resolve to a PullRequest with the number of ${rest[0]}.`);
+	process.stdout.write(JSON.stringify(pr));
+} else if (cmd === 'issue' && sub === 'view') {
+	const file = path.join(state, `issue-${rest[0]}.json`);
+	if (!fs.existsSync(file)) fail(`GraphQL: Could not resolve to an issue or pull request with the number of ${rest[0]}.`);
+	process.stdout.write(fs.readFileSync(file, 'utf8'));
+} else if (cmd === 'pr' && sub === 'diff') {
+	process.stdout.write(fs.readFileSync(path.join(state, 'diff.patch'), 'utf8'));
+} else if (cmd === 'api' && ![sub, ...rest].includes('POST')) {
+	// GET: inline review comments already on the PR ($FAKE_GH_STATE/review-comments.json, jq applied by hand).
+	const file = path.join(state, 'review-comments.json');
+	const comments = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : [];
+	for (const c of comments) {
+		process.stdout.write(`${JSON.stringify({ path: c.path, line: c.line ?? c.original_line, body: c.body, author: c.user?.login })}\n`);
+	}
+} else if (cmd === 'api') {
+	const endpoint = [sub, ...rest].find((a) => a.startsWith('repos/'));
+	const payload = JSON.parse(fs.readFileSync(0, 'utf8'));
+	fs.appendFileSync(path.join(state, 'reviews.jsonl'), `${JSON.stringify({ endpoint, payload })}\n`);
+	process.stdout.write(
+		JSON.stringify({
+			id: 1,
+			html_url: `${pr.url}#pullrequestreview-1`,
+			state: payload.event ? (payload.event === 'APPROVE' ? 'APPROVED' : payload.event === 'COMMENT' ? 'COMMENTED' : 'CHANGES_REQUESTED') : 'PENDING',
+		}),
+	);
+} else {
+	fail(`fake gh: unsupported command: ${process.argv.slice(2).join(' ')}`);
+}
