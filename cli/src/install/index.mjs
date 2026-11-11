@@ -11,6 +11,7 @@ import { fileHash, InstallContext } from './context.mjs';
 import { describe, ignoreReport } from './ignored.mjs';
 import { enableModules, retireJev } from './modules.mjs';
 import { INSTALL_HELP, list, MODULES, parseInstallArgs, RUNTIMES } from './options.mjs';
+import { guardRuleCollisions } from './rule-collisions.mjs';
 import { guardSkillCollisions } from './skill-collisions.mjs';
 import { guardSteeringCollisions } from './steering-collisions.mjs';
 import {
@@ -296,6 +297,7 @@ function selfInstall(ctx) {
   if (!ctx.runtimes && existsSync(join(ctx.target, '.cursor'))) ctx.runtimes = 'cursor';
   guardSkillCollisions(ctx);
   guardSteeringCollisions(ctx);
+  guardRuleCollisions(ctx);
   retireProjectCli(ctx);
   copyShipped(ctx);
   removeRetiredKitFiles(ctx);
@@ -348,6 +350,7 @@ export function runInstall(o, kit) {
   // Reads only target state: runs before the marker so a collision halt leaves nothing behind.
   guardSkillCollisions(ctx);
   guardSteeringCollisions(ctx);
+  guardRuleCollisions(ctx);
   const marker = join(o.target, INSTALLING_MARKER);
   if (!ctx.dryRun) {
     mkdirSync(dirname(marker), { recursive: true });

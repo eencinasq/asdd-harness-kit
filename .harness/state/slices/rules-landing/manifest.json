@@ -1,0 +1,35 @@
+{
+  "schema_version": "3.0",
+  "slice_id": "rules-landing",
+  "phase": "discovery",
+  "status": "in_progress",
+  "mode": "lite",
+  "escalation_signals": [],
+  "escalation_required": false,
+  "escalated_from_lite": false,
+  "created_at": "2026-11-11T05:14:25.093Z",
+  "updated_at": "2026-11-11T05:14:25.094Z",
+  "paths": {
+    "specs": ".harness/specs/rules-landing",
+    "tasks": ".harness/specs/rules-landing/tasks.md",
+    "features": ".harness/features/rules-landing.features.json"
+  },
+  "gates": {},
+  "active_features": [],
+  "open_dissents": 0,
+  "source": null,
+  "session_log": [
+    {
+      "timestamp": "2026-11-11T05:14:24.964Z",
+      "agent": "human",
+      "human": "squad",
+      "event": "phase_started",
+      "phase": "discovery",
+      "feature_id": null
+    }
+  ],
+  "contributors": [
+    "squad",
+    "human"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "rules-landing",
+  "source_tasks": ".harness/specs/rules-landing/tasks.md",
+  "features": []
+}

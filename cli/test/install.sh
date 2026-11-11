@@ -730,4 +730,50 @@ grep -qi 'rehomed' "$CTMP/rehome.log"
 rm -rf "$CTMP"
 echo "  OK"
 
+echo "== rule collision guard: unmanaged same-name file halts; dry-run reports; unique-name consumer rules survive =="
+CTMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-rule-guard.XXXXXX")"
+
+# Baseline site: consumer file named like a kit source file, not in managed_files → halt, file untouched
+mkdir -p "$CTMP/app/.agents/rules" "$CTMP/app/.harness/config"
+echo '# consumer rule profile' >"$CTMP/app/.agents/rules/_rule-profile.md"
+cat >"$CTMP/app/.harness/config/installed-versions.json" <<'EOF'
+{"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/rules/other.md"]}
+EOF
+if asdd install "$CTMP/app" --no-interactive --skip-deps >"$CTMP/baseline.log" 2>&1; then
+  echo "expected rule collision guard to halt on baseline site" >&2; exit 1
+fi
+grep -q 'rule.*collision\|collision' "$CTMP/baseline.log"
+grep -q 'consumer rule profile' "$CTMP/app/.agents/rules/_rule-profile.md"
+# --force never bypasses the guard
+if asdd install "$CTMP/app" --no-interactive --skip-deps --force >/dev/null 2>&1; then
+  echo "expected rule collision guard to halt even with --force" >&2; exit 1
+fi
+# --dry-run reports without halting
+asdd install "$CTMP/app" --no-interactive --dry-run --skip-deps >"$CTMP/dry.log" 2>&1
+grep -qi 'collision' "$CTMP/dry.log"
+grep -qi 'dry-run' "$CTMP/dry.log"
+
+# Legacy: colliding file + no manifest → documented halt
+mkdir -p "$CTMP/app2/.agents/rules"
+echo '# consumer' >"$CTMP/app2/.agents/rules/_rule-profile.md"
+if asdd install "$CTMP/app2" --no-interactive --skip-deps >"$CTMP/legacy.log" 2>&1; then
+  echo "expected legacy halt" >&2; exit 1
+fi
+grep -q 'LEGACY INSTALL' "$CTMP/legacy.log"
+
+# Non-colliding consumer rules are never clobbered
+mkdir -p "$CTMP/app3/.agents/rules" "$CTMP/app3/.harness/config"
+echo '# consumer domain rule' >"$CTMP/app3/.agents/rules/payments.md"
+cat >"$CTMP/app3/.harness/config/installed-versions.json" <<'EOF'
+{"kit_version":"3.0.0","artifacts":{},"managed_files":[]}
+EOF
+asdd install "$CTMP/app3" --no-interactive --skip-deps >"$CTMP/clean.log" 2>&1 \
+  || { echo "expected clean run with unique-name consumer rule" >&2; tail -5 "$CTMP/clean.log" >&2; exit 1; }
+grep -q 'consumer domain rule' "$CTMP/app3/.agents/rules/payments.md"
+[[ -f "$CTMP/app3/.agents/rules/_rule-profile.md" ]] \
+  || { echo "kit _rule-profile.md not installed" >&2; exit 1; }
+
+rm -rf "$CTMP"
+echo "  OK"
+
 echo "OK asdd install smoke test"

@@ -42,6 +42,7 @@ export const SELF_COPIES = [
   // What .agents/ and the root get: agents, skills, the MCP config and launchers, and the agent map.
   ['.agents/agents', 'cli/agents'],
   ['.agents/skills', 'cli/skills'],
+  ['.agents/rules', 'cli/rules'],
   ['.agents/mcp/bin', 'cli/mcp/bin'],
   ['.agents/mcp/sync-runtime-mcp.cjs', 'cli/mcp/sync-runtime-mcp.cjs'],
   ['.agents/mcp/README.md', 'cli/mcp/README.md'],
@@ -397,6 +398,8 @@ export function installAgentsCore(ctx) {
   const { kit, target } = ctx;
   ctx.copyTree(join(kit, 'cli/agents'), join(target, '.agents/agents'), 'refresh');
   ctx.copyTree(join(kit, 'cli/skills'), join(target, '.agents/skills'), 'refresh');
+  // .agents/rules/ — modular policy root (rules proposal D-7); absent until the kit ships rules
+  if (existsSync(join(kit, 'cli/rules'))) ctx.copyTree(join(kit, 'cli/rules'), join(target, '.agents/rules'), 'refresh');
   ctx.copyTree(join(kit, 'cli/mcp/bin'), join(target, '.agents/mcp/bin'), 'refresh');
   ctx.copyFile(join(kit, 'cli/mcp/sync-runtime-mcp.cjs'), join(target, '.agents/mcp/sync-runtime-mcp.cjs'), 'refresh');
   ctx.copyFile(join(kit, 'cli/mcp/README.md'), join(target, '.agents/mcp/README.md'), 'refresh');
