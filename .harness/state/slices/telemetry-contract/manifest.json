@@ -1,0 +1,35 @@
+{
+  "schema_version": "3.0",
+  "slice_id": "telemetry-contract",
+  "phase": "discovery",
+  "status": "in_progress",
+  "mode": "lite",
+  "escalation_signals": [],
+  "escalation_required": false,
+  "escalated_from_lite": false,
+  "created_at": "2026-11-11T05:20:04.589Z",
+  "updated_at": "2026-11-11T05:20:04.590Z",
+  "paths": {
+    "specs": ".harness/specs/telemetry-contract",
+    "tasks": ".harness/specs/telemetry-contract/tasks.md",
+    "features": ".harness/features/telemetry-contract.features.json"
+  },
+  "gates": {},
+  "active_features": [],
+  "open_dissents": 0,
+  "source": null,
+  "session_log": [
+    {
+      "timestamp": "2026-11-11T05:20:04.472Z",
+      "agent": "human",
+      "human": "squad",
+      "event": "phase_started",
+      "phase": "discovery",
+      "feature_id": null
+    }
+  ],
+  "contributors": [
+    "squad",
+    "human"
+  ]
+}

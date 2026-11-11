@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "telemetry-contract",
+  "source_tasks": ".harness/specs/telemetry-contract/tasks.md",
+  "features": []
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-contract-001",
+  "timestamp": "2026-11-11T05:20:04.472Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "telemetry-contract",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "lite",
+  "evidence": "Slice initialized",
+  "concerns": []
+}
