@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "sensor-fixes",
+  "concerns": [],
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "evidence": "npm test exit 0 (133/133): drift-lib.test 'sensor-fixes REQ-001' \u2014 deleting src/b.js changes evidence_hash, committing the deletion leaves it unchanged; the test fails on HEAD's scope-lib.mjs (committing it is not). fileLister drops `git ls-files --deleted`. asdd kit vendor refreshed tools/{spec-drift,jev-gate,knowledge}/src/harness/scope-lib.mjs. git ls-files --deleted was empty, so no recorded hash changed.",
+  "session_id": "sess-sensor-fixes-004",
+  "timestamp": "2026-11-12T18:12:02.000Z"
+}

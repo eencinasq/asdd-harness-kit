@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "sensor-fixes",
+  "concerns": [],
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "design.md: what changes, domain placement (harness sensors, no product code), no new domain terms, ADR-001 filter at the listing, ADR-002 dynamic import. Design confidence 0.9 -> QG-DES-01 PASS.",
+  "session_id": "sess-sensor-fixes-010",
+  "timestamp": "2026-11-12T18:15:01.000Z"
+}

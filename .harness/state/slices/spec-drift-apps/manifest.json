@@ -1,0 +1,291 @@
+{
+  "schema_version": "3.0",
+  "slice_id": "spec-drift-apps",
+  "phase": "knowledge",
+  "status": "DONE",
+  "mode": "full",
+  "escalation_signals": [
+    {
+      "type": "E1-scope-spread",
+      "evidence": "scope touches 2 top-level modules: cli, tools"
+    }
+  ],
+  "escalation_required": false,
+  "escalated_from_lite": false,
+  "created_at": "2026-11-12T03:11:17.913Z",
+  "updated_at": "2026-11-12T19:57:28.255Z",
+  "paths": {
+    "specs": ".harness/specs/spec-drift-apps",
+    "tasks": ".harness/specs/spec-drift-apps/tasks.md",
+    "features": ".harness/features/spec-drift-apps.features.json"
+  },
+  "gates": {
+    "discovery": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T03:11:19.000Z",
+      "evidence": "intent.md + capability.md: spec-drift MCP evaluation (MCP Apps + code mode), points 1-3; Tech Lead chose to keep the server read-only (point 2 = read-only learning view + CLI commands). Discovery confidence 0.85.",
+      "concerns": []
+    },
+    "spec": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T03:11:19.000Z",
+      "evidence": "requirements.md: REQ-001..004 MUST READY with AC-001..004. Spec confidence 0.85.",
+      "concerns": []
+    },
+    "validation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T03:11:55.000Z",
+      "evidence": "spec-validation-report.md PASSED; anti-pattern score 1.0; INFO VAL-001 (SDK validates structuredContent: loose schemas). Validation confidence 0.85.",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T03:11:55.000Z",
+      "evidence": "design.md: files, ADR-001..004 (loose schemas, server read-only per TL, server-side query, shared proposalFindings). Domain skipped (no terms). Design confidence 0.86 (QG-DES-01).",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T03:11:55.000Z",
+      "evidence": "tasks.md: TASK-001..004 with disjoint scopes and deps; features tracker. Confidence 0.86 (QG-TPL-01).",
+      "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T12:28:21.000Z",
+      "evidence": "TASK-001..004 passing (stamped): outputSchema on 11 tools + 2 new; learningReport and shared proposalFindings in the harness (vendored); audit_query and learning_report read-only tools; audit view learning panel and triage as copyable asdd commands; README. Re-verified cli-harness TASK-008/009/011 and agents-spec TASK-002 after DRIFT-02.",
+      "concerns": []
+    },
+    "qa": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T12:28:21.000Z",
+      "evidence": "spec-coverage-report.md PASSED: MUST 4/4, AC 4/4; pnpm test 113/113, npm test 132/132, e2e 95/96 (pre-existing analyze_spec_drift env-order failure, unchanged at HEAD); two follow-ups recorded (that test; directory-scope hash of committed deletions).",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T12:28:21.000Z",
+      "evidence": "Lessons: (1) adding outputSchema exposed a real data gap (Gate-command findings have no id) — the SDK turns a schema mismatch into a tool error, so schemas must be validated against real fixtures; (2) the read-only invariant of the spec-drift server was documented in three places and the plan nearly broke it — decisions stay at the CLI, views show the command; (3) server-side aggregation (audit_query) gives most of code mode's benefit on every host; (4) harness: committing a file deletion inside a directory scope changes evidence_hash (DRIFT-02 noise) — follow-up; (5) mcp.e2e analyze_spec_drift sets env after import — follow-up.",
+      "concerns": []
+    }
+  },
+  "active_features": [],
+  "open_dissents": 0,
+  "source": null,
+  "session_log": [
+    {
+      "timestamp": "2026-11-12T03:11:17.861Z",
+      "agent": "human",
+      "human": "squad",
+      "event": "phase_started",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T03:11:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T03:11:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T03:11:55.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "validation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T03:11:55.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T03:11:55.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T03:11:55.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T12:10:24.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T12:10:24.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T12:12:46.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T12:12:46.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T12:23:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T12:23:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-12T12:24:26.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-12T12:28:21.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T12:28:21.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T12:28:21.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:15:12.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T18:15:13.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T19:57:09.938Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T19:57:09.940Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T19:57:09.949Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T19:57:09.952Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T19:57:09.966Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-12T19:57:09.970Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    }
+  ],
+  "contributors": [
+    "squad",
+    "human",
+    "eencinas",
+    "asdd-pipeline"
+  ]
+}

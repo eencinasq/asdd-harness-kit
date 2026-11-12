@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-empty",
+  "concerns": [],
+  "session_id": "sess-spec-drift-empty-012",
+  "timestamp": "2026-11-12T19:57:09.671Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: pnpm build + test:e2e 101/101, test 116/116, typecheck OK, lint no errors (2 warnings + 1 info pre-existing in pr-review.prompts.ts and ci-templates.ts). empty-analysis.e2e: on a repo with no .semgrep, analyze_spec_drift/architecture/standards/rescan return isError false, status no-rules, findingCount 0, 'nothing was analyzed (this is not a pass)', a generatePrompt, schema-valid, no 'No violations'; a named unknown pack stays an error; nothing written. generate-architecture-rules prompt: repo root, .semgrep/architecture/ and standards/, harness step, confirm-before-write, call analyze_spec_drift. no-rules.spec (dashboard state). PR review uses the moved builder unchanged (architecture-import.spec)."
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "spec-drift-empty",
+  "source_tasks": ".harness/specs/spec-drift-empty/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Analysis no-rules result and rules prompt",
+      "user_visible_behavior": "With no rules the analysis says nothing was analyzed and offers to have the agent write rules.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e"
+      ],
+      "evidence": "tools/spec-drift: pnpm build + test:e2e 101/101, test 116/116, typecheck OK, lint no errors (2 warnings + 1 info pre-existing in pr-review.prompts.ts and ci-templates.ts). empty-analysis.e2e: on a repo with no .semgrep, analyze_spec_drift/architecture/standards/rescan return isError false, status no-rules, findingCount 0, 'nothing was analyzed (this is not a pass)', a generatePrompt, schema-valid, no 'No violations'; a named unknown pack stays an error; nothing written. generate-architecture-rules prompt: repo root, .semgrep/architecture/ and standards/, harness step, confirm-before-write, call analyze_spec_drift. no-rules.spec (dashboard state). PR review uses the moved builder unchanged (architecture-import.spec).",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis",
+        "tools/spec-drift/src/pr-review/architecture",
+        "tools/spec-drift/ui/analysis-dashboard",
+        "tools/spec-drift/ui/analysis-dashboard.html",
+        "tools/spec-drift/test/empty-analysis.e2e-spec.ts"
+      ],
+      "evidence_hash": "24a9da4a999af26ae4e85cf6324fedb7818cfd88a58bf3eb284ea63a035dccfa"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Audit uses .semgrep/architecture",
+      "user_visible_behavior": "Rules the agent generates are used by the audit architecture check.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test"
+      ],
+      "evidence": "npm test exit 0 (134/134): semgrep-lib.test 'spec-drift-empty REQ-003' — an empty .semgrep/architecture/ folder is not a config (unconfigured), a folder with a YAML file is selected (source selected, path .semgrep/architecture), a .semgrep.yml still wins; semgrep-lib 9/9. Steering spec-drift.md names the folder and the generate-architecture-rules prompt; asdd kit vendor refreshed tools/spec-drift/src/harness/semgrep-lib.mjs; asdd kit self refreshed .harness/steering/spec-drift.md.",
+      "scope_paths": [
+        "cli/src/harness/semgrep-lib.mjs",
+        "cli/src/harness/semgrep-lib.test.mjs",
+        "tools/spec-drift/src/harness/semgrep-lib.mjs",
+        "cli/steering/spec-drift.md",
+        ".harness/steering/spec-drift.md"
+      ],
+      "evidence_hash": "87e874a54693beb7735d2b66f9a662d614066efdb29b78baebf903ce36b76d06"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Audit no_data and rules prompt",
+      "user_visible_behavior": "Without the kit or data the audit tools and dashboard show No data with the reason.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001",
+        "TASK-002"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e"
+      ],
+      "evidence": "tools/spec-drift: pnpm build + test:e2e 101/101, test 116/116, typecheck OK, lint no errors (2 warnings + 1 info pre-existing in pr-review.prompts.ts and ci-templates.ts). empty-audit.e2e: without .harness/ audit_diff, verify_architecture_rules, verify_spec_compliance, audit_report, audit_query, learning_report return isError false with no_data (reason, next 'asdd install'), no findings, schema-valid, nothing written; with the kit and no data audit_report/verify_spec_compliance/audit_query/learning_report return no_data; verify_architecture_rules and audit_diff.architecture carry generate_prompt. model.spec: no_data view and generate_prompt in architecture details. insight/output-schemas/audit e2e updated (no data is not an error; unknown slice with slices stays an error).",
+      "scope_paths": [
+        "tools/spec-drift/src/audit",
+        "tools/spec-drift/ui/audit-dashboard",
+        "tools/spec-drift/test/empty-audit.e2e-spec.ts",
+        "tools/spec-drift/test/insight.e2e-spec.ts"
+      ],
+      "evidence_hash": "7c21ac624aaafa061e074a37b066d9448e5825b17133600a2caa62eb3ce77a6d"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Docs",
+      "user_visible_behavior": "The README documents empty states and rule generation.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm lint"
+      ],
+      "evidence": "tools/spec-drift/README.md: 'No rules is not a pass', 'No data is not an error', generate-architecture-rules prompt row, verify_architecture_rules config order, troubleshooting row; biome-formatted; lint no errors.",
+      "scope_paths": [
+        "tools/spec-drift/README.md"
+      ],
+      "evidence_hash": "a8c5774e61cbe06b63e94e918671d9cd2155d6090b7f5e5bbe35c4305f789625"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-008",
+  "timestamp": "2026-11-12T12:10:24.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_completed",
+  "evidence": "outputSchema on 11 tools: audit (audit_diff, verify_architecture_rules, verify_spec_compliance, generate_ci_gate, audit_report, audit_finding; src/audit/audit.output.ts) and analysis (analyze_architecture, analyze_standards, analyze_spec_drift, rescan -> ScanSummaryOutput; list_rule_packs -> RulePacksOutput; src/analysis/analysis.output.ts). Loose zod objects over the known fields (ADR-001). The first run found a real data gap: Gate-command findings carry no id, so FindingOutput.id is optional and documented. New test/output-schemas.e2e-spec.ts 2/2 (declared object schemas; client-side safeParse of real results; errors stay isError). Fixed the stale generate_ci_gate assertion in test/audit.e2e-spec.ts (the CI template installs the pinned kit and runs 'asdd check' since the cli-package change). Verification: typecheck OK; lint OK (0 errors; 2 warnings + 1 info pre-existing in untouched files); pnpm test 108/108; pnpm test:e2e 92/93 \u2014 the one failure ('MCP server (in-memory) > analyze_spec_drift runs through the service') fails identically without this change (baseline run with HEAD tools files): the test sets ANALYSIS_REPO_ROOT in before() after AppModule is imported, so the analyzer finds no .semgrep/; pre-existing, outside this slice."
+}

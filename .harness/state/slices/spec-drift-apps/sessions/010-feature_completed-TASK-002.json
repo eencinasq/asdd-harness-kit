@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-010",
+  "timestamp": "2026-11-12T12:12:46.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_completed",
+  "evidence": "proposalFindings moved from validators/learning.mjs into learning-lib.mjs (one implementation; the validator re-exports it, so asdd check's QG-LEARN-03 findings are unchanged). New learningReport(root, {limit}): summary counts, every pattern (id, signature, kind, occurrences, threshold, status, reopened, slices, last_seen, linked proposals) with the next command ('asdd learn --propose <LP>' when open; fill/decide/apply guidance when in flight), and every proposal with its missing fields (proposalFindings) and the next step (edit <file>: <first missing>, or the Tech Lead decision). Read-only. Test 'spec-drift-apps REQ-002: learningReport ...' (open + proposed patterns, unfilled SP-001, no file written, same findings as the invariants): learning-lib tests 19/19. asdd kit vendor refreshed the copies in tools/spec-drift, tools/jev-gate, tools/knowledge. npm test 132/132 (incl. kit vendor --check); tools/knowledge 8/8; tools/jev-gate typecheck + lint + test 14/14."
+}

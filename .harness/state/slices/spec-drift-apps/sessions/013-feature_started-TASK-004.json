@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-013",
+  "timestamp": "2026-11-12T12:23:48.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/README.md"
+  ],
+  "evidence": "Start TASK-004 (REQ-001, REQ-002, REQ-003, REQ-004)."
+}

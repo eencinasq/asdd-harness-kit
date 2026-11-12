@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-012",
+  "timestamp": "2026-11-12T12:23:48.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_completed",
+  "evidence": "New read-only tools in src/audit/audit-insight.tools.ts (AuditInsightTools, registered in audit.module.ts): audit_query (filters slice/severity/check/source/path prefix, group_by slice|severity|check|path|none, limit; from auto|diff|report|drift; pure queryFindings in audit-query.ts; no UI meta, a plain data tool for any host) and learning_report (learning-lib learningReport + a commands_note; opens the audit dashboard). Both declare outputSchema (audit-insight.output.ts) and readOnlyHint. AuditService gained findingsFrom() and learningReport() (reads only). View (ui/audit-dashboard): new 'learning' kind with a Learning panel (counts, patterns with next command, proposals with missing fields), copyable command blocks; review actions are comment / dismiss / confirm, where dismiss and confirm show the exact 'asdd triage <id> --dismiss --reason \"\u2026\"' / '--confirm' command (triageCommand) and send nothing to the model; messageFor throws for them. Tests: audit-query.spec.ts 3/3; model.spec.ts 8/8 (triage commands, learning view, audit_diff keeps its kind); test/insight.e2e-spec.ts 3/3 (typed + read-only, no triage tool, every audit tool readOnlyHint, learning_report and audit_query results validate, files unchanged by snapshot); mcp.e2e-spec.ts contract updated to 32 tools (learning_report -> audit view, audit_query text-only). Verification: typecheck OK; lint OK (1 pre-existing warning); build OK; pnpm test 113/113; pnpm test:e2e 95/96 \u2014 the remaining failure is the pre-existing 'analyze_spec_drift runs through the service' (env order in the test, fails identically at HEAD)."
+}

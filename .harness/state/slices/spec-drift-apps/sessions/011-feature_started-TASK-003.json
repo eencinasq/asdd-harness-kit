@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-011",
+  "timestamp": "2026-11-12T12:12:46.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/src/audit/audit.schemas.ts",
+    "tools/spec-drift/src/audit/audit.service.ts",
+    "tools/spec-drift/src/audit/audit.types.ts",
+    "tools/spec-drift/src/audit/harness-libs.ts",
+    "tools/spec-drift/src/audit/audit-query.ts",
+    "tools/spec-drift/src/audit/audit-query.spec.ts",
+    "tools/spec-drift/ui/audit-dashboard",
+    "tools/spec-drift/src/audit/audit-insight.tools.ts",
+    "tools/spec-drift/src/audit/audit.module.ts"
+  ],
+  "evidence": "Start TASK-003 (REQ-002, REQ-003, REQ-004)."
+}

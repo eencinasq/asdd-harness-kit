@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-017",
+  "timestamp": "2026-11-12T12:28:21.000Z",
+  "phase": "knowledge",
+  "event_type": "phase_completed",
+  "evidence": "Lessons: (1) adding outputSchema exposed a real data gap (Gate-command findings have no id) \u2014 the SDK turns a schema mismatch into a tool error, so schemas must be validated against real fixtures; (2) the read-only invariant of the spec-drift server was documented in three places and the plan nearly broke it \u2014 decisions stay at the CLI, views show the command; (3) server-side aggregation (audit_query) gives most of code mode's benefit on every host; (4) harness: committing a file deletion inside a directory scope changes evidence_hash (DRIFT-02 noise) \u2014 follow-up; (5) mcp.e2e analyze_spec_drift sets env after import \u2014 follow-up."
+}

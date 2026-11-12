@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "sensor-fixes",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "tools/spec-drift/test/mcp.e2e-spec.ts"
+  ],
+  "evidence": "Start TASK-002 (REQ-002).",
+  "session_id": "sess-sensor-fixes-005",
+  "timestamp": "2026-11-12T18:12:03.000Z"
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "sensor-fixes",
+  "source_tasks": ".harness/specs/sensor-fixes/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Scope listing skips deleted files",
+      "user_visible_behavior": "Committing a deletion does not reopen a passing feature through DRIFT-02.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test"
+      ],
+      "evidence": "npm test exit 0 (133/133): drift-lib.test 'sensor-fixes REQ-001' — deleting src/b.js changes evidence_hash, committing the deletion leaves it unchanged; the test fails on HEAD's scope-lib.mjs (committing it is not). fileLister drops `git ls-files --deleted`. asdd kit vendor refreshed tools/{spec-drift,jev-gate,knowledge}/src/harness/scope-lib.mjs. git ls-files --deleted was empty, so no recorded hash changed.",
+      "scope_paths": [
+        "cli/src/harness/scope-lib.mjs",
+        "cli/src/harness/drift-lib.test.mjs",
+        "tools/spec-drift/src/harness/scope-lib.mjs",
+        "tools/jev-gate/src/harness/scope-lib.mjs",
+        "tools/knowledge/src/harness/scope-lib.mjs"
+      ],
+      "evidence_hash": "c7c7412f2b378886d7d3c23e82c00c2bfaf6b4ad57b12b38104a6dbeb2bfc20c"
+    },
+    {
+      "id": "TASK-002",
+      "title": "spec-drift MCP e2e uses its sandbox env",
+      "user_visible_behavior": "analyze_spec_drift e2e passes against the sandbox repository.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "pnpm test:e2e (tools/spec-drift)"
+      ],
+      "evidence": "tools/spec-drift pnpm test:e2e 101/101 (after spec-drift-empty added the generate-architecture-rules prompt to the contract in mcp.e2e-spec.ts).",
+      "scope_paths": [
+        "tools/spec-drift/test/mcp.e2e-spec.ts"
+      ],
+      "evidence_hash": "fa9baf28b4e0ad707548958eb84586151b5e5499f6fdc3d3d5d496907e5dceda"
+    }
+  ]
+}

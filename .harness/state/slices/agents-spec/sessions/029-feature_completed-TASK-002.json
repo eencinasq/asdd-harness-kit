@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-029",
+  "timestamp": "2026-11-12T12:27:52.000Z",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "evidence": "Re-verified with no content change: the hash moved when the deletion of cli/steering/templates/spec-peer-review.md was committed (c35127e): a directory scope lists files with git ls-files --cached, so before the commit the deleted file entered the hash as <missing> and after it does not (harness sensor noise, reported). asdd kit agents-lint PASS (14 agents); npm test 132/132."
+}

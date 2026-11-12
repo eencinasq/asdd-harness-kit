@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-014",
+  "timestamp": "2026-11-12T12:24:26.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift/README.md: 32 tools; 'Typed results' paragraph (outputSchema on every analysis and harness-audit tool, loose schemas, errors carry none); audit_query and learning_report rows; 'Decisions stay at the CLI' (Dismiss/Confirm show the asdd triage command, learning view shows asdd learn --propose; no tool writes triage.json or a proposal); security model notes the audit tools write nothing. Formatted with biome (markdown tables); pnpm lint OK. Docs-only change after TASK-003's verification run (typecheck, pnpm test 113/113, e2e 95/96 with the pre-existing analyze_spec_drift env failure)."
+}

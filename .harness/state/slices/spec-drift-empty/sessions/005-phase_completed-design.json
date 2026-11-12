@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-empty",
+  "concerns": [],
+  "session_id": "sess-spec-drift-empty-005",
+  "timestamp": "2026-11-12T19:40:42.143Z",
+  "phase": "design",
+  "event_type": "phase_completed",
+  "evidence": "design.md: what changes, domain placement, ADR-001..004 (no-rules status; agent writes rules in the host; one folder layout; no_data as a field). Domain phase skipped (no product domain change). Confidence 0.87 (QG-DES-01)."
+}

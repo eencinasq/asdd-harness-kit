@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-009",
+  "timestamp": "2026-11-12T12:10:24.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/learning-lib.mjs",
+    "cli/src/harness/validators/learning.mjs",
+    "cli/src/harness/learning-lib.test.mjs",
+    "tools/spec-drift/src/harness/learning-lib.mjs"
+  ],
+  "evidence": "Start TASK-002 (REQ-002)."
+}

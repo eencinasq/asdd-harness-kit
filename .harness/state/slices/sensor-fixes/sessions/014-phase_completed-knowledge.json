@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "sensor-fixes",
+  "concerns": [],
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lessons: (1) a file listing built from git index must drop working-tree deletions, or evidence hashes move on commit; (2) NestJS ConfigModule.forRoot reads env when the module is evaluated; e2e tests that configure through env must import AppModule after setting it; (3) vendored copies make any harness-lib fix span cli and tools, so E1 fires for one-line fixes.",
+  "session_id": "sess-sensor-fixes-014",
+  "timestamp": "2026-11-12T18:15:05.000Z"
+}

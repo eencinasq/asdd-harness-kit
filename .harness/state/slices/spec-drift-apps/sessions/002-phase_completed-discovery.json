@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-002",
+  "timestamp": "2026-11-12T03:11:19.000Z",
+  "phase": "discovery",
+  "event_type": "phase_completed",
+  "evidence": "intent.md + capability.md: spec-drift MCP evaluation (MCP Apps + code mode), points 1-3; Tech Lead chose to keep the server read-only (point 2 = read-only learning view + CLI commands). Discovery confidence 0.85."
+}

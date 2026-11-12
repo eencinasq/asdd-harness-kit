@@ -1,0 +1,206 @@
+{
+  "schema_version": "3.0",
+  "slice_id": "sensor-fixes",
+  "phase": "knowledge",
+  "status": "DONE",
+  "mode": "escalated",
+  "escalation_signals": [
+    {
+      "type": "E1-scope-spread",
+      "evidence": "scope touches 2 top-level modules: cli, tools"
+    }
+  ],
+  "escalation_required": false,
+  "escalated_from_lite": true,
+  "created_at": "2026-11-12T18:03:31.376Z",
+  "updated_at": "2026-11-12T19:57:28.130Z",
+  "paths": {
+    "specs": ".harness/specs/sensor-fixes",
+    "tasks": ".harness/specs/sensor-fixes/tasks.md",
+    "features": ".harness/features/sensor-fixes.features.json"
+  },
+  "gates": {
+    "implementation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T18:15:03.000Z",
+      "evidence": "TASK-001..002 passing (implemented before escalation, unchanged): kit npm test 133/133; spec-drift unit 113/113, e2e 96/96; jev-gate 14/14; knowledge 8/8.",
+      "concerns": []
+    },
+    "validation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T18:15:00.000Z",
+      "evidence": "Escalated (E1-scope-spread, caused by vendored scope-lib copies): capability.md and requirements.md backfilled from spec.md (REQ-001..002 MUST, AC-001..002). anti-patterns.md score 1.0, no violation. spec-validation-report.md PASSED, confidence 0.9.",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T18:15:01.000Z",
+      "evidence": "design.md: what changes, domain placement (harness sensors, no product code), no new domain terms, ADR-001 filter at the listing, ADR-002 dynamic import. Design confidence 0.9 -> QG-DES-01 PASS.",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T18:15:02.000Z",
+      "evidence": "tasks.md: TASK-001 -> AC-001, TASK-002 -> AC-002, single wave, serial, disjoint scopes. Confidence 0.9 -> QG-TPL-01 PASS.",
+      "concerns": []
+    },
+    "qa": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T18:15:04.000Z",
+      "evidence": "spec-coverage-report.md PASSED: MUST 2/2, AC 2/2, spec-related tests 2/2; regression test fails on HEAD scope-lib and passes with the fix.",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T18:15:05.000Z",
+      "evidence": "Lessons: (1) a file listing built from git index must drop working-tree deletions, or evidence hashes move on commit; (2) NestJS ConfigModule.forRoot reads env when the module is evaluated; e2e tests that configure through env must import AppModule after setting it; (3) vendored copies make any harness-lib fix span cli and tools, so E1 fires for one-line fixes.",
+      "concerns": []
+    }
+  },
+  "active_features": [],
+  "open_dissents": 0,
+  "source": null,
+  "session_log": [
+    {
+      "timestamp": "2026-11-12T18:03:31.298Z",
+      "agent": "human",
+      "human": "squad",
+      "event": "phase_started",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:12:00.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "phase_started",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:12:01.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T18:12:02.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T18:12:03.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T18:12:04.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T18:12:05.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:13:17.682Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": null,
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:15:00.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "validation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:15:01.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:15:02.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:15:03.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:15:04.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T18:15:05.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T19:57:09.928Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T19:57:09.930Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    }
+  ],
+  "contributors": [
+    "squad",
+    "human",
+    "eencinas",
+    "asdd-lite",
+    "asdd-pipeline"
+  ]
+}

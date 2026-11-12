@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "sensor-fixes",
+  "concerns": [],
+  "event_type": "phase_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "evidence": "Lite spec.md (REQ-001..002) and tasks.md written.",
+  "session_id": "sess-sensor-fixes-002",
+  "timestamp": "2026-11-12T18:12:00.000Z"
+}

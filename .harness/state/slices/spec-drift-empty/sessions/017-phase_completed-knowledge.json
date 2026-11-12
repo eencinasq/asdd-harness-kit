@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-empty",
+  "concerns": [],
+  "session_id": "sess-spec-drift-empty-017",
+  "timestamp": "2026-11-12T19:57:27.294Z",
+  "phase": "knowledge",
+  "event_type": "phase_completed",
+  "evidence": "Lessons: (1) an empty rule set read as 'No violations' \u2014 any sensor with zero inputs must say 'not analyzed', never pass; (2) 'no data' as an optional field keeps every output schema valid, where an error would lose the reason for the user; (3) one folder layout (.semgrep/architecture/) lets one agent-generated rule set serve the analyzer, PR review, and the kit's audit; (4) process: starting dependent tasks while the e2e ran was caught by asdd check (dependency order, shared owner)."
+}

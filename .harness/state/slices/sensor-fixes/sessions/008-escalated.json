@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-sensor-fixes-008",
+  "timestamp": "2026-11-12T18:13:17.682Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "sensor-fixes",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Escalating lite \u2192 escalated: E1-scope-spread",
+  "concerns": []
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-spec-drift-empty-001",
+  "timestamp": "2026-11-12T19:40:16.623Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "spec-drift-empty",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "full",
+  "evidence": "Slice initialized",
+  "concerns": []
+}
