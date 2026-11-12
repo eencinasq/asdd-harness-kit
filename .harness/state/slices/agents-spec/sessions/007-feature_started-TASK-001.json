@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-007",
+  "timestamp": "2026-11-12T02:21:11.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/agents/asdd-discovery-agent.md",
+    "cli/agents/asdd-spec-agent.md",
+    "cli/agents/asdd-validation-agent.md",
+    "cli/agents/asdd-domain-agent.md",
+    "cli/agents/asdd-design-agent.md",
+    "cli/agents/asdd-task-planning-agent.md"
+  ],
+  "evidence": "Start TASK-001 (REQ-001, REQ-003)."
+}

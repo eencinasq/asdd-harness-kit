@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-017",
+  "timestamp": "2026-11-12T02:37:38.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_completed",
+  "evidence": "Reopened for the fleet fixes found while writing the sensor: refactor's handoff to QA removed (it closed a qa -> refactor -> qa handoff cycle, AL-301; the caller re-runs QA after a refactor PR); spike researcher's anti-hedging rule made explicit (A-018); scope path of the deleted spec-peer-review.md template now cli/steering/templates (DRIFT-05). kit agents-lint PASS (14 agents); agents-lint tests 10/10; npm test 131/131."
+}

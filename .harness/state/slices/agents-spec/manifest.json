@@ -1,0 +1,307 @@
+{
+  "schema_version": "3.0",
+  "slice_id": "agents-spec",
+  "phase": "knowledge",
+  "status": "DONE",
+  "mode": "full",
+  "escalation_signals": [
+    {
+      "type": "E1-scope-spread",
+      "evidence": "scope touches 2 top-level modules: cli, package.json"
+    }
+  ],
+  "escalation_required": false,
+  "escalated_from_lite": false,
+  "created_at": "2026-11-12T02:18:46.963Z",
+  "updated_at": "2026-11-12T02:49:25.649Z",
+  "paths": {
+    "specs": ".harness/specs/agents-spec",
+    "tasks": ".harness/specs/agents-spec/tasks.md",
+    "features": ".harness/features/agents-spec.features.json"
+  },
+  "gates": {
+    "discovery": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T02:19:23.000Z",
+      "evidence": "intent.md + capability.md: agent.spec review of the 13 shipped agents (3-5/10); outcomes MH-01..06 (P1..P5 + runtime projection, option 'proyectada' chosen by the Tech Lead). Discovery confidence 0.85.",
+      "concerns": []
+    },
+    "spec": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T02:19:24.000Z",
+      "evidence": "requirements.md: REQ-001..006 MUST READY, EARS, AC-001..006; runtime field formats confirmed in the official Claude Code, Cursor, OpenCode subagent docs (tools/maxTurns/Agent; readonly; permissions list/steps). Spec confidence 0.85.",
+      "concerns": []
+    },
+    "validation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T02:19:39.000Z",
+      "evidence": "spec-validation-report.md PASSED (QG-VAL-04): 6 MUST with ACs, anti-pattern score 1.0, INFO VAL-001 (Claude path-scoped writes out of scope), VAL-002 (OpenCode edit resource assumed path glob). Validation confidence 0.8.",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T02:21:01.000Z",
+      "evidence": "design.md: canonical frontmatter (metadata/capabilities/limits), projection table per runtime (Claude tools|disallowedTools/Agent/maxTurns; Cursor readonly; OpenCode permissions/steps), ADR-001..005, risks. Domain phase skipped (optional, no product terms). Design confidence 0.86 >= 0.85, requirements READY, validation PASSED (QG-DES-01).",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T02:21:01.000Z",
+      "evidence": "tasks.md: TASK-001..005, disjoint scopes, deps (004 after 001-003; 005 after all); features tracker. Task planning confidence 0.86, design READY (QG-TPL-01).",
+      "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T02:38:01.000Z",
+      "evidence": "TASK-001..005 passing (stamped): 14 agents to the agent grammar, single roles, spike researcher, runtime projection (Claude/Cursor/OpenCode), Playwright and Bruno runbooks as module skills, kit agents-lint in npm test (131/131). Other slices' features re-verified after DRIFT-02: cli-harness TASK-008/009/011, skills-spec TASK-005/006.",
+      "concerns": []
+    },
+    "qa": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T02:38:01.000Z",
+      "evidence": "spec-coverage-report.md PASSED: MUST 6/6, AC 6/6, agents-lint tests 10/10, install.sh OK, npm test 131/131; known limits VAL-001/002 and manual uninstall check recorded.",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T02:38:01.000Z",
+      "evidence": "Lessons: (1) one canonical agent file rendered per runtime is required because runtimes use the same key differently (Claude tools string vs OpenCode permissions list); (2) a Claude tools allowlist silently drops MCP tools, so MCP agents get a denylist; (3) writing the sensor found two fleet defects the manual review missed (qa<->refactor handoff cycle, cross-module agent names); (4) module runbooks belong in module skills (e2e 38 KB -> 6 KB, bruno 15 KB -> 6 KB).",
+      "concerns": []
+    }
+  },
+  "active_features": [],
+  "open_dissents": 0,
+  "source": null,
+  "session_log": [
+    {
+      "timestamp": "2026-11-12T02:18:46.927Z",
+      "agent": "human",
+      "human": "squad",
+      "event": "phase_started",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T02:19:23.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T02:19:24.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T02:19:39.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "validation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T02:21:01.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T02:21:01.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T02:21:11.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T02:24:08.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T02:24:08.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T02:26:56.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T02:26:56.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T02:28:52.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T02:28:52.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-12T02:33:03.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-12T02:33:03.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-12T02:38:01.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T02:38:01.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T02:38:01.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T02:45:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-12T02:45:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-12T02:49:25.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-12T02:49:25.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    }
+  ],
+  "contributors": [
+    "squad",
+    "human",
+    "eencinas",
+    "asdd-pipeline"
+  ]
+}

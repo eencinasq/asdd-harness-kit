@@ -31,6 +31,12 @@ inclusion: always
 - Encrypt confidential/restricted data at rest when the product requires it
 - Validate and sanitize untrusted input at trust boundaries
 
+## Prohibitions and halt
+
+Never commit, log, or paste into a prompt or tracker a secret, token, password, or raw PII; never weaken auth, TLS, or
+input validation to pass a test or gate. When a change needs a secret you lack or would cross these rules: HALT and
+escalate to the Tech Lead. Sensors: `asdd audit` Semgrep rules and the project's secret scanning.
+
 ## When to load
 
 Any slice touching auth, tokens, PII, encryption, payments, or public APIs must read this file. HTTP/GraphQL contract work also loads skill `api-and-interface-design` when that module is installed.

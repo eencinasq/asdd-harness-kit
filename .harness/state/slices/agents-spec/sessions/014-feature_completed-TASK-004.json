@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-014",
+  "timestamp": "2026-11-12T02:33:03.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_completed",
+  "evidence": "New cli/src/install/agent-frontmatter.mjs parses the canonical agent frontmatter and renders per runtime: Claude Code (tools allowlist Read/Grep/Glob/Bash/Write/Edit, Agent only for the orchestrator; disallowedTools when mcp_tools is true so MCP tools stay; maxTurns), Cursor (readonly: true when write_tools is false), OpenCode (ordered permissions: edit deny * + allow write_paths, subagent deny * for non-orchestrators; steps). context.writeGenerated writes kit-owned generated files (replaces legacy links, keeps a project-edited copy unless --force, recorded in managed_files/kit_files so uninstall removes it). runtimes.mjs renders for cursor/claude/opencode; junie/devin/kiro/kimi keep links. Manual run: install into a temp repo (claude,cursor,opencode,junie, all modules): 42 RENDER, reinstall 0 RENDER/56 KEEP, asdd check exit 0, uninstall removed the rendered dirs. install.sh: new assertions (validation tools without Edit/Agent, implementation with Agent, e2e disallowedTools: Agent, maxTurns; OpenCode qa permissions; Cursor readonly only on the researcher) \u2014 bash cli/test/install.sh: OK asdd install smoke test (after kit versions registered the new files)."
+}

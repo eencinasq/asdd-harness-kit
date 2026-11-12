@@ -1,187 +1,105 @@
 ---
 name: create-mcp-app
-description: This skill should be used when the user asks to "create an MCP App", "add a UI to an MCP tool", "build an interactive MCP View", "scaffold an MCP App", or needs guidance on MCP Apps SDK patterns, UI-resource registration, MCP App lifecycle, or host integration. Provides comprehensive guidance for building MCP Apps with interactive UIs.
+description: >-
+  Builds an MCP App: an MCP tool linked to a bundled HTML view. Use when asked to create or scaffold an MCP App or add a
+  UI to an MCP tool. Do NOT use for an MCP server without UI or a regular web page; or for testing app logic — use
+  test-driven-development.
+metadata:
+  tier: leaf
 ---
 
 # Create MCP App
 
-Build interactive UIs that run inside MCP-enabled hosts like Claude Desktop. An MCP App combines an MCP tool with an HTML resource to display rich, interactive content.
+Builds interactive UIs that run inside MCP-enabled hosts such as Claude Desktop. Every MCP App has two linked parts: a
+**tool** (called by the model or host, returns data) and a **resource** (serves the bundled HTML view). The tool's
+`_meta.ui.resourceUri` names the resource. Host calls tool → host renders the resource → server returns the result →
+the view receives it. SDK detail (framework templates, API source files, advanced patterns, dependencies, handler
+order, common mistakes, debugging): [`references/sdk-reference.md`](./references/sdk-reference.md).
 
-## Core Concept: Tool + Resource
+**Operational boundary:** the app's project directory (`<app-dir>`); the SDK reference clone lives outside it, in
+`$MCP_APPS_REF`, and is read-only.
 
-Every MCP App requires two parts linked together:
+## Preconditions
 
-1. **Tool** - Called by the LLM/host, returns data
-2. **Resource** - Serves the bundled HTML UI that displays the data
+- `node --version` and `npm --version` exit 0, and the network reaches the npm registry and GitHub (`npm view
+  @modelcontextprotocol/ext-apps version` prints a version).
+- `MCP_APPS_REF` is set to a directory outside the project, for example
+  `export MCP_APPS_REF="$(mktemp -d)/ext-apps"`.
 
-The tool's `_meta.ui.resourceUri` references the resource's URI.
+## Input / Output Contract
 
-Host calls tool → Host renders resource UI → Server returns result → UI receives result.
+- **Inputs:** `tool_contract` (`string`, what the model calls the tool for, its input schema, the data it returns,
+  required); `view` (`string`, what the view shows and lets the user do, required); `framework` (`enum`, `react` |
+  `vanillajs` | `vue` | `svelte` | `preact` | `solid`, default from the decision tree); `server` (`path`, an existing MCP
+  server to extend, optional); `req_ids` (`string[]`, `^REQ-\d{3}$`, in an ASDD slice).
+- **Outputs:** `app` (`directory`, `<app-dir>` with `server.ts`, the view source, `vite.config.ts` using `vite-plugin-singlefile`, and
+  `package.json` scripts); `bundle` (`html`, one single-file HTML under `<app-dir>/dist/`).
 
-## Quick Start Decision Tree
+## Execution Protocol
 
-### Framework Selection
+### Step 1: Pin the scope
 
-| Framework | SDK Support | Best For |
-|-----------|-------------|----------|
-| React | `useApp` hook provided | Teams familiar with React |
-| Vanilla JS | Manual lifecycle | Simple apps, no build complexity |
-| Vue/Svelte/Preact/Solid | Manual lifecycle | Framework preference |
+- **Action:** write the tool contract and a one-paragraph view description; in a slice, the `REQ-NNN` each behavior serves.
+- **Target:** the session (or the slice's design notes).
+- **Assertion:** the tool's input schema and returned fields are named.
 
-### Project Context
+### Step 2: Choose the setup
 
-**Adding to existing MCP server:**
-- Import `registerAppTool`, `registerAppResource` from SDK
-- Add tool registration with `_meta.ui.resourceUri`
-- Add resource registration serving bundled HTML
+- **Action:** pick framework and project context from the decision tree in the reference: join an existing MCP server or
+  start a new one (transport stdio or HTTP).
+- **Target:** `<app-dir>`.
+- **Assertion:** framework and context are named.
 
-**Creating new MCP server:**
-- Set up server with transport (stdio or HTTP)
-- Register tools and resources
-- Configure build system with `vite-plugin-singlefile`
+### Step 3: Get the reference
 
-## Getting Reference Code
+- **Action:** `git clone --branch "v$(npm view @modelcontextprotocol/ext-apps version)" --depth 1
+  https://github.com/modelcontextprotocol/ext-apps.git "$MCP_APPS_REF"` and pick `basic-server-<framework>`.
+- **Target:** `$MCP_APPS_REF`.
+- **Assertion:** `test -d "$MCP_APPS_REF/examples/basic-server-<framework>"` exits 0.
 
-Clone the SDK repository for working examples and API documentation:
+### Step 4: Register the tool and the resource
 
-```bash
-git clone --branch "v$(npm view @modelcontextprotocol/ext-apps version)" --depth 1 https://github.com/modelcontextprotocol/ext-apps.git /tmp/mcp-ext-apps
-```
+- **Action:** `npm install` the dependencies (never hand-write versions; the 2.x split SDK packages, no legacy
+  `@modelcontextprotocol/sdk` v1); register the tool with `_meta.ui.resourceUri` and the resource serving the bundled
+  HTML, with `_meta.ui.csp` / `_meta.ui.domain` in the resource's `contents[]`.
+- **Target:** `<app-dir>/server.ts`, `<app-dir>/package.json`.
+- **Assertion:** the server compiles and lists the tool.
 
-### Framework Templates
+### Step 5: Build the view
 
-Learn and adapt from `/tmp/mcp-ext-apps/examples/basic-server-{framework}/`:
+- **Action:** register every handler before `app.connect()`; return a text `content` fallback for hosts without UI;
+  follow the host theme (host style variables or `applyDocumentTheme`); send errors to the model as `isError`.
+- **Target:** the view source.
+- **Assertion:** `npm run build` writes one HTML file.
 
-| Template | Key Files |
-|----------|-----------|
-| `basic-server-vanillajs/` | `server.ts`, `src/mcp-app.ts`, `mcp-app.html` |
-| `basic-server-react/` | `server.ts`, `src/mcp-app.tsx` (uses `useApp` hook) |
-| `basic-server-vue/` | `server.ts`, `src/App.vue` |
-| `basic-server-svelte/` | `server.ts`, `src/App.svelte` |
-| `basic-server-preact/` | `server.ts`, `src/mcp-app.tsx` |
-| `basic-server-solid/` | `server.ts`, `src/mcp-app.tsx` |
+### Step 6: Test in a host
 
-Each template includes:
-- `server.ts` with `registerAppTool` and `registerAppResource`
-- `main.ts` entry point with HTTP and stdio transport setup
-- Client-side app (e.g., `src/mcp-app.ts`, `src/mcp-app.tsx`) with lifecycle handlers
-- `src/global.css` with global styles and host style variable fallbacks
-- `vite.config.ts` using `vite-plugin-singlefile`
-- `package.json` with `npm run` scripts and required dependencies
-- `.gitignore` excluding `node_modules/` and `dist/`
+- **Action:** `npm run build && npm run serve`, then in `$MCP_APPS_REF/examples/basic-host`:
+  `npm install && SERVERS='["http://localhost:3001/mcp"]' npm run start` and open `http://localhost:8080`. basic-host is
+  for local testing, not a guarantee of real host behavior.
+- **Target:** the running server and basic-host.
+- **Assertion:** a tool call renders the view with real data and no CSP or console errors.
 
-### API Reference (Source Files)
+Acceptance criteria of the finished app: the text `content` is useful without the UI; `resourceUri` matches a registered
+resource that serves the bundle; every network request of the view is allowed by its CSP and nothing else is fetched;
+handlers are registered before `connect()`; the view follows the host theme at the host's sizes; errors reach the model.
 
-Read JSDoc documentation directly from `/tmp/mcp-ext-apps/src/`:
+## Verification Gate
 
-| File | Contents |
-|------|----------|
-| `src/app.ts` | `App` class, handlers (`ontoolinput`, `ontoolresult`, `onhostcontextchanged`, `onteardown`, etc.), lifecycle |
-| `src/server/index.ts` | `registerAppTool`, `registerAppResource`, helper functions |
-| `src/spec.types.ts` | All type definitions: `McpUiHostContext`, `McpUiStyleVariableKey` (CSS variable names), `McpUiResourceCsp` (CSP configuration), etc. |
-| `src/styles.ts` | `applyDocumentTheme`, `applyHostStyleVariables`, `applyHostFonts` |
-| `src/react/useApp.tsx` | `useApp` hook for React apps |
+1. `npm run build` exits 0 and `ls <app-dir>/dist/*.html | wc -l` prints 1.
+2. `grep -n "resourceUri" <app-dir>/server.ts` matches, and its URI equals the registered resource's.
+3. `grep -c "@modelcontextprotocol/sdk\"" <app-dir>/package.json` prints 0 (no legacy v1 package).
+4. In basic-host: the tool call renders, the console shows no CSP error, a forced error arrives as `isError`, and with
+   the UI unavailable the text `content` alone answers. List any acceptance criterion that does not hold, with the
+   reason, instead of claiming done.
+5. Negative check: `git status --porcelain` lists no path outside `<app-dir>` (the SDK clone is outside the project).
 
-### Advanced Patterns
+## Escalation Gate
 
-See `/tmp/mcp-ext-apps/docs/patterns.md` for detailed recipes:
+HALT when a Precondition fails (no network, no npm), when the SDK release and the templates disagree on an API, or when
+the host needs a network origin the user has not approved for the CSP. Escalate as Context → Options → Recommendation →
+Decision Needed; never widen the CSP to make an error go away.
 
-- **App-only tools** — `visibility: ["app"]`, hiding tools from model
-- **Polling** — real-time dashboards, interval management
-- **Chunked responses** — large files, pagination, base64 encoding
-- **Error handling** — `isError`, informing model of failures
-- **Binary resources** — audio/video/etc via `resources/read`, blob field
-- **Network requests** — assets, fetch, CSP, `_meta.ui.csp`, CORS, `_meta.ui.domain`
-- **Host context** — theme, styling, fonts, safe area insets
-- **Fullscreen mode** — `requestDisplayMode`, display mode changes
-- **Model context** — `updateModelContext`, `sendMessage`, keeping model informed
-- **View state** — `viewUUID`, localStorage, state recovery
-- **Visibility-based pause** — IntersectionObserver, pausing animations/WebGL
-- **Streaming input** — `ontoolinputpartial`, progressive rendering
+## Handoff & Convergence
 
-### Reference Host Implementation
-
-`/tmp/mcp-ext-apps/examples/basic-host/` shows one way an MCP Apps-capable host could be implemented. Real-world hosts like Claude Desktop are more sophisticated—use basic-host for local testing and protocol understanding, not as a guarantee of host behavior.
-
-## Critical Implementation Notes
-
-### Adding Dependencies
-
-**Always** use `npm install` to add dependencies rather than manually writing version numbers:
-
-```bash
-npm install @modelcontextprotocol/ext-apps @modelcontextprotocol/client@^2.0.0 @modelcontextprotocol/server@^2.0.0 @modelcontextprotocol/node@^2.0.0 @modelcontextprotocol/express@^2.0.0 zod@^4.2.0 express cors
-npm install -D typescript vite vite-plugin-singlefile concurrently cross-env @types/node @types/express @types/cors
-```
-
-ext-apps 2.x requires the split base MCP SDK packages (`@modelcontextprotocol/client`,
-`server`, `node`, `express`) at `^2.0.0`; `@modelcontextprotocol/core` comes in
-transitively. Do not add the legacy `@modelcontextprotocol/sdk` v1 package or
-substitute unpublished local packages.
-
-### TypeScript Server Execution
-
-Unless the user has specified otherwise, use `tsx` for running TypeScript server files. For example:
-
-```bash
-npm install -D tsx
-
-npm pkg set scripts.dev="cross-env NODE_ENV=development concurrently 'cross-env INPUT=mcp-app.html vite build --watch' 'tsx --watch main.ts'"
-```
-
-> [!NOTE]
-> The SDK examples use `bun` but generated projects should default to `tsx` for broader compatibility.
-
-### Handler Registration Order
-
-Register ALL handlers BEFORE calling `app.connect()`:
-
-```typescript
-const app = new App({ name: "My App", version: "1.0.0" });
-
-// Register handlers first
-app.ontoolinput = (params) => { /* handle input */ };
-app.ontoolresult = (result) => { /* handle result */ };
-app.onhostcontextchanged = (ctx) => { /* handle context */ };
-app.onteardown = async () => { return {}; };
-// etc.
-
-// Then connect
-await app.connect();
-```
-
-## Common Mistakes to Avoid
-
-1. **No text fallback** - Always provide `content` array for non-UI hosts
-2. **Missing CSP configuration** - MCP Apps HTML is served as an MCP resource with no same-origin server; ALL network requests—even to `localhost`—require a CSP configuration
-3. **CSP or CORS config in wrong _meta object** - `_meta.ui.csp` and `_meta.ui.domain` go in the `contents[]` objects returned by `registerAppResource()`'s read callback, not in `registerAppResource()`'s config object
-4. **Handlers after app.connect()** - Register ALL handlers BEFORE calling `app.connect()`
-5. **No streaming for large inputs** - Use `ontoolinputpartial` to show progress during input generation
-
-## Testing
-
-### Using basic-host
-
-Test MCP Apps locally with the basic-host example:
-
-```bash
-# Terminal 1: Build and run your server
-npm run build && npm run serve
-
-# Terminal 2: Run basic-host (from cloned repo)
-cd /tmp/mcp-ext-apps/examples/basic-host
-npm install
-SERVERS='["http://localhost:3001/mcp"]' npm run start
-# Open http://localhost:8080
-```
-
-Configure `SERVERS` with a JSON array of your server URLs (default: `http://localhost:3001/mcp`).
-
-### Debug with sendLog
-
-Send debug logs to the host application (rather than just the iframe's dev console):
-
-```typescript
-await app.sendLog({ level: "info", data: "Debug message" });
-await app.sendLog({ level: "error", data: { error: err.message } });
-```
+- **handoff → `test-driven-development`:** for the tool's data logic, tested apart from the view; passes `tool_contract`.

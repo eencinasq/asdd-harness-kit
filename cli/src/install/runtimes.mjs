@@ -4,6 +4,7 @@ import { join } from 'node:path';
 
 import { CliError } from '../paths.mjs';
 import { c, log, warn } from '../ui.mjs';
+import { RENDERERS, parseAgent } from './agent-frontmatter.mjs';
 import { isSymlink } from './context.mjs';
 import { list, RUNTIMES } from './options.mjs';
 import { asddCommand, KIT_BIN, LEGACY_PROJECT_BIN } from './phases.mjs';
@@ -65,6 +66,25 @@ function linkAgentFiles(ctx, runtimeDir) {
     ctx.link(`../../.agents/agents/${base}`, join(dir, base));
     ctx.recordManaged(join(dir, base));
     log(`${c.blue('LINK')}  ${join(dir, base)}`);
+  }
+}
+
+/**
+ * Claude Code, Cursor, and OpenCode read per-agent tool fields: render each agent from its canonical capabilities
+ * (agents-spec REQ-004) instead of linking it. Other runtimes keep the link (linkAgentFiles).
+ */
+function renderAgentFiles(ctx, runtimeDir, runtime) {
+  const dir = realAgentsDir(ctx, runtimeDir);
+  for (const base of agentFiles(ctx)) {
+    const source = `.agents/agents/${base}`;
+    const parsed = parseAgent(readFileSync(join(ctx.target, source), 'utf8'));
+    if (!parsed) {
+      ctx.link(`../../${source}`, join(dir, base));
+      ctx.recordManaged(join(dir, base));
+      warn(`${source}: no frontmatter; linked instead of rendered`);
+      continue;
+    }
+    ctx.writeGenerated(join(dir, base), RENDERERS[runtime](parsed, source));
   }
 }
 
@@ -182,7 +202,7 @@ const WIRE = {
     mkdirSync(join(t, '.cursor/rules'), { recursive: true });
     realAgentsDir(ctx, '.cursor');
     linkUnlessOwned(ctx, join(t, '.cursor/skills'), '../.agents/skills', `${join(t, '.cursor/skills')} → ../.agents/skills`);
-    linkAgentFiles(ctx, '.cursor');
+    renderAgentFiles(ctx, '.cursor', 'cursor');
     linkIfMissing(ctx, join(t, '.cursor/mcp.json'), '../.agents/mcp/mcp.json');
     ctx.copyFile(join(ctx.kit, 'cli/runtimes/cursor/asdd-steering.mdc'), join(t, '.cursor/rules/asdd-steering.mdc'), 'refresh');
     removeRuntimeModels(ctx, '.cursor');
@@ -192,7 +212,7 @@ const WIRE = {
     const t = ctx.target;
     realAgentsDir(ctx, '.claude');
     linkSkills(ctx, '.claude');
-    linkAgentFiles(ctx, '.claude');
+    renderAgentFiles(ctx, '.claude', 'claude');
     linkIfMissing(ctx, join(t, '.mcp.json'), '.agents/mcp/mcp.json');
     const claudeMd = join(t, 'CLAUDE.md');
     if (!existsSync(claudeMd)) {
@@ -209,7 +229,7 @@ const WIRE = {
   },
   opencode(ctx) {
     const t = ctx.target;
-    linkAgentFiles(ctx, '.opencode');
+    renderAgentFiles(ctx, '.opencode', 'opencode');
     linkSkills(ctx, '.opencode');
     const config = join(t, 'opencode.json');
     if (!existsSync(config)) {

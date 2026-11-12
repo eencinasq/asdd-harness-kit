@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-019",
+  "timestamp": "2026-11-12T02:37:38.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_completed",
+  "evidence": "Reopened for fleet fixes: the bruno and playwright-e2e agents no longer name each other (cross-module references dangle when only one module is installed, AL-302); the full-stack order stays in prose. kit agents-lint PASS (14 agents); kit skills-lint PASS (17 skills); install.sh OK; npm test 131/131."
+}

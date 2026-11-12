@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-11T01:11:17.966Z",
+  "generated_at": "2026-11-12T02:49:25.797Z",
   "threshold": 3,
   "summary": {
     "patterns": 17,
@@ -14,16 +14,17 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 13,
+      "occurrences": 15,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-11-11T19:00:00.000Z",
+      "last_seen": "2026-11-12T02:49:25.000Z",
       "sources": [
         "escalation"
       ],
       "slices": [
+        "agents-spec",
         "agents-use-scripts",
         "asdd-cli",
         "cli-harness",
@@ -35,13 +36,14 @@
         "knowledge-simplify",
         "mcp-standalone",
         "modules-top-level",
+        "skills-spec",
         "spec-drift-merge",
         "unified-versioning"
       ],
       "examples": [
+        "scope touches 2 top-level modules: cli, package.json",
         "scope touches 7 top-level modules: .agents, .harness, AGENTS.md, README.md, runtimes, scripts, tools",
-        "scope touches 11 top-level modules: .agents, .github, .harness, README.md, cli, docs, package-lock.json, package.json, runtimes, scripts, tools",
-        "scope touches 12 top-level modules: .agents, .cursor, .github, .harness, AGENTS.md, README.md, cli, docs, modules, package.json, runtimes, tools"
+        "scope touches 11 top-level modules: .agents, .github, .harness, README.md, cli, docs, package-lock.json, package.json, runtimes, scripts, tools"
       ],
       "proposals": [
         {

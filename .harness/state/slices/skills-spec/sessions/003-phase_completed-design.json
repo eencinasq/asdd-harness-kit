@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-003",
+  "timestamp": "2026-11-12T01:40:31.000Z",
+  "phase": "design",
+  "event_type": "phase_completed",
+  "evidence": "Design in spec.md: one skill grammar (skill.spec \u00a72), every skill leaf, judgment outputs to files, core names only core, Node sensor next to kit guidance."
+}

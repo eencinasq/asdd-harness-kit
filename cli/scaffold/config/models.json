@@ -12,7 +12,7 @@
     },
     "tier-a": {
       "label": "Precision",
-      "reasoning_profile": "Structured output, precise requirements, cross-reference validation, test generation, peer review",
+      "reasoning_profile": "Structured output, precise requirements, cross-reference validation, coverage auditing",
       "context_window": "Large (128k tokens)",
       "cost_priority": "High quality required; use strong model but avoid over-provisioning context",
       "agent_count": 3,
@@ -31,7 +31,7 @@
       "reasoning_profile": "Small features (≤3 files), summarization, pattern detection, state tracking, failure log analysis",
       "context_window": "Small–medium (8k–32k tokens)",
       "cost_priority": "Optimize for throughput and low latency; cheapest viable model",
-      "agent_count": 3,
+      "agent_count": 4,
       "estimated_call_ratio": "~25% of total agent invocations"
     }
   },
@@ -46,7 +46,8 @@
     "asdd-task-planning-agent": "tier-b",
     "asdd-lite-agent": "tier-c",
     "asdd-knowledge-agent": "tier-c",
-    "asdd-refactor-agent": "tier-c"
+    "asdd-refactor-agent": "tier-c",
+    "asdd-spike-researcher": "tier-c"
   },
   "module_agent_tiers": {
     "asdd-e2e-tester": "tier-a",

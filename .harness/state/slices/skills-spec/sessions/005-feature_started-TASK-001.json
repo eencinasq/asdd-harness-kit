@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-005",
+  "timestamp": "2026-11-12T01:40:31.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/skills/anti-pattern-detection/SKILL.md",
+    "cli/skills/business-model-canvas/SKILL.md",
+    "cli/skills/domain-language-extraction/SKILL.md",
+    "cli/skills/capability-discovery/SKILL.md"
+  ],
+  "evidence": "Start TASK-001 (REQ-001, REQ-002, REQ-004, REQ-005)."
+}

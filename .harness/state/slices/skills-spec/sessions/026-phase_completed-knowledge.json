@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-026",
+  "timestamp": "2026-11-12T02:09:57.000Z",
+  "phase": "knowledge",
+  "event_type": "phase_completed",
+  "evidence": "Lessons: (1) textwrap broke a skill name at its hyphen in a description; the index joins lines with spaces, so the name dangled - the new sensor caught it (SL-302); wrap with break_on_hyphens=False. (2) The skills index is always loaded: every Do NOT use clause costs budget; the project margin is now 45 bytes - the next description growth needs a Tech Lead decision on the binding. (3) DRIFT-02 re-verification needs the hash cleared (reopen = in_progress + sync) before passing again; sync never restamps a passing feature. (4) A one-line package.json edit is enough for E1-scope-spread: kit slices that add a test file to npm test escalate. First escalated slice to complete the full path."
+}

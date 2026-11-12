@@ -68,6 +68,8 @@ node cli/bin/asdd.mjs install /path/to/repo                      # from a clone 
 | `asdd kit vendor [--check]` | Kit repo only: copy the `cli/src/harness` libraries each MCP server under `tools/` needs into `tools/<name>/src/harness/`; `--check` exits 1 when a copy is stale. |
 | `asdd kit self [--check]` | Kit repo only: copy what `cli/` ships into the kit's own `.harness/` (it installs itself); `--check` exits 1 while a copy is stale. |
 | `asdd kit guidance [--only stale,cutoffs,budget,asserts] [dir]` | Kit repo only: stale mechanisms in shipped guidance, numeric cutoffs in agent prompts, the always-loaded steering budget, bare `!` asserts in kit tests. |
+| `asdd kit skills-lint [--only a,b] [dir]` | The skill grammar (`skill.spec` `S-*`: `Use when` and `Do NOT use` in the description, `metadata.tier`, operational boundary, typed Input / Output Contract, steps with Action / Target / Assertion, Verification Gate with a negative check, Escalation Gate, Handoff & Convergence, size caps, no absolute paths), the fleet rules (`SL-103`, `SL-105` duplicated blocks, `SL-301` handoff cycles, `SL-302` dangling references — a core skill may name only core skills), and `R-004`/`R-005` on `AGENTS.md` and the always-loaded steering. In the kit: `cli/skills` and `cli/modules/*/skills`; in a project: `.agents/skills`. `npm test` runs it. |
+| `asdd kit agents-lint [--only a,b] [dir]` | The agent grammar (`agent.spec` `A-*`: `Use when` and `Do NOT use`, `metadata.tier`, `capabilities`, `limits.max_turns`, guarantees, Operational and Quarantine Boundary, Decision Rights, Pre-Flight Reading & Ground Truth (Tier 1–3), typed Delegation & I/O Contract with a verdict, Negative Space with `file:line` and anti-hedging, Convergence gate with a negative check, Escalation Gate, provenance, 20 KB cap, no manifest writes) and the fleet rules (`AL-103` tier vs capabilities: only an orchestrator spawns sub-agents, an auditor never edits, a researcher never writes; `AL-301` handoff cycles; `AL-302` dangling or cross-module names and unknown mounted skills). `asdd install` renders these capabilities into Claude Code, Cursor, and OpenCode agent files. `npm test` runs it. |
 | `asdd --version`, `asdd help` | The kit version, and every command. |
 
 `npx asdd-harness-kit <dir> [options]` and `npx asdd-harness-kit --interactive` (the form before the CLI) still install.
@@ -93,7 +95,8 @@ kit-owned files (spec drift exempts them), and the hash of each seed (exempt onl
 4. agents, skills, and MCP (an empty project `mcp.json`: the servers in `tools/` stay in the kit);
 5. retired kit files, including any previously copied `tools/{knowledge,spec-drift,jev-gate}` and everything the old
    `jev` module installed (`capabilities.jev`, `modules.jev`, its files, and the `jev-gate` MCP entry);
-6. modules, the skills index, and runtime wiring;
+6. modules, the skills index, and runtime wiring (agents rendered for Claude Code, Cursor, and OpenCode from their
+   `capabilities`; links elsewhere);
 7. the removal of the `sqlite-vec` install older kits put in `.harness/` (the harness installs no npm packages);
 8. the version manifest, and the project's own config and invariant checks.
 
@@ -108,14 +111,15 @@ cli/
 ├── dist/                 compiled src/ without tests (what the npm package runs; never copied into projects)
 ├── src/main.mjs          dispatch and help (harness commands run in-process; a global asdd hands them to the project's devDependency)
 ├── src/harness/          the harness: commands.mjs (the asdd names) + every command and library; tests next to them
-├── src/install/          options, context (copy policies, versions), phases, modules, runtimes, pr, index (the run)
+├── src/install/          options, context (copy policies, versions), phases, modules, runtimes, agent-frontmatter
+│                         (renders agents per runtime), pr, index (the run)
 ├── src/doctor.mjs, src/uninstall.mjs, src/pin.mjs (which asdd a project runs, and whether it fits)
-├── src/kit/              versions, build, vendor, self, guidance (kit repo only)
+├── src/kit/              versions, build, vendor, self, guidance, skills-lint, agents-lint (kit repo only)
 ├── AGENTS.md             the agent map (→ project root, seeded once)
 ├── agents/ skills/       ASDD agents and the skills catalog (→ .agents/)
 ├── mcp/                  the kit's MCP config (knowledge, spec-drift, jev-gate) and launchers; projects get the
 │                         launchers and an empty mcp.json (→ .agents/mcp/)
-├── modules/              opt-in modules: bruno, playwright-e2e, web-ui, http-api
+├── modules/              opt-in modules: bruno, playwright-e2e (agent + skill each), web-ui, http-api
 ├── runtimes/             runtime recipes: cursor, claude, opencode, kimi, junie, devin, kiro
 ├── steering/             portable steering + templates/ (→ .harness/steering)
 ├── scaffold/             .harness skeleton: config schema + README, models.json, feature schema, folder READMEs

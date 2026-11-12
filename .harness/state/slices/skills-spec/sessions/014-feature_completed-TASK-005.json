@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-014",
+  "timestamp": "2026-11-12T01:53:10.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_completed",
+  "evidence": "cli/steering/skills.md: 'Markers and escalation' defines PENDING_DEFINITION, ASSUMPTION \u2014 CONFIRMATION REQUIRED, PROPOSED \u2014 VALIDATION REQUIRED, DERIVED once (skills cite it) and the HALT + Context -> Options -> Recommendation -> Decision Needed format; sensors named (asdd check, asdd kit skills-lint); disclosure header compacted. README.md, security-rules.md, controls.md: Prohibitions sections with a HALT directive and their sensor (R-006/R-007/R-009). asdd-design-agent.md section 11 cites the documentation-and-adrs ADR format instead of its own schema (single authority). Skill descriptions tightened (all 15 now 278-351 chars) so the regenerated index fits: always-loaded 31942 bytes <= budget 31962 (binding not raised). kit self + --check OK; kit guidance PASS; kit skills-lint PASS (15 skills, 7 rule files)."
+}

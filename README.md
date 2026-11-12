@@ -17,7 +17,7 @@ It gives AI agents a governed pipeline — from shaping an idea through implemen
 | **Quality gates** | EARS templates, Harness invariants, shaping and delivery gates (human-decided, `decided_by`) | Test suites, failure logs |
 | **Spec drift and audit** | Drift checks in the invariants and CI, codebase auditor, `spec-drift` MCP server with a dashboard | Architecture gate command, audit commands, OpenAPI contract (optional bindings) |
 | **Knowledge** | Generated index of specs, requirements, features, and sessions, queried through the `knowledge` MCP server | Optional embeddings endpoint |
-| **Runtime adapters** | Configs and symlinks for Cursor, Claude Code, OpenCode, Kimi, Junie, Devin, Kiro | Your IDE or agent runtime |
+| **Runtime adapters** | Agent files rendered with each agent's tool envelope for Claude Code, Cursor, and OpenCode; links for Kimi, Junie, Devin, Kiro; hooks and MCP config | Your IDE or agent runtime |
 
 **ASDD** answers *which phase* and *which spec artifact*.
 **Harness** answers *which feature* is under test now, which files may change, and what evidence is required before work is called done.
@@ -193,11 +193,13 @@ The knowledge index (spec/session/feature graph + searchable chunks) regenerates
 The kit has **one version**: `package.json`. Every artifact the installer copies carries that version in `cli/versions.json` (installed as `.harness/config/versions.json`), and the target records what it received in `.harness/config/installed-versions.json`. Re-running the installer refreshes every kit-owned file whose version changed, so a release reaches every file — nothing stays stale because one file was not bumped.
 
 ```bash
-node cli/bin/asdd.mjs kit versions bump 3.7.0   # set package.json + lock, restamp every artifact
+node cli/bin/asdd.mjs kit versions bump 3.10.0  # set package.json + lock, restamp every artifact
 node cli/bin/asdd.mjs kit versions              # restamp at the current version (npm run versions)
 ```
 
 Then re-run the installer in dependent projects. `npm test` fails when an artifact's version differs from the project version, or when the installer refreshes a file that has no version entry.
+
+**Upgrading to 3.10.** Re-running `asdd install .` replaces the agent links under `.claude/agents/`, `.cursor/agents/`, and `.opencode/agents/` with rendered files (see [Agents and their tool envelopes](#agents-and-their-tool-envelopes)); edit `.agents/agents/`, never the rendered copies. The QA agent no longer generates tests or peer-reviews specs, and the `spec-peer-review.md` template is gone.
 
 ### Use as a template for a new project
 
@@ -220,7 +222,7 @@ The clone carries the kit's own slices, features, and bindings; replace them wit
 
 ### Kit tests
 
-- `npm test` — builds `cli/dist`, checks the vendored server libraries and the kit's self-install copies are current, then runs the installer smoke test (all runtimes and modules, upgrades, uninstall, the npm package contents, and an install from the packed tarball as people install it: `npm pack`, `npm i -g`, `asdd install`, the hooks), lifecycle e2e (slice state machine with negative invariant cases), and unit tests for the CLI, drift, audit, Semgrep, knowledge, the learning loop, and the `openapi` adapter.
+- `npm test` — builds `cli/dist`, checks the vendored server libraries and the kit's self-install copies are current, then runs the installer smoke test (all runtimes and modules, upgrades, uninstall, the npm package contents, and an install from the packed tarball as people install it: `npm pack`, `npm i -g`, `asdd install`, the hooks), lifecycle e2e (slice state machine with negative invariant cases), and unit tests for the CLI, drift, audit, Semgrep, knowledge, the learning loop, and the `openapi` adapter. It also runs `asdd kit skills-lint` and `asdd kit agents-lint` (the grammar every shipped skill and agent must follow) with their tests.
 - `npm run test:full-flow` — Shape Up → Product Delivery → lite slice → evidence → escalation → DONE → Verify-on-Stop.
 - MCP servers — `pnpm typecheck && pnpm lint && pnpm test` inside each `tools/<name>/`.
 
@@ -282,6 +284,8 @@ A guide steers the agent before it edits. A sensor checks the result and, on fai
 | Pull request | `.github/workflows/harness-invariants.yml` runs unit tests, installer smoke, lifecycle e2e with negative cases, config/skills checks, and `asdd sync` + `asdd check` (with the PR branch and body for `DRIFT-07`) | CI |
 | On a schedule | `asdd audit` (drift over all slices, unowned code, audit commands, hotspots) and the `codebase-audit` skill; the Tech Lead triages | `.harness/audits/` |
 | Before a new spec enters Task Planning | The full-suite command in `quality-gates.project.md` must report zero failures | `QG-DEB-*` |
+| Choosing and running a skill or agent | Each one states when to use it and when not (`Use when` / `Do NOT use`), its boundary, a verification gate, and an escalation gate (HALT → Context → Options → Recommendation → Decision Needed); markers and the escalation format live in `skills.md` | `asdd kit skills-lint`, `asdd kit agents-lint` |
+| Agent tool access | Each agent's `capabilities` (tier) are rendered into the runtime: auditors cannot edit, only the orchestrator spawns sub-agents, the researcher writes nothing | `.agents/agents/_runtime-template.md` |
 | Same failure, override, or dismissal three times | `asdd learn` opens a pattern; a steering proposal names the guide or sensor to change. WARN while open, FAIL when the slice closes Knowledge | `QG-DEB-06`, `QG-LEARN-*` |
 
 Fast checks stay at session stop. The more expensive suite stays on the Task Planning gate. CI repeats the invariants check after integration.
@@ -632,9 +636,31 @@ Rules: `QG-LEARN-01`…`09` in [`quality-gates.md`](.harness/steering/quality-ga
 
 ## What's inside
 
-**Agents** (`.agents/agents/`) — Discovery, Spec, Validation, Domain, Design, Task Planning, Implementation, QA, Knowledge, Refactor, and Lite. Runtime-agnostic markdown.
+**Agents** (`.agents/agents/`) — Discovery, Spec, Validation, Domain, Design, Task Planning, Implementation, QA, Knowledge, Refactor, Lite, and Spike Researcher. Runtime-agnostic markdown; one role per agent.
 
-**Skills** (`.agents/skills/`) — Shape Up, Product Delivery, External Trackers, Capability Discovery, Domain-Language Extraction, Test-Driven Development, Documentation & ADRs, Anti-Pattern Detection, Codebase Audit, Codegraph, Business Model Canvas, and Create MCP App. Agents see names and descriptions ([`skills.md`](.harness/steering/skills.md)) and read a skill's body only when the task starts.
+#### Agents and their tool envelopes
+
+Each agent declares a tier and what it may do in its frontmatter (`metadata.tier`, `capabilities`, `limits.max_turns`), and its body follows one grammar: when to use it and when not, a role charter (guarantees, operational and quarantine boundaries, decision rights), ground truth in tiers, a typed delegation contract with a verdict, negative space, a convergence gate with a negative check, and an escalation gate.
+
+| Tier | Agents | Tool envelope |
+|---|---|---|
+| orchestrator | Implementation | Edits through context-fresh sub-agents; the only agent that spawns sub-agents |
+| specialist | Discovery, Spec, Domain, Design, Task Planning, Refactor, Knowledge, Lite, Integration Tester, E2E Tester | Writes only its own artifacts (`write_paths`) |
+| auditor | Validation, QA | Writes only its report; never edits what it audits. QA judges coverage; tests come from Implementation's TDD step |
+| researcher | Spike Researcher | Read-only; returns a cited findings table when an agent reports low confidence |
+
+`asdd install` renders these envelopes for the runtimes that support them:
+
+| Runtime | Rendered from `capabilities` |
+|---|---|
+| Claude Code (`.claude/agents/`) | `tools` allowlist (auditors without `Edit`; `Agent` only for the orchestrator), or `disallowedTools` for agents that need MCP tools; `maxTurns` |
+| Cursor (`.cursor/agents/`) | `readonly: true` for agents that write nothing |
+| OpenCode (`.opencode/agents/`) | `permissions`: edits denied outside `write_paths`, sub-agents denied except for the orchestrator; `steps` |
+| Kimi, Junie, Devin, Kiro | A link to `.agents/agents/` (no per-agent tool field) |
+
+Claude Code has no per-path write rule, so an auditor there keeps `Write` and `Bash`; its negative mutation check and `DRIFT-01` cover the rest. Details: [`cli/agents/_runtime-template.md`](cli/agents/_runtime-template.md).
+
+**Skills** (`.agents/skills/`) — Shape Up, Product Delivery, External Trackers, Capability Discovery, Domain-Language Extraction, Test-Driven Development, Documentation & ADRs, Anti-Pattern Detection, Codebase Audit, Codegraph, Business Model Canvas, and Create MCP App. Agents see names and descriptions ([`skills.md`](.harness/steering/skills.md)) and read a skill's body only when the task starts. Every skill is a runbook: trigger and negative boundary, an input/output contract, steps with an action, target, and assertion, a verification gate, an escalation gate, and its handoffs; general advice lives in its `references/`.
 
 **Steering** (`.harness/steering/`)
 
@@ -656,7 +682,7 @@ Rules: `QG-LEARN-01`…`09` in [`quality-gates.md`](.harness/steering/quality-ga
 
 **MCP servers** (`tools/`, NestJS; never installed into projects, which get an empty `.agents/mcp/mcp.json`) — `knowledge` and `spec-drift` (also in the npm package), and `jev-gate` (only in a clone of this repository). Agents and skills do not depend on these servers: they run the same logic through the `asdd` CLI (`asdd knowledge`, `asdd drift`, `asdd audit`). Codegraph is a skill (`.agents/skills/codegraph`) on the codegraph CLI, not an MCP server.
 
-**Modules** (`cli/modules/`, part of the CLI; opt-in) — `bruno` (integration testing agent), `playwright-e2e` (end-to-end testing agent), `web-ui` (UI skills), and `http-api` (API design skills and the `openapi` compliance adapter).
+**Modules** (`cli/modules/`, part of the CLI; opt-in) — `bruno` (integration testing agent + `bruno-api-testing` skill), `playwright-e2e` (end-to-end testing agent + `playwright-e2e-testing` skill), `web-ui` (UI skills), and `http-api` (API design skills and the `openapi` compliance adapter).
 
 **Runtime recipes** (`cli/runtimes/`) — Cursor, Claude Code, OpenCode, Kimi Code, Junie, Devin, and Kiro. The installer wires agents, skills, and MCP into each runtime; the recipes themselves stay in this kit.
 
@@ -693,6 +719,7 @@ The kit is developed with the kit: every change goes through a slice in this rep
 
 - **Running the CLI.** The kit has no `.harness/cli`: run `node cli/bin/asdd.mjs <command>` (its hooks, CI, and `project.json` commands do).
 - **Edit sources, not copies.** Steering, scaffold, agents, skills, and harness code live in `cli/`. After a change: `npm run build` (`cli/dist`), `asdd kit vendor` (when a server's vendored library changed), `asdd kit self` (the kit's own `.harness/`, `.agents/`, `AGENTS.md`), and `asdd kit versions` (when the shipped artifacts changed). `npm test` fails while any of them is stale.
+- **Skills and agents.** A new or changed skill or agent follows the grammar `asdd kit skills-lint` and `asdd kit agents-lint` check (both run in `npm test`). A core skill or agent names only core skills and agents; module ones may name core ones and their own module's. Long runbooks go to a skill's `references/`, not into an agent.
 - **Mode.** Use `asdd slice init <id> --full`. Almost every kit change touches `cli/`, `.harness/`, and `.agents/`, so a lite slice would raise E1 on its first feature (see `docs/knowledge-base/steering-proposals/SP-001.md`).
 - **Bindings.** `.harness/steering/{product,structure,tech,domain-layer.project,quality-gates.project,design-system}.md` describe the kit itself. The stubs that projects receive live in `cli/templates/bindings/`.
 - **Kit-only artifacts.** This repo's slices, specs, features, sessions, archive, learning state, audits, `project.json`, bindings, and steering proposals are never installed into a project and never published to npm (`files` negations in `package.json`). `cli/test/install.sh` fails if one leaks.

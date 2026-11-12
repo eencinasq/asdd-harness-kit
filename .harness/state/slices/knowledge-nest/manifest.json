@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": true,
   "created_at": "2026-11-10T13:27:52.390Z",
-  "updated_at": "2026-11-11T01:11:17.900Z",
+  "updated_at": "2026-11-12T02:49:25.711Z",
   "paths": {
     "specs": ".harness/specs/knowledge-nest",
     "tasks": ".harness/specs/knowledge-nest/tasks.md",

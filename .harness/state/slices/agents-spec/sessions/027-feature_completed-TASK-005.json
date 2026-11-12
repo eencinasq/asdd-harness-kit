@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-027",
+  "timestamp": "2026-11-12T02:49:25.000Z",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "evidence": "Re-verified after the README update for 3.10 (README.md: rendered runtime agents, tiers/envelopes, kit lints, upgrade note; cli/README.md layout and install phases; cli/modules/README.md; cli/runtimes READMEs): npm test 131/131."
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-005",
+  "timestamp": "2026-11-12T02:21:01.000Z",
+  "phase": "design",
+  "event_type": "phase_completed",
+  "evidence": "design.md: canonical frontmatter (metadata/capabilities/limits), projection table per runtime (Claude tools|disallowedTools/Agent/maxTurns; Cursor readonly; OpenCode permissions/steps), ADR-001..005, risks. Domain phase skipped (optional, no product terms). Design confidence 0.86 >= 0.85, requirements READY, validation PASSED (QG-DES-01)."
+}

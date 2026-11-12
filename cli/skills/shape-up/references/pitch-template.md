@@ -24,6 +24,9 @@ Every pitch needs all five components to be ready for betting:
 ```markdown
 # [Feature Name]
 
+pitch_id: PITCH-NNN
+betting_state: needs_shaping   # ready_for_bet | bet | no_bet (the betting table decides)
+
 ## Problem
 
 [Describe the specific situation that doesn't work today.

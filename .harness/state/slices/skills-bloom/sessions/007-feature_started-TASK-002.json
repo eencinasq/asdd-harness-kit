@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-bloom",
+  "concerns": [],
+  "session_id": "sess-skills-bloom-007",
+  "timestamp": "2026-11-11T12:02:47.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/skills/anti-pattern-detection/SKILL.md",
+    "cli/src/kit/guidance.mjs",
+    "cli/test/guidance.test.mjs"
+  ],
+  "evidence": "Start TASK-002 (REQ-002, REQ-005, REQ-008)."
+}

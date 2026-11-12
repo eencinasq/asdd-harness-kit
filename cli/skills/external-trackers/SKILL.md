@@ -1,134 +1,116 @@
 ---
 name: external-trackers
-description: Handoff contract between Shape Up work recorded in an external tracker (Linear, Jira, GitHub Issues, or a manual pitch document) and ASDD + Harness execution. Defines how a bet pitch and its scopes in a tracker become intents, how agents trace them, and how status syncs back. Use when intent.md references an external source or when the squad needs to sync status back to a tracker.
+description: >-
+  Reads a bet pitch from a tracker (Linear, Jira, GitHub, manual) into the ASDD handoff fields and syncs ASDD status
+  back. Use when a pitch or intent references a tracker item, or to sync status. Do NOT use for splitting a pitch into
+  intents — use product-delivery; or for shaping — use shape-up.
+metadata:
+  tier: leaf
 ---
 
-# External Trackers — Shape Up → ASDD Handoff Contract
+# External Trackers — Shape Up ↔ ASDD handoff
 
-## Boundary rule
+**Humans own shaping and betting.** Shapers write pitches; the betting table bets them for a cycle; the pitch, its
+betting decision, and optionally its scope map live in a tracker or a manual pitch document (a tracker cycle or
+milestone holds the bet; one issue per scope is optional; there are no sprints, stories, or backlog). **Agents own ASDD
+execution:** they read the tracker, do not re-shape, and work within the appetite. This skill is the only one that
+reads from or writes to a tracker.
 
-**Humans own shaping and betting.** Shapers write pitches; the betting table bets them for a cycle. The pitch, its betting decision, and optionally its scope map live in an external tracker (Linear, Jira, GitHub Issues) or a manual pitch document. There are no sprints, stories, or backlog: a tracker cycle or milestone holds the bet, and one issue per scope is optional.
+**Operational boundary:** reads tracker items (MCP or a pasted or local snapshot); writes
+`docs/pitches/<pitch-id>/handoff.yaml`, the `source` block of a slice's first session, and — only when sync is enabled —
+comments, ticks, and closes on the tracker items of this pitch. It never writes `intent.md` (that is
+`product-delivery`) and never edits the pitch text in the tracker.
 
-**Agents own ASDD + Harness execution.** They read the tracker content, do not re-shape, and work within the appetite the betting table set.
+## Preconditions
 
-The ASDD agents never run `shape-up`. A bet pitch is split into intents by `product-delivery` (one intent per scope) before `@asdd-discovery-agent` starts. If the pitch is missing, incomplete, or not bet: stop and ask the human.
+- A tracker MCP server is configured for the tracker type ([`references/mcp-configurations.md`](./references/mcp-configurations.md)),
+  or the human supplies the pitch (pasted, or a local snapshot such as `.harness/specs/<slice>/pitch.md`). The tracker
+  stays canonical; snapshots are secondary.
+- Status sync runs only when the project binding enables it or the Tech Lead asks (default: manual sync by the TL).
 
----
+## Input / Output Contract
+
+- **Inputs:** `tracker_ref` (`string`, a tracker URL or `source_pitch_id` / `source_scope_id`, required);
+  `asdd_event` (`enum`, one of the Status sync events below, optional — only for sync).
+- **Outputs:** `handoff` (`yaml`, the Required handoff fields below, written to `docs/pitches/<pitch-id>/handoff.yaml`);
+  `session_source` (`json object`, the `source` block of the slice's `001` session); `tracker_update` (a tracker comment
+  or state change, read back through the MCP).
 
 ## Required handoff fields
-
-The tracker item (pitch issue, scope issue, or manual pitch doc) must contain:
 
 | Field | Required | ASDD use |
 |---|---|---|
 | `source_pitch_id` | Yes | Traceability, session provenance |
-| `source_scope_id` | Yes when the item is one scope | One scope = one slice = one `intent.md` |
-| `title` | Yes | Slice name, intent.md heading |
-| `problem` | Yes | intent.md Problem |
-| `desired_outcome` | Yes | intent.md Desired Outcome (one observable result per scope) |
-| `appetite` | Yes | intent.md Appetite — the bet's boundary, never an estimate |
+| `source_scope_id` | When the item is one scope | One scope = one slice = one `intent.md` |
+| `title` | Yes | Slice name, intent heading |
+| `problem` | Yes | intent Problem |
+| `desired_outcome` | Yes | intent Desired Outcome (one observable result per scope) |
+| `appetite` | Yes | intent Appetite — the bet's boundary, never an estimate |
 | `cycle` | Yes | Cycle the pitch was bet for |
-| `must_haves` | Yes | intent.md Must-have outcomes (EARS-style) |
-| `nice_to_haves` | No | intent.md Nice-to-haves (~), cuttable |
-| `no_gos` | Yes | intent.md No-gos — hard boundary |
-| `rabbit_holes` | No | intent.md Rabbit holes, with the shapers' patch |
+| `must_haves` | Yes | intent Must-have outcomes (EARS-style) |
+| `nice_to_haves` | No | intent Nice-to-haves (~), cuttable |
+| `no_gos` | Yes | intent No-gos — hard boundary |
+| `rabbit_holes` | No | intent Rabbit holes, with the shapers' patch |
 | `depends_on` | No | Other scopes that must finish first |
-| `tracker_url` | Yes | Canonical URL — intent.md references this |
+| `tracker_url` | Yes | Canonical URL the intent references |
 | `tracker_type` | Yes | `linear` \| `jira` \| `github` \| `manual` |
-| `betting_state` | Yes | Only `bet` may enter ASDD. Others stop. |
-| `assigned_team` | No | Team that took the bet, for session attribution |
+| `betting_state` | Yes | Only `bet` may enter ASDD |
+| `assigned_team` | No | Session attribution |
 | `tech_lead` | No | Escalation contact |
 
-If any **required** field is missing, do not create a slice. Return a `handoff_incomplete` notice to the human.
+## Execution Protocol
 
----
+### Step 1: Read the tracker item
 
-## Tracker → ASDD mapping
+- **Action:** with an MCP server, read the pitch (and scope issues, if any) by `tracker_ref`; without one, take the
+  pasted pitch or the local snapshot.
+- **Target:** the tracker item.
+- **Assertion:** the item's text is in hand, with its URL or snapshot path.
 
-```text
-Tracker pitch (bet, cycle)
-  ├── scope issue or scope map entry  → one slice, one intent.md
-  │     ├── title            → intent.md heading / slice name
-  │     ├── problem          → intent.md Problem
-  │     ├── desired_outcome  → intent.md Desired Outcome
-  │     ├── appetite, cycle  → intent.md Appetite, Source
-  │     ├── must_haves       → intent.md Must-have outcomes (MH-NN)
-  │     ├── nice_to_haves    → intent.md Nice-to-haves (~)
-  │     ├── no_gos           → intent.md No-gos
-  │     ├── rabbit_holes     → intent.md Rabbit holes
-  │     └── depends_on       → intent.md Depends on
-  └── tracker_url            → intent.md Source reference
-```
+### Step 2: Extract the handoff fields
 
-A pitch with no scopes in the tracker is split by `product-delivery` first.
+- **Action:** copy each field of the table verbatim (never paraphrase or expand). A required field that is missing
+  makes the record `handoff_incomplete`; an unclear must-have is `PENDING_DEFINITION` (markers:
+  `.harness/steering/skills.md`).
+- **Target:** `docs/pitches/<pitch-id>/handoff.yaml`.
+- **Assertion:** every required field is present, or the file says `status: handoff_incomplete` and lists the gaps.
 
----
+### Step 3: Record provenance
 
-## Reading from trackers
+- **Action:** when a slice is created from this item, give its `001` session a `source` block:
+  `{"tracker_type", "tracker_url", "pitch_id", "scope_id", "cycle", "assigned_by", "appetite_weeks"}` (the Knowledge
+  agent's cooldown analysis reads it).
+- **Target:** `.harness/state/slices/<slice-id>/sessions/001-*.json`.
+- **Assertion:** `asdd check` exits 0 with the block in place.
 
-### With MCP (preferred)
+### Step 4: Sync status back (only when enabled)
 
-If the runtime exposes an MCP server for the tracker:
+- **Action:** map the event to its tracker action: slice created → comment with the slice ID and intent path; phase
+  completed → comment with the phase and evidence summary; feature passing → tick the matching must-have; slice
+  completed → close the scope issue; dissent logged → comment with the note and severity; appetite warning → comment
+  that the scope may not fit the cycle (hill chart still uphill late).
+- **Target:** the tracker item of this pitch or scope.
+- **Assertion:** reading the item back through the MCP shows the comment or state change.
 
-1. Read the pitch (and scope issues, if any) via MCP using `tracker_url` or `source_pitch_id`.
-2. Extract the handoff fields above.
-3. Write them into `intent.md` verbatim — do not paraphrase or expand.
-4. Record the tracker read in the session log.
+Guardrails: do not reshape (flag `PENDING_DEFINITION`); do not expand scope (ask before starting nice-to-haves); do not
+invent estimates (report progress against the appetite); a no-go is a hard boundary that needs a new pitch and bet.
 
-### Without MCP (fallback)
+## Verification Gate
 
-1. The human pastes the pitch into the prompt, or
-2. The `intent.md` is written by hand before the session starts, or
-3. The agent reads a local snapshot (e.g., `.harness/specs/<slice>/pitch.md`).
+1. `test -s docs/pitches/<pitch-id>/handoff.yaml` exits 0, and `grep -cE '^(source_pitch_id|title|problem|desired_outcome|appetite|cycle|must_haves|no_gos|tracker_url|tracker_type|betting_state):' docs/pitches/<pitch-id>/handoff.yaml`
+   prints 11 — or the file says `status: handoff_incomplete`.
+2. After Step 3: `asdd check` exits 0.
+3. After Step 4: the MCP read-back of the item shows the update.
+4. Negative check: `git status --porcelain -- .harness/specs` lists no `intent.md` this run wrote.
 
-In all cases, the canonical source is the tracker. Local snapshots are secondary.
+## Escalation Gate
 
----
+HALT when a required field is missing (`handoff_incomplete`), when `betting_state` is not `bet`, or when the pitch is
+missing or incomplete: do not create a slice; ask the human. HALT before any tracker write that sync is not enabled for.
+Escalate as Context → Options → Recommendation → Decision Needed.
 
-## Status sync (optional)
+## Handoff & Convergence
 
-When the team wants the tracker to reflect ASDD progress:
-
-| ASDD event | Tracker action |
-|---|---|
-| Slice created | Comment on the pitch or scope issue with the slice ID and intent.md path |
-| Phase completed | Comment with the phase name and evidence summary |
-| Feature passing | Tick the matching must-have in the scope issue |
-| Slice completed | Close the scope issue |
-| Dissent logged | Comment with the dissent note and severity |
-| Appetite warning | Comment that the scope is at risk of not fitting the cycle (hill chart still uphill late in the cycle) |
-
-Do not sync automatically unless the project binding explicitly enables it. Default: manual sync by the TL.
-
----
-
-## Guardrails
-
-- **Do not reshape.** If a must-have is unclear, flag it as `PENDING_DEFINITION` in the spec — do not rewrite the pitch.
-- **Do not expand scope.** Nice-to-haves are cuttable. If must-haves finish early, ask the human before starting nice-to-haves.
-- **Do not invent estimates.** The appetite is the betting table's boundary. Agents report progress against it (hill chart), not against estimates.
-- **Respect no-gos.** A no-go is a hard boundary. Crossing it requires a new pitch and a new bet.
-
----
-
-## Session provenance
-
-When writing the initial session file for a slice that came from a tracker:
-
-```json
-{
-  "event_type": "phase_started",
-  "phase": "discovery",
-  "source": {
-    "tracker_type": "linear",
-    "tracker_url": "https://linear.app/...",
-    "pitch_id": "PITCH-042",
-    "scope_id": "SCOPE-002",
-    "cycle": "2026-C4",
-    "assigned_by": "tech-lead-name",
-    "appetite_weeks": 6
-  }
-}
-```
-
-This preserves traceability for the Knowledge Agent's cooldown analysis.
+- **handoff → `product-delivery`:** when `handoff.yaml` is complete and `betting_state` is `bet`; passes `handoff` as the
+  `pitch` input.
+- **redirect → `shape-up`:** when the tracker pitch is not bet or is missing an ingredient.

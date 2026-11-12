@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-006",
+  "timestamp": "2026-11-12T01:43:47.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_completed",
+  "evidence": "anti-pattern-detection, business-model-canvas, domain-language-extraction, capability-discovery rewritten to the skill.spec grammar: description = capability + Use when + Do NOT use (naming core siblings), metadata.tier leaf, Operational boundary, Preconditions (capability-discovery), typed Input / Output Contract (outputs to .harness/specs/<slice-id>/anti-patterns.md, glossary.md, canvas.yaml, capability.md drafts), Execution Protocol steps with Action/Target/Assertion, Verification Gate (test -s/grep counts + negative check), Escalation Gate (HALT, Context -> Options -> Recommendation -> Decision Needed), Handoff & Convergence (anti-pattern <-redirect- glossary; canvas -> anti-pattern; capability-discovery -> domain-language-extraction, codebase-audit). Content of the skills-bloom contract kept. kit skills-lint --only <4 skills>: PASS (4 of 15); kit guidance: PASS."
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-016",
+  "timestamp": "2026-11-12T02:37:38.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/agents/asdd-implementation-agent.md",
+    "cli/agents/asdd-qa-agent.md",
+    "cli/agents/asdd-refactor-agent.md",
+    "cli/agents/asdd-knowledge-agent.md",
+    "cli/agents/asdd-lite-agent.md",
+    "cli/agents/asdd-spike-researcher.md",
+    "cli/agents/_runtime-template.md",
+    "cli/agents/README.md",
+    "cli/steering/templates",
+    "cli/scaffold/config/models.json"
+  ],
+  "evidence": "Start TASK-002 (REQ-001, REQ-002, REQ-003)."
+}

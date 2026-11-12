@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-agents-spec-001",
+  "timestamp": "2026-11-12T02:18:46.927Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "agents-spec",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "full",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

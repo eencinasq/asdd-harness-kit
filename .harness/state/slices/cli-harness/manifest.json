@@ -7,13 +7,13 @@
   "escalation_signals": [
     {
       "type": "E1-scope-spread",
-      "evidence": "scope touches 12 top-level modules: .agents, .cursor, .github, .harness, AGENTS.md, README.md, cli, docs, modules, package.json, runtimes, tools"
+      "evidence": "scope touches 13 top-level modules: .agents, .cursor, .github, .harness, AGENTS.md, README.md, cli, docs, modules, package-lock.json, package.json, runtimes, tools"
     }
   ],
   "escalation_required": false,
   "escalated_from_lite": true,
   "created_at": "2026-11-10T21:52:25.034Z",
-  "updated_at": "2026-11-11T01:11:17.872Z",
+  "updated_at": "2026-11-12T02:49:25.682Z",
   "paths": {
     "specs": ".harness/specs/cli-harness",
     "tasks": ".harness/specs/cli-harness/tasks.md",
@@ -391,12 +391,269 @@
       "event": "feature_completed",
       "phase": "implementation",
       "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-11T13:00:00.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-11T13:00:00.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-11T13:00:00.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-11T13:10:00.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-11T13:10:00.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-11T13:10:00.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-12T01:58:36.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-12T01:58:36.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-12T01:58:36.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T01:58:36.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T01:58:36.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-12T01:58:36.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-12T02:09:36.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T02:09:36.000Z",
+      "agent": "asdd-lite",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-12T02:37:38.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-12T02:45:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-12T02:45:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-12T02:45:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T02:45:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T02:45:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-12T02:45:48.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-12T02:49:25.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-12T02:49:25.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-008"
+    },
+    {
+      "timestamp": "2026-11-12T02:49:25.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T02:49:25.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-009"
+    },
+    {
+      "timestamp": "2026-11-12T02:49:25.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-12T02:49:25.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-011"
     }
   ],
   "contributors": [
     "squad",
     "human",
     "eencinas",
-    "asdd-lite"
+    "asdd-lite",
+    "asdd-pipeline"
   ]
 }

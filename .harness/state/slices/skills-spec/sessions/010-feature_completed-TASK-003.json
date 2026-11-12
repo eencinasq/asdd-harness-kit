@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-010",
+  "timestamp": "2026-11-12T01:48:38.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_completed",
+  "evidence": "test-driven-development: trigger narrowed (code whose behavior a test can pin; Do NOT use for live-browser checks, UI craft, API contract design, config/docs) ; runbook RED/GREEN/REFACTOR/evidence with assertions; tutorial (cycle examples, Prove-It, pyramid, sizes, good tests, anti-patterns, rationalizations, red flags) moved to new references/testing-practices.md; 16741 -> 5153 bytes. documentation-and-adrs: single ADR authority (default template incl. drivers, strongest argument against, Steering consulted), inline/API/README/changelog/agent docs to new references/writing-docs.md (with the worked ADR example); 12879 -> 5496 bytes. codegraph: cites the AGENTS.md codegraph-first rule instead of restating it; preconditions, read-only boundary. codebase-audit: grammar with preconditions and findings schema step. create-mcp-app: /tmp/mcp-ext-apps replaced by $MCP_APPS_REF (S-011 x6 fixed); SDK detail to new references/sdk-reference.md; 10461 -> 5995 bytes. kit skills-lint --only <5 skills>: PASS (5 of 15); kit guidance: PASS."
+}

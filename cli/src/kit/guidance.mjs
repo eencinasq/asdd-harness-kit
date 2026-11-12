@@ -5,7 +5,7 @@
  *
  * dir is the kit repo (default) or an installed project (cli/test/install.sh runs it there).
  *   stale    REQ-001/002  shipped guidance names a removed mechanism
- *   cutoffs  REQ-006/007  an agent prompt compares a score or percentage against a number
+ *   cutoffs  REQ-006/007  an agent prompt or a skill compares a score or percentage against a number (skills-bloom REQ-008)
  *   budget   REQ-010      always-loaded steering + AGENTS.md exceeds the kit binding
  *   asserts  TASK-001     a kit test script uses a bare `!` assertion (ignored by `set -e`)
  */
@@ -75,10 +75,23 @@ const CUTOFFS = [
   [/reduces? [\w ]{0,24}by 0?\.\d/i, 'agent-defined score arithmetic (cite the QG-* rule instead)'],
 ];
 
+/** Markdown files under `rel` (recursively), relative to root; none when it is missing. */
+function markdownUnder(root, rel) {
+  if (!existsSync(join(root, rel))) return [];
+  return readdirSync(join(root, rel), { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? markdownUnder(root, `${rel}/${e.name}`) : e.name.endsWith('.md') ? [`${rel}/${e.name}`] : [],
+  );
+}
+
+/**
+ * Agent-defined cutoffs in what agents follow: the agent prompts and the skills a project receives (SKILL.md and its
+ * references). In the kit, the module skills too (they ship from cli/modules/; .agents/skills has the core ones).
+ */
 export function checkCutoffs(root) {
-  const dir = join(root, '.agents/agents');
-  if (!existsSync(dir)) return [];
-  const files = readdirSync(dir).filter((n) => n.endsWith('.md')).map((n) => `.agents/agents/${n}`);
+  const modules = existsSync(join(root, 'cli/modules'))
+    ? readdirSync(join(root, 'cli/modules'), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => `cli/modules/${e.name}/skills`)
+    : [];
+  const files = ['.agents/agents', '.agents/skills', ...modules].flatMap((rel) => markdownUnder(root, rel));
   return scanLines(root, files, CUTOFFS).map((f) => `cutoffs ${f}`);
 }
 

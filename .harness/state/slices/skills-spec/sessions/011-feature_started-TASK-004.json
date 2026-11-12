@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-011",
+  "timestamp": "2026-11-12T01:48:38.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/modules/http-api/skills",
+    "cli/modules/web-ui/skills"
+  ],
+  "evidence": "Start TASK-004 (REQ-001, REQ-002, REQ-004, REQ-005)."
+}

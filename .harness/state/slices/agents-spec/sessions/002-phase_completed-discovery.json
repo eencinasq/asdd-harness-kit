@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-002",
+  "timestamp": "2026-11-12T02:19:23.000Z",
+  "phase": "discovery",
+  "event_type": "phase_completed",
+  "evidence": "intent.md + capability.md: agent.spec review of the 13 shipped agents (3-5/10); outcomes MH-01..06 (P1..P5 + runtime projection, option 'proyectada' chosen by the Tech Lead). Discovery confidence 0.85."
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-027",
+  "timestamp": "2026-11-12T02:37:38.000Z",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "evidence": "Reopen TASK-005: DRIFT-02 after agents-spec edited files in its scope_paths.",
+  "scope_paths": [
+    "cli/steering/skills.md",
+    "cli/steering/controls.md",
+    "cli/steering/README.md",
+    "cli/steering/security-rules.md",
+    "cli/agents/asdd-design-agent.md"
+  ]
+}

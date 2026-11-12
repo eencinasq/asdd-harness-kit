@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-015",
+  "timestamp": "2026-11-12T01:53:10.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-006",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/kit/skills-lint.mjs",
+    "cli/src/main.mjs",
+    "cli/test/skills-lint.test.mjs",
+    "package.json"
+  ],
+  "evidence": "Start TASK-006 (REQ-006)."
+}

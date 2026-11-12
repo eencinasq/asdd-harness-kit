@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-bloom",
+  "concerns": [],
+  "session_id": "sess-skills-bloom-023",
+  "timestamp": "2026-11-11T13:40:00.000Z",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lessons: (1) a skill step that judges needs criteria, evidence per verdict, and the strongest counter-case (Bloom C5); codebase-audit, capability-discovery, product-delivery are the reference contracts. (2) Create-level skills need the most constraints: per-step outputs, provenance markers (PROPOSED / ASSUMPTION / PENDING_DEFINITION), acceptance criteria. (3) Skills repeated gate thresholds from quality-gates.md; the cutoffs sensor (asdd kit guidance) now covers skills, so the one-numeric-gate rule is enforced, not just written. (4) Shipped guidance referenced commands the kit does not ship (/shape, /spec --pitch, /four-risks) and a non-existent skill; no sensor catches dangling references yet (candidate follow-up)."
+}
