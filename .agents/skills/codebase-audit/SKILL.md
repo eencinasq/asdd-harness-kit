@@ -1,65 +1,97 @@
 ---
 name: codebase-audit
 description: >-
-  Inferential pass of the codebase auditor. Reads the latest
-  .harness/audits/ report, takes the top churn hotspots, traces each to its
-  requirements, and judges every EARS criterion satisfied, violated, or unclear
-  with file and line evidence. Use for scheduled health audits, when the Tech
-  Lead asks "where has the code drifted from the spec?", or after
-  `asdd audit` reports hotspots. Produces findings only; never edits code.
+  Judges the code in the audit's churn hotspots against its requirements with file and line evidence. Use when running a
+  scheduled audit or after `asdd audit` reports hotspots. Do NOT use for judging requirement text — use
+  anti-pattern-detection; or for exploring code — use codegraph.
+metadata:
+  tier: leaf
 ---
 
 # Codebase audit (inferential pass)
 
-The computational pass (`asdd audit`) finds drift, unowned code, failing audit commands, Semgrep violations (with the rule's fix), and churn hotspots. This skill adds judgement: does the code in the hottest files still do what its requirements say? Semgrep findings (`SEMGREP`) are already computational; do not restate them as spec verdicts.
+The computational pass (`asdd audit`) finds drift, unowned code, failing audit commands, Semgrep violations (with the
+rule's fix), and churn hotspots. This skill adds judgment: does the code in the hottest files still do what its
+requirements say? Semgrep findings (`SEMGREP`) are already computational; do not restate them as spec verdicts. Design:
+[README → Codebase auditor](https://github.com/eencinasq/asdd-harness-kit#codebase-auditor). Runner: the Knowledge
+agent, a scheduled agent, or the Tech Lead's session; consumer: the Tech Lead — engineers act only after the TL confirms
+a finding and turns it into a slice or a task.
 
-Design: [README → Codebase auditor](https://github.com/eencinasq/asdd-harness-kit#codebase-auditor).
+**Operational boundary:** reads code, requirements, features, and the knowledge index; writes only the `findings` of
+the latest `.harness/audits/<timestamp>.json`. Findings only: never edits product code, specs, or features.
 
-## Who runs it
+## Preconditions
 
-- **Runner:** the Knowledge Agent, a scheduled agent, or the Tech Lead's session.
-- **Consumer:** the Tech Lead. Engineers act on findings only after the TL confirms them and turns them into a slice or a task.
+- A report exists in `.harness/audits/` (newest `<timestamp>.json`, not `triage.json`); if not, run `asdd audit` first.
+- `asdd knowledge status` exits 0 (for `asdd knowledge trace`).
 
-## Inputs
+## Input / Output Contract
 
-1. The latest report in `.harness/audits/` (newest `<timestamp>.json`, not `triage.json`). If there is none, run `asdd audit` first.
-2. `.harness/audits/triage.json`: skip findings the TL dismissed.
-3. The knowledge index: `asdd knowledge trace file:<path>` for the requirement links of each file.
+- **Inputs:** `report` (`path`, `.harness/audits/<timestamp>.json`, required); `triage` (`path`,
+  `.harness/audits/triage.json`, optional — findings the TL dismissed are skipped); `top_n` (`integer`, default 10).
+- **Outputs:** `findings` (`json`, entries appended to `report.findings`, schema in Step 4); `summary` (`markdown`, the
+  report path, counts, and each `violated` / `unclear` verdict, in the final message).
 
-## Steps
+## Execution Protocol
 
-1. Take the top **N** entries of `hotspots` (default 10; the TL may set another N).
-2. For each hotspot file, trace it to requirements: `asdd knowledge trace file:<path>`, or the features whose `scope_paths` cover it and their `req_ids`.
-3. Read those requirements (`requirements.md`, or `spec.md` for lite slices) and the code.
-4. Judge each requirement against the code:
-   - `satisfied`: the code does what the requirement says, with the file and line that show it.
-   - `violated`: the code contradicts the requirement, with the file and line, and what differs.
-   - `unclear`: you cannot tell from the code. Never report `unclear` as `satisfied`.
-5. A hotspot with no requirement links is itself a finding: high-churn code with no spec.
-6. Append the judgements to the same report file under `findings`, one entry per `violated` or `unclear` verdict:
+### Step 1: Pick the hotspots
 
-```json
-{
-  "id": "AUD-<8 hex>",
-  "source": "inferential",
-  "check": "SPEC-VERDICT",
-  "verdict": "violated",
-  "severity": "advisory",
-  "slice_id": "wallet-deposits",
-  "node": "req:wallet-deposits:REQ-004",
-  "paths": ["src/wallet/deposits.ts"],
-  "line": 88,
-  "message": "Deposit above the limit is accepted; REQ-004 requires rejection"
-}
-```
+- **Action:** take the top `top_n` entries of `hotspots`, minus those dismissed in `triage`.
+- **Target:** `report`.
+- **Assertion:** the list has at most `top_n` files, each present on disk.
 
-   The ID is `AUD-` plus the first 8 hex characters of the sha256 of `SPEC-VERDICT|<slice_id>|<node>|<paths joined by |>`, so it stays stable across runs.
-7. Present the report to the TL: the file path, the counts, and each `violated` / `unclear` verdict next to the computational findings. `asdd triage --list` shows what is already triaged.
+### Step 2: Trace to requirements
 
-## Rules
+- **Action:** for each hotspot, `asdd knowledge trace file:<path>`, or the features whose `scope_paths` cover it and
+  their `req_ids`; read those requirements (`requirements.md`, or `spec.md` for lite slices). A hotspot with no
+  requirement link is itself a finding: high-churn code with no spec.
+- **Target:** the knowledge index and `.harness/specs/`.
+- **Assertion:** each hotspot has its REQ IDs or a no-spec finding.
 
-- **Findings only.** Never edit product code, specs, or features from this skill.
-- **Advisory.** Inferential findings never fail a gate on their own (`QG-DRIFT-05`). They become blocking only after the TL confirms them: `asdd triage <id> --confirm`.
-- **Follow-up, not fix.** A confirmed `violated` finding becomes a new lite slice (`asdd slice init`) or a task in the owning slice.
-- **Recurring.** A finding listed in `recurring` (three or more occurrences) triggers `QG-DEB-06`: name the guide or sensor in `controls.md` that must change.
-- **Cite, don't paraphrase.** Every verdict names the requirement ID and the file and line.
+### Step 3: Judge
+
+- **Action:** judge each requirement against the code: `satisfied` (the file and line that show it), `violated` (the
+  file and line, and what differs), or `unclear` (you cannot tell — never report it as `satisfied`). Before keeping
+  `satisfied` or `violated`, state the strongest counter-case (a caller, a guard, a config, a later step) and check it;
+  if you cannot rule it out, the verdict is `unclear`.
+- **Target:** the hotspot files.
+- **Assertion:** every verdict names the requirement ID, the file and line, and the counter-case checked.
+
+### Step 4: Record
+
+- **Action:** append one entry per `violated` or `unclear` verdict to `findings`:
+
+  ```json
+  { "id": "AUD-<8 hex>", "source": "inferential", "check": "SPEC-VERDICT", "verdict": "violated",
+    "severity": "advisory", "slice_id": "wallet-deposits", "node": "req:wallet-deposits:REQ-004",
+    "paths": ["src/wallet/deposits.ts"], "line": 88,
+    "message": "Deposit above the limit is accepted; REQ-004 requires rejection (checked: the API guard)" }
+  ```
+
+  The ID is `AUD-` plus the first 8 hex characters of the sha256 of `SPEC-VERDICT|<slice_id>|<node>|<paths joined by |>`,
+  so it stays stable across runs. Then present the summary to the TL (`asdd triage --list` shows what is triaged).
+- **Target:** `report`.
+- **Assertion:** the report still parses as JSON and each new entry has the ten fields.
+
+Inferential findings are advisory and never fail a gate on their own (`QG-DRIFT-05`); they block only after the TL
+confirms them (`asdd triage <id> --confirm`). A confirmed `violated` finding becomes a new lite slice (`asdd slice init`)
+or a task in the owning slice. A finding listed in `recurring` triggers `QG-DEB-06`: name the guide or sensor in
+`controls.md` that must change.
+
+## Verification Gate
+
+1. `node -e "JSON.parse(require('fs').readFileSync('<report>','utf8'))"` exits 0.
+2. Every new finding matches `/^AUD-[0-9a-f]{8}$/` and has `"source": "inferential"`.
+3. `asdd check` exits 0.
+4. Negative check: `git status --porcelain` shows no change this run made outside `.harness/audits/`.
+
+## Escalation Gate
+
+HALT when the report is missing and `asdd audit` fails, when a hotspot's requirements contradict each other, or when a
+`violated` verdict touches security or data loss (tell the TL now instead of waiting for triage). Escalate as Context →
+Options → Recommendation → Decision Needed.
+
+## Handoff & Convergence
+
+- **redirect → `codegraph`:** when a hotspot's callers or guards are needed to check a counter-case.
+- The Tech Lead triages; confirmed findings become slices or tasks.

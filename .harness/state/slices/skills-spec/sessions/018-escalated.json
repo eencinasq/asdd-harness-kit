@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-skills-spec-018",
+  "timestamp": "2026-11-12T02:03:52.468Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Escalating lite → escalated: E1-scope-spread",
+  "concerns": []
+}

@@ -1,148 +1,74 @@
 ---
 name: api-and-interface-design
 description: >-
-  Designs stable REST/HTTP APIs, GraphQL schemas, and typed module boundaries
-  that are hard to misuse. Use when designing or changing endpoints, public
-  contracts, GraphQL schemas, frontend–backend boundaries, DTOs, or any surface
-  one system calls another. Loads references/api-standards.md (REST) and
-  references/graphql-best-practices.md (GraphQL) via progressive disclosure.
+  Designs and changes typed contracts between systems (REST, GraphQL, DTOs, module exports). Use when designing or
+  changing an endpoint, schema, or public contract. Do NOT use for the ADR or docs — use documentation-and-adrs; or for
+  handler tests — use test-driven-development.
+metadata:
+  tier: leaf
 ---
 
 # API and Interface Design
 
-## Overview
+Stable, typed interfaces that make the right call easy and the wrong one hard. Principles (Hyrum's law, one-version
+rule, error mapping, boundary validation, naming, idempotency, TypeScript patterns, red flags):
+[`references/design-principles.md`](./references/design-principles.md). REST resource shape, status codes, pagination,
+auth, versioning, CORS: [`references/api-standards.md`](./references/api-standards.md). GraphQL schema, nullability,
+connections, errors, N+1, field authorization: [`references/graphql-best-practices.md`](./references/graphql-best-practices.md).
 
-Design stable, well-documented interfaces that make the right thing easy and the wrong thing hard — HTTP APIs, GraphQL schemas, module contracts, and typed boundaries.
+**Operational boundary:** the contract files of the change (OpenAPI document, GraphQL SDL, shared types or DTOs) and the
+handlers or resolvers that implement them. It never changes another surface's contract in the same change.
 
-**Progressive disclosure (complementary, no overlapping SoTs):**
+## Input / Output Contract
 
-| Load | Owns |
-|------|------|
-| This `SKILL.md` | Design principles, contracts, errors, validation boundaries, naming, idempotency *semantics*, TypeScript interface patterns, verification |
-| [`references/api-standards.md`](./references/api-standards.md) | REST resource shape, HTTP methods/status, pagination/filter/sort, auth patterns, versioning, CORS, docs/testing checklists |
-| [`references/graphql-best-practices.md`](./references/graphql-best-practices.md) | Schema design, nullability, Query/Mutation/Subscription, Connections, error extensions, N+1, field authz, evolution |
+- **Inputs:** `change` (`string`, the operation to add or change, required); `surface` (`enum`, `rest` | `graphql` |
+  `module`, required); `req_ids` (`string[]`, `^REQ-\d{3}$`, in an ASDD slice).
+- **Outputs:** `contract` (`openapi | sdl | types`, the typed contract: the OpenAPI path, the SDL type and fields, or the exported types, at the
+  project's contract location); `deprecations` (`markdown`, each removed or changed field with its deprecation path,
+  in the change description or the ADR).
 
-Discover **project** conventions from the repo (global prefix, schema path, auth, OpenAPI/codegen, app bootstrap). Do not invent a second conflicting style.
+## Execution Protocol
 
-## When to Use
+### Step 1: Find the project conventions
 
-- New or changed HTTP/REST endpoints
-- New or changed GraphQL schema, operations, or resolvers
-- Module / package public exports and DTOs
-- Frontend ↔ backend contracts
-- Breaking-change / deprecation decisions
-- Idempotent money or side-effecting writes
+- **Action:** locate the global prefix, the OpenAPI or SDL location, codegen, auth, error envelope, and naming style
+  already in use (`.harness/steering/tech.md`, then the repository).
+- **Target:** the repository.
+- **Assertion:** each convention is named with the file it comes from; when two conflict, stop at the Escalation Gate.
 
-## Workflow
+### Step 2: Write the contract first
 
-1. **Contract first** — typed inputs/outputs and error shape before implementation.
-2. If work is HTTP/REST: **Read** `references/api-standards.md`.
-3. If work is GraphQL: **Read** `references/graphql-best-practices.md`.
-4. Align with project conventions found in the repo (prefix, auth, schema/OpenAPI location).
-5. Implement; run Verification below (+ the matching reference checklist).
+- **Action:** write typed inputs, outputs, and the error shape before any implementation; read the REST or GraphQL
+  reference for the surface. Add, do not break: new optional fields or operations; a removal or type change gets a
+  deprecation path (`@deprecated` in GraphQL).
+- **Target:** the contract file.
+- **Assertion:** every public operation of the change has typed request, response, and error.
 
-## Core Principles
+### Step 3: Implement at the boundary
 
-### Hyrum’s Law
+- **Action:** validate at the edge (HTTP or GraphQL input, env load, every third-party response), not deep in the
+  domain; side-effecting writes that accept an idempotency key claim it atomically and fail loudly on a key reused with
+  another body.
+- **Target:** the handlers or resolvers.
+- **Assertion:** the project's contract check (OpenAPI lint, schema check, or type check from `tech.md`) exits 0.
 
-Every observable behavior becomes a dependency. Expose intentionally; do not leak implementation; plan deprecation when removing anything public.
+## Verification Gate
 
-### One-version rule
+1. The project's contract check exits 0 (for example `npx @redocly/cli lint <openapi>`, a GraphQL schema check, or `tsc --noEmit`, as `tech.md` names).
+2. The project's test command exits 0.
+3. One error format per surface: the changed operations' error responses reference the same schema
+   (`grep` the contract for the error schema name).
+4. The checklist of the matching reference (`api-standards.md` or `graphql-best-practices.md`) holds.
+5. Negative check: `git diff --name-only` lists only contract, handler or resolver, and test files of this surface.
 
-Prefer extending one live contract over long-lived parallel API versions or diamond dependency forks.
+## Escalation Gate
 
-### Contract first
+HALT when the change breaks a published contract and no deprecation path is agreed, when two conventions conflict, or
+when an idempotency key cannot be claimed atomically with the store in use. Escalate as Context → Options →
+Recommendation → Decision Needed.
 
-```typescript
-interface TaskAPI {
-  createTask(input: CreateTaskInput): Promise<Task>;
-  listTasks(params: ListTasksParams): Promise<PaginatedResult<Task>>;
-  getTask(id: string): Promise<Task>;
-  updateTask(id: string, input: UpdateTaskInput): Promise<Task>;
-  deleteTask(id: string): Promise<void>;
-}
-```
+## Handoff & Convergence
 
-### Consistent errors
-
-One error strategy everywhere for a given surface. For HTTP/REST, map:
-
-| Status | Meaning |
-|--------|---------|
-| 400 | Malformed request |
-| 401 | Unauthenticated |
-| 403 | Forbidden |
-| 404 | Missing resource |
-| 409 | Conflict |
-| 422 | Semantically invalid |
-| 429 | Rate limited |
-| 5xx | Server fault (no internals in body) |
-
-REST JSON shape → `references/api-standards.md`.  
-GraphQL `errors[]` / payload errors → `references/graphql-best-practices.md`.
-
-### Validate at boundaries
-
-Validate at HTTP/GraphQL edges, forms, env load, and **all third-party responses**. Do not re-validate trusted internal call chains that already share types.
-
-### Prefer addition
-
-Add optional fields / new endpoints / new GraphQL fields. Do not change field types or remove fields without a deprecation path (`@deprecated` in GraphQL).
-
-### Predictable naming
-
-| Surface | Convention |
-|---------|------------|
-| REST paths | Plural nouns, no verbs |
-| GraphQL | `PascalCase` types, `camelCase` fields; mutations verb+noun |
-| Query / JSON fields | One style project-wide (`camelCase` *or* `snake_case`) |
-| Booleans | `is` / `has` / `can` |
-| Enums | Documented stable strings |
-
-### Idempotency (honour the key)
-
-Accepting an idempotency key (header, extension, or input) without honouring it is worse than no key.
-
-- Key from **client/intent**, stable across retries — not `randomUUID()` or `Date.now()` per attempt
-- **Claim atomically** (unique constraint); no check-then-act races
-- Same key + different body → **fail loudly** (e.g. 422 / domain error)
-- In-flight duplicate: deliberate conflict, wait, or async accepted — never double-apply
-- Treat outcomes as success / failure / **unknown**; record intent before side effects
-- Retention ≥ longest retry/DLQ path
-
-HTTP wiring → REST reference. Mutation patterns → GraphQL reference.
-
-## TypeScript interface patterns
-
-- Discriminated unions for variants
-- Separate `CreateXInput` from `X` (server-generated fields)
-- Branded IDs when ID mix-ups are costly
-
-## Red flags
-
-- Different response shapes for the same endpoint / operation family
-- Mixed error formats
-- Validation deep inside domain with no boundary gate
-- Breaking field type or nullability changes
-- List endpoints / fields without pagination strategy
-- Verbs in REST URLs (`/createTask`); Query fields that mutate
-- Unvalidated third-party payloads
-- Idempotency TOCTOU or key regenerated per retry
-- GraphQL N+1 with no batching; auth only at gateway for sensitive fields
-
-## Verification
-
-- [ ] Typed request/response (OpenAPI, GraphQL SDL, or shared types) for every public operation
-- [ ] Single error format per surface
-- [ ] Boundary validation only (plus untrusted externals)
-- [ ] Lists paginated (or explicitly unbounded with rationale)
-- [ ] Additive evolution / deprecation noted for breaks
-- [ ] Consistent naming
-- [ ] Side-effecting writes: idempotency key honoured or documented unsafe-to-retry
-- [ ] **HTTP/REST:** checklist in `references/api-standards.md`
-- [ ] **GraphQL:** checklist in `references/graphql-best-practices.md`
-
-## See also
-
-- REST detail: `references/api-standards.md`
-- GraphQL detail: `references/graphql-best-practices.md`
+- **handoff → `documentation-and-adrs`:** when the change is a decision expensive to reverse (API style, versioning,
+  breaking change); passes `contract` and `deprecations`.
+- **handoff → `test-driven-development`:** for the handler and resolver logic; passes `contract`.

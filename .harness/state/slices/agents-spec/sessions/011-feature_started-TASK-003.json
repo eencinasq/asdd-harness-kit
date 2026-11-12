@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-011",
+  "timestamp": "2026-11-12T02:26:56.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/modules/bruno/asdd-integration-tester.md",
+    "cli/modules/playwright-e2e",
+    "cli/src/install/modules.mjs"
+  ],
+  "evidence": "Start TASK-003 (REQ-003, REQ-005)."
+}

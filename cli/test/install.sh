@@ -185,6 +185,11 @@ PKG_DIR="$TMP/pack" && mkdir -p "$PKG_DIR/prefix" "$PKG_DIR/app"
 (cd "$ROOT" && npm pack --pack-destination "$PKG_DIR" >/dev/null 2>&1)
 npm i -g --prefix "$PKG_DIR/prefix" "$PKG_DIR"/asdd-harness-kit-*.tgz >/dev/null 2>&1
 (cd "$PKG_DIR/app" && git init -q && env PATH="$PKG_DIR/prefix/bin:$PATH" asdd install . --runtime=cursor,claude --modules=all --no-interactive >/dev/null 2>&1)
+# agents-spec REQ-004: an auditor gets no Edit and no Agent on Claude Code; the orchestrator gets Agent
+grep -qx 'tools: Read, Grep, Glob, Bash, Write' "$PKG_DIR/app/.claude/agents/asdd-validation-agent.md"
+grep -qx 'tools: Read, Grep, Glob, Bash, Write, Edit, Agent' "$PKG_DIR/app/.claude/agents/asdd-implementation-agent.md"
+grep -qx 'disallowedTools: Agent' "$PKG_DIR/app/.claude/agents/asdd-e2e-tester.md"
+grep -qx 'maxTurns: 40' "$PKG_DIR/app/.claude/agents/asdd-validation-agent.md"
 test ! -e "$PKG_DIR/app/.harness/cli"
 echo '{"command":"git status"}' | (cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" sh -c "$EXPECT_GATE") | grep -q '"permission": *"allow"'
 (cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" asdd check >/dev/null)
@@ -210,7 +215,11 @@ grep -qxF '.harness/knowledge' "$TMP/existing-app/.gitignore"
 # Shape Up -> Product Delivery integration contract.
 grep -q '^name: shape-up$' "$TMP/existing-app/.agents/skills/shape-up/SKILL.md"
 grep -q '^name: product-delivery$' "$TMP/existing-app/.agents/skills/product-delivery/SKILL.md"
-grep -q 'references/conversions.md' "$TMP/existing-app/.agents/skills/product-delivery/SKILL.md"
+# skills-spec REQ-002: product-delivery owns the scope map (its own schema), with no file link into shape-up
+grep -q 'contracts/scope-map.schema.yaml' "$TMP/existing-app/.agents/skills/product-delivery/SKILL.md"
+if grep -q 'shape-up/references' "$TMP/existing-app/.agents/skills/product-delivery/SKILL.md"; then
+  echo "product-delivery still reads the scope map format from shape-up" >&2; exit 1
+fi
 grep -q 'bundle_type: shape_up_pitch_bundle' "$TMP/existing-app/.agents/skills/shape-up/references/conversions.md"
 grep -q 'source_pitch_id:' "$TMP/existing-app/.agents/skills/shape-up/references/conversions.md"
 grep -q 'const: scope_map' "$TMP/existing-app/.agents/skills/product-delivery/contracts/scope-map.schema.yaml"
@@ -306,7 +315,19 @@ test -z "$(find "$TMP/existing-app" \( -name '.DS_Store' -o -name '._*' \) -prin
 grep -q 'my product' "$TMP/existing-app/README.md"
 test -f "$TMP/existing-app/.agents/skills/api-and-interface-design/SKILL.md"
 test -L "$TMP/existing-app/.opencode/skills"
-test -L "$TMP/existing-app/.opencode/agents/asdd-discovery-agent.md"
+# agents-spec REQ-004: Claude Code, Cursor, and OpenCode get agent files rendered from the canonical capabilities
+test -f "$TMP/existing-app/.opencode/agents/asdd-discovery-agent.md" && test ! -L "$TMP/existing-app/.opencode/agents/asdd-discovery-agent.md"
+grep -q 'Rendered by asdd install from .agents/agents/asdd-qa-agent.md' "$TMP/existing-app/.opencode/agents/asdd-qa-agent.md"
+oc_qa="$(sed -n '/^---$/,/^---$/p' "$TMP/existing-app/.opencode/agents/asdd-qa-agent.md")"
+grep -q 'resource: ".harness/specs/\*/spec-coverage-report.md"' <<<"$oc_qa"
+grep -q 'action: subagent' <<<"$oc_qa"
+if grep -q 'action: subagent' <<<"$(sed -n '/^---$/,/^---$/p' "$TMP/existing-app/.opencode/agents/asdd-implementation-agent.md")"; then
+  echo "the orchestrator must keep its sub-agents on OpenCode" >&2; exit 1
+fi
+grep -qx 'readonly: true' "$TMP/existing-app/.cursor/agents/asdd-spike-researcher.md"
+if grep -qx 'readonly: true' "$TMP/existing-app/.cursor/agents/asdd-validation-agent.md"; then
+  echo "an auditor still writes its report on Cursor" >&2; exit 1
+fi
 test -f "$TMP/existing-app/opencode.json"
 test -L "$TMP/existing-app/.kimi-code/agents"
 test -L "$TMP/existing-app/.kimi-code/skills"

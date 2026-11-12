@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-008",
+  "timestamp": "2026-11-12T01:46:05.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_completed",
+  "evidence": "shape-up: runbook grammar (flow picker, run flow, write pitch, review with quoted evidence + counter-case, convert/record bet), coaching detail moved to new references/flows.md; 15199 -> 7588 bytes (packaged cap 15 KB); scope_map mode only when the pitch leaves the repo; pitch-template gains pitch_id/betting_state lines. product-delivery: sole owner of the scope map in a harness repo (docs/pitches/<pitch-id>/scope-map.yaml, its own contracts schema; no link into shape-up), preconditions = entry gate, steps 1-6 with assertions, redirects to shape-up/external-trackers. external-trackers: sole reader/writer of trackers, writes docs/pitches/<pitch-id>/handoff.yaml (never intent.md), session source block, sync only when enabled; handoff -> product-delivery. kit skills-lint --only shape-up,product-delivery,external-trackers: PASS (3 of 15); kit guidance: PASS."
+}

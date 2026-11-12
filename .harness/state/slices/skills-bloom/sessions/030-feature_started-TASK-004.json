@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-bloom",
+  "concerns": [],
+  "session_id": "sess-skills-bloom-030",
+  "timestamp": "2026-11-12T01:58:36.000Z",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "evidence": "Reopen TASK-004: DRIFT-02 after skills-spec edited files in its scope_paths.",
+  "scope_paths": [
+    "cli/skills/domain-language-extraction/SKILL.md"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-bloom",
+  "concerns": [],
+  "session_id": "sess-skills-bloom-018",
+  "timestamp": "2026-11-11T12:07:05.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-006",
+  "event_type": "feature_completed",
+  "evidence": "shape-up: removed the /shape, /spec --pitch, /four-risks shortcuts and the 'Integration with Other Commands' section (the kit ships none of those commands); flows ordered 1-6 (Flow 4 moved after Flow 3); decorative ASCII boxes turned into plain markdown (no content lost; duplicate step titles dropped); pitch review is a table with a verdict, a quote or named gap from the pitch, and a fix per element, plus the strongest counter-case before 'Ready for betting' (gate decision stays human, decided_by). 519 -> 440 lines. kit self refreshed; kit guidance PASS; guidance tests 9/9."
+}

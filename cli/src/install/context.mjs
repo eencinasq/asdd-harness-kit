@@ -155,6 +155,38 @@ export class InstallContext {
     return 'update';
   }
 
+  /**
+   * Kit-owned content the installer generates (a rendered runtime agent file): written when missing, replacing a link,
+   * or when it changed; a copy the project edited since the kit wrote it is kept unless --force (like `refresh`).
+   */
+  writeGenerated(dest, content) {
+    const rel = this.rel(dest);
+    this.recordManaged(dest);
+    this.kitFiles.add(rel);
+    const linked = isSymlink(dest);
+    if (!linked && existsSync(dest)) {
+      const current = readFileSync(dest, 'utf8');
+      if (current === content) {
+        this.stats.kept += 1;
+        log(`${c.dim('KEEP')}  ${dest}`);
+        return;
+      }
+      const recorded = this.kitHashes[rel];
+      if (recorded && fileHash(dest) !== recorded && !this.force) {
+        this.stats.skipped += 1;
+        this.skipped.push(rel);
+        log(`${c.yellow('SKIP')}  ${dest} (changed in this project since the kit rendered it; --force overwrites)`);
+        return;
+      }
+    }
+    this.stats[existsSync(dest) || linked ? 'updated' : 'created'] += 1;
+    log(`${c.blue('RENDER')} ${dest}`);
+    if (this.dryRun) return;
+    if (linked) unlinkSync(dest);
+    mkdirSync(dirname(dest), { recursive: true });
+    writeFileSync(dest, content);
+  }
+
   copyTree(src, dest, policy = 'refresh') {
     if (!existsSync(src)) throw new CliError(`missing kit dir: ${src}`);
     for (const rel of filesUnder(src)) {

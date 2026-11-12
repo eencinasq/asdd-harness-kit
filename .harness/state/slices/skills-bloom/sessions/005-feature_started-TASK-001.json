@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-bloom",
+  "concerns": [],
+  "session_id": "sess-skills-bloom-005",
+  "timestamp": "2026-11-11T12:20:00.000Z",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/skills/test-driven-development/SKILL.md"
+  ],
+  "evidence": "Start TASK-001 (REQ-001)."
+}

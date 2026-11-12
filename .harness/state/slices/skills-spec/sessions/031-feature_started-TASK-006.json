@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-031",
+  "timestamp": "2026-11-12T02:45:48.000Z",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-006",
+  "evidence": "Reopen TASK-006: DRIFT-02 after the 3.10.0 version bump edited files in its scope_paths.",
+  "scope_paths": [
+    "cli/src/kit/skills-lint.mjs",
+    "cli/src/main.mjs",
+    "cli/test/skills-lint.test.mjs",
+    "package.json",
+    "cli/test/install.sh",
+    "cli/README.md"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-008",
+  "timestamp": "2026-11-12T02:24:08.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_completed",
+  "evidence": "Discovery, spec, validation, domain, design, task-planning agents rewritten to the agent.spec grammar: description = capability + Use when + Do NOT use (naming sibling agents/skills, no pipeline ordinal); metadata tier/workspace_mode/model_profile; capabilities (validation = auditor: deny edit_file; others specialist), write_paths, mounted core skills; limits.max_turns; Role Charter (guarantees, Operational/Quarantine Boundary, Decision Rights); Pre-Flight Reading & Ground Truth (Tier 1/2/3); typed Delegation & I/O Contract with verdict and handoff/redirect edges; Negative Space (incl. file:line execution-point, anti-hedging, quarantine, Author/Model provenance); Convergence & Verification Gate (probes + asdd check + git status negative check); Escalation Gate (phase_blocked, Context -> Options -> Recommendation -> Decision Needed). P1: '(write phase/gates)' replaced by read-only/generated in all six. Discovery's inline capability template replaced by the steering template (20131 -> 19397 bytes). Verified with the scratch structural check (all A-* slots present, sizes <= 20 KB); asdd kit agents-lint (TASK-005) re-verifies."
+}

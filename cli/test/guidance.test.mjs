@@ -92,7 +92,20 @@ test('TASK-001: a bare `!` assertion in a kit test script fails', withDir((root,
   assert.match(findings[0], /cli\/test\/x\.sh:3/);
 }));
 
-test('REQ-006: the agent prompts the kit ships contain no cutoff of their own', () => {
+test('skills-bloom REQ-008: a cutoff in a skill (SKILL.md or its references, core or module) fails', withDir((root, write) => {
+  write('.agents/skills/anti-pattern-detection/SKILL.md', '# A\n- < 0.70: BLOCK capability\nMore than 10 FRs is a mega-capability.\n');
+  write('.agents/skills/business-model-canvas/references/scoring.md', 'Each CRITICAL finding reduces agent confidence by 0.10.\n');
+  write('cli/modules/web-ui/skills/frontend-ui-engineering/SKILL.md', 'Lighthouse score >= 0.9 passes.\n');
+  write('.agents/skills/codegraph/SKILL.md', 'Run codegraph explore before > 1 grep.\n');
+  const findings = checkCutoffs(root).map((f) => f.replace(/^cutoffs /, '').split(' ')[0]);
+  assert.deepEqual(findings.sort(), [
+    '.agents/skills/anti-pattern-detection/SKILL.md:2:',
+    '.agents/skills/business-model-canvas/references/scoring.md:1',
+    'cli/modules/web-ui/skills/frontend-ui-engineering/SKILL.md:1',
+  ].map((f) => f.replace(/:$/, '')).sort());
+}));
+
+test('REQ-006, skills-bloom REQ-008: the agent prompts and skills the kit ships contain no cutoff of their own', () => {
   assert.deepEqual(checkCutoffs(KIT_ROOT), []);
 });
 

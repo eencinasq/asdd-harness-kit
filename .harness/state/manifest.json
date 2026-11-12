@@ -82,6 +82,30 @@
       "mode": "lite",
       "manifest": ".harness/state/slices/spec-drift-merge/manifest.json",
       "features": ".harness/features/spec-drift-merge.features.json"
+    },
+    {
+      "slice_id": "skills-bloom",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/skills-bloom/manifest.json",
+      "features": ".harness/features/skills-bloom.features.json"
+    },
+    {
+      "slice_id": "skills-spec",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/skills-spec/manifest.json",
+      "features": ".harness/features/skills-spec.features.json"
+    },
+    {
+      "slice_id": "agents-spec",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/agents-spec/manifest.json",
+      "features": ".harness/features/agents-spec.features.json"
     }
   ]
 }

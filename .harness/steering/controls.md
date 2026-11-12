@@ -42,6 +42,11 @@ ASDD-Lite skips the confidence scores and the numeric phase gates (`QG-DEC-07`, 
 4. **Done.** A feature is `passing` only after its `verification` evidence is recorded and the left sensors for this session exit 0. A green narrative is not evidence.
 5. **Repeat.** When a failure, override, or dismissal reaches the occurrence threshold, `asdd learn` opens a pattern; change the guide or sensor that missed it (escape) or that fires without cause (noise) through a steering proposal ([Learning Gate](./quality-gates.md#learning-gate)). Do not only patch the product code.
 
+## Prohibitions
+
+Never skip, waive, or widen a sensor to pass a gate; dismiss findings only through `asdd triage` with a reason.
+When the precedence above does not settle a conflict: HALT and escalate to the Tech Lead.
+
 ## Session close
 
 Leave a clean state before handoff:

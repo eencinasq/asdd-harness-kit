@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-013",
+  "timestamp": "2026-11-12T02:28:52.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/install/agent-frontmatter.mjs",
+    "cli/src/install/runtimes.mjs",
+    "cli/src/install/context.mjs",
+    "cli/test/install.sh"
+  ],
+  "evidence": "Start TASK-004 (REQ-004)."
+}

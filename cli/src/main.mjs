@@ -34,6 +34,8 @@ Kit development (in the kit repo):
   asdd kit build [--obfuscate] [--check]  compile cli/src → cli/dist (projects and npm ship dist only)
   asdd kit vendor [--check]           copy cli/src/harness libs into tools/*/src/harness
   asdd kit guidance [--only a,b] [dir]  stale guidance, cutoffs, steering budget, test asserts
+  asdd kit skills-lint [--only a,b] [dir]  skill grammar (S-*), fleet routing (SL-*), rule size (R-004/005)
+  asdd kit agents-lint [--only a,b] [dir]  agent grammar (A-*), tier/capability envelope and handoffs (AL-*)
   asdd kit self [--check]             copy what cli/ ships into the kit's own .harness/ (--check: fail while stale)
 
 Other:
@@ -48,6 +50,8 @@ const KIT_COMMANDS = {
   build: './kit/build.mjs',
   vendor: './kit/vendor.mjs',
   guidance: './kit/guidance.mjs',
+  'skills-lint': './kit/skills-lint.mjs',
+  'agents-lint': './kit/agents-lint.mjs',
   self: './kit/self.mjs',
 };
 const FULL_ONLY = ['install', 'uninstall', 'kit'];
@@ -122,7 +126,7 @@ async function runHarness(args) {
 }
 
 async function kit([name, ...args]) {
-  if (!KIT_COMMANDS[name]) throw new CliError(`usage: asdd kit versions|build|vendor|guidance|self [options] (got ${name ?? 'nothing'})`, 2);
+  if (!KIT_COMMANDS[name]) throw new CliError(`usage: asdd kit versions|build|vendor|guidance|skills-lint|agents-lint|self [options] (got ${name ?? 'nothing'})`, 2);
   const { run } = await import(KIT_COMMANDS[name]);
   return run(args);
 }

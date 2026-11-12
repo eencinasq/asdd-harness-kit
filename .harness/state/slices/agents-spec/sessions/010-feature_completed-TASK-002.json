@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-010",
+  "timestamp": "2026-11-12T02:26:56.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_completed",
+  "evidence": "Implementation (orchestrator, only agent with subagent_tools: true), QA (auditor: deny edit_file, writes only spec-coverage-report.md), refactor, knowledge, lite (specialists) to the agent grammar. P1: implementation's parallel rule now matches session-loop (one at a time by default; parallel only with unique owners + disjoint scope_paths); foreign data-testid examples (privy, room-min-buyin, partner branding) replaced by generic ones; 'Functions: Max 20 lines' replaced by the project's tech.md conventions; knowledge no longer writes the manifest (Chat-to-Manifest and DEPENDENCY_CONFLICT-in-manifest removed; conflicts are dissent sessions) and uses the documentation-and-adrs ADR format; no pipeline ordinals. P2: QA test generation (Mode A) and spec peer review (Mode C) removed \u2014 tests come from implementation's TDD, requirement review from validation; spec-peer-review.md template deleted; knowledge drops the state-custodian role and re-triggering; new read-only asdd-spike-researcher (researcher tier, write_tools false, returns a cited findings table; knowledge records it). _runtime-template.md: Epistemic rules (working tree, file:line, anti-hedging, quarantine, provenance) and the capability/projection table; only the orchestrator spawns sub-agents (Claude tool Agent, formerly Task). README: roles, rendered runtimes. models.json: spike researcher tier-c; tier-a profile 'coverage auditing'. Sizes 5.3-16 KB. Scratch structural check passes; asdd kit agents-lint (TASK-005) re-verifies."
+}

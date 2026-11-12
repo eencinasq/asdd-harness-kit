@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-003",
+  "timestamp": "2026-11-12T02:19:24.000Z",
+  "phase": "spec",
+  "event_type": "phase_completed",
+  "evidence": "requirements.md: REQ-001..006 MUST READY, EARS, AC-001..006; runtime field formats confirmed in the official Claude Code, Cursor, OpenCode subagent docs (tools/maxTurns/Agent; readonly; permissions list/steps). Spec confidence 0.85."
+}

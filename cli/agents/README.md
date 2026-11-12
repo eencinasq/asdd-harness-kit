@@ -8,9 +8,13 @@ All agents use SoT under [`.harness/`](../../.harness/). They write session file
 
 ```
 Discovery → Spec → Validation → Domain → Design → Task planning → Implementation → QA → Refactor → Knowledge
-                                                                    ↓
-                                              Integration (Bruno) + E2E (Playwright)
+                                                                    ↓                         ↑
+                                              Integration (Bruno) + E2E (Playwright)    Spike researcher (on low confidence)
 ```
+
+Roles: one per agent (`metadata.tier`). QA audits only; tests come from Implementation's TDD step; requirements are
+reviewed by Validation; spikes are read-only research by `asdd-spike-researcher`. Rendered runtime files and the
+capability schema: [`_runtime-template.md`](_runtime-template.md).
 
 Small work (≤3 files, ≤1 new domain concept): `asdd-lite-agent` — see [`asdd-lite.md`](../../.harness/steering/asdd-lite.md).
 
@@ -40,12 +44,12 @@ Optional stack modules (Bruno, Playwright, web-UI, HTTP API): [`modules/README.m
 
 | Runtime | Adapter |
 |---------|---------|
-| Cursor | `.cursor/agents/*` → symlinks here |
-| Claude Code | `.claude/agents/*` → symlinks here |
+| Cursor | `.cursor/agents/*` → rendered from here (`readonly` from capabilities) |
+| Claude Code | `.claude/agents/*` → rendered from here (`tools` / `disallowedTools`, `maxTurns`) |
 | Junie | `.junie/agents/*` → symlinks here |
 | Devin | `.devin/agents/*` → symlinks here |
 | Kimi | `.kimi-code/agents` → symlink here (also native `.agents/agents` discovery) |
-| OpenCode | `.opencode/agents/*` → symlinks here; `opencode.json` loads `AGENTS.md` |
+| OpenCode | `.opencode/agents/*` → rendered from here (`permissions`, `steps`); `opencode.json` loads `AGENTS.md` |
 | Kiro | `.kiro/agents/*` → symlinks here |
 | Codex | No agent adapter; MCP projection only (`.agents/mcp/mcp.codex.toml`) |
 

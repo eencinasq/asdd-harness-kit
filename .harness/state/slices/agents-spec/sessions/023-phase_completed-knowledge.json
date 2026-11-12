@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-023",
+  "timestamp": "2026-11-12T02:38:01.000Z",
+  "phase": "knowledge",
+  "event_type": "phase_completed",
+  "evidence": "Lessons: (1) one canonical agent file rendered per runtime is required because runtimes use the same key differently (Claude tools string vs OpenCode permissions list); (2) a Claude tools allowlist silently drops MCP tools, so MCP agents get a denylist; (3) writing the sensor found two fleet defects the manual review missed (qa<->refactor handoff cycle, cross-module agent names); (4) module runbooks belong in module skills (e2e 38 KB -> 6 KB, bruno 15 KB -> 6 KB)."
+}

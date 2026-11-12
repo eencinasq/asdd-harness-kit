@@ -1,0 +1,183 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "skills-bloom",
+  "source_tasks": ".harness/specs/skills-bloom/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "TDD names REQs and records evidence",
+      "user_visible_behavior": "Tests written through the TDD skill carry the REQ-NNN they verify; the run goes to evidence.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit guidance",
+        "node --test cli/test/guidance.test.mjs"
+      ],
+      "evidence": "TDD skill: new section 'In an ASDD slice' (tests name the REQ-NNN token DRIFT-04 looks for; verification output goes to evidence before passing; DRIFT-02 reopens on scope edits); naming example and verification checklist name REQs. kit guidance PASS; guidance tests 8/8. | Re-verified after slice skills-spec rewrote the skill to the skill.spec grammar (the skills-bloom contract kept: criteria, quoted evidence, counter-case, markers, no cutoffs): kit guidance PASS (cutoffs 0); guidance tests pass in npm test 119/119; kit skills-lint PASS.",
+      "scope_paths": [
+        "cli/skills/test-driven-development/SKILL.md"
+      ],
+      "evidence_hash": "54e122a7ff4764116ae0611dbf03734f5cfa53bb8c04a715d13ab895141d3784"
+    },
+    {
+      "id": "TASK-002",
+      "title": "anti-pattern-detection to the C5 contract",
+      "user_visible_behavior": "Findings come first with criteria, evidence and counter-case; fixes are proposals; gates cite QG-DIS.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002",
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit self",
+        "node cli/bin/asdd.mjs kit guidance --only cutoffs (no finding in anti-pattern-detection)"
+      ],
+      "evidence": "anti-pattern-detection rewritten to the C5 contract: criteria table with 'not a violation' column (context check, not keyword match); Step 1 detect (violation/not/unclear, quoted evidence, strongest counter-case for CRITICAL/HIGH) then Step 2 propose (fixes are proposals, PENDING_DEFINITION when a fact is missing); score counts patterns (0..1), thresholds only cited (QG-DIS-02/03/04); confidence effect qualitative (QG-DEC-10); dangling 'decomposition skill' replaced by a split proposal. kit self refreshed; kit guidance --only cutoffs: 0 findings in anti-pattern-detection (remaining: business-model-canvas, domain-language-extraction = TASK-003/004). | Re-verified after slice skills-spec rewrote the skill to the skill.spec grammar (the skills-bloom contract kept: criteria, quoted evidence, counter-case, markers, no cutoffs): kit guidance PASS (cutoffs 0); guidance tests pass in npm test 119/119; kit skills-lint PASS.",
+      "scope_paths": [
+        "cli/skills/anti-pattern-detection/SKILL.md"
+      ],
+      "evidence_hash": "01458d2c15c1f2c01e059e048de17e61fdd7fa5f2b6e59fd4d9bb568d4c0fb36"
+    },
+    {
+      "id": "TASK-003",
+      "title": "business-model-canvas complete and provenance-marked",
+      "user_visible_behavior": "Every canvas block maps to an output; generated items are PROPOSED with their source block; empty blocks are PENDING_DEFINITION.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit guidance",
+        "node --test cli/test/guidance.test.mjs"
+      ],
+      "evidence": "business-model-canvas rewritten: chain Extract (C1, verbatim blocks) -> Map (C3, table) -> Propose (C6) -> Report gaps, one output each; all nine BMC blocks mapped (Key Activities, Key Resources, Cost Structure added) plus the nine Lean Canvas blocks; YAML output schema; every capability/persona PROPOSED — VALIDATION REQUIRED with source_blocks; FRs/EARS only when the block states the behavior, else a PO question; empty block PENDING_DEFINITION; revenue MUST is proposed, the PO decides; confidence qualitative (QG-DEC-10), no thresholds. kit self refreshed; kit guidance --only cutoffs: 0 findings in business-model-canvas. | Re-verified after slice skills-spec rewrote the skill to the skill.spec grammar (the skills-bloom contract kept: criteria, quoted evidence, counter-case, markers, no cutoffs): kit guidance PASS (cutoffs 0); guidance tests pass in npm test 119/119; kit skills-lint PASS.",
+      "scope_paths": [
+        "cli/skills/business-model-canvas/SKILL.md"
+      ],
+      "evidence_hash": "74d238165adcedb62c5b59bc22dc15ecb1d78bcd466b9db459081edea13b8d84"
+    },
+    {
+      "id": "TASK-004",
+      "title": "domain-language-extraction source-bounded",
+      "user_visible_behavior": "Every term cites its source; unstated definitions are marked ASSUMPTION.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit guidance",
+        "node --test cli/test/guidance.test.mjs"
+      ],
+      "evidence": "domain-language-extraction rewritten: only from the supplied text, every entry cites its source; chain Extract (C1) -> Classify (C2) -> Mark what the text does not say (ASSUMPTION — CONFIRMATION REQUIRED, PENDING_DEFINITION, conflicts with both sources) -> Compare with docs/architecture/domain-model.md; open-questions section; confidence qualitative per term (QG-DEC-10), no thresholds. kit self refreshed; kit guidance --only cutoffs PASS. | Re-verified after slice skills-spec rewrote the skill to the skill.spec grammar (the skills-bloom contract kept: criteria, quoted evidence, counter-case, markers, no cutoffs): kit guidance PASS (cutoffs 0); guidance tests pass in npm test 119/119; kit skills-lint PASS.",
+      "scope_paths": [
+        "cli/skills/domain-language-extraction/SKILL.md"
+      ],
+      "evidence_hash": "bd84db0111555cd5b159366a10ad0514323fc0c576c47e6b2dccb7a3adb70d2f"
+    },
+    {
+      "id": "TASK-005",
+      "title": "Counter-case in judging steps",
+      "user_visible_behavior": "ADR alternatives and audit verdicts name criteria, evidence and the strongest counter-case.",
+      "status": "passing",
+      "priority": 5,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit guidance",
+        "node --test cli/test/guidance.test.mjs"
+      ],
+      "evidence": "documentation-and-adrs: the alternatives section is a judgment with a contract (decision drivers from the Context, every alternative judged against them, evidence per verdict, strongest argument against the chosen option, REQ and slice links); example rewritten as a drivers table plus the counter-case; verification checklist item. codebase-audit: a satisfied/violated verdict needs the strongest counter-case checked (caller, guard, config, later step), else unclear; violated message names it. kit self refreshed; kit guidance PASS; guidance tests 9/9. | Re-verified after slice skills-spec rewrote the skill to the skill.spec grammar (the skills-bloom contract kept: criteria, quoted evidence, counter-case, markers, no cutoffs): kit guidance PASS (cutoffs 0); guidance tests pass in npm test 119/119; kit skills-lint PASS.",
+      "scope_paths": [
+        "cli/skills/documentation-and-adrs/SKILL.md",
+        "cli/skills/codebase-audit/SKILL.md"
+      ],
+      "evidence_hash": "8b7570e250f409c25f59e5ac630dc468a347c024abfedbc201f68db8353de2a1"
+    },
+    {
+      "id": "TASK-006",
+      "title": "shape-up consistent and leaner",
+      "user_visible_behavior": "No dangling commands; flows 1-6 in order; review cites pitch evidence; fewer lines.",
+      "status": "passing",
+      "priority": 6,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-005",
+        "REQ-006"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit guidance",
+        "node --test cli/test/guidance.test.mjs"
+      ],
+      "evidence": "shape-up: removed the /shape, /spec --pitch, /four-risks shortcuts and the 'Integration with Other Commands' section (the kit ships none of those commands); flows ordered 1-6 (Flow 4 moved after Flow 3); decorative ASCII boxes turned into plain markdown (no content lost; duplicate step titles dropped); pitch review is a table with a verdict, a quote or named gap from the pitch, and a fix per element, plus the strongest counter-case before 'Ready for betting' (gate decision stays human, decided_by). 519 -> 440 lines. kit self refreshed; kit guidance PASS; guidance tests 9/9. | Re-verified after slice skills-spec rewrote the skill to the skill.spec grammar (the skills-bloom contract kept: criteria, quoted evidence, counter-case, markers, no cutoffs): kit guidance PASS (cutoffs 0); guidance tests pass in npm test 119/119; kit skills-lint PASS.",
+      "scope_paths": [
+        "cli/skills/shape-up/SKILL.md"
+      ],
+      "evidence_hash": "bb62564ce7c72fbef19320bdf5ce429e81b0703e19c0c7d7d10ac766d2ad580d"
+    },
+    {
+      "id": "TASK-007",
+      "title": "create-mcp-app with a contract",
+      "user_visible_behavior": "Workflow with per-step outputs, acceptance criteria and a verification checklist.",
+      "status": "passing",
+      "priority": 7,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-007"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit guidance",
+        "node --test cli/test/guidance.test.mjs"
+      ],
+      "evidence": "create-mcp-app: Workflow (6 steps, each with a checkable output: tool contract + REQ, setup, template, registration, single-file bundle, host test), Acceptance criteria (text fallback, resourceUri, CSP/domain, handlers before connect, host theme, errors to the model, npm-installed 2.x SDK), Verification checklist (incl. listing unmet criteria instead of claiming done). Reference content kept. kit self refreshed; kit guidance PASS; guidance tests 9/9. | Re-verified after slice skills-spec rewrote the skill to the skill.spec grammar (the skills-bloom contract kept: criteria, quoted evidence, counter-case, markers, no cutoffs): kit guidance PASS (cutoffs 0); guidance tests pass in npm test 119/119; kit skills-lint PASS.",
+      "scope_paths": [
+        "cli/skills/create-mcp-app/SKILL.md"
+      ],
+      "evidence_hash": "a9969241080db530a654e732d75eb0cc25e273e47d9d9d5ab1d2fdb494085619"
+    },
+    {
+      "id": "TASK-008",
+      "title": "kit guidance: no agent-defined cutoffs in skills",
+      "user_visible_behavior": "asdd kit guidance fails on a cutoff in a skill (SKILL.md or references, core or module).",
+      "status": "passing",
+      "priority": 8,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-008"
+      ],
+      "depends_on": [
+        "TASK-002",
+        "TASK-003",
+        "TASK-004"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs kit guidance",
+        "node --test cli/test/guidance.test.mjs"
+      ],
+      "evidence": "asdd kit guidance cutoffs now scans .agents/skills/** (SKILL.md and references) and, in the kit, cli/modules/*/skills/** besides .agents/agents. New test: a cutoff in a core skill, a skill reference, and a module skill fails; '> 1' counts and 'more than 10 FRs' do not. Kit-wide test (REQ-006 + skills-bloom REQ-008) passes now that TASK-002..004 removed the five cutoffs it found. kit guidance PASS; guidance tests 9/9.",
+      "scope_paths": [
+        "cli/src/kit/guidance.mjs",
+        "cli/test/guidance.test.mjs"
+      ],
+      "evidence_hash": "222d354c14cd7dde1ad3c4abf23fd1c483360218d1e74c3f66c9deec9d92e0cd"
+    }
+  ]
+}

@@ -1,7 +1,25 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-11-11T01:11:17.908Z",
+  "generated_at": "2026-11-12T02:49:25.743Z",
   "slices": [
+    {
+      "slice_id": "agents-spec",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-12T02:49:25.649Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-pipeline"
+      ]
+    },
     {
       "slice_id": "agents-use-scripts",
       "phase": "implementation",
@@ -12,7 +30,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.853Z",
+      "last_activity": "2026-11-12T02:49:25.654Z",
       "contributors": [
         "squad",
         "human",
@@ -30,7 +48,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.858Z",
+      "last_activity": "2026-11-12T02:49:25.658Z",
       "contributors": [
         "squad",
         "human",
@@ -48,12 +66,13 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.872Z",
+      "last_activity": "2026-11-12T02:49:25.682Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
-        "asdd-lite"
+        "asdd-lite",
+        "asdd-pipeline"
       ]
     },
     {
@@ -66,7 +85,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.874Z",
+      "last_activity": "2026-11-12T02:49:25.685Z",
       "contributors": [
         "squad",
         "human",
@@ -84,7 +103,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.883Z",
+      "last_activity": "2026-11-12T02:49:25.694Z",
       "contributors": [
         "squad",
         "human",
@@ -110,7 +129,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.897Z",
+      "last_activity": "2026-11-12T02:49:25.707Z",
       "contributors": [
         "squad",
         "human",
@@ -136,7 +155,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.900Z",
+      "last_activity": "2026-11-12T02:49:25.711Z",
       "contributors": [
         "squad",
         "human",
@@ -154,7 +173,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.903Z",
+      "last_activity": "2026-11-12T02:49:25.714Z",
       "contributors": [
         "squad",
         "human",
@@ -172,12 +191,49 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.905Z",
+      "last_activity": "2026-11-12T02:49:25.716Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "skills-bloom",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "lite",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-12T02:49:25.729Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "skills-spec",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-12T02:49:25.739Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "asdd-pipeline"
       ]
     },
     {
@@ -190,7 +246,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-11T01:11:17.908Z",
+      "last_activity": "2026-11-12T02:49:25.742Z",
       "contributors": [
         "squad",
         "human",

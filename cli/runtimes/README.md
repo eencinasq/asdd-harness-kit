@@ -1,40 +1,24 @@
 # Runtime adapters
 
-IDE folders (`.cursor`, `.claude`, `.kiro`, …) are **not** the SoT. Symlink agents/skills/MCP to `.agents/` and keep SoT under `.harness/`.
+IDE folders (`.cursor`, `.claude`, `.kiro`, …) are **not** the SoT: `.agents/` and `.harness/` are. `asdd install <dir> --runtime=<names>` wires each runtime. Claude Code, Cursor, and OpenCode get agent files **rendered** from each agent's `capabilities` (their tool envelope); the other runtimes get links. Edit `.agents/agents/`, then re-run the installer; a rendered file you edit is kept (SKIP) until `--force`.
 
 ## Cursor
 
-```bash
-mkdir -p .cursor/rules .cursor/agents .cursor/skills
-# Prefer directory symlinks when the IDE allows:
-ln -sfn ../../.agents/skills .cursor/skills
-# Per-agent files (Cursor often expects files under .cursor/agents/):
-for f in .agents/agents/asdd-*.md; do
-  ln -sfn "../../.agents/agents/$(basename "$f")" ".cursor/agents/$(basename "$f")"
-done
-ln -sfn ../.agents/mcp/mcp.json .cursor/mcp.json
-cp cli/runtimes/cursor/asdd-steering.mdc .cursor/rules/asdd-steering.mdc
-```
+The installer links `.cursor/skills` and `.cursor/mcp.json` to `.agents/`, copies `cli/runtimes/cursor/asdd-steering.mdc` to
+`.cursor/rules/`, and renders `.cursor/agents/asdd-*.md` (`readonly: true` for agents that write nothing).
 
 The Cursor `stop` hook in `.cursor/hooks.json` runs `asdd verify` before the agent session ends. That script runs `asdd check` and, on FAIL, submits the error as the next user message. `asdd install <dir> --runtime=cursor` installs the hooks and keeps an existing `hooks.json` entry for verify. Projects get no copy of the CLI: each hook runs a short POSIX line that uses the project's `node_modules/.bin/asdd` (a devDependency), else `asdd` on the PATH (a global install), and fails closed with how to install it when neither exists. Native Windows shells are not supported for the hooks (WSL and Git Bash are).
 
 ## Claude Code
 
-```bash
-mkdir -p .claude/agents
-ln -sfn ../.agents/skills .claude/skills
-for f in .agents/agents/asdd-*.md; do
-  ln -sfn "../../.agents/agents/$(basename "$f")" ".claude/agents/$(basename "$f")"
-done
-ln -sfn .agents/mcp/mcp.json .mcp.json
-# Point CLAUDE.md at AGENTS.md
-echo 'Follow [`AGENTS.md`](AGENTS.md).' > CLAUDE.md
-```
+The installer links `.claude/skills` and `.mcp.json` to `.agents/`, creates `CLAUDE.md` pointing at `AGENTS.md`, adds the
+Stop and PreToolUse hooks to `.claude/settings.json`, and renders `.claude/agents/asdd-*.md` with `tools` (or
+`disallowedTools` for agents that need MCP tools) and `maxTurns`.
 
 ## OpenCode
 
-The installer creates .opencode/agents links, a .opencode/skills link, and
-the project-level opencode.json MCP projection.
+The installer renders `.opencode/agents/asdd-*.md` (`permissions` for edits and sub-agents, `steps`), links
+`.opencode/skills`, and maintains the project-level `opencode.json` MCP projection.
 
 ## Kimi Code
 

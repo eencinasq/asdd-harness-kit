@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-012",
+  "timestamp": "2026-11-12T01:50:04.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_completed",
+  "evidence": "api-and-interface-design (http-api), frontend-ui-engineering and browser-testing-with-devtools (web-ui) to the grammar; descriptions exclude each other and the core siblings by name (test-driven-development, documentation-and-adrs), so the TDD / browser / frontend 'fix a bug' collision and the API / docs overlap are bilateral now. Tutorials moved to new references: design-principles.md (api), ui-craft.md (frontend), devtools-workflows.md (browser; MCP setup and the five workflows); security boundaries kept in the browser skill. Machine checks in the gates: contract check, a11y lint 0 violations, console 0 errors via the MCP tool. kit skills-lint (all): PASS \u2014 15 skills, 7 rule files; kit guidance: PASS."
+}

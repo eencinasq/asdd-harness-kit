@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-bloom",
+  "concerns": [],
+  "session_id": "sess-skills-bloom-008",
+  "timestamp": "2026-11-11T12:04:11.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_completed",
+  "evidence": "anti-pattern-detection rewritten to the C5 contract: criteria table with 'not a violation' column (context check, not keyword match); Step 1 detect (violation/not/unclear, quoted evidence, strongest counter-case for CRITICAL/HIGH) then Step 2 propose (fixes are proposals, PENDING_DEFINITION when a fact is missing); score counts patterns (0..1), thresholds only cited (QG-DIS-02/03/04); confidence effect qualitative (QG-DEC-10); dangling 'decomposition skill' replaced by a split proposal. kit self refreshed; kit guidance --only cutoffs: 0 findings in anti-pattern-detection (remaining: business-model-canvas, domain-language-extraction = TASK-003/004)."
+}

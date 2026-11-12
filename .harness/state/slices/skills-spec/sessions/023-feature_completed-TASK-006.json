@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-023",
+  "timestamp": "2026-11-12T02:09:10.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-006",
+  "event_type": "feature_completed",
+  "evidence": "asdd kit skills-lint (cli/src/kit/skills-lint.mjs, registered in main.mjs and HELP; documented in cli/README.md): decidable S-* rules as errors (S-001/002/003/005/006/008/009/011/013/016/017/018/020) with the fleet promotions (S-014 -> SL-101, S-015 -> SL-303, S-021 -> SL-302, S-022 -> SL-103), S-004 as a warning; fleet SL-103 (orchestrator deps / leaf has none), SL-105 (identical 5-line blocks), SL-301 (handoff cycles; redirects excluded), SL-302 (dangling names; a core skill may name only core skills); R-004 (24 KB) and R-005 (no frontmatter in the root AGENTS.md) on always-loaded rules; --only to narrow; kit or project mode. It caught a real defect while this slice ran (description wrapped at a hyphen: 'domain-language- extraction'). cli/test/skills-lint.test.mjs 10/10; npm test runs kit skills-lint and the tests: 119/119 pass. install.sh: product-delivery asserted to own the scope-map schema with no link into shape-up (replaces the old conversions.md assertion). cli/versions.json regenerated (7 new reference files). | Reopened after the escalation for AC-002/AC-003 (VAL-002): two shipped-content tests ('skills-spec REQ-002 AC-002' routes and owners: TDD boundary, browser names TDD, product-delivery own schema and no shape-up link, shape-up scope_map only outside, external-trackers sole tracker reader/writer and never writes intent.md, design agent cites documentation-and-adrs; 'skills-spec REQ-003 AC-003': four markers + HALT/Decision Needed in skills.md, Prohibitions + HALT in README/controls/security-rules, codegraph cites AGENTS.md). skills-lint tests 12/12; npm test 121/121; kit skills-lint PASS (15 skills, 7 rule files)."
+}

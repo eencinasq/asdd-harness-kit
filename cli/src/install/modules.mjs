@@ -15,9 +15,11 @@ function enableOne(ctx, m) {
   switch (m) {
     case 'bruno':
       ctx.copyFile(mod('bruno/asdd-integration-tester.md'), join(target, '.agents/agents/asdd-integration-tester.md'), 'refresh');
+      ctx.copyTree(mod('bruno/skills'), join(target, '.agents/skills'), 'refresh');
       break;
     case 'playwright-e2e':
       ctx.copyFile(mod('playwright-e2e/asdd-e2e-tester.md'), join(target, '.agents/agents/asdd-e2e-tester.md'), 'refresh');
+      ctx.copyTree(mod('playwright-e2e/skills'), join(target, '.agents/skills'), 'refresh');
       break;
     case 'web-ui':
       ctx.copyTree(mod('web-ui/skills'), join(target, '.agents/skills'), 'refresh');

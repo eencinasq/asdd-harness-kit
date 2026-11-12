@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-026",
+  "timestamp": "2026-11-12T02:49:25.000Z",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "evidence": "Reopen TASK-005: DRIFT-02 after the 3.10 README update edited files in its scope_paths.",
+  "scope_paths": [
+    "cli/src/kit/agents-lint.mjs",
+    "cli/src/main.mjs",
+    "cli/test/agents-lint.test.mjs",
+    "package.json",
+    "cli/README.md",
+    "cli/versions.json"
+  ]
+}

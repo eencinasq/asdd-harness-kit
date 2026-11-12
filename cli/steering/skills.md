@@ -4,29 +4,36 @@ inclusion: always
 
 # ASDD skills index (kit)
 
-Initial catalog for folders under `.agents/skills/`. Each folder exposes only its name and description here. The skill body stays in `SKILL.md` until the matching task starts.
+Name and description of each folder under `.agents/skills/`; choose a skill here.
 
-## Disclosure
+- When you start the task a description matches, `Read` `.agents/skills/<name>/SKILL.md` and follow it. Before that,
+  do not `Read` the `SKILL.md`, its `references/`, or its `agents/`.
+- Never copy a skill body here. After adding or editing a skill, run `asdd skills-index --write`.
 
-- Read this file to choose a skill. This is the initial index.
-- When you start the task that matches a description, `Read` `.agents/skills/<name>/SKILL.md` and follow that file.
-- Until that task starts, do not `Read` that `SKILL.md`, its `references/`, or its `agents/`.
-- Do not copy a skill body into this index. After adding or editing a skill folder, regenerate the catalog with `asdd skills-index --write`.
-- A skill that is not yet copied into `.agents/skills/` is not part of this index.
+## Markers and escalation
+
+Mark what the source does not settle; never write it as fact or drop a marker before its decision:
+`PENDING_DEFINITION` (a required fact is missing; its gate stays open), `ASSUMPTION — CONFIRMATION REQUIRED` (inferred,
+not stated), `PROPOSED — VALIDATION REQUIRED` (agent-generated; a human decides, `decided_by`), `DERIVED` (carried into
+a derived artifact with its `source_*` ID).
+
+When a precondition, step, or invariant cannot be met: HALT — no guessing, blind retries, or workarounds — and report
+Context → Options → Recommendation → Decision Needed. A `redirect` to the producer of a missing input is recovery,
+not escalation. Sensors: `asdd check` (index), `asdd kit skills-lint` (skill grammar).
 
 <!-- skills-index:start -->
 | Name | Description |
 | --- | --- |
-| `anti-pattern-detection` | Detects 8 specification anti-patterns in capabilities and requirements. Acts as a quality gate before finalization. |
-| `business-model-canvas` | Parses Business Model Canvas and Lean Canvas inputs into structured product capabilities, personas, and revenue-critical features. |
-| `capability-discovery` | Brownfield onboarding — discovers major capabilities from ANY existing codebase via language-agnostic signals (topology, API/behavior surfaces, persistence entities, tests, docs/trackers), consolidates them into a deduped capability list, and lands them as ASDD slices. Use when onboarding an existing repo that has code but no specs, or when the user asks "what capabilities does this project have?" |
-| `codebase-audit` | Inferential pass of the codebase auditor. Reads the latest .harness/audits/ report, takes the top churn hotspots, traces each to its requirements, and judges every EARS criterion satisfied, violated, or unclear with file and line evidence. Use for scheduled health audits, when the Tech Lead asks "where has the code drifted from the spec?", or after `asdd audit` reports hotspots. Produces findings only; never edits code. |
-| `codegraph` | Code intelligence from the codegraph CLI: explore an area, a symbol's callers and callees, a change's impact, affected tests. Use before grep or broad reads to explore code, map requirements to code, or check blast radius. |
-| `create-mcp-app` | This skill should be used when the user asks to "create an MCP App", "add a UI to an MCP tool", "build an interactive MCP View", "scaffold an MCP App", or needs guidance on MCP Apps SDK patterns, UI-resource registration, MCP App lifecycle, or host integration. Provides comprehensive guidance for building MCP Apps with interactive UIs. |
-| `documentation-and-adrs` | Documents decisions and rationale (ADRs, inline why-comments, README, changelogs, agent context)—not obvious code. Use when making architectural choices, changing public APIs or user-facing behavior, onboarding, or when the same explanation keeps recurring. Loads references/architecture-documentation.md for arc42/C4/layout detail via progressive disclosure. |
-| `domain-language-extraction` | Extracts domain-specific terminology from business documents into a ubiquitous language dictionary. Seeds the domain slice. |
-| `external-trackers` | Handoff contract between Shape Up work recorded in an external tracker (Linear, Jira, GitHub Issues, or a manual pitch document) and ASDD + Harness execution. Defines how a bet pitch and its scopes in a tracker become intents, how agents trace them, and how status syncs back. Use when intent.md references an external source or when the squad needs to sync status back to a tracker. |
-| `product-delivery` | Turns a bet Shape Up pitch into ASDD work. Splits the pitch into as many scopes as it needs, writes one intent.md per scope (one ASDD slice each), and hands every intent to the ASDD Discovery agent to run the pipeline. Use when a pitch has been bet and the team starts building it. |
-| `shape-up` | Shape work using the Shape Up methodology (Ryan Singer, Basecamp). Walk through the 4-step shaping process to create pitches ready for betting. Distinguishes between established product mode (fixed time, variable scope) and new product mode (looser constraints). Use when planning cycle work, writing pitches, or coaching PMs on shaping. |
-| `test-driven-development` | Drives development with tests using the red-green-refactor loop. Use when implementing any logic, fixing any bug, or changing any behavior. Use when you need to prove that code works, when a bug report arrives, or when you're about to modify existing functionality. Combine with browser-testing-with-devtools for UI runtime verification. |
+| `anti-pattern-detection` | Judges drafted capabilities and requirements against eight specification anti-patterns and scores them. Use when a capability or requirements draft reaches its anti-pattern gate. Do NOT use for extracting terms — use domain-language-extraction; or for judging code — use codebase-audit. |
+| `business-model-canvas` | Turns a Business Model Canvas or Lean Canvas into proposed capabilities and personas traced to their blocks. Use when a Discovery intent supplies a BMC or Lean Canvas. Do NOT use for free-text vocabulary — use domain-language-extraction; or for existing code — use capability-discovery. |
+| `capability-discovery` | Discovers the capabilities an existing codebase implements as draft capability files. Use when onboarding a repository that has code but no specs. Do NOT use for a business canvas — use business-model-canvas; or for judging code against requirements — use codebase-audit. |
+| `codebase-audit` | Judges the code in the audit's churn hotspots against its requirements with file and line evidence. Use when running a scheduled audit or after `asdd audit` reports hotspots. Do NOT use for judging requirement text — use anti-pattern-detection; or for exploring code — use codegraph. |
+| `codegraph` | Answers structural code questions from the codegraph index: code flows, callers, blast radius, affected tests. Use when exploring code or checking impact, before grep or broad reads. Do NOT use for judging code against requirements — use codebase-audit; or for searching specs (`asdd knowledge`). |
+| `create-mcp-app` | Builds an MCP App: an MCP tool linked to a bundled HTML view. Use when asked to create or scaffold an MCP App or add a UI to an MCP tool. Do NOT use for an MCP server without UI or a regular web page; or for testing app logic — use test-driven-development. |
+| `documentation-and-adrs` | Records architectural decisions as ADRs (the kit's ADR format) and updates the docs a change needs. Use when making an architectural decision or changing public behavior. Do NOT use for designing an API contract (the http-api module); or for tests — use test-driven-development. |
+| `domain-language-extraction` | Extracts the domain terms a business text states into a source-cited glossary. Use when an intent, pitch, or requirements draft needs its vocabulary pinned. Do NOT use for judging requirement quality — use anti-pattern-detection; or for a canvas — use business-model-canvas. |
+| `external-trackers` | Reads a bet pitch from a tracker (Linear, Jira, GitHub, manual) into the ASDD handoff fields and syncs ASDD status back. Use when a pitch or intent references a tracker item, or to sync status. Do NOT use for splitting a pitch into intents — use product-delivery; or for shaping — use shape-up. |
+| `product-delivery` | Splits a bet Shape Up pitch into scopes and writes one intent.md (one ASDD slice) per scope. Use when a pitch has been bet and building starts in a repository with .harness/. Do NOT use for shaping or betting — use shape-up; or for tracker reads and syncs — use external-trackers. |
+| `shape-up` | Shapes ideas into Shape Up pitches, reviews them, and records the bet. Use when writing or reviewing a pitch or coaching shaping. Do NOT use for splitting a bet pitch into intents in a .harness/ repository — use product-delivery; or for trackers — use external-trackers. |
+| `test-driven-development` | Drives a code change with a failing test first and records the run as feature evidence. Use when changing code whose behavior a test can pin. Do NOT use for live-browser checks, UI craft, or API contract design (module skills); or for configuration or docs. |
 <!-- skills-index:end -->

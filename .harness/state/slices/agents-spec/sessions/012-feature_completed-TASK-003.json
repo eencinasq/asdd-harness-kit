@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-012",
+  "timestamp": "2026-11-12T02:28:52.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_completed",
+  "evidence": "Module agents to the agent grammar: asdd-integration-tester (15419 -> 6210 bytes) and asdd-e2e-tester (38435 -> 6433 bytes), both specialists with write_paths on their test trees (e2e: mcp_tools true for the Playwright MCP). Their runbooks moved verbatim into two new module skills that pass the skill grammar: cli/modules/playwright-e2e/skills/playwright-e2e-testing (SKILL.md + references/pipeline.md, patterns.md) and cli/modules/bruno/skills/bruno-api-testing (SKILL.md + references/bruno-reference.md; the dangling 'QA-Automator skill' reference removed). The bruno runbook move goes beyond the P4 proposal (only e2e) for the same A-020 reason and the 20 KB cap. modules.mjs installs each module's skills. kit skills-lint PASS (17 skills); kit guidance PASS."
+}

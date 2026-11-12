@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-bloom",
+  "concerns": [],
+  "session_id": "sess-skills-bloom-019",
+  "timestamp": "2026-11-11T12:07:05.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-007",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/skills/create-mcp-app/SKILL.md"
+  ],
+  "evidence": "Start TASK-007 (REQ-007)."
+}

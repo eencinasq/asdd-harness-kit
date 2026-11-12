@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-030",
+  "timestamp": "2026-11-12T02:37:38.000Z",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-006",
+  "evidence": "Re-verified after agents-spec added agents-lint to main.mjs, package.json, cli/README.md and projection assertions to install.sh: npm test 131/131 (kit skills-lint PASS 17 skills; kit agents-lint PASS 14 agents); install.sh OK."
+}

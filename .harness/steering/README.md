@@ -45,6 +45,12 @@ Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-ha
 
 Optional: [`templates/slice-manifest.stub.json`](templates/slice-manifest.stub.json) for new slices.
 
+## Prohibitions
+
+A stub binding is not product truth; generated files (`PROGRESS.md`, manifests, registry, skills index) are never
+hand-edited. When a phase needs a stub binding: HALT and ask the Tech Lead. Sensor: `asdd doctor` (stub bindings);
+`asdd sync` rewrites generated files.
+
 ## Baseline reads
 
 `structure.md`, `product.md`, `manifest.md`, `session-loop.md`, `controls.md`.  

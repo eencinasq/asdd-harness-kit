@@ -1,0 +1,151 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "agents-spec",
+  "source_tasks": ".harness/specs/agents-spec/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Upstream agents to the agent grammar",
+      "user_visible_behavior": "Discovery, spec, validation, domain, design and task-planning agents declare trigger, boundary, tier, capabilities, ground truth, I/O contract, negative space, gates; no manifest writes.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit agents-lint",
+        "npm test"
+      ],
+      "evidence": "Discovery, spec, validation, domain, design, task-planning agents rewritten to the agent.spec grammar: description = capability + Use when + Do NOT use (naming sibling agents/skills, no pipeline ordinal); metadata tier/workspace_mode/model_profile; capabilities (validation = auditor: deny edit_file; others specialist), write_paths, mounted core skills; limits.max_turns; Role Charter (guarantees, Operational/Quarantine Boundary, Decision Rights); Pre-Flight Reading & Ground Truth (Tier 1/2/3); typed Delegation & I/O Contract with verdict and handoff/redirect edges; Negative Space (incl. file:line execution-point, anti-hedging, quarantine, Author/Model provenance); Convergence & Verification Gate (probes + asdd check + git status negative check); Escalation Gate (phase_blocked, Context -> Options -> Recommendation -> Decision Needed). P1: '(write phase/gates)' replaced by read-only/generated in all six. Discovery's inline capability template replaced by the steering template (20131 -> 19397 bytes). Verified with the scratch structural check (all A-* slots present, sizes <= 20 KB); asdd kit agents-lint (TASK-005) re-verifies.",
+      "scope_paths": [
+        "cli/agents/asdd-discovery-agent.md",
+        "cli/agents/asdd-spec-agent.md",
+        "cli/agents/asdd-validation-agent.md",
+        "cli/agents/asdd-domain-agent.md",
+        "cli/agents/asdd-design-agent.md",
+        "cli/agents/asdd-task-planning-agent.md"
+      ],
+      "evidence_hash": "3e19652581a93ab045eeca7c93e89377a346ca95a48de24d104e5e9a7705efc9"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Downstream agents, spike researcher, single roles",
+      "user_visible_behavior": "Implementation, QA, refactor, knowledge, lite follow the grammar; QA only audits; knowledge custodies no state and spawns nothing; a read-only spike researcher exists.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit agents-lint",
+        "npm test"
+      ],
+      "evidence": "Reopened for the fleet fixes found while writing the sensor: refactor's handoff to QA removed (it closed a qa -> refactor -> qa handoff cycle, AL-301; the caller re-runs QA after a refactor PR); spike researcher's anti-hedging rule made explicit (A-018); scope path of the deleted spec-peer-review.md template now cli/steering/templates (DRIFT-05). kit agents-lint PASS (14 agents); agents-lint tests 10/10; npm test 131/131.",
+      "scope_paths": [
+        "cli/agents/asdd-implementation-agent.md",
+        "cli/agents/asdd-qa-agent.md",
+        "cli/agents/asdd-refactor-agent.md",
+        "cli/agents/asdd-knowledge-agent.md",
+        "cli/agents/asdd-lite-agent.md",
+        "cli/agents/asdd-spike-researcher.md",
+        "cli/agents/_runtime-template.md",
+        "cli/agents/README.md",
+        "cli/steering/templates",
+        "cli/scaffold/config/models.json"
+      ],
+      "evidence_hash": "7529bc2a62776e65df828ce8f71309e9ed4cf4a0e5a3e14ceb53aef8ae3c6f63"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Module agents; Playwright runbook as a skill",
+      "user_visible_behavior": "Integration and e2e testers follow the grammar; e2e-tester under 20 KB; the Playwright pipeline is a module skill installed with playwright-e2e.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003",
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit agents-lint",
+        "npm test"
+      ],
+      "evidence": "Reopened for fleet fixes: the bruno and playwright-e2e agents no longer name each other (cross-module references dangle when only one module is installed, AL-302); the full-stack order stays in prose. kit agents-lint PASS (14 agents); kit skills-lint PASS (17 skills); install.sh OK; npm test 131/131.",
+      "scope_paths": [
+        "cli/modules/bruno",
+        "cli/modules/playwright-e2e",
+        "cli/src/install/modules.mjs"
+      ],
+      "evidence_hash": "6573b21cef12e9bbd1b4d0de9cf34505da5b9b6199c31608f0c54ec9999c27da"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Runtime projection of capabilities",
+      "user_visible_behavior": "Installing Claude Code, Cursor or OpenCode writes agent files with the runtime's tool envelope; other runtimes keep links; uninstall removes them.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001",
+        "TASK-002",
+        "TASK-003"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs kit agents-lint",
+        "npm test"
+      ],
+      "evidence": "New cli/src/install/agent-frontmatter.mjs parses the canonical agent frontmatter and renders per runtime: Claude Code (tools allowlist Read/Grep/Glob/Bash/Write/Edit, Agent only for the orchestrator; disallowedTools when mcp_tools is true so MCP tools stay; maxTurns), Cursor (readonly: true when write_tools is false), OpenCode (ordered permissions: edit deny * + allow write_paths, subagent deny * for non-orchestrators; steps). context.writeGenerated writes kit-owned generated files (replaces legacy links, keeps a project-edited copy unless --force, recorded in managed_files/kit_files so uninstall removes it). runtimes.mjs renders for cursor/claude/opencode; junie/devin/kiro/kimi keep links. Manual run: install into a temp repo (claude,cursor,opencode,junie, all modules): 42 RENDER, reinstall 0 RENDER/56 KEEP, asdd check exit 0, uninstall removed the rendered dirs. install.sh: new assertions (validation tools without Edit/Agent, implementation with Agent, e2e disallowedTools: Agent, maxTurns; OpenCode qa permissions; Cursor readonly only on the researcher) — bash cli/test/install.sh: OK asdd install smoke test (after kit versions registered the new files).",
+      "scope_paths": [
+        "cli/src/install/agent-frontmatter.mjs",
+        "cli/src/install/runtimes.mjs",
+        "cli/src/install/context.mjs",
+        "cli/test/install.sh"
+      ],
+      "evidence_hash": "c0a258df6b8b0bec7d1e404f8424027f93c343f15cfb98fcc5bfae13e8007300"
+    },
+    {
+      "id": "TASK-005",
+      "title": "asdd kit agents-lint in npm test",
+      "user_visible_behavior": "asdd kit agents-lint fails on a decidable A-*/AL-* violation; npm test runs it.",
+      "status": "passing",
+      "priority": 5,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002",
+        "REQ-005",
+        "REQ-006"
+      ],
+      "depends_on": [
+        "TASK-001",
+        "TASK-002",
+        "TASK-003",
+        "TASK-004"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs kit agents-lint",
+        "npm test"
+      ],
+      "evidence": "asdd kit agents-lint (cli/src/kit/agents-lint.mjs, registered in main.mjs HELP and kit dispatch, documented in cli/README.md): A-001/002/003/005/007/008/009/010/011/013/016/017/018/019/020/022/023/024/025 and the fleet promotions AL-101 (A-014), AL-103 (A-021 + tier vs capabilities: subagent_tools only for the orchestrator), AL-303 (A-015); fleet AL-301 handoff cycles (redirects excluded), AL-302 dangling/cross-module agent names and unknown mounted skills; kit or project mode; --only. Reuses the install parser (agent-frontmatter.mjs). On HEAD's QA and knowledge agents it reports 15 rules each incl. A-023 (manifest write). cli/test/agents-lint.test.mjs 10/10 (fixtures per rule, shipped-content AC-001/AC-002 checks, renderer projection per runtime). npm test runs kit agents-lint and the tests: 131/131. cli/versions.json regenerated (new agent and module skills, template removed). | Re-verified after the version bump 3.9.0 -> 3.10.0 (package.json, package-lock.json, cli/versions.json via asdd kit versions bump): npm test 131/131 (incl. install.sh version checks, kit skills-lint, kit agents-lint). | Re-verified after the README update for 3.10 (README.md: rendered runtime agents, tiers/envelopes, kit lints, upgrade note; cli/README.md layout and install phases; cli/modules/README.md; cli/runtimes READMEs): npm test 131/131.",
+      "scope_paths": [
+        "cli/src/kit/agents-lint.mjs",
+        "cli/src/main.mjs",
+        "cli/test/agents-lint.test.mjs",
+        "package.json",
+        "cli/README.md",
+        "cli/versions.json"
+      ],
+      "evidence_hash": "ea15f8f83e8d3b6015cea9d7b9fecf5a4c6bbed662744a99bc4154b05e3ff221"
+    }
+  ]
+}

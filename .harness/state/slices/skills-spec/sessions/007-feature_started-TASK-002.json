@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-007",
+  "timestamp": "2026-11-12T01:43:47.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/skills/shape-up",
+    "cli/skills/product-delivery",
+    "cli/skills/external-trackers"
+  ],
+  "evidence": "Start TASK-002 (REQ-001, REQ-002, REQ-004, REQ-005)."
+}
