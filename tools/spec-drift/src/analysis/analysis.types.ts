@@ -97,8 +97,15 @@ export type ScanSummary = {
 	readonly repoRoot: string;
 	readonly mode: ScanMode;
 	readonly packs: readonly string[];
-	/** `failed`: the engine did not produce a result (crash, bad config); see stderrTail. */
-	readonly status: 'ok' | 'failed';
+	/**
+	 * `failed`: the engine did not produce a result (crash, bad config); see stderrTail. `no-rules`: the repo has no rules
+	 * for the mode, nothing was analyzed (never a pass); see message and generatePrompt.
+	 */
+	readonly status: 'ok' | 'failed' | 'no-rules';
+	/** Set with `no-rules`: what is missing. */
+	readonly message?: string;
+	/** Set with `no-rules`: the prompt that asks the host agent to write a rule set from this codebase. */
+	readonly generatePrompt?: string;
 	readonly exitCode: number;
 	readonly findingCount: number;
 	readonly bySeverity: Readonly<Record<string, number>>;

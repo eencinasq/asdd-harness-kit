@@ -48,13 +48,19 @@ function walkFiles(root, dir, out = [], limit = 20000) {
 
 /**
  * Lists project files under a folder prefix ('' = everything): git's tracked and untracked-but-not-ignored files, or a
- * filesystem walk outside git. One listing per lister.
+ * filesystem walk outside git. Files deleted from the working tree are left out even while git's index still has them,
+ * so committing a deletion does not change an evidence hash a second time. One listing per lister.
  */
 export function fileLister(root, gitAvailable) {
   let tracked = null;
   return (prefix) => {
     if (!gitAvailable) return walkFiles(root, join(root, prefix));
-    tracked ??= gitLines(root, ['ls-files', '--cached', '--others', '--exclude-standard']) ?? [];
+    if (!tracked) {
+      const deleted = new Set(gitLines(root, ['ls-files', '--deleted']) ?? []);
+      tracked = (gitLines(root, ['ls-files', '--cached', '--others', '--exclude-standard']) ?? []).filter(
+        (f) => !deleted.has(f),
+      );
+    }
     return prefix ? tracked.filter((f) => f.startsWith(`${prefix}/`)) : tracked;
   };
 }

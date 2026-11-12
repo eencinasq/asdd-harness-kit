@@ -429,7 +429,9 @@ test(
 	withServer(async ({ call }) => {
 		for (const provider of ['github', 'gitlab']) {
 			const { payload, structured } = await call('generate_ci_gate', { provider });
-			assert.match(payload['content'], /asdd\.mjs check/);
+			// The job installs the kit version the project pins and runs the asdd command (no CLI copy in projects).
+			assert.match(payload['content'], /npm i -g "asdd-harness-kit@/);
+			assert.match(payload['content'], /asdd check/);
 			assert.match(payload['content'], /HARNESS_PR_BRANCH/);
 			assert.equal(structured['provider'], provider);
 		}
@@ -474,7 +476,9 @@ test(
 test(
 	'REQ-001: audit_report filters the latest report; audit_finding returns one finding',
 	withServer(async ({ call }, root) => {
-		assert.equal((await call('audit_report', {})).isError, true, 'no report yet');
+		const none = await call('audit_report', {});
+		assert.equal(none.isError, false, 'no report yet is no data, not an error (spec-drift-empty REQ-004)');
+		assert.match(none.structured['no_data']['next'], /asdd audit/);
 		const finding = (id: string, severity: string, last_seen: string) => ({
 			id,
 			check: 'UNOWNED',

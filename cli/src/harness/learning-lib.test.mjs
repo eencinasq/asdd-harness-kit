@@ -9,6 +9,7 @@ import {
   countOccurrences,
   exportLessons,
   learningForReview,
+  learningReport,
   writeCommandSignal,
   failureSignatures,
   isoWeek,
@@ -296,3 +297,37 @@ test('QG-LEARN-09: export keeps verified lessons on kit-owned controls, generic 
   assert.match(markdown, /kit 9\.9\.9/);
   assert.doesNotMatch(markdown, /secret/);
 }));
+
+test('spec-drift-apps REQ-002: learningReport lists patterns and proposals with what is missing and the next command, read-only', withFixture((root) => {
+  failureLog(root, [
+    { date: '2026-01-01', slice: 's1', sig: 'tests:flaky' },
+    { date: '2026-01-02', slice: 's1', sig: 'tests:flaky' },
+    { date: '2026-01-03', slice: 's1', sig: 'tests:flaky' },
+    { date: '2026-01-01', slice: 's1', sig: 'docs:typo' },
+    { date: '2026-01-02', slice: 's1', sig: 'docs:typo' },
+    { date: '2026-01-03', slice: 's1', sig: 'docs:typo' },
+  ]);
+  const proposed = patternId('failure:docs:typo');
+  proposal(root, 'SP-001', { id: 'SP-001', pattern: proposed, status: 'proposed', change: 'add-guide', control: '<file>', success: '<criterion>' });
+  const before = readdirSync(root, { recursive: true }).sort().join('\n');
+  const report = learningReport(root);
+  assert.equal(readdirSync(root, { recursive: true }).sort().join('\n'), before, 'writes nothing');
+  const open = report.patterns.find((p) => p.signature === 'failure:tests:flaky');
+  assert.equal(open.status, 'open');
+  assert.equal(open.next, `asdd learn --propose ${open.id}`);
+  const inFlight = report.patterns.find((p) => p.id === proposed);
+  assert.equal(inFlight.status, 'proposed');
+  assert.match(inFlight.next, /SP-001\.md and ask the Tech Lead/);
+  const sp = report.proposals.find((p) => p.id === 'SP-001');
+  assert.ok(sp.missing.some((m) => /control must name the guide or sensor file/.test(m)));
+  assert.ok(sp.missing.some((m) => /success criterion is unfilled/.test(m)));
+  assert.match(sp.next, /^edit docs\/knowledge-base\/steering-proposals\/SP-001\.md: control must name/);
+  assert.deepEqual(
+    proposalFindings(root, { file: sp.file, ...{ id: 'SP-001', pattern: proposed, status: 'proposed', change: 'add-guide', control: '<file>', success: '<criterion>' } }, new Set([proposed])).map((f) => f.slice(sp.file.length + 2)),
+    sp.missing,
+    'the same findings the invariants report',
+  );
+  assert.equal(report.summary.open, 1);
+  assert.equal(report.summary.proposals, 1);
+}));
+

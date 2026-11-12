@@ -419,6 +419,91 @@ function allSessions(root) {
   return out;
 }
 
+const DECIDED_STATUSES = new Set(['accepted', 'rejected', 'applied']);
+
+/** Contract problems of one steering proposal (QG-LEARN-03, QG-LEARN-05). */
+export function proposalFindings(root, proposal, patternIds) {
+  const out = [];
+  const where = proposal.file;
+  const name = where.split('/').pop();
+  if (!proposal.id) return [`${where}: missing frontmatter (id, pattern, status, control, change, success)`];
+  if (!/^SP-\d{3,}$/.test(proposal.id) || !name.startsWith(proposal.id)) out.push(`${where}: id "${proposal.id}" must be SP-NNN and match the file name`);
+  if (!proposal.pattern) out.push(`${where}: missing pattern`);
+  else if (!patternIds.has(proposal.pattern)) out.push(`${where}: pattern ${proposal.pattern} matches no learning signal (run learn.mjs --all)`);
+  if (!PROPOSAL_STATUSES.includes(proposal.status)) out.push(`${where}: status must be one of ${PROPOSAL_STATUSES.join(', ')} (got "${proposal.status ?? ''}")`);
+  if (!CHANGE_TYPES.includes(proposal.change)) out.push(`${where}: change must be one of ${CHANGE_TYPES.join(', ')} (got "${proposal.change ?? ''}")`);
+  const control = String(proposal.control ?? '').split('#')[0].trim();
+  if (!control || control.startsWith('<')) out.push(`${where}: control must name the guide or sensor file to change`);
+  else if (!existsSync(join(root, control))) out.push(`${where}: control ${control} does not exist`);
+  if (!proposal.success || proposal.success.startsWith('<')) out.push(`${where}: success criterion is unfilled`);
+  if (DECIDED_STATUSES.has(proposal.status) && !proposal.decided_by) out.push(`${where}: status ${proposal.status} needs decided_by (Tech Lead decision)`);
+  if (proposal.status === 'applied' && !proposal.applied_commit) out.push(`${where}: status applied needs applied_commit (the commit that changed ${control || 'the control'})`);
+  if (proposal.applied_at && !Number.isFinite(Date.parse(proposal.applied_at))) out.push(`${where}: applied_at must be an ISO date`);
+  return out;
+}
+
+const NEXT_FOR_PATTERN = {
+  proposed: (p) => `fill ${p.proposals[0]?.file ?? 'the proposal'} and ask the Tech Lead to decide (status accepted or rejected, decided_by)`,
+  accepted: (p) => `apply the change to the control, then set status applied with applied_commit in ${p.proposals[0]?.file ?? 'the proposal'}`,
+  applied: () => 'nothing: asdd learn verifies the change after the next sessions (QG-LEARN-06)',
+  verified: () => null,
+  watching: () => null,
+};
+
+/**
+ * Read-only learning view (spec-drift `learning_report`, spec-drift-apps REQ-002): every pattern and proposal, what each
+ * proposal still lacks (the same `proposalFindings` the invariants use), and the command a human runs next. Writes nothing.
+ */
+export function learningReport(root, { limit = 50 } = {}) {
+  const proposals = loadProposals(root);
+  const { patterns, unsigned_failures } = derivePatterns(root, { proposals });
+  const ids = new Set(patterns.map((p) => p.id));
+  const nextFor = (p) =>
+    p.status === 'open' ? `asdd learn --propose ${p.id}` : (NEXT_FOR_PATTERN[p.status]?.(p) ?? null);
+  return {
+    summary: {
+      patterns: patterns.length,
+      open: patterns.filter((p) => p.status === 'open').length,
+      in_flight: patterns.filter((p) => ['proposed', 'accepted', 'applied'].includes(p.status)).length,
+      verified: patterns.filter((p) => p.status === 'verified').length,
+      proposals: proposals.length,
+      unsigned_failures,
+    },
+    patterns: patterns.slice(0, limit).map((p) => ({
+      id: p.id,
+      signature: p.signature,
+      kind: p.kind,
+      occurrences: p.occurrences,
+      threshold: p.threshold,
+      status: p.status,
+      reopened: p.reopened,
+      slices: p.slices,
+      last_seen: p.last_seen,
+      proposals: p.proposals.map((x) => ({ id: x.id, status: x.status })),
+      next: nextFor(p),
+    })),
+    proposals: proposals.map((pr) => {
+      const missing = proposalFindings(root, pr, ids).map((f) => f.slice(pr.file.length + 2));
+      const decided = DECIDED_STATUSES.has(pr.status);
+      return {
+        id: pr.id ?? null,
+        file: pr.file,
+        pattern: pr.pattern ?? null,
+        status: pr.status ?? null,
+        change: pr.change ?? null,
+        control: pr.control ?? null,
+        decided_by: pr.decided_by ?? null,
+        missing,
+        next: missing.length
+          ? `edit ${pr.file}: ${missing[0]}`
+          : decided
+            ? null
+            : `Tech Lead: set status accepted or rejected, and decided_by, in ${pr.file}`,
+      };
+    }),
+  };
+}
+
 /** Area a pattern is about (`sensor:DRIFT-01:docs` → `docs`, `blocked:feature:src` → `src`), or null. */
 export function signatureArea(signature) {
   const m = signature.match(/^(?:sensor|warn):[A-Z][A-Z0-9-]*-\d+:(.+)$/) ?? signature.match(/^blocked:feature:(.+)$/);

@@ -12,6 +12,7 @@ import {
 	payloadOf,
 	resolveMode,
 	traceSummary,
+	triageCommand,
 	viewModel,
 } from './model.ts';
 
@@ -215,6 +216,7 @@ test('REQ-004: every payload field reaches the view model', () => {
 		output_truncated: false,
 		message: 'm',
 		sources: [{ id: 'domain-layer', path: '.harness/steering/domain-layer.md', filled: true }],
+		generate_prompt: null,
 	});
 	const audit = view({
 		generated_at: '2026-10-20',
@@ -268,15 +270,76 @@ test('REQ-004: actions depend on mode and only produce messages for the host', (
 		['task'],
 	);
 	assert.deepEqual(
-		actionsFor('review').map((a: any) => a.id),
-		['comment', 'dismiss'],
+		actionsFor('review').map((a: any) => [a.id, Boolean(a.command)]),
+		[
+			['comment', false],
+			['dismiss', true],
+			['confirm', true],
+		],
 	);
 	const f = finding('AUD-12345678', 'fail');
 	assert.match(messageFor('task', f), /AUD-12345678/);
 	assert.match(messageFor('comment', f), /Do not post/);
-	assert.match(
-		messageFor('dismiss', f, { reason: 'ADR-7 "intended"' }),
-		/asdd triage AUD-12345678 --dismiss --reason "ADR-7 \\"intended\\""/,
-	);
 	assert.match(traceSummary({ indexed: false }), /asdd knowledge sync/);
+});
+
+test('spec-drift-apps REQ-003: triage is a command for a terminal, never a message to the model', () => {
+	const f = finding('AUD-12345678', 'fail');
+	assert.equal(
+		triageCommand('dismiss', f, { reason: 'ADR-7 "intended"' }),
+		'asdd triage AUD-12345678 --dismiss --reason "ADR-7 \\"intended\\""',
+	);
+	assert.equal(triageCommand('confirm', f), 'asdd triage AUD-12345678 --confirm');
+	assert.equal(triageCommand('confirm', f, { reason: ' real ' }), 'asdd triage AUD-12345678 --confirm --reason "real"');
+	assert.throws(() => messageFor('dismiss', f), /triage command/);
+	assert.throws(() => messageFor('confirm', f), /triage command/);
+});
+
+test('spec-drift-apps REQ-002: a learning_report result is the read-only learning view', () => {
+	const payload = {
+		summary: { patterns: 2, open: 1, in_flight: 1, verified: 0, proposals: 1, unsigned_failures: 0 },
+		patterns: [{ id: 'LP-1', status: 'open', next: 'asdd learn --propose LP-1' }],
+		proposals: [
+			{ id: 'SP-001', file: 'x', status: 'proposed', missing: ['success criterion is unfilled'], next: 'edit x' },
+		],
+		commands_note: 'This server writes nothing.',
+	};
+	assert.equal(kindOf(payload), 'learning');
+	const vm = view(payload);
+	assert.equal(vm.kind, 'learning');
+	assert.equal(vm.learning.patterns[0].next, 'asdd learn --propose LP-1');
+	assert.deepEqual(vm.learning.proposals[0].missing, ['success criterion is unfilled']);
+	assert.equal(vm.learning.note, 'This server writes nothing.');
+	assert.equal(
+		kindOf({ mode: 'author', findings: [], learning: { patterns: [], open: 0 } }),
+		'diff',
+		'audit_diff keeps its kind',
+	);
+});
+
+test('spec-drift-empty REQ-004: a no_data result is the "No data" view, not an error', () => {
+	const noData = { reason: 'No audit report in .harness/audits/ yet.', next: 'Run asdd audit.' };
+	for (const payload of [
+		{ no_data: noData, findings: [], reports: [] },
+		{ mode: 'author', no_data: noData, findings: [], suppressed: [] },
+		{ slice_id: 's1', adapters: {}, summary: {}, findings: [], no_data: noData },
+	]) {
+		const vm = view(payload);
+		assert.deepEqual(vm.noData, noData);
+		assert.equal(vm.error, undefined);
+		assert.deepEqual(vm.findings, []);
+	}
+});
+
+test('spec-drift-empty REQ-003: an architecture check with no rules carries the agent prompt to the view', () => {
+	const arch = {
+		status: 'unconfigured',
+		semgrep: { status: 'unconfigured' },
+		sources: [],
+		generate_prompt: '# Generate',
+	};
+	assert.equal(view(arch).details.architecture.generate_prompt, '# Generate');
+	const diff = { mode: 'author', findings: [], architecture: { ...arch } };
+	assert.equal(view(diff).details.architecture.generate_prompt, '# Generate');
+	assert.equal(view({ ...arch, generate_prompt: undefined }).details.architecture.generate_prompt, null);
 });

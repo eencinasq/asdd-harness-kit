@@ -154,6 +154,23 @@ test('REQ-005 DRIFT-02: passing feature reopens when its scope files change afte
   }
 });
 
+test('sensor-fixes REQ-001 DRIFT-02: deleting a file changes the hash once; committing the deletion does not', () => {
+  const root = fixture();
+  try {
+    write(root, 'src/b.js', 'b\n');
+    git(root, 'add', '-A');
+    git(root, 'commit', '-q', '-m', 'b');
+    const before = evidenceHash(root, ['src']);
+    rmSync(join(root, 'src/b.js'));
+    const deleted = evidenceHash(root, ['src']);
+    assert.notEqual(deleted, before, 'the deletion is a change');
+    git(root, 'commit', '-q', '-am', 'rm b');
+    assert.equal(evidenceHash(root, ['src']), deleted, 'committing it is not');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('REQ-005 DRIFT-02: a passing feature not stamped yet is not compared, and no git is needed', () => {
   const root = fixture({
     withGit: false,

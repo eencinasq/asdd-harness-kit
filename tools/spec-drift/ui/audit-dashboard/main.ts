@@ -28,6 +28,7 @@ import {
 	resolveMode,
 	SEVERITIES,
 	traceSummary,
+	triageCommand,
 	type ViewModel,
 	viewModel,
 } from './model.ts';
@@ -41,6 +42,7 @@ const TITLES: Record<Kind, string> = {
 	architecture: 'Architecture',
 	finding: 'Finding',
 	ci: 'CI gate',
+	learning: 'Learning loop',
 };
 
 type TraceState =
@@ -68,6 +70,8 @@ let paging: { loading: true } | { error: string } | null = null;
 const sent = new Map<string, string>();
 const traces = new Map<string, TraceState>();
 const reasons = new Map<string, string>();
+/** Per finding id: the triage command shown to copy (the view records nothing itself). */
+const commands = new Map<string, string>();
 /** Source texts loaded on demand (verify_architecture_rules { source }). */
 const texts = new Map<string, TextState>();
 /** Findings currently rendered, by data-index. */
@@ -108,6 +112,52 @@ const table = (head: string[], rows: string[][]): string =>
 	`<div class="table-wrap"><table><thead><tr>${head.map((h) => `<th scope="col">${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows
 		.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`)
 		.join('')}</tbody></table></div>`;
+
+/** A command a human runs in a terminal, with a copy button (the view and the server write nothing). */
+const commandBlock = (command: string): string =>
+	`<div class="command"><code>${escapeHtml(command)}</code><button type="button" class="btn btn-sm" data-action="copy" data-text="${escapeHtml(command)}">Copy</button></div>`;
+
+/** The learning loop, read-only: patterns, proposals, what each proposal lacks, and the next command (REQ-002). */
+const renderLearning = (vm: ViewModel): string => {
+	const l = vm.learning;
+	if (!l) return '';
+	const s = l.summary;
+	const next = (text: string | null | undefined): string =>
+		!text ? '<span class="subtle">—</span>' : text.startsWith('asdd ') ? commandBlock(text) : escapeHtml(text);
+	const counts = [
+		badge(`${s['open'] ?? 0} open`, (s['open'] ?? 0) > 0 ? 'tone-warning' : 'tone-success'),
+		badge(`${s['in_flight'] ?? 0} in flight`),
+		badge(`${s['verified'] ?? 0} verified`, 'tone-success'),
+		badge(`${s['proposals'] ?? 0} proposals`),
+	].join(' ');
+	const patterns = l.patterns.length
+		? table(
+				['Pattern', 'Status', 'Occurrences', 'Signature', 'Next'],
+				l.patterns.map((p) => [
+					mono(p['id']),
+					badge(String(p['status']), p['status'] === 'open' ? 'tone-warning' : ''),
+					escapeHtml(`${p['occurrences']} / ${p['threshold']} (${p['kind']})`),
+					mono(p['signature']),
+					next(p['next']),
+				]),
+			)
+		: '<p class="subtle">No learning patterns yet.</p>';
+	const proposals = l.proposals.length
+		? table(
+				['Proposal', 'Pattern', 'Status', 'Still missing', 'Next'],
+				l.proposals.map((p) => [
+					mono(p['id'] ?? p['file']),
+					p['pattern'] ? mono(p['pattern']) : '—',
+					badge(String(p['status'] ?? 'invalid')),
+					(p['missing'] as string[]).length
+						? `<ul class="plain">${(p['missing'] as string[]).map((m) => `<li>${escapeHtml(m)}</li>`).join('')}</ul>`
+						: badge('complete', 'tone-success'),
+					next(p['next']),
+				]),
+			)
+		: '<p class="subtle">No steering proposals.</p>';
+	return `<section class="stack" aria-label="Learning loop"><div>${counts}</div>${l.note ? `<div class="callout">${escapeHtml(l.note)}</div>` : ''}<h2>Patterns</h2>${patterns}<h2>Steering proposals</h2>${proposals}</section>`;
+};
 
 const textBlock = (key: string, label: string): string => {
 	const state = texts.get(key);
@@ -184,8 +234,21 @@ const renderArchitecture = (vm: ViewModel): string => {
 		vm.semgrep && vm.semgrep['source'] !== 'none' && !vm.semgrep['yaml']
 			? `<div>${textBlock('semgrep', 'Semgrep rules')}</div>`
 			: '';
+	// No rules: the agent can write them from the codebase, in the host, at the user's request (the server writes nothing).
+	const offer = arch.generate_prompt
+		? `<div class="callout stack">
+			<p class="callout-title">No Semgrep rules — this is not a pass</p>
+			<p>The agent can write architecture rules from this codebase into <code>.semgrep/architecture/</code>; review them before you commit them.</p>
+			<div class="toolbar">
+				<button type="button" class="btn btn-primary" data-action="ask-rules">Ask the agent to write rules</button>
+				<button type="button" class="btn" data-action="copy" data-text="${escapeHtml(arch.generate_prompt)}">Copy prompt</button>
+			</div>
+			${disclosure('Prompt', pre(arch.generate_prompt))}
+		</div>`
+		: '';
 	return `<section class="card stack" aria-labelledby="arch-title">
 		<div class="card-header"><h2 id="arch-title">Architecture rules</h2>${badge(arch.status, statusTone(arch.status))}</div>
+		${offer}
 		<dl class="dl">${dl}</dl>
 		${arch.output ? disclosure(`Gate output${arch.output_truncated ? ' (last 1,500 characters)' : ''}`, pre(arch.output)) : ''}
 		${sources}
@@ -269,6 +332,10 @@ const renderActions = (finding: AuditFinding, index: number): string => {
 	const trace = `<button type="button" class="btn btn-sm" data-action="trace">${traces.has(finding.id) ? 'Hide trace' : 'Trace'}</button>`;
 	const done = sent.get(finding.id);
 	if (done) return `${trace}<span class="subtle">Sent: ${escapeHtml(done)}</span>`;
+	const command = commands.get(finding.id);
+	if (command) {
+		return `${trace}<div class="stack"><span class="subtle">Run in a terminal (the view records nothing):</span>${commandBlock(command)}</div>`;
+	}
 	const mode = resolveMode(toolName, args, payload);
 	return (
 		trace +
@@ -280,7 +347,7 @@ const renderActions = (finding: AuditFinding, index: number): string => {
 					return `<div class="reason">
 						<label class="sr-only" for="reason-${index}">Dismissal reason</label>
 						<input id="reason-${index}" class="input" data-role="reason" value="${escapeHtml(reason)}" placeholder="Reason (cite an ADR if there is one)" />
-						<button type="button" class="btn btn-sm btn-primary" data-action="send" data-id="${a.id}" ${reason.trim() ? '' : 'disabled'}>Send</button>
+						<button type="button" class="btn btn-sm btn-primary" data-action="send" data-id="${a.id}" ${reason.trim() ? '' : 'disabled'}>${a.command ? 'Show command' : 'Send'}</button>
 					</div>`;
 				}
 				return `<button type="button" class="btn btn-sm${a.id === 'task' ? ' btn-primary' : ''}" data-action="${a.needsReason ? 'ask' : 'send'}" data-id="${a.id}">${escapeHtml(a.label)}</button>`;
@@ -387,7 +454,13 @@ const setHeader = (vm: ViewModel | null): void => {
 	const mode = resolveMode(toolName, args, payload);
 	titleEl.textContent = vm ? TITLES[vm.kind] : 'Spec drift';
 	modeLabel.textContent =
-		vm?.kind === 'ci' ? `CI gate · ${vm.ci?.provider ?? ''}` : mode === 'review' ? 'Tech Lead review' : 'Author';
+		vm?.kind === 'ci'
+			? `CI gate · ${vm.ci?.provider ?? ''}`
+			: vm?.kind === 'learning'
+				? 'Read-only'
+				: mode === 'review'
+					? 'Tech Lead review'
+					: 'Author';
 	const meta = vm?.details?.meta ?? [];
 	metaEl.innerHTML = meta.length
 		? meta.map(([k, v]) => `<span>${escapeHtml(k)}: ${mono(v)}</span>`).join(' · ')
@@ -408,8 +481,16 @@ const render = (): void => {
 		content.innerHTML = `<div class="callout tone-danger" role="alert">${escapeHtml(vm.error)}</div>`;
 		return;
 	}
+	if (vm.noData) {
+		content.innerHTML = `${emptyState('No data', vm.noData.reason)}${vm.noData.next ? `<p class="subtle">${escapeHtml(vm.noData.next)}</p>` : ''}`;
+		return;
+	}
 	if (vm.kind === 'ci' && vm.ci) {
 		content.innerHTML = `<p>Suggested path: ${mono(vm.ci.path)}</p>${vm.ci.note ? `<div class="callout">${escapeHtml(vm.ci.note)}</div>` : ''}${pre(vm.ci.content)}`;
+		return;
+	}
+	if (vm.kind === 'learning') {
+		content.innerHTML = renderLearning(vm);
 		return;
 	}
 	if (vm.kind === 'finding') {
@@ -473,11 +554,10 @@ const findingOf = (el: HTMLElement): AuditFinding | undefined =>
 	rendered[Number(el.closest<HTMLElement>('[data-index]')?.dataset['index'])];
 
 const sendAction = async (action: Action, finding: AuditFinding): Promise<void> => {
-	const reason = reasons.get(finding.id)?.trim();
 	try {
 		const result = await app.sendMessage({
 			role: 'user',
-			content: [{ type: 'text', text: messageFor(action.id, finding, { reason }) }],
+			content: [{ type: 'text', text: messageFor(action.id, finding) }],
 		});
 		sent.set(
 			finding.id,
@@ -539,6 +619,20 @@ const toggleText = async (key: string): Promise<void> => {
 	render();
 };
 
+/** Sends the rules-generation prompt to the host agent, which writes the files at the user's request. */
+const askForRules = (button: HTMLButtonElement): Promise<void> =>
+	withBusyButton(button, 'Sending…', async () => {
+		const prompt = viewModel(payload)?.details?.architecture?.generate_prompt;
+		if (!prompt) return;
+		try {
+			const result = await app.sendMessage({ role: 'user', content: [{ type: 'text', text: prompt }] });
+			if (result.isError) setStatus('The host did not accept the message. Copy the prompt instead.', 'danger');
+			else setStatus('Asked the agent to write rules. Refresh when they exist.', 'success');
+		} catch (error) {
+			setStatus(errorMessage(error), 'danger');
+		}
+	});
+
 content.addEventListener('click', (event) => {
 	const target = event.target as HTMLElement;
 	const filterButton = target.closest<HTMLButtonElement>('[data-filter] button[data-value]');
@@ -568,8 +662,25 @@ content.addEventListener('click', (event) => {
 			}
 			break;
 		case 'send':
-			if (finding && action && (!action.needsReason || reasons.get(finding.id)?.trim()))
+			if (!finding || !action || (action.needsReason && !reasons.get(finding.id)?.trim())) break;
+			if (action.command && (action.id === 'dismiss' || action.id === 'confirm')) {
+				commands.set(finding.id, triageCommand(action.id, finding, { reason: reasons.get(finding.id) }));
+				reasons.delete(finding.id);
+				render();
+			} else {
 				void sendAction(action, finding);
+			}
+			break;
+		case 'copy': {
+			const text = button.dataset['text'] ?? '';
+			void navigator.clipboard
+				.writeText(text)
+				.then(() => setStatus('Copied. Run it in a terminal.', 'success'))
+				.catch(() => setStatus('The host blocked the clipboard: select the command and copy it.', 'danger'));
+			break;
+		}
+		case 'ask-rules':
+			void askForRules(button);
 			break;
 		case 'load-text':
 			void toggleText(button.dataset['key'] ?? '');

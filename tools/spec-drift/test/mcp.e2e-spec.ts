@@ -17,7 +17,6 @@ import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { connectMcpClient } from '@nestjs/mcp/testing';
 import { Test, type TestingModule } from '@nestjs/testing';
 
-import { AppModule } from '../src/app.module.ts';
 import { createSemgrepSpecRepo } from './fixtures/sandbox.ts';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -48,9 +47,11 @@ const EXPECTED_UI: Record<string, { uri: string; appOnly?: boolean }> = {
 	generate_ci_gate: { uri: UI.audit },
 	audit_report: { uri: UI.audit },
 	audit_finding: { uri: UI.audit },
+	learning_report: { uri: UI.audit },
 };
 const TEXT_ONLY = [
 	'list_rule_packs',
+	'audit_query',
 	'pr_review_start',
 	'pr_review_next_group',
 	'pr_review_submit_findings',
@@ -69,7 +70,7 @@ const textOf = (result: Awaited<ReturnType<Client['callTool']>>): string =>
 /** Contract every transport must satisfy. */
 const assertContract = async (client: Client): Promise<void> => {
 	const { tools } = await client.listTools();
-	assert.equal(tools.length, 30, 'tool count');
+	assert.equal(tools.length, 32, 'tool count');
 	for (const [name, ui] of Object.entries(EXPECTED_UI)) {
 		const meta = tools.find((t) => t.name === name)?._meta as Record<string, any> | undefined;
 		assert.equal(meta?.ui?.resourceUri, ui.uri, `${name} ui.resourceUri`);
@@ -95,6 +96,7 @@ const assertContract = async (client: Client): Promise<void> => {
 	const { prompts } = await client.listPrompts();
 	assert.deepEqual(prompts.map((p) => p.name).sort(), [
 		'architecture-review',
+		'generate-architecture-rules',
 		'pr-review',
 		'review-pr',
 		'spec-alignment',
@@ -148,6 +150,8 @@ describe('MCP server (in-memory)', () => {
 		process.env['PR_REVIEW_ROOT'] = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-e2e-artifacts-'));
 		// Never scan the developer's real checkout from tests.
 		process.env['ANALYSIS_REPO_ROOT'] = createSemgrepSpecRepo();
+		// ConfigModule.forRoot reads the environment when AppModule is evaluated: import it only after setting it.
+		const { AppModule } = await import('../src/app.module.ts');
 
 		moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
 		await moduleRef.init();
@@ -404,7 +408,7 @@ describe('HTTP transport security', () => {
 			await client.connect(
 				new StreamableHTTPClientTransport(new URL(url), { requestInit: { headers: { 'x-api-key': key } } }),
 			);
-			assert.equal((await client.listTools()).tools.length, 30);
+			assert.equal((await client.listTools()).tools.length, 32);
 			await client.close();
 		} finally {
 			child.kill();

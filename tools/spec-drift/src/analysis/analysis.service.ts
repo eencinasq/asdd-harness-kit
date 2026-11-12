@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -8,6 +11,7 @@ import { countBy } from './domain/count-by.ts';
 import { buildDriftReport } from './domain/drift-report.ts';
 import { packsForMode, UnknownPackError } from './domain/pack-selection.ts';
 import { buildPackSummaries } from './domain/pack-summary.ts';
+import { buildRulesPrompt } from './domain/rules-prompt.ts';
 import { CODE_ANALYZER, type CodeAnalyzer } from './ports/code-analyzer.port.ts';
 
 export type ScanOptions = {
@@ -61,6 +65,7 @@ export class AnalysisService {
 		const context = mcpRequestContext.current();
 		const { engine } = this.analyzer;
 		const packs = this.selectPacks(options, await this.listPacks());
+		if (!packs?.length) return this.noRules(options.mode, packs === null);
 		await context.reportProgress(0, 2, `Running ${engine.name} (${packs.map((p) => p.id).join(', ') || 'no packs'})`);
 
 		const rules = await this.analyzer.loadRules(packs);
@@ -99,12 +104,52 @@ export class AnalysisService {
 		};
 	}
 
-	private selectPacks(options: ScanOptions, available: readonly RulePack[]): RulePack[] {
+	/** The prompt that asks the host agent to write a first rule set for a repo (spec-drift-empty REQ-002). */
+	rulesPrompt(repoRoot: string = this.repoRoot): string {
+		return buildRulesPrompt({
+			repoRoot,
+			project: path.basename(repoRoot),
+			engine: this.analyzer.engine,
+			guide: this.analyzer.authoringGuide(),
+			harness: existsSync(path.join(repoRoot, '.harness')),
+			done: 'After creating the rules, call `analyze_spec_drift` to scan with them (and `verify_architecture_rules` when the repo uses the asdd harness).',
+		});
+	}
+
+	/** Nothing to analyze for this mode (spec-drift-empty REQ-001): not an error, and never a pass. */
+	private noRules(mode: ScanMode, missingSet: boolean): ScanSummary {
+		const { engine } = this.analyzer;
+		const what = missingSet ? `no \`${engine.rulesDir}/${mode}/\` rules` : `no rules under \`${engine.rulesDir}/\``;
+		return {
+			engine,
+			scannedAt: new Date().toISOString(),
+			repoRoot: this.repoRoot,
+			mode,
+			packs: [],
+			status: 'no-rules',
+			message: `${path.basename(this.repoRoot)} has ${what}: nothing was analyzed (this is not a pass).`,
+			generatePrompt: this.rulesPrompt(),
+			exitCode: 0,
+			findingCount: 0,
+			bySeverity: {},
+			byPack: {},
+			byRule: {},
+			findings: [],
+			rules: [],
+			drift: { totalRules: 0, cleanRules: 0, driftingRules: 0, items: [], topDrifts: [] },
+			packSummaries: [],
+			stderrTail: '',
+		};
+	}
+
+	/** Packs to scan; null when the mode's rule set does not exist and no pack was named (no rules, not bad input). */
+	private selectPacks(options: ScanOptions, available: readonly RulePack[]): RulePack[] | null {
 		try {
 			return packsForMode(options.mode, available, options.packs, this.analyzer.engine.rulesDir);
 		} catch (error) {
-			if (error instanceof UnknownPackError) throw new BadRequestException(error.message);
-			throw error;
+			if (!(error instanceof UnknownPackError)) throw error;
+			if (options.packs?.length) throw new BadRequestException(error.message);
+			return null;
 		}
 	}
 }

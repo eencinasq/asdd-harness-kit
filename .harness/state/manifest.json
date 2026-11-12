@@ -106,6 +106,30 @@
       "mode": "full",
       "manifest": ".harness/state/slices/agents-spec/manifest.json",
       "features": ".harness/features/agents-spec.features.json"
+    },
+    {
+      "slice_id": "spec-drift-apps",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-apps/manifest.json",
+      "features": ".harness/features/spec-drift-apps.features.json"
+    },
+    {
+      "slice_id": "sensor-fixes",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/sensor-fixes/manifest.json",
+      "features": ".harness/features/sensor-fixes.features.json"
+    },
+    {
+      "slice_id": "spec-drift-empty",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-empty/manifest.json",
+      "features": ".harness/features/spec-drift-empty.features.json"
     }
   ]
 }

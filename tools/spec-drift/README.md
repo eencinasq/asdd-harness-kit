@@ -32,8 +32,13 @@ nvm install && pnpm install && pnpm build
 
 ## Tools
 
-30 tools. Five are **dashboard-only** (`visibility: ["app"]`): the dashboard calls them, and hosts that
+32 tools. Five are **dashboard-only** (`visibility: ["app"]`): the dashboard calls them, and hosts that
 support MCP Apps visibility hide them from the model.
+
+**Typed results.** Every analysis and harness-audit tool declares an `outputSchema` (zod, in `*.output.ts`), and
+its `structuredContent` validates against it; clients — including code-mode hosts that generate a typed API from
+the tool list — know each result's shape. The schemas are loose objects over the known fields, so a new field
+never turns a result into an error; `{ error }` results are tool errors (`isError`) and carry no schema.
 
 ### Static analysis
 
@@ -44,6 +49,15 @@ support MCP Apps visibility hide them from the model.
 | `analyze_standards`    | dashboard | The `standards/` set only                                                           |
 | `list_rule_packs`      | text      | Sets and packs discovered under `<repo>/.semgrep/`                                  |
 | `rescan`               | app-only  | Re-run from the dashboard                                                           |
+
+**No rules is not a pass.** When the repo has no rules for the mode (no `.semgrep/architecture/` for
+`analyze_architecture`, nothing under `.semgrep/` for `analyze_spec_drift`), the result has `status: "no-rules"`, no
+findings, and a `generatePrompt`: the dashboard shows **Ask the agent to write rules** (and **Copy prompt**), and the
+text asks the model to offer it to the user. The prompt has the agent derive the rules from this codebase — and, when the
+repo has `.harness/`, from its steering bindings and ADRs — into `.semgrep/architecture/` and `.semgrep/standards/`, list
+them for the user to confirm, and validate them. The same prompt is the MCP prompt `generate-architecture-rules`. The
+agent writes the files in the host; this server writes nothing. A pack named in `packs` that does not exist is still an
+input error.
 
 ### PR review
 
@@ -69,17 +83,34 @@ support MCP Apps visibility hide them from the model.
 
 ### Harness audit
 
-Over the repo at `HARNESS_ROOT` (default: the working directory). All read-only; each opens the audit dashboard
-(`ui://spec-drift/audit-dashboard.html`) and returns the same JSON as text.
+Over the repo at `HARNESS_ROOT` (default: the working directory). All read-only: these tools write nothing to the
+repository. Each except `audit_query` opens the audit dashboard (`ui://spec-drift/audit-dashboard.html`) and returns
+the same JSON as text.
 
-| Tool                        | Purpose                                                                                                                                  |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `audit_diff`                | Spec drift (`DRIFT-01…07`) and architecture rules on a diff; `mode: "review"` adds `DRIFT-07` and applies Tech Lead triage               |
-| `verify_architecture_rules` | Bound Gate command + Semgrep (`.semgrep.yml`, the binding, or rules generated from the boundary table); `source` returns one source text |
-| `verify_spec_compliance`    | Per slice: the `ears` adapter plus enabled module adapters (e.g. `openapi`)                                                              |
-| `generate_ci_gate`          | GitHub / GitLab job text that runs `asdd check`; writes nothing                                                                          |
-| `audit_report`              | Latest `.harness/audits/` report, filtered by `severity` / `since`                                                                       |
-| `audit_finding`             | One finding with its knowledge-graph trace (REQ → feature → file)                                                                        |
+**Decisions stay at the CLI.** Triage and proposal decisions are the Tech Lead's and are recorded by the `asdd` CLI, not
+by this server: in review mode the dashboard's **Dismiss…** and **Confirm** show the exact
+`asdd triage <id> --dismiss --reason "…"` / `--confirm` command to copy into a terminal, and the learning view shows
+`asdd learn --propose <LP>` and what each proposal still lacks. No tool writes `.harness/audits/triage.json` or a
+proposal, so a model — on a host that ignores app-only visibility — cannot silence a finding.
+
+**No data is not an error.** Without the kit (no `.harness/` in `HARNESS_ROOT`), every tool below except
+`generate_ci_gate` and `audit_finding` returns `no_data: { reason, next }` and no findings, and the dashboard shows
+**No data**. With the kit but nothing recorded yet, `audit_report` (no report: run `asdd audit`),
+`verify_spec_compliance` (no slices), `audit_query` (no source to query), and `learning_report` (no incidents or
+proposals) do the same. When the architecture check finds no Semgrep rules, `verify_architecture_rules` and the
+`architecture` block of `audit_diff` carry `generate_prompt`, and the architecture card offers **Ask the agent to write
+rules**; the kit's audit selects the `.semgrep/architecture/` folder that prompt writes.
+
+| Tool                        | Purpose                                                                                                                                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `audit_diff`                | Spec drift (`DRIFT-01…07`) and architecture rules on a diff; `mode: "review"` adds `DRIFT-07` and applies Tech Lead triage                                                                                                            |
+| `verify_architecture_rules` | Bound Gate command + Semgrep (the binding, `.semgrep.yml`, the `.semgrep/architecture/` folder, or rules generated from the boundary table); `source` returns one source text                                                         |
+| `verify_spec_compliance`    | Per slice: the `ears` adapter plus enabled module adapters (e.g. `openapi`)                                                                                                                                                           |
+| `generate_ci_gate`          | GitHub / GitLab job text that runs `asdd check`; writes nothing                                                                                                                                                                       |
+| `audit_report`              | Latest `.harness/audits/` report, filtered by `severity` / `since`                                                                                                                                                                    |
+| `audit_finding`             | One finding with its knowledge-graph trace (REQ → feature → file)                                                                                                                                                                     |
+| `audit_query`               | Filter (slice, severity, check, source, path prefix) and group (slice, severity, check, top-level path) findings on the server: totals, per-group counts, at most `limit` findings. Text only — use it to summarize instead of paging |
+| `learning_report`           | The self-improving loop: patterns, steering proposals with the fields each still lacks, and the `asdd` command a human runs next                                                                                                      |
 
 Results stay under 8 KB (Cursor stops mounting MCP Apps above about 13 KB): larger ones carry the first findings,
 full counts and a `page.token`; call the same tool with `page_token` and `offset` for the rest. Source texts are
@@ -91,6 +122,7 @@ left out unless `include_text: true`.
 | ----------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | Prompt            | `review-pr` (`pr`, `repoPath?`, `focus?`, `ticket?`)                         | Slash command that runs the whole review                                                                                       |
 | Prompt            | `spec-drift-report` (`paths?`, `severity?`)                                  | Slash command for a drift report grouped by ADR                                                                                |
+| Prompt            | `generate-architecture-rules`                                                | Have the agent write `.semgrep/architecture/` and `.semgrep/standards/` rules from this codebase (and its harness ADRs)        |
 | Prompt            | `architecture-review` (`paths?`)                                             | Harness: inferential architecture review (codebase-audit skill)                                                                |
 | Prompt            | `spec-alignment` (`slice_id`)                                                | Harness: per-REQ satisfied / violated / unclear for one slice                                                                  |
 | Prompt            | `pr-review` (`base_branch`, `target_branch`, `pr_body?`)                     | Harness: Tech Lead drift review of a branch, draft comments only (not the GitHub `review-pr`)                                  |
@@ -345,7 +377,8 @@ The tools act with **your** `gh` and `git` credentials:
 - **The model cannot post a visible review.** `pr_review_publish` only creates a pending review;
   `pr_review_ui_publish` (submit) is dashboard-only and asks for confirmation. A prompt-injected PR can at
   most leave you a draft.
-- **Read-only on your repo.** It runs `git fetch` and reads commits; it never checks out, commits or pushes.
+- **Read-only on your repo.** It runs `git fetch` and reads commits; it never checks out, commits or pushes. The
+  harness-audit tools write nothing (triage and proposals are recorded with `asdd triage` / `asdd learn`).
 - **HTTP** binds to `127.0.0.1`; foreign `Origin`s and non-localhost `Host` headers get 403 (no driving tools
   from a web page, no DNS rebinding); another bind address requires `MCP_API_KEY`.
 - **External commands** run without a shell, with `--` before user-supplied paths, literal pathspecs,
@@ -451,20 +484,20 @@ decorator metadata); Biome for lint/format; caller mistakes throw Nest exception
 
 ## Troubleshooting
 
-| Symptom                                                        | Fix                                                                                                               |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Server fails to start / "Connection closed"                    | Run `bin/mcp-stdio < /dev/null` in a terminal: stderr says what is missing; no output and exit 0 means it starts. |
-| `Node v24.22.2 not found`                                      | `nvm install` here, or set `MCP_NODE` in the client's `env`.                                                      |
-| `Parameter decorators only work when experimental decorators…` | Start through `bin/mcp-stdio`, not `node --import tsx src/main.ts` from another directory.                        |
-| Client shows old behaviour / old dashboard                     | `pnpm build`, then restart the server in the client (Cursor: toggle it in Settings → MCP).                        |
-| `git rev-parse --show-toplevel failed`                         | No repo to review: set `PR_REVIEW_REPO` or pass `repoPath`.                                                       |
-| `gh auth login` in the error                                   | `gh auth login` (the server uses your `gh` session).                                                              |
-| `Bad credentials` / HTTP 401 from `gh`                         | A stale `GITHUB_TOKEN` / `GH_TOKEN` overrides `gh`'s login: unset it (or set it from `gh auth token`).            |
-| Architecture: "Semgrep failed" / `semgrep: not found`          | Install Semgrep and make sure the client's `PATH` includes it (see the Cursor example).                           |
-| `Another process is still working on …`                        | Another client is working on the same PR; retry. A crashed holder's lock is taken over automatically.             |
-| `… timed out after 120s`                                       | Raise `COMMAND_TIMEOUT_SECONDS` / `ANALYSIS_TIMEOUT_SECONDS`, or check that `git fetch` works without prompts.    |
-| HTTP 403 / 401 on `/mcp`                                       | 403: `Origin` not allowed (`MCP_ALLOWED_ORIGINS`) or non-localhost `Host`. 401: missing / wrong `X-Api-Key`.      |
-| Dashboards empty / resource read fails                         | `pnpm build` (views are served from `dist/`).                                                                     |
-| Analysis reports 0 rules                                       | `ANALYSIS_REPO_ROOT` has no rules under `.semgrep/` — check with `list_rule_packs`.                               |
+| Symptom                                                        | Fix                                                                                                                   |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Server fails to start / "Connection closed"                    | Run `bin/mcp-stdio < /dev/null` in a terminal: stderr says what is missing; no output and exit 0 means it starts.     |
+| `Node v24.22.2 not found`                                      | `nvm install` here, or set `MCP_NODE` in the client's `env`.                                                          |
+| `Parameter decorators only work when experimental decorators…` | Start through `bin/mcp-stdio`, not `node --import tsx src/main.ts` from another directory.                            |
+| Client shows old behaviour / old dashboard                     | `pnpm build`, then restart the server in the client (Cursor: toggle it in Settings → MCP).                            |
+| `git rev-parse --show-toplevel failed`                         | No repo to review: set `PR_REVIEW_REPO` or pass `repoPath`.                                                           |
+| `gh auth login` in the error                                   | `gh auth login` (the server uses your `gh` session).                                                                  |
+| `Bad credentials` / HTTP 401 from `gh`                         | A stale `GITHUB_TOKEN` / `GH_TOKEN` overrides `gh`'s login: unset it (or set it from `gh auth token`).                |
+| Architecture: "Semgrep failed" / `semgrep: not found`          | Install Semgrep and make sure the client's `PATH` includes it (see the Cursor example).                               |
+| `Another process is still working on …`                        | Another client is working on the same PR; retry. A crashed holder's lock is taken over automatically.                 |
+| `… timed out after 120s`                                       | Raise `COMMAND_TIMEOUT_SECONDS` / `ANALYSIS_TIMEOUT_SECONDS`, or check that `git fetch` works without prompts.        |
+| HTTP 403 / 401 on `/mcp`                                       | 403: `Origin` not allowed (`MCP_ALLOWED_ORIGINS`) or non-localhost `Host`. 401: missing / wrong `X-Api-Key`.          |
+| Dashboards empty / resource read fails                         | `pnpm build` (views are served from `dist/`).                                                                         |
+| Analysis says `no-rules`                                       | `ANALYSIS_REPO_ROOT` has no rules for that mode — check with `list_rule_packs`, or run `generate-architecture-rules`. |
 
 `src/harness/` is generated by the kit's `asdd kit vendor` from `cli/src/harness`: never edit it here; edit the source and rerun it (`npm test` in the kit fails while a copy is stale).

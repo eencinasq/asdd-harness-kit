@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Prompt } from '@nestjs/mcp';
 import * as z from 'zod';
+
+import { AnalysisService } from './analysis.service.ts';
 
 const SpecDriftArgs = z.object({
 	paths: z
@@ -10,8 +12,23 @@ const SpecDriftArgs = z.object({
 	severity: z.enum(['ERROR', 'WARNING', 'INFO']).optional().describe('Minimum severity'),
 });
 
+const NoArgs = z.object({});
+
 @Injectable()
 export class AnalysisPrompts {
+	constructor(@Inject(AnalysisService) private readonly analysis: AnalysisService) {}
+
+	@Prompt({
+		name: 'generate-architecture-rules',
+		title: 'Generate architecture rules',
+		description:
+			'Have the agent write the project’s architecture and coding-standard rules (e.g. .semgrep/architecture/, .semgrep/standards/) from the existing codebase, for the analyze tools and the audit.',
+		argsSchema: NoArgs,
+	})
+	generateArchitectureRules(): string {
+		return this.analysis.rulesPrompt();
+	}
+
 	@Prompt({
 		name: 'spec-drift-report',
 		title: 'Architecture spec drift report',

@@ -3,6 +3,14 @@ import { Resource, Tool } from '@nestjs/mcp';
 
 import { appToolMeta, RESOURCE_MIME_TYPE, readAppHtml } from '../common/mcp/mcp-app.util.ts';
 import {
+	AuditDiffOutput,
+	AuditFindingOutput,
+	AuditReportOutput,
+	GenerateCiGateOutput,
+	VerifyArchitectureOutput,
+	VerifySpecComplianceOutput,
+} from './audit.output.ts';
+import {
 	type AuditDiffInput,
 	AuditDiffInputSchema,
 	type AuditFindingInput,
@@ -52,6 +60,7 @@ export class AuditTools {
 		description:
 			'Spec drift (DRIFT-01..07) and architecture rules for a diff, with a summary (files_analyzed, spec_compliance, drift_level). mode "review" adds DRIFT-07 and applies TL triage.',
 		inputSchema: AuditDiffInputSchema,
+		outputSchema: AuditDiffOutput,
 		_meta: appToolMeta(AUDIT_UI_URI),
 	})
 	auditDiff(args: AuditDiffInput) {
@@ -65,6 +74,7 @@ export class AuditTools {
 		description:
 			'Read domain-layer.md, domain-layer.project.md, product.md, structure.md, and tech.md. Select .semgrep.yml (or the Semgrep rules binding) or generate a temporary config from the boundary table, run semgrep scan --json, and return violations with fixes. Also runs the Gate command when it is bound. Unconfigured and a missing semgrep binary are not a pass. Does not write .semgrep.yml.',
 		inputSchema: VerifyArchitectureInputSchema,
+		outputSchema: VerifyArchitectureOutput,
 		_meta: appToolMeta(AUDIT_UI_URI),
 	})
 	verifyArchitectureRules(args: VerifyArchitectureInput) {
@@ -82,6 +92,7 @@ export class AuditTools {
 		description:
 			'Compare a slice spec with the code: the "ears" adapter (requirement coverage and test mentions) plus enabled module adapters (for example "openapi").',
 		inputSchema: VerifySpecComplianceInputSchema,
+		outputSchema: VerifySpecComplianceOutput,
 		_meta: appToolMeta(AUDIT_UI_URI),
 	})
 	verifySpecCompliance(args: VerifySpecComplianceInput) {
@@ -97,6 +108,7 @@ export class AuditTools {
 		description:
 			'Return CI configuration text (GitHub or GitLab) that runs check-invariants (including spec drift). Carries no threshold; does not write files.',
 		inputSchema: GenerateCiGateInputSchema,
+		outputSchema: GenerateCiGateOutput,
 		_meta: appToolMeta(AUDIT_UI_URI),
 	})
 	generateCiGate(args: GenerateCiGateInput) {
@@ -110,6 +122,7 @@ export class AuditTools {
 		description:
 			'Latest codebase audit report from .harness/audits/, including Semgrep problems and fixes, filtered by severity or by findings seen since a date.',
 		inputSchema: AuditReportInputSchema,
+		outputSchema: AuditReportOutput,
 		_meta: appToolMeta(AUDIT_UI_URI),
 	})
 	auditReport(args: AuditReportInput) {
@@ -123,6 +136,7 @@ export class AuditTools {
 		description:
 			'One finding (from the latest audit_diff or audit report) with its knowledge-graph trace (REQ, feature, file).',
 		inputSchema: AuditFindingInputSchema,
+		outputSchema: AuditFindingOutput,
 		_meta: appToolMeta(AUDIT_UI_URI),
 	})
 	auditFinding(args: AuditFindingInput) {

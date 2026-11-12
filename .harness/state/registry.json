@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-11-12T02:49:25.743Z",
+  "generated_at": "2026-11-12T19:57:28.309Z",
   "slices": [
     {
       "slice_id": "agents-spec",
@@ -12,7 +12,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.649Z",
+      "last_activity": "2026-11-12T19:57:27.822Z",
       "contributors": [
         "squad",
         "human",
@@ -30,7 +30,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.654Z",
+      "last_activity": "2026-11-12T19:57:27.837Z",
       "contributors": [
         "squad",
         "human",
@@ -48,7 +48,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.658Z",
+      "last_activity": "2026-11-12T19:57:27.848Z",
       "contributors": [
         "squad",
         "human",
@@ -66,7 +66,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.682Z",
+      "last_activity": "2026-11-12T19:57:27.945Z",
       "contributors": [
         "squad",
         "human",
@@ -85,7 +85,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.685Z",
+      "last_activity": "2026-11-12T19:57:27.955Z",
       "contributors": [
         "squad",
         "human",
@@ -103,7 +103,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.694Z",
+      "last_activity": "2026-11-12T19:57:27.998Z",
       "contributors": [
         "squad",
         "human",
@@ -129,7 +129,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.707Z",
+      "last_activity": "2026-11-12T19:57:28.056Z",
       "contributors": [
         "squad",
         "human",
@@ -155,7 +155,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.711Z",
+      "last_activity": "2026-11-12T19:57:28.073Z",
       "contributors": [
         "squad",
         "human",
@@ -173,7 +173,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.714Z",
+      "last_activity": "2026-11-12T19:57:28.091Z",
       "contributors": [
         "squad",
         "human",
@@ -191,12 +191,31 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.716Z",
+      "last_activity": "2026-11-12T19:57:28.107Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "sensor-fixes",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-12T19:57:28.130Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "asdd-pipeline"
       ]
     },
     {
@@ -209,7 +228,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.729Z",
+      "last_activity": "2026-11-12T19:57:28.178Z",
       "contributors": [
         "squad",
         "human",
@@ -227,12 +246,48 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.739Z",
+      "last_activity": "2026-11-12T19:57:28.224Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "spec-drift-apps",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-12T19:57:28.255Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "spec-drift-empty",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-12T19:57:28.287Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
         "asdd-pipeline"
       ]
     },
@@ -246,7 +301,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T02:49:25.742Z",
+      "last_activity": "2026-11-12T19:57:28.308Z",
       "contributors": [
         "squad",
         "human",

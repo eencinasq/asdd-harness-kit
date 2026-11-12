@@ -39,6 +39,9 @@ export type Trace = {
 /** Any audit tool result: a JSON object, `{ error }` when the call failed. */
 export type AuditPayload = Record<string, unknown> & { readonly error?: string; readonly findings?: AuditFinding[] };
 
+/** Nothing to show, why, and the next step: not an error (spec-drift-empty REQ-004). */
+export type NoData = { readonly reason: string; readonly next: string };
+
 /** Counts and the token for a result cut to fit the MCP App budget. */
 export type FindingsPage = {
 	readonly tool: string;

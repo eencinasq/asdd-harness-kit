@@ -68,6 +68,8 @@ export type AuditLib = {
 
 export type LearningLib = {
 	learningForReview(root: string, options: { changed: string[]; slices: string[] }): unknown;
+	/** Read-only: patterns, proposals with their missing fields, and the next command (spec-drift-apps REQ-002). */
+	learningReport(root: string, options?: { limit?: number }): Record<string, unknown>;
 };
 
 export type KnowledgeStore = {

@@ -10,12 +10,23 @@
  */
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { readBinding } from './drift-lib.mjs';
 
-const CONFIG_CANDIDATES = ['.semgrep.yml', '.semgrep.yaml', 'semgrep.yml', '.semgrep/architecture.yml'];
+/**
+ * Config files, then the rule folder the spec-drift analyzer and the generate-architecture-rules prompt use
+ * (`.semgrep/architecture/`, selected only when it holds a YAML file).
+ */
+const CONFIG_CANDIDATES = ['.semgrep.yml', '.semgrep.yaml', 'semgrep.yml', '.semgrep/architecture.yml', '.semgrep/architecture'];
+
+/** A rule file, or a folder with at least one YAML file in it. */
+function holdsRules(abs) {
+  if (!existsSync(abs)) return false;
+  if (!statSync(abs).isDirectory()) return true;
+  return readdirSync(abs, { recursive: true }).some((f) => /\.ya?ml$/.test(String(f)));
+}
 const UNFILLED = new Set(['', '…', '...', 'unfilled', 'n/a', 'na']);
 const LANGUAGE_PATTERNS = [
   ['typescript', /typescript|\bts\b/i],
@@ -315,7 +326,7 @@ function selectedConfig(root, sources) {
     return { status: 'ready', source: 'selected', path: rel };
   }
   for (const rel of CONFIG_CANDIDATES) {
-    if (existsSync(join(root, rel))) return { status: 'ready', source: 'selected', path: rel };
+    if (holdsRules(join(root, rel))) return { status: 'ready', source: 'selected', path: rel };
   }
   return null;
 }
@@ -338,7 +349,7 @@ export function resolveSemgrepConfig(root, sources) {
     return {
       status: 'unconfigured',
       source: 'none',
-      message: 'No .semgrep.yml and no "Paths | Must not import" rows in the architecture specs.',
+      message: 'No .semgrep.yml, no .semgrep/architecture/ rules, and no "Paths | Must not import" rows in the architecture specs.',
     };
   }
   return {

@@ -19,6 +19,7 @@ import {
 	toolErrorText,
 	withBusyButton,
 } from '../shared/ui.ts';
+import { noRulesView } from './no-rules.ts';
 import { formatAgentPrompt, remediationFor } from './remediations.ts';
 
 type Tab = 'findings' | 'drift';
@@ -32,6 +33,9 @@ const engineLabel = $('engine-label');
 const scanMeta = $('scan-meta');
 const loading = $('loading');
 const failure = $('failure');
+const noRules = $('no-rules');
+const askRulesBtn = $<HTMLButtonElement>('ask-rules');
+const copyRulesBtn = $<HTMLButtonElement>('copy-rules-prompt');
 const summarySection = $('summary');
 const packOverview = $('pack-overview');
 const packOverviewBody = $('pack-overview-body');
@@ -270,6 +274,22 @@ const render = (s: ScanSummary): void => {
 	].join('');
 	modeSelect.value = s.mode === 'all' ? 'spec-drift' : s.mode;
 
+	const empty = noRulesView(s);
+	noRules.hidden = !empty;
+	if (empty) {
+		$('no-rules-title').textContent = empty.title;
+		$('no-rules-message').textContent = empty.message;
+		$('no-rules-prompt').textContent = empty.prompt;
+		failure.hidden = true;
+		summarySection.hidden = true;
+		packOverview.hidden = true;
+		tabsEl.hidden = true;
+		$('panel-findings').hidden = true;
+		panelDrift.hidden = true;
+		setStatus('');
+		return;
+	}
+
 	failure.hidden = s.status !== 'failed';
 	if (s.status === 'failed') {
 		failure.innerHTML = `
@@ -346,7 +366,29 @@ const sendToAgent = async (finding: Finding, button: HTMLButtonElement): Promise
 	});
 };
 
+/** The agent writes the rules in the host, at the user's request; the server writes nothing (spec-drift-empty ADR-002). */
+const askForRules = (): Promise<void> =>
+	withBusyButton(askRulesBtn, 'Sending…', async () => {
+		const prompt = current?.generatePrompt;
+		if (!prompt) return;
+		try {
+			const result = await app.sendMessage({ role: 'user', content: [{ type: 'text', text: prompt }] });
+			if (result.isError) setStatus('The host did not accept the message. Copy the prompt instead.', 'danger');
+			else setStatus('Asked the agent to write rules. Re-scan when they exist.', 'success');
+		} catch (error) {
+			setStatus(errorMessage(error), 'danger');
+		}
+	});
+
 // ── Events ───────────────────────────────────────────────────────────────────
+
+askRulesBtn.addEventListener('click', () => void askForRules());
+copyRulesBtn.addEventListener('click', () => {
+	void navigator.clipboard
+		.writeText(current?.generatePrompt ?? '')
+		.then(() => setStatus('Prompt copied.', 'success'))
+		.catch(() => setStatus('The host blocked the clipboard: open “Prompt” and copy it.', 'danger'));
+});
 
 createSegmented(severityFilterEl, (value) => {
 	severityFilter = value;

@@ -5,7 +5,8 @@ import { pathToFileURL } from 'node:url';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import type { AuditFinding, AuditPayload, Trace } from './audit.types.ts';
+import { AnalysisService } from '../analysis/analysis.service.ts';
+import type { AuditFinding, AuditPayload, NoData, Trace } from './audit.types.ts';
 import { type ArchitectureSource, type HarnessLibs, harnessLibs, type SemgrepScan } from './harness-libs.ts';
 
 export const AUDIT_OPTIONS = Symbol('AUDIT_OPTIONS');
@@ -58,6 +59,11 @@ const architectureStatus = (gateStatus: string, semgrepStatus: string, findings:
 	return 'unconfigured';
 };
 
+const NO_REPORT: NoData = {
+	reason: 'No audit report in .harness/audits/ yet.',
+	next: 'Run asdd audit (or schedule it in CI with generate_ci_gate).',
+};
+
 const nonEmpty = (v: unknown): string | undefined => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
 
 export type AuditDiffInput = {
@@ -77,10 +83,25 @@ export class AuditService {
 	/** Latest audit_diff result of this server process (resource spec://drift/latest-report, audit_finding). */
 	private lastDiffReport: AuditPayload | null = null;
 
-	constructor(@Inject(AUDIT_OPTIONS) private readonly options: AuditOptions) {}
+	constructor(
+		@Inject(AUDIT_OPTIONS) private readonly options: AuditOptions,
+		@Inject(AnalysisService) private readonly analysis: AnalysisService,
+	) {}
 
 	get root(): string {
 		return this.options.root;
+	}
+
+	/** The kit's data lives in `.harness/`; without it there is nothing to audit (spec-drift-empty REQ-004). */
+	private get installed(): boolean {
+		return existsSync(path.join(this.root, '.harness'));
+	}
+
+	private get notInstalled(): NoData {
+		return {
+			reason: `The asdd harness is not installed in ${path.basename(this.root)} (no .harness/): there is no spec data to audit.`,
+			next: 'To audit specs, install asdd-harness-kit in the project (asdd install). To review architecture without it, use analyze_architecture with the project rules.',
+		};
 	}
 
 	private async libs(): Promise<HarnessLibs> {
@@ -118,6 +139,7 @@ export class AuditService {
 	// ── architecture rules ────────────────────────────────────────────────────
 
 	async verifyArchitectureRules(paths: readonly string[] = [], { includeText = true } = {}): Promise<AuditPayload> {
+		if (!this.installed) return { status: 'no-data', no_data: this.notInstalled, findings: [] };
 		const { drift, semgrep: semgrepLib } = await this.libs();
 		const root = this.root;
 		const sources = semgrepLib.loadArchitectureSources(root, { includeText: true });
@@ -192,6 +214,8 @@ export class AuditService {
 			sources: includeText ? sources : sources.map(({ text: _text, ...rest }) => rest),
 			semgrep: publishSemgrep(semgrep, includeText),
 			...(message ? { message } : {}),
+			// No rules at all: offer the agent prompt that writes them from the codebase (spec-drift-empty REQ-003).
+			...(semgrep.status === 'unconfigured' ? { generate_prompt: this.analysis.rulesPrompt(root) } : {}),
 			...(output && gateStatus !== 'pass' ? { output: output.trim().slice(-4000) } : {}),
 		};
 	}
@@ -244,7 +268,18 @@ export class AuditService {
 	}
 
 	async verifySpecCompliance(sliceId: string, adapterId?: string): Promise<AuditPayload> {
+		const empty = { slice_id: sliceId, adapters: {}, summary: {}, findings: [] };
+		if (!this.installed) return { ...empty, no_data: this.notInstalled };
 		const known = this.activeSlices();
+		if (!known.length) {
+			return {
+				...empty,
+				no_data: {
+					reason: 'No slices in .harness/state/manifest.json yet: no specification to check.',
+					next: 'Start one with asdd slice init <slice-id>.',
+				},
+			};
+		}
 		if (!known.includes(sliceId)) return { error: `unknown slice "${sliceId}"`, known };
 		const libs = await this.libs();
 		const adapters = await this.loadAdapters();
@@ -294,6 +329,7 @@ export class AuditService {
 		mode = 'author',
 		pr_body,
 	}: AuditDiffInput = {}): Promise<AuditPayload> {
+		if (!this.installed) return { mode, no_data: this.notInstalled, findings: [], suppressed: [] };
 		const { drift, audit, learning } = await this.libs();
 		const root = this.root;
 		const review = mode === 'review';
@@ -332,6 +368,7 @@ export class AuditService {
 				message: architecture['message'],
 				sources: archSources.map(({ id, path: p, filled }) => ({ id, path: p, filled })),
 				semgrep: architecture['semgrep'],
+				...(architecture['generate_prompt'] ? { generate_prompt: architecture['generate_prompt'] } : {}),
 			},
 			summary: { ...res.summary, drift_level: driftLevel(all) },
 			notes: res.notes,
@@ -343,14 +380,71 @@ export class AuditService {
 		return report;
 	}
 
+	// ── insight (read-only) ───────────────────────────────────────────────────
+
+	/**
+	 * Findings to query (audit_query): the latest audit_diff of this process, the latest audit report, or a fresh drift
+	 * check over all slices; `auto` takes the first that exists. Reads only.
+	 */
+	async findingsFrom(
+		from: 'auto' | 'diff' | 'report' | 'drift',
+	): Promise<{ from: string; findings: AuditFinding[] } | { from: string; no_data: NoData }> {
+		if (!this.installed) return { from, no_data: this.notInstalled };
+		const { audit, drift } = await this.libs();
+		const diff = this.lastDiffReport?.['no_data'] ? undefined : this.lastDiffReport?.findings;
+		if (from === 'diff' || (from === 'auto' && diff)) {
+			return diff
+				? { from: 'diff', findings: diff }
+				: {
+						from,
+						no_data: {
+							reason: 'No audit_diff has run in this server process yet.',
+							next: 'Call audit_diff first, or query from "report" or "drift".',
+						},
+					};
+		}
+		const latest = audit.latestReport(this.root);
+		if (from === 'report' || (from === 'auto' && latest)) {
+			return latest
+				? { from: `report ${latest.path}`, findings: (latest.report.findings ?? []) as AuditFinding[] }
+				: { from, no_data: NO_REPORT };
+		}
+		return { from: 'drift', findings: drift.runDrift({ root: this.root, requirementChecks: true }).findings };
+	}
+
+	/** The learning loop, read-only (learning_report): decisions stay with the Tech Lead at the asdd CLI. */
+	async learningReport(limit?: number): Promise<AuditPayload> {
+		const commands_note =
+			"This server writes nothing. Run the `next` commands in a terminal (asdd learn --propose, asdd triage); proposal decisions (status, decided_by) are the Tech Lead's, in the proposal file.";
+		if (!this.installed) {
+			const summary = { patterns: 0, open: 0, in_flight: 0, verified: 0, proposals: 0, unsigned_failures: 0 };
+			return { summary, patterns: [], proposals: [], commands_note, no_data: this.notInstalled };
+		}
+		const { learning } = await this.libs();
+		const report = learning.learningReport(this.root, { limit });
+		const s = report['summary'] as Record<string, number> | undefined;
+		const empty = !s?.['patterns'] && !s?.['proposals'] && !s?.['unsigned_failures'];
+		return {
+			...report,
+			commands_note,
+			...(empty
+				? {
+						no_data: {
+							reason: 'No failure-log incidents and no steering proposals yet.',
+							next: 'Agents log failures in docs/agent-failure-log.md; a signature seen often enough becomes a learning pattern here.',
+						},
+					}
+				: {}),
+		};
+	}
+
 	// ── audit reports ─────────────────────────────────────────────────────────
 
 	async auditReport({ since, severity }: { since?: string; severity?: string } = {}): Promise<AuditPayload> {
 		const { audit } = await this.libs();
+		if (!this.installed) return { no_data: this.notInstalled, findings: [], reports: [] };
 		const latest = audit.latestReport(this.root);
-		if (!latest) {
-			return { error: 'no audit report yet — run: asdd audit', reports: [] };
-		}
+		if (!latest) return { no_data: NO_REPORT, findings: [], reports: [] };
 		const sinceTime = since ? Date.parse(since) : Number.NaN;
 		const findings = (latest.report.findings ?? []).filter(
 			(f) =>

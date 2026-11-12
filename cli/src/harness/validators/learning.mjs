@@ -1,31 +1,10 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { CHANGE_TYPES, PROPOSAL_STATUSES, derivePatterns, loadProposals } from '../learning-lib.mjs';
+import { derivePatterns, loadProposals, proposalFindings } from '../learning-lib.mjs';
 import { readSessions } from '../sync-state.mjs';
 
-const DECIDED = new Set(['accepted', 'rejected', 'applied']);
-
-/** Contract problems of one steering proposal (QG-LEARN-03, QG-LEARN-05). */
-export function proposalFindings(root, proposal, patternIds) {
-  const out = [];
-  const where = proposal.file;
-  const name = where.split('/').pop();
-  if (!proposal.id) return [`${where}: missing frontmatter (id, pattern, status, control, change, success)`];
-  if (!/^SP-\d{3,}$/.test(proposal.id) || !name.startsWith(proposal.id)) out.push(`${where}: id "${proposal.id}" must be SP-NNN and match the file name`);
-  if (!proposal.pattern) out.push(`${where}: missing pattern`);
-  else if (!patternIds.has(proposal.pattern)) out.push(`${where}: pattern ${proposal.pattern} matches no learning signal (run learn.mjs --all)`);
-  if (!PROPOSAL_STATUSES.includes(proposal.status)) out.push(`${where}: status must be one of ${PROPOSAL_STATUSES.join(', ')} (got "${proposal.status ?? ''}")`);
-  if (!CHANGE_TYPES.includes(proposal.change)) out.push(`${where}: change must be one of ${CHANGE_TYPES.join(', ')} (got "${proposal.change ?? ''}")`);
-  const control = String(proposal.control ?? '').split('#')[0].trim();
-  if (!control || control.startsWith('<')) out.push(`${where}: control must name the guide or sensor file to change`);
-  else if (!existsSync(join(root, control))) out.push(`${where}: control ${control} does not exist`);
-  if (!proposal.success || proposal.success.startsWith('<')) out.push(`${where}: success criterion is unfilled`);
-  if (DECIDED.has(proposal.status) && !proposal.decided_by) out.push(`${where}: status ${proposal.status} needs decided_by (Tech Lead decision)`);
-  if (proposal.status === 'applied' && !proposal.applied_commit) out.push(`${where}: status applied needs applied_commit (the commit that changed ${control || 'the control'})`);
-  if (proposal.applied_at && !Number.isFinite(Date.parse(proposal.applied_at))) out.push(`${where}: applied_at must be an ISO date`);
-  return out;
-}
+/** Contract problems of one steering proposal (QG-LEARN-03, QG-LEARN-05): one implementation, in learning-lib. */
+export { proposalFindings };
 
 /**
  * Whether `applied_commit` really changed the control (QG-LEARN-05).

@@ -9,7 +9,7 @@ export const SEVERITIES = ['fail', 'warn', 'advisory'] as const;
 // biome-ignore lint/suspicious/noExplicitAny: tool payloads are open JSON from the harness scripts.
 export type Payload = Record<string, any>;
 
-export type Kind = 'diff' | 'compliance' | 'audit' | 'architecture' | 'finding' | 'ci';
+export type Kind = 'diff' | 'compliance' | 'audit' | 'architecture' | 'finding' | 'ci' | 'learning';
 export type Mode = 'author' | 'review';
 export type Level = 'blocking' | 'warning' | 'clean' | 'unknown';
 
@@ -24,6 +24,8 @@ export type ArchitectureDetails = {
 	output_truncated: boolean;
 	message: string | null;
 	sources: Array<{ id: string; path: string; filled: boolean; text?: string }>;
+	/** No Semgrep rules: the prompt that asks the host agent to write them (spec-drift-empty REQ-003). */
+	generate_prompt: string | null;
 };
 
 export type Details = {
@@ -41,6 +43,8 @@ export type Hotspot = { path: string; score: number; churn: number; req_links: n
 export type ViewModel = {
 	kind: Kind;
 	error?: string;
+	/** Nothing to show: why, and the next step (spec-drift-empty REQ-004). */
+	noData?: { reason: string; next: string };
 	findings: AuditFinding[];
 	summary: Payload;
 	checks: Check[];
@@ -58,9 +62,19 @@ export type ViewModel = {
 	hotspots?: Hotspot[];
 	unconfigured?: string[];
 	semgrep?: Payload | null;
+	learning?: { summary: Payload; patterns: Payload[]; proposals: Payload[]; note?: string };
 };
 
-export type Action = { id: 'task' | 'comment' | 'dismiss'; label: string; needsReason?: boolean };
+/**
+ * A view action. `command` actions record a Tech Lead decision: the view shows the asdd command to run in a terminal and
+ * sends nothing (the server writes nothing; spec-drift-apps REQ-003). The others send a request to the host chat.
+ */
+export type Action = {
+	id: 'task' | 'comment' | 'dismiss' | 'confirm';
+	label: string;
+	needsReason?: boolean;
+	command?: boolean;
+};
 
 /** Payload of a CallToolResult: structuredContent, else the JSON text fallback. */
 export const payloadOf = (result: unknown): Payload | null => {
@@ -79,6 +93,7 @@ export const payloadOf = (result: unknown): Payload | null => {
 export const kindOf = (payload: Payload | null): Kind | null => {
 	if (!payload) return null;
 	if (payload['finding']) return 'finding';
+	if (Array.isArray(payload['patterns']) && Array.isArray(payload['proposals'])) return 'learning';
 	if (payload['provider'] && 'content' in payload) return 'ci';
 	if (payload['adapters']) return 'compliance';
 	if (payload['hotspots'] || payload['reports']) return 'audit';
@@ -193,6 +208,7 @@ const architectureOf = (kind: Kind, payload: Payload): ArchitectureDetails | nul
 		output_truncated: Boolean(arch.output_truncated ?? payload['output_truncated']),
 		message: arch.message ?? null,
 		sources: arch.sources ?? [],
+		generate_prompt: arch.generate_prompt ?? null,
 	};
 };
 
@@ -228,6 +244,16 @@ export const viewModel = (payload: Payload | null): ViewModel | null => {
 	const kind = kindOf(payload);
 	if (!kind || !payload) return null;
 	if (payload['error']) return { kind, error: String(payload['error']), findings: [], summary: {}, checks: [] };
+	const noData = payload['no_data'];
+	if (noData) {
+		return {
+			kind,
+			noData: { reason: String(noData.reason ?? 'No data.'), next: String(noData.next ?? '') },
+			findings: [],
+			summary: {},
+			checks: [],
+		};
+	}
 	if (kind === 'ci') {
 		return {
 			kind,
@@ -244,6 +270,20 @@ export const viewModel = (payload: Payload | null): ViewModel | null => {
 	}
 	if (kind === 'finding') {
 		return { kind, findings: [payload['finding']], trace: payload['trace'] ?? null, summary: {}, checks: [] };
+	}
+	if (kind === 'learning') {
+		return {
+			kind,
+			learning: {
+				summary: payload['summary'] ?? {},
+				patterns: payload['patterns'],
+				proposals: payload['proposals'],
+				note: payload['commands_note'],
+			},
+			findings: [],
+			summary: {},
+			checks: [],
+		};
 	}
 	const findings: AuditFinding[] =
 		kind === 'compliance'
@@ -305,7 +345,8 @@ export const actionsFor = (mode: Mode): Action[] =>
 	mode === 'review'
 		? [
 				{ id: 'comment', label: 'Draft comment' },
-				{ id: 'dismiss', label: 'Dismiss…', needsReason: true },
+				{ id: 'dismiss', label: 'Dismiss…', needsReason: true, command: true },
+				{ id: 'confirm', label: 'Confirm', command: true },
 			]
 		: [{ id: 'task', label: 'Send to agent as task' }];
 
@@ -318,19 +359,29 @@ const describe = (f: AuditFinding): string => {
 	return `${f.id} (${f.check}, ${f.severity}): ${f.message}${files}${node}${rule}${fix}${remediation}`;
 };
 
-/** Text the view sends to the host chat (ui/message). The view never changes files itself. */
-export const messageFor = (
-	actionId: Action['id'],
+/**
+ * The triage command a Tech Lead runs in a terminal (spec-drift-apps REQ-003). Neither the view nor the server writes
+ * `.harness/audits/triage.json`; `asdd triage` does.
+ */
+export const triageCommand = (
+	actionId: 'dismiss' | 'confirm',
 	finding: AuditFinding,
 	{ reason }: { reason?: string } = {},
-): string => {
+): string =>
+	actionId === 'dismiss'
+		? `asdd triage ${finding.id} --dismiss --reason ${JSON.stringify(reason?.trim() ?? '')}`
+		: `asdd triage ${finding.id} --confirm${reason?.trim() ? ` --reason ${JSON.stringify(reason.trim())}` : ''}`;
+
+/** Text the view sends to the host chat (ui/message). The view never changes files itself. */
+export const messageFor = (actionId: Action['id'], finding: AuditFinding): string => {
 	switch (actionId) {
 		case 'task':
 			return `Fix spec drift finding ${describe(finding)}\n\nWork inside the active slice: change only files mapped by its intent, design, tasks, or spec, or by feature scope_paths. If the change is intended, map the file in the slice instead of reverting it. Run audit_diff again when done.`;
 		case 'comment':
 			return `Draft a pull request review comment for finding ${describe(finding)}\n\nCite the requirement or rule it breaks, with file and line. Do not post it; show me the draft.`;
 		case 'dismiss':
-			return `Record a Tech Lead dismissal for finding ${finding.id} (${finding.check}). Run:\nasdd triage ${finding.id} --dismiss --reason ${JSON.stringify(reason ?? '')}\n\nThe dismissal holds until the finding's files change.`;
+		case 'confirm':
+			throw new Error(`${actionId} is a triage command (triageCommand), not a chat message`);
 		default:
 			throw new Error(`unknown action ${String(actionId)}`);
 	}

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Resource, Tool } from '@nestjs/mcp';
-
 import { appToolMeta, RESOURCE_MIME_TYPE, readAppHtml } from '../common/mcp/mcp-app.util.ts';
+import { RulePacksOutput, ScanSummaryOutput } from './analysis.output.ts';
 import { presentPacks, presentScan } from './analysis.presenter.ts';
 import {
 	type AnalyzeInput,
@@ -33,6 +33,7 @@ export class AnalysisTools {
 		description:
 			'Run the architecture rule set (boundaries, network/DB, scaffolding, taint) with the configured static analyzer and open an interactive dashboard for findings and ADR-backed spec drift.',
 		inputSchema: scopedAnalyzeSchema('architecture'),
+		outputSchema: ScanSummaryOutput,
 		_meta: appToolMeta(ANALYSIS_UI_URI),
 	})
 	analyzeArchitecture(args: ScopedAnalyzeInput) {
@@ -46,6 +47,7 @@ export class AnalysisTools {
 		description:
 			'Run the coding-standards rule set (try/catch, enum, any, assertions, process.env, naming) with the configured static analyzer and show an interactive dashboard.',
 		inputSchema: scopedAnalyzeSchema('standards'),
+		outputSchema: ScanSummaryOutput,
 		_meta: appToolMeta(ANALYSIS_UI_URI),
 	})
 	analyzeStandards(args: ScopedAnalyzeInput) {
@@ -59,6 +61,7 @@ export class AnalysisTools {
 		description:
 			'Compare the live codebase against the rule-encoded architectural/ADR specs (AGENTS.md / ADRs). Returns a drift report: which rules are clean vs violating, with samples — rendered in an interactive MCP App dashboard.',
 		inputSchema: AnalyzeInputSchema,
+		outputSchema: ScanSummaryOutput,
 		_meta: appToolMeta(ANALYSIS_UI_URI),
 	})
 	analyzeSpecDrift(args: AnalyzeInput) {
@@ -72,6 +75,7 @@ export class AnalysisTools {
 		description:
 			"List the rule packs of the analyzed repo (e.g. under .semgrep/): one per top-level folder (set) and one per rule file. Use their ids in the analyze tools' `packs` argument.",
 		inputSchema: EmptyInputSchema,
+		outputSchema: RulePacksOutput,
 	})
 	async listPacks() {
 		return presentPacks(this.analysis.engine.rulesDir, await this.analysis.listPacks());
@@ -84,6 +88,7 @@ export class AnalysisTools {
 		title: 'Re-run analysis',
 		description: 'Re-run the analysis with the given options (used by the dashboard UI).',
 		inputSchema: AnalyzeInputSchema,
+		outputSchema: ScanSummaryOutput,
 		_meta: appToolMeta(ANALYSIS_UI_URI, ['app']),
 	})
 	rescan(args: AnalyzeInput) {

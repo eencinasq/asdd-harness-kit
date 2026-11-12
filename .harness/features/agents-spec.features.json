@@ -47,7 +47,7 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "Reopened for the fleet fixes found while writing the sensor: refactor's handoff to QA removed (it closed a qa -> refactor -> qa handoff cycle, AL-301; the caller re-runs QA after a refactor PR); spike researcher's anti-hedging rule made explicit (A-018); scope path of the deleted spec-peer-review.md template now cli/steering/templates (DRIFT-05). kit agents-lint PASS (14 agents); agents-lint tests 10/10; npm test 131/131.",
+      "evidence": "Reopened for the fleet fixes found while writing the sensor: refactor's handoff to QA removed (it closed a qa -> refactor -> qa handoff cycle, AL-301; the caller re-runs QA after a refactor PR); spike researcher's anti-hedging rule made explicit (A-018); scope path of the deleted spec-peer-review.md template now cli/steering/templates (DRIFT-05). kit agents-lint PASS (14 agents); agents-lint tests 10/10; npm test 131/131. | Re-verified with no content change: the hash moved when the deletion of cli/steering/templates/spec-peer-review.md was committed (c35127e): a directory scope lists files with git ls-files --cached, so before the commit the deleted file entered the hash as <missing> and after it does not (harness sensor noise, reported). asdd kit agents-lint PASS (14 agents); npm test 132/132.",
       "scope_paths": [
         "cli/agents/asdd-implementation-agent.md",
         "cli/agents/asdd-qa-agent.md",
@@ -60,7 +60,7 @@
         "cli/steering/templates",
         "cli/scaffold/config/models.json"
       ],
-      "evidence_hash": "7529bc2a62776e65df828ce8f71309e9ed4cf4a0e5a3e14ceb53aef8ae3c6f63"
+      "evidence_hash": "cff287920444088e3160c74d68657102b1accfe670f62cdc7d8ebe16579082eb"
     },
     {
       "id": "TASK-003",

@@ -14,6 +14,9 @@
 | knowledge-nest | escalated | implementation | in_progress | 0 |
 | mcp-standalone | escalated | implementation | in_progress | 0 |
 | modules-top-level | escalated | implementation | in_progress | 0 |
+| sensor-fixes | escalated | knowledge | DONE | 0 |
 | skills-bloom | lite | knowledge | DONE | 0 |
 | skills-spec | escalated | knowledge | DONE | 0 |
+| spec-drift-apps | full | knowledge | DONE | 0 |
+| spec-drift-empty | full | knowledge | DONE | 0 |
 | spec-drift-merge | escalated | implementation | in_progress | 0 |

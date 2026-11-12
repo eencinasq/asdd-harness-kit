@@ -1,7 +1,19 @@
 import type { RulePack, ScanSummary } from './analysis.types.ts';
 
+/** No rules: say nothing was analyzed, and offer the agent prompt (spec-drift-empty REQ-001, REQ-002). */
+const noRulesText = (summary: ScanSummary): string =>
+	[
+		`${summary.engine.name} ${summary.mode} — no rules, nothing analyzed (not a pass).`,
+		summary.message ?? '',
+		'',
+		'Offer the user to have the agent write rules from this codebase (the dashboard button "Ask the agent to write rules", or the MCP prompt `generate-architecture-rules`). Only if the user agrees, follow:',
+		'',
+		summary.generatePrompt ?? '',
+	].join('\n');
+
 /** Plain-text summary for hosts that do not render the dashboard. */
 const toText = (summary: ScanSummary): string => {
+	if (summary.status === 'no-rules') return noRulesText(summary);
 	const lines = [
 		`${summary.engine.name} ${summary.mode} — ${summary.findingCount} finding(s)`,
 		`Spec drift: ${summary.drift.driftingRules}/${summary.drift.totalRules} rules violating`,

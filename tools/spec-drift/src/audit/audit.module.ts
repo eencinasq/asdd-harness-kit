@@ -5,6 +5,7 @@ import type { Env } from '../config/env.schema.ts';
 import { AuditPrompts } from './audit.prompts.ts';
 import { AUDIT_OPTIONS, type AuditOptions, AuditService } from './audit.service.ts';
 import { AuditTools } from './audit.tools.ts';
+import { AuditInsightTools } from './audit-insight.tools.ts';
 
 /**
  * Harness governance feature (formerly the spec-drift-auditor server): spec drift, architecture rules, spec
@@ -25,6 +26,7 @@ import { AuditTools } from './audit.tools.ts';
 		},
 		AuditService,
 		AuditTools,
+		AuditInsightTools,
 		AuditPrompts,
 	],
 	exports: [AuditService],

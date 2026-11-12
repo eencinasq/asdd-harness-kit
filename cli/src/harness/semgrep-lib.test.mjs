@@ -79,6 +79,20 @@ test('resolveSemgrepConfig selects .semgrep.yml and does not generate', () => {
   assert.equal(config.yaml, undefined);
 });
 
+test('spec-drift-empty REQ-003: resolveSemgrepConfig selects the .semgrep/architecture folder once it holds rules', () => {
+  const root = mkdtempSync(join(tmpdir(), 'semgrep-folder-'));
+  mkdirSync(join(root, '.semgrep/architecture'), { recursive: true });
+  const stub = sources.map((s) => (s.id === 'domain-layer.project' ? { ...s, text: '# Layers\n' } : s));
+  assert.equal(resolveSemgrepConfig(root, stub).status, 'unconfigured', 'an empty folder is not a config');
+  mkdirSync(join(root, '.semgrep/architecture/boundaries'), { recursive: true });
+  writeFileSync(join(root, '.semgrep/architecture/boundaries/01.yml'), 'rules: []\n');
+  const config = resolveSemgrepConfig(root, stub);
+  assert.equal(config.source, 'selected');
+  assert.equal(config.path, '.semgrep/architecture');
+  writeFileSync(join(root, '.semgrep.yml'), 'rules: []\n');
+  assert.equal(resolveSemgrepConfig(root, stub).path, '.semgrep.yml', 'a config file still wins');
+});
+
 test('resolveSemgrepConfig honors the Semgrep rules binding', () => {
   const root = mkdtempSync(join(tmpdir(), 'semgrep-bound-'));
   mkdirSync(join(root, 'rules'), { recursive: true });

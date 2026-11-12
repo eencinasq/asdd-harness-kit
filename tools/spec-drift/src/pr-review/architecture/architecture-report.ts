@@ -3,6 +3,7 @@
  * markdown sections added to prompts / reports. Engine-neutral (the analyzer is pluggable).
  */
 import type { EngineInfo } from '../../analysis/analysis.types.ts';
+import { buildRulesPrompt } from '../../analysis/domain/rules-prompt.ts';
 import type { ReviewFinding } from '../engine/types.ts';
 import type { ArchitectureFinding, ArchitectureReviewView } from './architecture.types.ts';
 
@@ -12,6 +13,7 @@ const ARCHITECTURE_SECTION = /\n## Architecture \(project[\s\S]*$/m;
 const LEGACY_ENGINE: EngineInfo = { id: 'semgrep', name: 'Semgrep', rulesDir: '.semgrep' };
 const engineOf = (arch: ArchitectureReviewView): EngineInfo => arch.engine ?? LEGACY_ENGINE;
 
+/** The rules-generation prompt for a PR review: once the rules exist, re-run the PR's architecture scan. */
 export const buildRulesGeneratePrompt = (options: {
 	readonly repoRoot: string;
 	readonly project: string;
@@ -19,32 +21,14 @@ export const buildRulesGeneratePrompt = (options: {
 	readonly engine: EngineInfo;
 	/** Engine-specific authoring steps (CodeAnalyzer.authoringGuide). */
 	readonly guide: readonly string[];
-}): string => {
-	const { engine } = options;
-	const prBit =
-		options.pr !== undefined
-			? `After creating the rules, call \`pr_review_architecture_rescan\` with pr=${options.pr} to re-run the architecture scan on the PR files.`
-			: 'After creating the rules, tell the user to re-run the PR review or architecture rescan.';
-
-	return [
-		`# Generate ${engine.rulesDir} architecture rules for ${options.project}`,
-		'',
-		`Repo root: \`${options.repoRoot}\``,
-		`There is no usable \`${engine.rulesDir}/\` config in this project yet.`,
-		'',
-		'## Goal',
-		`Create a project-specific ${engine.name} rule set under \`${engine.rulesDir}/\` that encodes **this** codebase’s architecture and coding standards (not a generic template copy-paste).`,
-		'',
-		'## How',
-		'1. Explore the codebase: README, AGENTS.md / CLAUDE.md, ADRs, package layout, dependency boundaries, lint rules, and existing conventions.',
-		...options.guide.map((step, i) => `${i + 2}. ${step}`),
-		`${options.guide.length + 2}. Keep rules precise; avoid noisy style nits unless the project already enforces them.`,
-		`${options.guide.length + 3}. Do **not** invent secrets or commit credentials.`,
-		'',
-		'## Done',
-		prBit,
-	].join('\n');
-};
+}): string =>
+	buildRulesPrompt({
+		...options,
+		done:
+			options.pr !== undefined
+				? `After creating the rules, call \`pr_review_architecture_rescan\` with pr=${options.pr} to re-run the architecture scan on the PR files.`
+				: 'After creating the rules, tell the user to re-run the PR review or architecture rescan.',
+	});
 
 export const architecturePromptSection = (arch: ArchitectureReviewView): string => {
 	const engine = engineOf(arch);

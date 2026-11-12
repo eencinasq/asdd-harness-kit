@@ -28,6 +28,17 @@
 
 			<div id="failure" class="callout tone-danger" role="alert" hidden></div>
 
+			<section id="no-rules" class="card stack" aria-labelledby="no-rules-title" hidden>
+				<h2 id="no-rules-title">No rules — nothing analyzed</h2>
+				<p id="no-rules-message"></p>
+				<p class="subtle">This is not a pass. The agent can write rules from this codebase; review them before you commit them.</p>
+				<div class="toolbar">
+					<button type="button" id="ask-rules" class="btn btn-primary">Ask the agent to write rules</button>
+					<button type="button" id="copy-rules-prompt" class="btn">Copy prompt</button>
+				</div>
+				<details class="disclosure"><summary>Prompt</summary><pre class="block" id="no-rules-prompt"></pre></details>
+			</section>
+
 			<section id="summary" class="stack" aria-label="Summary" hidden>
 				<div class="kpis">
 					<div class="kpi" id="kpi-findings-card">
