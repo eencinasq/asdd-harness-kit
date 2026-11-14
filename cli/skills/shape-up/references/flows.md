@@ -162,9 +162,10 @@ What's next?
 
 **When user provides a pitch to review:**
 
-**Pitch Review**
+**Pitch Review — critique-first / no-glazing**
 
-I'll review this pitch against Shape Up principles.
+Start with the **strongest reason this pitch could fail the appetite**. Prefer a fresh-context
+(Goldfish) pass: quote the pitch file only; ignore the drafting chat. Empty praise is not a verdict.
 
 Checking:
 - Problem - Is the friction specific and real?
@@ -203,25 +204,33 @@ Skip the coaching, just ask the minimum questions:
 
 **When the idea isn't ready to shape:**
 
-**Not Ready To Shape**
+Write a **concepts brief** first ([`concepts-brief-template.md`](./concepts-brief-template.md)) to
+`docs/pitches/<pitch-id>/concepts_brief.md`. Optional brownfield context:
+[`brownfield-bootstrap.md`](./brownfield-bootstrap.md). Do not set `ready_for_bet` from a brief alone.
 
-This idea might not be ready to shape yet.
+**Readiness gate** (human `decided_by` on each row):
 
-Signs it's too early:
+| Question | Must be… |
+|----------|----------|
+| Specific friction named? | yes, or deferred with who/when to learn |
+| Who has it? | named actor, or deferred |
+| Evidence it matters? | cited, "none yet", or deferred |
+| Learn vs ship? | explicit |
+
+- `brief_status: ready_to_shape` → continue to Flow 1 or 3 (formal pitch).
+- `brief_status: parked` → stop; gather evidence; do not invent a pitch.
+- `brief_status: exploring` → keep asking; critique-first on the weakest open question.
+
+Signs it's still too early:
 - Can't articulate specific friction
 - Don't know who has the problem
 - Solution is completely unclear
 - No evidence it matters
 
-What would help:
-- Talk to users experiencing the friction
-- Find evidence (support tickets, analytics, interviews)
-- Prototype to learn, not to ship
-
 Would you like to:
-1. Dig deeper into the problem now
-2. Plan discovery work first
-3. Shape anyway (accept higher risk)
+1. Dig deeper into the problem now (update the brief)
+2. Plan discovery work first (`parked`)
+3. Shape anyway (accept higher risk — record deferrals on the readiness gate, then Flow 1)
 
 ## Flow 5: Convert or Hand Off a Pitch
 

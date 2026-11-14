@@ -242,6 +242,14 @@
       "mode": "lite",
       "manifest": ".harness/state/slices/kit-playbook/manifest.json",
       "features": ".harness/features/kit-playbook.features.json"
+    },
+    {
+      "slice_id": "egm-shaping",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/egm-shaping/manifest.json",
+      "features": ".harness/features/egm-shaping.features.json"
     }
   ]
 }

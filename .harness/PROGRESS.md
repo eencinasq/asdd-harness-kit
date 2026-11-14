@@ -14,6 +14,7 @@
 | asdd-p4 | escalated | knowledge | DONE | 0 |
 | asdd-roadmap | lite | knowledge | DONE | 0 |
 | cli-harness | escalated | implementation | in_progress | 0 |
+| egm-shaping | full | knowledge | DONE | 0 |
 | harness-green | escalated | knowledge | DONE | 0 |
 | jev-gate-nest | escalated | implementation | in_progress | 0 |
 | jev-module | full | knowledge | DONE | 0 |

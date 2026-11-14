@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-14T03:00:53.571Z",
+  "generated_at": "2026-11-14T03:28:31.030Z",
   "threshold": 3,
   "summary": {
     "patterns": 18,
@@ -14,12 +14,12 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 29,
+      "occurrences": 30,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-11-14T03:00:52.524Z",
+      "last_seen": "2026-11-14T03:28:30.000Z",
       "sources": [
         "escalation"
       ],
@@ -34,6 +34,7 @@
         "asdd-p4",
         "cli-harness",
         "drift-consistency",
+        "egm-shaping",
         "harness-green",
         "jev-gate-nest",
         "jev-module",

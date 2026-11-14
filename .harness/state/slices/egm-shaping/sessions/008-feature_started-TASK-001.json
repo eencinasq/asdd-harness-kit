@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-egm-shaping-008",
+  "timestamp": "2026-11-14T03:28:19.000Z",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "egm-shaping",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "evidence": "start TASK-001",
+  "concerns": [],
+  "scope_paths": [
+    "cli/skills/product-delivery/SKILL.md",
+    "cli/skills/product-delivery/contracts/scope-map.schema.yaml",
+    "cli/skills/product-delivery/references/asdd-harness-handoff.md",
+    "cli/skills/product-delivery/references/shape-up-input.md",
+    "cli/skills/product-delivery/examples/end-to-end-example.md",
+    ".harness/steering/templates/intent.md"
+  ]
+}

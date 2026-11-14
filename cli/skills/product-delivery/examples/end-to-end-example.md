@@ -3,8 +3,10 @@
 ```text
 PITCH-014 (bet, six weeks)
   → scope map: SCOPE-001 (must_have), SCOPE-002 (nice_to_have ~)
+  → Goldfish scope-split-review.md → ready_for_intents
+  → intent_fit: both fit (lite)
   → intents: orders-quick-reorder, orders-reorder-edit
-  → @asdd-discovery-agent per intent → ASDD pipeline per slice
+  → @asdd-discovery-agent per fit intent → ASDD pipeline per slice
 ```
 
 ## 1. Bet pitch (from `shape-up`)
@@ -54,6 +56,13 @@ scopes:
       - skip items no longer sold and say so
     rabbit_holes: [price changes since the original order — use current price]
     depends_on: []
+    intent_fit:
+      one_outcome: true
+      lite_fit: true
+      ears_ready: true
+      self_contained: true
+      status: fit
+      decided_by: shapers
     slice_id: orders-quick-reorder
   - id: SCOPE-002
     name: Reorder edit step
@@ -61,9 +70,30 @@ scopes:
     class: nice_to_have         # scope choice (decided_by: shapers)
     must_haves: [edit quantities before adding to the cart]
     depends_on: [SCOPE-001]
+    intent_fit:
+      one_outcome: true
+      lite_fit: true
+      ears_ready: true
+      self_contained: true
+      status: fit
+      decided_by: shapers
     slice_id: orders-reorder-edit
 validation: { all_items_placed: true, unplaced_items: [], cycles: [], fits_appetite: true }
 ```
+
+## 2b. Scope-split review (Goldfish)
+
+`docs/pitches/PITCH-014/scope-split-review.md` — critique-first, cited from the map (example abbreviated):
+
+| Lens | Verdict | Evidence | Fix | Human |
+|------|---------|----------|-----|-------|
+| Appetite fit | pass | "appetite: six weeks" + two scopes | — | accept — shapers |
+| One demoable outcome | pass | SCOPE-001/002 each one `outcome` | — | accept — shapers |
+| ASDD lite-fit | pass | each scope one vertical slice | — | accept — shapers |
+| No-gos & deps | pass | `depends_on: [SCOPE-001]` acyclic | — | accept — shapers |
+| Gaps | pass | all must-haves placed | — | accept — shapers |
+
+Status: `ready_for_intents`
 
 ## 3. Intents
 
@@ -92,6 +122,9 @@ Six weeks for the whole pitch (shared with orders-reorder-edit).
 ## Must-have outcomes
 - MH-01: When a signed-in customer taps Reorder on a past order, the system shall add every still-sold item of that order to the cart at its current price.
 - MH-02: If an item of the past order is no longer sold, then the system shall leave it out of the cart and tell the customer which item was skipped.
+
+## Intent fitness
+- one_outcome / lite_fit / ears_ready / self_contained: fit (decided_by: shapers)
 
 ## No-gos
 - No subscriptions or scheduled reorders.

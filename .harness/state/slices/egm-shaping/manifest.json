@@ -1,0 +1,259 @@
+{
+  "schema_version": "3.0",
+  "slice_id": "egm-shaping",
+  "phase": "knowledge",
+  "status": "DONE",
+  "mode": "full",
+  "escalation_signals": [
+    {
+      "type": "E1-scope-spread",
+      "evidence": "scope touches 3 top-level modules: .harness, cli, docs"
+    }
+  ],
+  "escalation_required": false,
+  "escalated_from_lite": false,
+  "created_at": "2026-11-14T03:20:52.279Z",
+  "updated_at": "2026-11-14T03:28:30.855Z",
+  "paths": {
+    "specs": ".harness/specs/egm-shaping",
+    "tasks": ".harness/specs/egm-shaping/tasks.md",
+    "features": ".harness/features/egm-shaping.features.json"
+  },
+  "gates": {
+    "discovery": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-14T03:23:07.000Z",
+      "evidence": "Planning artifacts for EGM P0–P4: intent, capability, requirements, design, tasks, features.",
+      "concerns": []
+    },
+    "spec": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-14T03:23:07.000Z",
+      "evidence": "Planning artifacts for EGM P0–P4: intent, capability, requirements, design, tasks, features.",
+      "concerns": []
+    },
+    "validation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-14T03:23:07.000Z",
+      "evidence": "Planning artifacts for EGM P0–P4: intent, capability, requirements, design, tasks, features.",
+      "concerns": []
+    },
+    "domain": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-14T03:23:07.000Z",
+      "evidence": "Planning artifacts for EGM P0–P4: intent, capability, requirements, design, tasks, features.",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-14T03:23:07.000Z",
+      "evidence": "Planning artifacts for EGM P0–P4: intent, capability, requirements, design, tasks, features.",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-14T03:23:07.000Z",
+      "evidence": "Planning artifacts for EGM P0–P4: intent, capability, requirements, design, tasks, features.",
+      "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-14T03:28:30.000Z",
+      "evidence": "All TASK-001…005 passing; skills-lint OK; EGM P0–P4 shipped in shape-up/product-delivery.",
+      "concerns": []
+    },
+    "qa": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-14T03:28:30.000Z",
+      "evidence": "All TASK-001…005 passing; skills-lint OK; EGM P0–P4 shipped in shape-up/product-delivery.",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-14T03:28:30.000Z",
+      "evidence": "All TASK-001…005 passing; skills-lint OK; EGM P0–P4 shipped in shape-up/product-delivery.",
+      "concerns": []
+    }
+  },
+  "active_features": [],
+  "open_dissents": 0,
+  "source": null,
+  "session_log": [
+    {
+      "timestamp": "2026-11-14T03:20:52.139Z",
+      "agent": "human",
+      "human": "squad",
+      "event": "phase_started",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-14T03:23:07.000Z",
+      "agent": "asdd-full",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-14T03:23:07.000Z",
+      "agent": "asdd-full",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-14T03:23:07.000Z",
+      "agent": "asdd-full",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "validation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-14T03:23:07.000Z",
+      "agent": "asdd-full",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "domain",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-14T03:23:07.000Z",
+      "agent": "asdd-full",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-14T03:23:07.000Z",
+      "agent": "asdd-full",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:19.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-14T03:28:30.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-14T03:28:30.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-14T03:28:30.000Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    }
+  ],
+  "contributors": [
+    "squad",
+    "human",
+    "eencinas",
+    "asdd-full",
+    "asdd-pipeline"
+  ]
+}

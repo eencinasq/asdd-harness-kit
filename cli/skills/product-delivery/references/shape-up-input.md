@@ -81,7 +81,7 @@ The shapers decide and record the reason for each class in the scope map.
 
 ## Scope map gate
 
-Before writing intents, verify:
+Before the Goldfish scope-split review and intents, verify:
 
 - the pitch is `bet` and its ID is stable;
 - every must-have and nice-to-have is placed in exactly one scope, and no pitch item is dropped;
@@ -91,3 +91,9 @@ Before writing intents, verify:
 - open questions are `PENDING_DEFINITION`, not guesses.
 
 Record the map in [`../contracts/scope-map.schema.yaml`](../contracts/scope-map.schema.yaml) format.
+
+Then run [`scope-split-review.md`](./scope-split-review.md) (critique-first / Goldfish). After
+`ready_for_intents`, fill `intent_fit` per kept scope and only then write intents
+([`asdd-harness-handoff.md`](./asdd-harness-handoff.md)). Signals that a candidate is not
+**lite-fit**: more than one top-level module likely to change; more than one demoable outcome;
+must-haves for unrelated actors — split or record an explicit `--full` decision with `decided_by`.

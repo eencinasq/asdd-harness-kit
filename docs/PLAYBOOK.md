@@ -124,11 +124,16 @@ scope, `asdd-converge` checks requirements, test mentions and evidence before `p
 
 ### Play C — A shaped bet (full path)
 
-1. **Shape** — _"Shape a pitch for <idea>"_ (the `shape-up` skill): problem, appetite, solution, rabbit holes, no-gos.
-   A person bets on it, or lets it go.
-2. **Split** — _"Split the bet pitch into scopes"_ (`product-delivery`): one `intent.md` per scope, each one slice.
-3. **Specify** — per scope: `asdd slice init <id> --full`, then the agents run Discovery → Spec → Validation →
-   Domain → Design → Task Planning, with a human gate where the steering says so.
+1. **Shape** — _"Shape a pitch for <idea>"_ (the `shape-up` skill): vague ideas start as a `concepts_brief` with a
+   readiness gate; then problem, appetite, solution, rabbit holes, no-gos. Reviews are critique-first (weakest point
+   first). A person bets on it, or lets it go. Optional brownfield context:
+   `cli/skills/shape-up/references/brownfield-bootstrap.md` (complements `asdd init-flow`; does not replace it).
+2. **Split** — _"Split the bet pitch into scopes"_ (`product-delivery`): scope map → **Goldfish scope-split review** →
+   **intent fitness** (one outcome, lite-fit, EARS, self-contained) → one `intent.md` per **fit** scope only. Unfit
+   scopes re-split or return to shaping — they never call `asdd slice init`.
+3. **Specify** — per fit scope: `asdd slice init <id>` (lite by default; `--full` only when fitness recorded an explicit
+   full decision), then the agents run Discovery → Spec → Validation → Domain → Design → Task Planning, with a human
+   gate where the steering says so. Discovery does not re-shape unfit intents — send them back to product-delivery.
 4. **Build** — Implementation, feature by feature; QA checks every MUST requirement has a feature and a test; Knowledge
    records decisions and cut scope.
 

@@ -15,26 +15,42 @@ Write intents only when:
 
 - the pitch is `bet` and its ID is stable;
 - the scope map passed its gate ([`shape-up-input.md`](./shape-up-input.md));
+- the Goldfish scope-split review is `ready_for_intents` ([`scope-split-review.md`](./scope-split-review.md));
 - every scope has a recorded scope choice (`decided_by`); `reshape` scopes are removed;
+- every kept scope has **intent fitness** `status: fit` (below);
 - the project bindings and quality gates under `.harness/steering/` are filled.
 
 `needs_shaping`, `ready_for_bet`, and `no_bet` pitches never enter ASDD. Return them to `shape-up`.
 
-## One intent per scope
+## Intent fitness (codeable)
 
-For each kept scope:
+A kept scope is **fit** for ASDD only when all hold. Record them under `intent_fit` on the scope in the map:
+
+| Check | Field | Fail → |
+|-------|--------|--------|
+| Exactly one observable outcome | `one_outcome` | Split or merge |
+| **Lite-fit** — expected as one `lite` (or later hotfix) slice unless an explicit `--full` or re-split is recorded | `lite_fit` | Re-split, reshape, or set `lite_fit: false` with `decided_by` + notes for `--full` |
+| Must-haves are EARS-ready (one trigger, one observable response, no ambiguous term) with human confirm | `ears_ready` | Rewrite MH; do not invent |
+| Intent is **self-contained** (another agent understands it without the pitch chat) | `self_contained` | Enrich intent; do not rely on chat |
+
+`intent_fit.status` is `fit`, `unfit`, or `pending`. **Unfit scopes must not run `asdd slice init`.** Re-split, reshape, or return `RE-SHAPING_REQUIRED`. Discovery must not re-shape an unfit intent — send it back to product-delivery.
+
+## One intent per fit scope
+
+For each **fit** kept scope:
 
 1. **Choose a slice ID.** Lowercase, hyphenated, named after the scope in the project's language (e.g. `orders-quick-reorder`). Do not create a second slice for a scope that already has one.
-2. **Create the slice.** `asdd slice init <slice-id>` (lite by default; `--full` only when the scope is known upfront to be cross-cutting).
+2. **Create the slice.** `asdd slice init <slice-id>` (lite by default; `--full` only when `intent_fit` records an explicit full decision).
 3. **Write `.harness/specs/<slice-id>/intent.md`** from `.harness/steering/templates/intent.md`:
    - Source: `Pitch ID`, `Scope ID`, scope map link, `bet`, cycle, scope class.
    - Problem and desired outcome narrowed to this scope.
    - Appetite: the bet's appetite (shared by all scopes).
-   - Must-have outcomes as EARS-style statements (`MH-01`, …). Check each against the EARS criteria (one trigger, one observable response, no ambiguous term) and record who confirmed it (`decided_by`).
+   - Must-have outcomes as EARS-style statements (`MH-01`, …). Check each against the EARS criteria and record who confirmed it (`decided_by`).
+   - Optional `## Intent fitness` mirroring the map's `intent_fit`.
    - Nice-to-haves (~), no-gos, rabbit holes, actors, depends on, open questions.
 4. **Record the slice ID** on the scope in the scope map.
 
-A small pitch with one scope produces one intent. A pitch with five scopes produces five intents. There is no parent container above the intents; the pitch and the scope map link them.
+A small pitch with one fit scope produces one intent. Unfit scopes produce zero intents until fixed. There is no parent container above the intents; the pitch and the scope map link them.
 
 ## Handing off to Discovery
 
@@ -81,8 +97,9 @@ Never extend the appetite. When time runs short, hammer the scope: cut `~` items
 
 The handoff is complete when:
 
-- every kept scope has exactly one slice and one `intent.md`;
-- every intent carries `source_pitch_id` and `source_scope_id`;
+- every **fit** kept scope has exactly one slice and one `intent.md`;
+- every kept scope has `intent_fit.status: fit` (unfit scopes have no slice);
+- every intent carries `source_pitch_id` and `source_scope_id` and is self-contained;
 - every must-have outcome passed the EARS criteria, confirmed by a human (`decided_by`);
 - dependencies between intents are acyclic and written in `Depends on`;
 - the next agent (`@asdd-discovery-agent`) and the slice order are explicit.

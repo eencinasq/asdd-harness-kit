@@ -89,6 +89,33 @@ properties:
         slice_id:
           type: string
           description: ASDD slice created for this scope (.harness/specs/<slice_id>/intent.md)
+        intent_fit:
+          type: object
+          description: >-
+            Optional on legacy maps; product-delivery must fill it for new maps before
+            asdd slice init. status fit means one codeable ASDD slice.
+          properties:
+            one_outcome:
+              type: boolean
+              description: Exactly one observable, demoable outcome
+            lite_fit:
+              type: boolean
+              description: >-
+                True when the scope is expected as lite or hotfix. False only with an
+                explicit --full or re-split decision recorded in decided_by / notes
+            ears_ready:
+              type: boolean
+              description: Must-haves are EARS-ready and human-confirmed
+            self_contained:
+              type: boolean
+              description: Intent readable without the pitch chat
+            status:
+              type: string
+              enum: [fit, unfit, pending]
+            decided_by:
+              type: string
+            notes:
+              type: string
   reshaped:
     type: array
     description: Scopes removed from the bet by the shapers; returned to shaping

@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "egm-shaping",
+  "source_tasks": ".harness/specs/egm-shaping/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Intent fitness gate (P0)",
+      "user_visible_behavior": "product-delivery requires intent_fit per kept scope (one outcome, lite-fit, EARS, self-contained) before slice init; unfit scopes re-split or RE-SHAPING_REQUIRED; scope-map schema accepts optional intent_fit.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "grep -q 'intent fitness\\|intent_fit\\|INTENT_FIT' cli/skills/product-delivery/SKILL.md",
+        "grep -q 'intent_fit' cli/skills/product-delivery/contracts/scope-map.schema.yaml",
+        "grep -q 'lite-fit\\|lite_fit\\|self-contained\\|self_contained' cli/skills/product-delivery/references/asdd-harness-handoff.md",
+        "node cli/bin/asdd.mjs kit skills-lint --only product-delivery"
+      ],
+      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "scope_paths": [
+        "cli/skills/product-delivery/SKILL.md",
+        "cli/skills/product-delivery/contracts/scope-map.schema.yaml",
+        "cli/skills/product-delivery/references/asdd-harness-handoff.md",
+        "cli/skills/product-delivery/references/shape-up-input.md",
+        "cli/skills/product-delivery/examples/end-to-end-example.md",
+        ".harness/steering/templates/intent.md"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "a0fcbdf3dbb744627b4fbe74bdfa1fdaa8e1ec52726cb3670ea229e916285c31"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Goldfish scope-split review (P1)",
+      "user_visible_behavior": "After proposing a scope map, product-delivery writes a critique-first scope-split-review.md (multi-lens Goldfish) and records human accept/ignore before intents.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "test -f cli/skills/product-delivery/references/scope-split-review.md",
+        "grep -q 'scope-split-review\\|Goldfish\\|fresh-context' cli/skills/product-delivery/SKILL.md",
+        "grep -q 'appetite\\|lite-fit\\|demoable\\|critique' cli/skills/product-delivery/references/scope-split-review.md",
+        "node cli/bin/asdd.mjs kit skills-lint --only product-delivery"
+      ],
+      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "scope_paths": [
+        "cli/skills/product-delivery/SKILL.md",
+        "cli/skills/product-delivery/references/scope-split-review.md",
+        "cli/skills/product-delivery/examples/end-to-end-example.md"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "96a65d5cbe6f5fecc84830b5cedb41f969c3eb1dd2fb851750f4bafba7aaf507"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Concepts brief + readiness (P2)",
+      "user_visible_behavior": "shape-up Flow 4 / vague ideas write concepts_brief.md with a readiness gate before formal pitch; pitch review is critique-first and quote-backed.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-005",
+        "REQ-006"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "test -f cli/skills/shape-up/references/concepts-brief-template.md",
+        "grep -q 'concepts_brief\\|readiness' cli/skills/shape-up/SKILL.md",
+        "grep -q 'concepts_brief\\|readiness' cli/skills/shape-up/references/flows.md",
+        "node cli/bin/asdd.mjs kit skills-lint --only shape-up"
+      ],
+      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "scope_paths": [
+        "cli/skills/shape-up/SKILL.md",
+        "cli/skills/shape-up/references/flows.md",
+        "cli/skills/shape-up/references/concepts-brief-template.md",
+        "cli/skills/shape-up/references/pitch-template.md"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "6b328a3d15cb00074329747ed7f4fe3245e64bfbadd945f3292b6901b5017190"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Critique-first language (P3)",
+      "user_visible_behavior": "shape-up and product-delivery skills require critique-first / no-glazing (weakest point first; no empty praise; cited evidence).",
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-007"
+      ],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "verification": [
+        "grep -qi 'critique-first\\|no-glazing\\|no glazing' cli/skills/shape-up/SKILL.md",
+        "grep -qi 'critique-first\\|no-glazing\\|no glazing' cli/skills/product-delivery/SKILL.md",
+        "node cli/bin/asdd.mjs kit skills-lint --only shape-up,product-delivery"
+      ],
+      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "scope_paths": [
+        "cli/skills/shape-up/SKILL.md",
+        "cli/skills/product-delivery/SKILL.md"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "adf2a04306f812b84cb5f723feceb1fe494bc67082c09cf7d3d731f395f891a7"
+    },
+    {
+      "id": "TASK-005",
+      "title": "Brownfield bootstrap + docs (P4)",
+      "user_visible_behavior": "Optional EGM-inspired brownfield bootstrap reference complements asdd init-flow; PLAYBOOK/README mention intent fitness and scope-split review; hotfix skips pitch track.",
+      "status": "passing",
+      "priority": 5,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-008",
+        "REQ-009"
+      ],
+      "depends_on": [
+        "TASK-004"
+      ],
+      "verification": [
+        "test -f cli/skills/shape-up/references/brownfield-bootstrap.md",
+        "grep -q 'init-flow\\|hotfix' cli/skills/shape-up/references/brownfield-bootstrap.md",
+        "grep -qE 'intent fitness|scope-split|Goldfish' docs/PLAYBOOK.md",
+        "node cli/bin/asdd.mjs kit skills-lint --only shape-up,product-delivery"
+      ],
+      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "scope_paths": [
+        "cli/skills/shape-up/references/brownfield-bootstrap.md",
+        "docs/PLAYBOOK.md",
+        "cli/README.md",
+        "docs/ASDD-ROADMAP.md"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "289975428b457680d63d741cee64680c1f03575e18e154cab0124e80f6f1155c"
+    }
+  ]
+}

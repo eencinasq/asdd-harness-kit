@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-11-14T03:00:53.504Z",
+  "generated_at": "2026-11-14T03:28:30.866Z",
   "slices": [
     {
       "slice_id": "agents-spec",
@@ -186,6 +186,25 @@
         "human",
         "eencinas",
         "asdd-lite",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "egm-shaping",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:28:30.855Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-full",
         "asdd-pipeline"
       ]
     },

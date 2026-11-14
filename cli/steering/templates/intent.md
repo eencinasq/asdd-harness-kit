@@ -49,3 +49,13 @@
 
 ## Open questions
 - [Unresolved item — PENDING_DEFINITION in the spec]
+
+## Intent fitness
+> Filled by `product-delivery` from the scope map `intent_fit`. Unfit scopes must not call `asdd slice init`.
+
+- **one_outcome:** yes | no
+- **lite_fit:** yes | no (if no: `--full` with decided_by, or re-split)
+- **ears_ready:** yes | no (`decided_by` on each MH)
+- **self_contained:** yes | no
+- **status:** fit | unfit | pending
+- **decided_by:** [who]

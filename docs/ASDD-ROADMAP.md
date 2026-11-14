@@ -13,8 +13,10 @@
 | **P2** | `asdd-p2` | `--hotfix` / lite / `--full`, `slice amend`, hill sensor | — |
 | **P3** | `asdd-p3` | `waves`, `portfolio`, `converge-eval` | P3.3 Windows hooks, P3.4 import Spec Kit/OpenSpec |
 | **P4** | `asdd-p4` | `tracker-sync`, Stop `advisory`, `spec-source` opt-in | P4.2 presets Cencosud |
+| **Shaping** | `egm-shaping` | Intent fitness, Goldfish scope-split, concepts_brief, critique-first, brownfield pack | — |
 
 Slices `asdd-p0`…`asdd-p4` están en `DONE` (escalated donde el scope cruzó módulos). El detalle por ítem está en §4.
+`egm-shaping` porta conceptos EGM (Elephant/Goldfish) a `shape-up` / `product-delivery` para intents lite-fit; SoT de build sigue en `.harness/`.
 
 ### Comandos nuevos (referencia rápida)
 

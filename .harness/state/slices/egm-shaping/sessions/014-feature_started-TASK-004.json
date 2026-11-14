@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-egm-shaping-014",
+  "timestamp": "2026-11-14T03:28:19.000Z",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "egm-shaping",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "evidence": "start TASK-004",
+  "concerns": [],
+  "scope_paths": [
+    "cli/skills/shape-up/SKILL.md",
+    "cli/skills/product-delivery/SKILL.md"
+  ]
+}

@@ -65,8 +65,10 @@ Also: `check`, `verify`, `gate`, `drift`, `check-config`, `skills-index`, `sync`
 `knowledge sync|search|trace|slice|status|patterns`, `learn`, `audit`, `triage`.
 
 Agent skills that wrap the CLI (do not invent SoT): `asdd-status`, `asdd-next`, `asdd-implement`, `asdd-converge`
-under `cli/skills/`. Guides: [`docs/guides/spec-kit-to-asdd.md`](docs/guides/spec-kit-to-asdd.md),
-[`docs/guides/spec-as-source.md`](docs/guides/spec-as-source.md).
+under `cli/skills/`. PO/PM path: `shape-up` (concepts brief + critique-first review) → `product-delivery`
+(Goldfish scope-split + **intent fitness** before `slice init`). Guides:
+[`docs/guides/spec-kit-to-asdd.md`](docs/guides/spec-kit-to-asdd.md),
+[`docs/guides/spec-as-source.md`](docs/guides/spec-as-source.md); playbook Play C.
 
 Stop hook mode: default fail-closed; set `stop.mode: "advisory"` in `.harness/config/project.json` or
 `HARNESS_STOP_MODE=advisory` so Verify-on-Stop still runs `check --live` but does not block the session.

@@ -17,6 +17,10 @@ Every pitch needs all five components to be ready for betting:
 4. **Rabbit Holes** - Known risks to flag
 5. **No-Gos** - What we're explicitly NOT doing
 
+Vague ideas: write a [`concepts-brief-template.md`](./concepts-brief-template.md) and pass its
+readiness gate before filling this template. Optional brownfield context:
+[`brownfield-bootstrap.md`](./brownfield-bootstrap.md).
+
 ---
 
 ## Pitch Structure
