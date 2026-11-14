@@ -186,7 +186,7 @@
         "npm test",
         "cd tools/knowledge && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/knowledge && pnpm test` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/knowledge && pnpm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/knowledge-store-sqlite.mjs",
         "cli/src/harness/knowledge-query.mjs",
@@ -208,7 +208,7 @@
         "tools/knowledge/README.md",
         "tools/spec-drift/src/audit/harness-libs.ts"
       ],
-      "evidence_hash": "c29392bceea1561b65c70db5377bbf2b9144534042044e310fa4d1ecdaf57fb6"
+      "evidence_hash": "c8958b05a545150e92efb6a3bf028f4b7a41b538da46cf809e1a1e7e85bff6f7"
     },
     {
       "id": "TASK-009",
@@ -225,7 +225,7 @@
         "npm test",
         "cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-stamped after vendoring proposals to docs/knowledge-base/steering-proposals/external/ (verifications green: npm test 195/195, install.sh, kit versions).",
       "scope_paths": [
         "cli/src/install/**",
         "cli/src/harness/commands.mjs",
@@ -253,7 +253,7 @@
         ".github/workflows/harness-invariants.yml",
         ".harness/steering/structure.md"
       ],
-      "evidence_hash": "3ca319b9aae8697ce22ed232e6129ef32d6abb6c6b05e7b0b148faf93f83cb8e"
+      "evidence_hash": "476beafa385171b09e931799203b24456d7ec03f0e31c1130edbd27e7dac90e3"
     },
     {
       "id": "TASK-010",
@@ -283,7 +283,7 @@
       "id": "TASK-011",
       "title": "The CLI as a Node package only",
       "user_visible_behavior": "Projects get no copy of the CLI: asdd is installed once per machine (npm i -g, or npm pack from the repo) or as a devDependency; hooks find it and fail closed without it.",
-      "status": "passing",
+      "status": "in_progress",
       "priority": 11,
       "owner": "claude",
       "req_ids": [
@@ -325,7 +325,7 @@
         "README.md",
         "package.json"
       ],
-      "evidence_hash": "56a512aed5baa24f076dff17d55afd3055dbc3b0246d93e6740b09226e2bba9e"
+      "notes": "Re-verification blocked: tools/spec-drift suite fails — src/coverage/coverage.ts is imported by 6+ files but absent on main (pre-existing defect, not rebase-related). Set in_progress per DRIFT-02."
     }
   ]
 }

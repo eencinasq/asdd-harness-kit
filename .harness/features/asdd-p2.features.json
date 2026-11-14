@@ -18,7 +18,7 @@
       "verification": [
         "node --test cli/src/harness/init-slice.test.mjs"
       ],
-      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/init-slice.test.mjs` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/init-slice.test.mjs` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/init-slice.mjs",
         "cli/src/harness/init-slice.test.mjs",
@@ -28,7 +28,7 @@
         "cli/steering/asdd-lite.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "e240f7436d0b518b65f824f246b51b187fb67aedcbcb7c40e94779bd92b2cd53"
+      "evidence_hash": "06574b5842ab55acce2380215ad3faafda66b3a24ca4ade816ec2f3bd622ba1e"
     },
     {
       "id": "TASK-002",
@@ -46,7 +46,7 @@
       "verification": [
         "node --test cli/src/harness/amend-slice.test.mjs"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/amend-slice.test.mjs` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/amend-slice.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/amend-slice.mjs",
         "cli/src/harness/amend-slice.test.mjs",
@@ -55,7 +55,7 @@
         "cli/README.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "0306539933c49c79b321f255f2016915d494a8777fb016e0c15754cad1b07f20"
+      "evidence_hash": "a1d8fd1f3e4ee4f6eec07b57529d123331f6f46c19efcc49112b569acc6cc182"
     },
     {
       "id": "TASK-003",
@@ -73,7 +73,7 @@
       "verification": [
         "node --test cli/src/harness/hill-lib.test.mjs"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/hill-lib.test.mjs` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/hill-lib.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/scaffold/features/feature.schema.json",
         ".harness/features/feature.schema.json",
@@ -85,7 +85,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "b2338d466c1e5f6533cf14f6cc3a47c279a484fff30ebdda9d1963c9461e5598"
+      "evidence_hash": "ff21d49352e9422e6e6ae5053d2336220cae9736df55c1af3b01aa9aed2b51e6"
     }
   ]
 }

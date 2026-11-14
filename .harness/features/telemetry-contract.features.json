@@ -19,12 +19,12 @@
         "node -e 'JSON.parse(require(\"fs\").readFileSync(\".harness/state/telemetry/telemetry.schema.json\",\"utf8\"))'",
         "exemplar validation: README 4-line mock vs landed schema — required keys, enums, id patterns, closed top level, ≤4KB lines, reserved-attr discipline, trace-model consistency (env-child / synthesized phase own-trace / detection self-trace)"
       ],
-      "evidence": "Programmatic validation against the LANDED schema file — all 4 exemplar spans pass schema checks and trace-model checks; schema is valid JSON Schema draft-07.",
+      "evidence": "Programmatic validation against the LANDED schema file — all 4 exemplar spans pass schema checks and trace-model checks; schema is valid JSON Schema draft-07. | Re-stamped after vendoring proposals to docs/knowledge-base/steering-proposals/external/ (verifications green: npm test 195/195, install.sh, kit versions).",
       "scope_paths": [
         ".harness/state/telemetry/telemetry.schema.json",
         ".harness/state/telemetry/README.md"
       ],
-      "evidence_hash": "a1338babc1c20f4dfb6245801f7676943a1319e9bfdbaa6808dec3b51d65331a"
+      "evidence_hash": "7f9f3ef9157c8cd9a984ac239da6ce46d40c738cdcaf5a5beefef3669b7751ee"
     }
   ]
 }

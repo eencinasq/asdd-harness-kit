@@ -3,7 +3,7 @@
 ## Intent
 
 Land Phase 1 of the converged profiling proposal
-`@asdd/proposals/harness.profiling/v2` (`v2.review.md` verdict CONVERGED):
+`docs/knowledge-base/profiling-proposals/v2.md` (`v2.review.md` verdict CONVERGED):
 the ratified span schema + one-pager at `.harness/state/telemetry/` — a
 documentation/contract landing with **zero** script, installer, config, or
 gitignore edits. Instrumentation, emitters, rollup, CLI, validator, and all

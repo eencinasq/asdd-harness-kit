@@ -18,7 +18,7 @@
       "verification": [
         "node --test cli/src/harness/pipeline-metrics.test.mjs"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/pipeline-metrics.test.mjs` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/pipeline-metrics.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/pipeline-metrics.mjs",
         "cli/src/harness/pipeline-metrics.test.mjs",
@@ -26,7 +26,7 @@
         "cli/src/harness/commands.mjs",
         "cli/README.md"
       ],
-      "evidence_hash": "3838b42aad9ddbd91d36420ded7845c170f13d11cc1a413b640bd0fd789bbbb0"
+      "evidence_hash": "7f16582351695df6de37f1c4d0c77362c1700f9baade7df2bd7e1da3795cb21a"
     },
     {
       "id": "TASK-002",
@@ -46,7 +46,7 @@
         "node --test cli/src/harness/init-flow.test.mjs",
         "test -f cli/docs/guides/spec-kit-to-asdd.md && grep -q \"Spec Kit\" cli/docs/guides/spec-kit-to-asdd.md"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/init-flow.test.mjs && test -f cli/docs/guides/spec-kit-to-asdd.md && grep -q \"Spec Kit\" cli/docs/guides/spec-kit-to-asdd.md` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/init-flow.test.mjs && test -f cli/docs/guides/spec-kit-to-asdd.md && grep -q \"Spec Kit\" cli/docs/guides/spec-kit-to-asdd.md` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/init-flow.mjs",
         "cli/src/harness/init-flow.test.mjs",
@@ -55,7 +55,7 @@
         "cli/README.md",
         "package.json"
       ],
-      "evidence_hash": "4135663fc5a65644f769d77fd15b981e0bc84067e76c172f3a43a24aa99e09e7"
+      "evidence_hash": "e3aaa473da942d59a1880551e2c2064f10113116bcf042b8cb43591982e331fa"
     }
   ]
 }

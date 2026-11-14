@@ -18,7 +18,7 @@
         "node --test cli/src/harness/asdd-skills.test.mjs",
         "node cli/bin/asdd.mjs kit skills-lint 2>&1 | tee /tmp/asdd-p1-skills-lint.txt; test -f cli/skills/asdd-status/SKILL.md && test -f cli/skills/asdd-next/SKILL.md && test -f cli/skills/asdd-implement/SKILL.md && test -f cli/skills/asdd-converge/SKILL.md && grep -q asdd-status cli/steering/skills.md"
       ],
-      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/asdd-skills.test.mjs && node cli/bin/asdd.mjs kit skills-lint 2>&1 | tee /tmp/asdd-p1-skills-lint.txt; test -f cli/skills/asdd-status/SKILL.md && test -f cli/skills/asdd-next/SKILL.md && test -f cli/skills/asdd-implement/SKILL.md && test -f cli/skills/asdd-converge/SKILL.md && grep -q asdd-status cli/steering/skills.md` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/asdd-skills.test.mjs && node cli/bin/asdd.mjs kit skills-lint 2>&1 | tee /tmp/asdd-p1-skills-lint.txt; test -f cli/skills/asdd-status/SKILL.md && test -f cli/skills/asdd-next/SKILL.md && test -f cli/skills/asdd-implement/SKILL.md && test -f cli/skills/asdd-converge/SKILL.md && grep -q asdd-status cli/steering/skills.md` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/skills/asdd-status",
         "cli/skills/asdd-next",
@@ -26,7 +26,7 @@
         "cli/skills/asdd-converge",
         "cli/steering/skills.md"
       ],
-      "evidence_hash": "26656161e9b197adea6a8e1774c9ec9e9ee4db44d8dc2d844a46a48acc6db1e2"
+      "evidence_hash": "23ded13b1849aa558c4fcf71e5ac666677cc23e9b57d304025a1825d4840aaa6"
     },
     {
       "id": "TASK-002",
@@ -45,7 +45,7 @@
       "verification": [
         "node --test cli/src/harness/pipeline-html.test.mjs"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/pipeline-html.test.mjs` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/pipeline-html.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/pipeline-html.mjs",
         "cli/src/harness/pipeline-html.test.mjs",
@@ -54,7 +54,7 @@
         "tools/knowledge/src/knowledge",
         "cli/README.md"
       ],
-      "evidence_hash": "9340ac84a5d5fbb38a8ac4a8476808b7be47814ebdc85987e3c189fecf2b359f"
+      "evidence_hash": "6224f47884c1323a8d87abb67cd0cf7e3bb6f97910b0e007feba016c7c317a4c"
     },
     {
       "id": "TASK-003",
@@ -73,7 +73,7 @@
       "verification": [
         "node --test cli/src/harness/converge-lib.test.mjs"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/converge-lib.test.mjs` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/converge-lib.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/converge-lib.mjs",
         "cli/src/harness/converge-lib.test.mjs",
@@ -83,7 +83,7 @@
         "package.json",
         "docs/ASDD-ROADMAP.md"
       ],
-      "evidence_hash": "f05b759a6b65cdb0921a91d7d4a301316c961988aec20fdbda328673e75c702e"
+      "evidence_hash": "151bf9042e04e56e049881c9c5aa2ec77b5c5ca5b62a768f91127fbf20d7b009"
     }
   ]
 }

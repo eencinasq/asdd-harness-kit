@@ -22,6 +22,8 @@
     "LICENSE",
     "README.md",
     "!docs/knowledge-base/steering-proposals/**",
+    "!docs/knowledge-base/rules-proposals/**",
+    "!docs/knowledge-base/profiling-proposals/**",
     "!docs/architecture/domain-model.md",
     "!docs/agent-failure-log.md",
     "!docs/dissent-log.md"

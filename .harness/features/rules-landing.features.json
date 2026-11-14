@@ -20,7 +20,7 @@
         "node cli/bin/asdd.mjs kit versions  # .agents/rules/_rule-profile.md stamped @3.10.0",
         "bash cli/test/install.sh  # \"== rule collision guard ==\" OK + all prior blocks"
       ],
-      "evidence": "Re-verified post-rebase (CLI era): bash cli/test/install.sh exit 0 incl. \"== rule collision guard ==\" block; node --check rule-collisions.mjs + versions.mjs OK; versions.json regenerated (122 artifacts). Recorded commands updated from retired scripts/* to cli/* equivalents.",
+      "evidence": "Re-verified post-rebase (CLI era): bash cli/test/install.sh exit 0 incl. \"== rule collision guard ==\" block; node --check rule-collisions.mjs + versions.mjs OK; versions.json regenerated (122 artifacts). Recorded commands updated from retired scripts/* to cli/* equivalents. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-stamped after vendoring proposals to docs/knowledge-base/steering-proposals/external/ (verifications green: npm test 195/195, install.sh, kit versions).",
       "scope_paths": [
         "cli/rules/_rule-profile.md",
         ".agents/rules/_rule-profile.md",
@@ -31,7 +31,7 @@
         "cli/test/install.sh",
         "cli/versions.json"
       ],
-      "evidence_hash": "4fe67e1aad034d886dad9ee64a3e7dc86037750d291205e1d1c58a382729e724"
+      "evidence_hash": "6e773708f80bf71d781dc44538c0ea33665f806e528a363b98b48a81409ac17d"
     },
     {
       "id": "TASK-002",

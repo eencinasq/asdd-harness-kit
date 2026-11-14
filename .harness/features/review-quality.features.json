@@ -66,7 +66,7 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "npm test exit 0 (136/136). learning-lib.test 'review-quality REQ-005': a metrics file with 3 reviews of project shop, 1 of another project and a bad line → 3 ingested into 2026-W45-ana / 2026-W46-ana summaries; a second run and another author ingest 0; review:python.performance is a noise pattern, 3 occurrences, open; a kept-only rule is no signal; learningReport.review_quality = 3 reviews, drafted 7, kept 4, removed 3, acceptance 4/7, top rule python.performance, authors [ana]; null without reviews; a missing file ingests nothing. reviewMetricsFile follows PR_REVIEW_ROOT / XDG_STATE_HOME. learn.mjs ingests before compaction and reports it. QG-LEARN-01 lists removed review comments (cli/steering + kit copy). asdd kit vendor refreshed learning-lib.mjs in spec-drift, jev-gate, knowledge.",
+      "evidence": "npm test exit 0 (136/136). learning-lib.test 'review-quality REQ-005': a metrics file with 3 reviews of project shop, 1 of another project and a bad line → 3 ingested into 2026-W45-ana / 2026-W46-ana summaries; a second run and another author ingest 0; review:python.performance is a noise pattern, 3 occurrences, open; a kept-only rule is no signal; learningReport.review_quality = 3 reviews, drafted 7, kept 4, removed 3, acceptance 4/7, top rule python.performance, authors [ana]; null without reviews; a missing file ingests nothing. reviewMetricsFile follows PR_REVIEW_ROOT / XDG_STATE_HOME. learn.mjs ingests before compaction and reports it. QG-LEARN-01 lists removed review comments (cli/steering + kit copy). asdd kit vendor refreshed learning-lib.mjs in spec-drift, jev-gate, knowledge. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/learning-lib.mjs",
         "cli/src/harness/learning-lib.test.mjs",
@@ -77,7 +77,7 @@
         "cli/steering/quality-gates.md",
         ".harness/steering/quality-gates.md"
       ],
-      "evidence_hash": "647b36cf59083905bb74691857612491458e247622c0853557e54cac2676c3ac"
+      "evidence_hash": "7735d6b3a53c00663d838a200e3ad40fcb6e551ca76fcb7521877c326b97f15b"
     },
     {
       "id": "TASK-004",

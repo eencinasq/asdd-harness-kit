@@ -17,11 +17,11 @@
       "verification": [
         "test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 14"
       ],
-      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 14` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 14` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "docs/ASDD-ROADMAP.md"
       ],
-      "evidence_hash": "dcf3c3bf62a1d72c170f893c66ecf0bee1a3bb8b99aea8f473be0d4f4bd2c915"
+      "evidence_hash": "c3a8b25ea673d15647496f6dc330fce13fc16349166b996d4f72a62b9ab7efb8"
     }
   ]
 }

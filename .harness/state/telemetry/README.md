@@ -1,7 +1,7 @@
 # Harness Telemetry (contract-only — Phase 1)
 
 This directory holds the ratified telemetry contract for the ASDD harness.
-Normative source: proposal `@asdd/proposals/harness.profiling/v2` (CONVERGED —
+Normative source: proposal `docs/knowledge-base/profiling-proposals/v2.md` (CONVERGED —
 `v2.review.md`). Phase 1 lands the schema and this file only — **no emitters,
 no instrumentation, no span data yet** (all wiring is Phase-2, guardrailed
 `AR-1…AR-10`).

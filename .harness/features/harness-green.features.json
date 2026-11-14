@@ -17,7 +17,7 @@
       "verification": [
         "npm test && node cli/bin/asdd.mjs kit guidance && cd tools/knowledge && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && node cli/bin/asdd.mjs kit guidance && cd tools/knowledge && pnpm test` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && node cli/bin/asdd.mjs kit guidance && cd tools/knowledge && pnpm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/skills/asdd-converge/SKILL.md",
         "cli/skills/asdd-implement/SKILL.md",
@@ -30,7 +30,7 @@
         "cli/versions.json",
         "tools/knowledge/test/knowledge.e2e-spec.ts"
       ],
-      "evidence_hash": "6c7bf2cf9aa01f96c5329127184bc48848a09da74ef1e46b673e16b3ef158b87"
+      "evidence_hash": "b99ed9282bf3a20e76c31d47d0d0020560769dd931a546308396a6e47461ff86"
     }
   ]
 }

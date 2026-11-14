@@ -17,20 +17,20 @@
       "verification": [
         "test -f docs/PLAYBOOK.md && test $(grep -c '^### Play ' docs/PLAYBOOK.md) -ge 12 && grep -q 'docs/PLAYBOOK.md' README.md && grep -q 'docs/PLAYBOOK.md' cli/README.md && grep -q 'kit playbook' tools/spec-drift/docs/PLAYBOOK.md"
       ],
-      "evidence": "docs/PLAYBOOK.md: 6 sections like the spec-drift playbook, 12 plays (adopt, lite, shaped bet, hotfix, escalate, red check, amend, parallel, PR gate, health check, learning loop, portfolio), quick reference with commands from asdd help; linked from README (contents, session flow, documentation table, upgrade note), cli/README, and the spec-drift playbook. Verification command exits 0.",
+      "evidence": "docs/PLAYBOOK.md: 6 sections like the spec-drift playbook, 12 plays (adopt, lite, shaped bet, hotfix, escalate, red check, amend, parallel, PR gate, health check, learning loop, portfolio), quick reference with commands from asdd help; linked from README (contents, session flow, documentation table, upgrade note), cli/README, and the spec-drift playbook. Verification command exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "docs/PLAYBOOK.md",
         "tools/spec-drift/docs/PLAYBOOK.md",
         "README.md",
         "cli/README.md"
       ],
-      "evidence_hash": "0bc604e7eeb40414895b7dc9d88318e93f97c27eee15ef866e366211d7601cd6"
+      "evidence_hash": "4a6d308bd3d26bc48691a382acc96b8b2cd9edf4fc88c876bd5054da6299510d"
     },
     {
       "id": "TASK-002",
       "title": "Version 3.11.0 (servers 1.1.0)",
       "user_visible_behavior": "Re-running asdd install refreshes every kit file to 3.11.0.",
-      "status": "passing",
+      "status": "in_progress",
       "priority": 2,
       "owner": "claude",
       "req_ids": [
@@ -53,7 +53,7 @@
         "tools/knowledge/package.json",
         "tools/knowledge/src/app.constants.ts"
       ],
-      "evidence_hash": "fae0b106ae1addbca5188752bd61e9f53e10b3fa46fa6acac586870df7837b2e"
+      "notes": "Re-verification blocked: tools/spec-drift suite fails — src/coverage/coverage.ts is imported by 6+ files but absent on main (pre-existing defect, not rebase-related). Set in_progress per DRIFT-02."
     }
   ]
 }

@@ -3,7 +3,7 @@
 > **Contract document.** This file is a `contract-doc` — it carries no frontmatter, is
 > never JIT-loaded, and is exempt from the rule-slot grammar it defines (see
 > *Contract-doc registry* below). Ratified by steering proposal
-> `@asdd/proposals/harness.stearing/v1` — steering changes flow through steering
+> `docs/knowledge-base/steering-proposals/v1.md` — steering changes flow through steering
 > proposals (`controls.md` precedence #5).
 
 ## What a steering file is
@@ -84,7 +84,7 @@ addition.
 ## Demarcation law (steering vs modular rules)
 
 - Holds **unconditionally** for every actor in its path scope → `.agents/rules/` or
-  `AGENTS.md` (`modular_policy` / `directory_root` — see sibling proposal `rules/v1`).
+  `AGENTS.md` (`modular_policy` / `directory_root` — see proposal `docs/knowledge-base/rules-proposals/v1.md`).
 - Holds only when a **phase/mode/role** matches → `.harness/steering/` (this profile).
 - `inclusion:`/`tags:` keys are **reserved to steering** — a `.agents/rules/` file
   carrying them is a profile violation; one file, one grammar.

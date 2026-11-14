@@ -70,7 +70,7 @@
       "id": "TASK-003",
       "title": "Dependency-graph rules behind the analyzer port",
       "user_visible_behavior": "The layer table becomes dependency rules (layers, cycles) next to Semgrep.",
-      "status": "passing",
+      "status": "in_progress",
       "priority": 3,
       "owner": "claude",
       "req_ids": [
@@ -91,7 +91,7 @@
         "tools/spec-drift/test/dependencies.e2e-spec.ts",
         "tools/spec-drift/src/analysis/domain/domain.spec.ts"
       ],
-      "evidence_hash": "005096f820a9701cd0fb17c091b7fc2a98311da9cf0b5f09cc50368a27707bce"
+      "notes": "Re-verification blocked: tools/spec-drift suite fails — src/coverage/coverage.ts is imported by 6+ files but absent on main (pre-existing defect, not rebase-related). Set in_progress per DRIFT-02."
     },
     {
       "id": "TASK-004",

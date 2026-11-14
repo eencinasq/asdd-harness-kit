@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-14T03:28:31.030Z",
+  "generated_at": "2026-11-14T04:44:22.877Z",
   "threshold": 3,
   "summary": {
     "patterns": 21,
-    "open": 0,
+    "open": 1,
     "in_flight": 3,
     "verified": 0,
     "unsigned_failures": 0
@@ -133,6 +133,27 @@
       ]
     },
     {
+      "id": "LP-f374bf6d",
+      "signature": "sensor:DRIFT-02",
+      "kind": "escape",
+      "occurrences": 3,
+      "threshold": 3,
+      "status": "open",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:34:26.022Z",
+      "last_seen": "2026-11-13T02:25:45.463Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [],
+      "examples": [
+        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-001 changed after evidence_commit 67f5a59; set it back to in_progress and rerun verification"
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-e9c4ddb0",
       "signature": "blocked:phase:qa",
       "kind": "escape",
@@ -220,27 +241,6 @@
       "examples": [
         "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)",
         "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by agents-use-scripts, asdd-cli, cli-harness, jev-gate-nest, knowledge-nest, mcp-standalone, modules-top-level, spec-drift-merge, spec-drift-adoption (intent/design/tasks/spec or scope_paths)"
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-f374bf6d",
-      "signature": "sensor:DRIFT-02",
-      "kind": "escape",
-      "occurrences": 2,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-10-28T01:34:26.022Z",
-      "last_seen": "2026-11-13T02:25:45.463Z",
-      "sources": [
-        "sensor"
-      ],
-      "slices": [],
-      "examples": [
-        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification",
-        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
-        "DRIFT-02 passing feature TASK-001 changed after evidence_commit 67f5a59; set it back to in_progress and rerun verification"
       ],
       "proposals": []
     },
@@ -432,27 +432,6 @@
       "proposals": []
     },
     {
-      "id": "LP-b028f255",
-      "signature": "warn:QG-DEC-09",
-      "kind": "noise",
-      "occurrences": 1,
-      "threshold": 5,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-13T02:25:45.463Z",
-      "sources": [
-        "warn"
-      ],
-      "slices": [
-        "sensor-fixes"
-      ],
-      "examples": [
-        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
-      ],
-      "proposals": []
-    },
-    {
       "id": "LP-1d3df87a",
       "signature": "sensor:<path>: missing portable slot(s): enforcement (kit_steering_rule profile)",
       "kind": "escape",
@@ -506,6 +485,27 @@
       "slices": [],
       "examples": [
         "asdd-steering.mdc mandates reads for auto files bypassing tags: structure.md, product.md, codegraph.md (recorded G-6 — Phase-2 generated projections)"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-b028f255",
+      "signature": "warn:QG-DEC-09",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 5,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-13T02:25:45.463Z",
+      "last_seen": "2026-11-13T02:25:45.463Z",
+      "sources": [
+        "warn"
+      ],
+      "slices": [
+        "sensor-fixes"
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
       ],
       "proposals": []
     }

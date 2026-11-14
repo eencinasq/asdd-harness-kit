@@ -42,7 +42,7 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "npm test 137/137 (after rule-coverage: kit scan excludes .semgrep; steering spec-drift.md).",
+      "evidence": "npm test 137/137 (after rule-coverage: kit scan excludes .semgrep; steering spec-drift.md). | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/semgrep-lib.mjs",
         "cli/src/harness/semgrep-lib.test.mjs",
@@ -50,7 +50,7 @@
         "cli/steering/spec-drift.md",
         ".harness/steering/spec-drift.md"
       ],
-      "evidence_hash": "e62d51d425c1ff816bddbe496e59393c9584d72cee119e47e9bbc706e899957e"
+      "evidence_hash": "b14951c6e150903fb387a6aef0c379fabf088905829c48b70c30963caed6b893"
     },
     {
       "id": "TASK-003",

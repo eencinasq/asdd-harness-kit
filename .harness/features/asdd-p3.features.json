@@ -43,7 +43,7 @@
       "verification": [
         "node --test cli/src/harness/portfolio-lib.test.mjs"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/portfolio-lib.test.mjs` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/portfolio-lib.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/portfolio-lib.mjs",
         "cli/src/harness/portfolio-lib.test.mjs",
@@ -52,7 +52,7 @@
         "cli/README.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "b5da7a9ba83db2bca7ff8da9a7c9b612124e46ecec6e76d7d4f241696d9defac"
+      "evidence_hash": "88fef5b553c63b03be79d290c083b702a4a0a00bd963fa8fa1ed0a5238641351"
     },
     {
       "id": "TASK-003",
@@ -71,7 +71,7 @@
         "node --test cli/src/harness/converge-eval-lib.test.mjs",
         "node cli/bin/asdd.mjs converge-eval"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/converge-eval-lib.test.mjs && node cli/bin/asdd.mjs converge-eval` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/converge-eval-lib.test.mjs && node cli/bin/asdd.mjs converge-eval` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/converge-eval-lib.mjs",
         "cli/src/harness/converge-eval-lib.test.mjs",
@@ -82,7 +82,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "851dd07dbd519cc3f70b03293b432b0449e8ccb26fee939d24f0cbbf709b75d9"
+      "evidence_hash": "031ac13ce3d76b06dd9cd6657ee5daa80c424ebb530f95a9e733ed3c615ff1f9"
     }
   ]
 }

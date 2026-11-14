@@ -3,7 +3,7 @@
 > **Contract document.** This file is a `contract-doc` — it carries no
 > frontmatter, is never loaded as a rule, and is exempt from the rule-slot
 > grammar it defines (see *Contract-doc registry* below). Ratified by rules
-> proposal `@asdd/proposals/rules/v1` — rule-profile changes flow through
+> proposal `docs/knowledge-base/rules-proposals/v1.md` — rule-profile changes flow through
 > proposals (`controls.md` precedence #5).
 
 ## What a rule is

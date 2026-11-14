@@ -3,7 +3,7 @@
 ## Intent
 
 Land the Phase-1 implementation checklist (`L-1`→`L-3`) of the converged rules
-proposal `@asdd/proposals/rules/v1.md` (vault; `v1.review.md` verdict CONVERGED):
+proposal `docs/knowledge-base/rules-proposals/v1.md` (`v1.review.md` verdict CONVERGED):
 establish the `.agents/rules/` modular-policy root, wire installer copy +
 collision guard + version stamping, and add the `AGENTS.md` rules-routing
 section. Decision contract: `D-7`, `D-8`, `D-10` — Phase-2 guardrails `AR-1…AR-7`

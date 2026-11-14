@@ -20,6 +20,17 @@ Initial catalog for folders under `.agents/skills/`. Each folder exposes only it
 
 `asdd skills-index` FAILs on index↔folder drift (SKL-04); `check-skill-profile` / `check-skill-fleet` lint bundles. SKL-02/SKL-03 are reviewer-enforced disclosure economy.
 
+## Markers and escalation
+
+Mark what the source does not settle; never write it as fact or drop a marker before its decision:
+`PENDING_DEFINITION` (a required fact is missing; its gate stays open), `ASSUMPTION — CONFIRMATION REQUIRED` (inferred,
+not stated), `PROPOSED — VALIDATION REQUIRED` (agent-generated; a human decides, `decided_by`), `DERIVED` (carried into
+a derived artifact with its `source_*` ID).
+
+When a precondition, step, or invariant cannot be met: HALT — no guessing, blind retries, or workarounds — and report
+Context → Options → Recommendation → Decision Needed. A `redirect` to the producer of a missing input is recovery,
+not escalation. Sensors: `asdd check` (index), `asdd kit skills-lint` (skill grammar).
+
 <!-- skills-index:start -->
 | Name | Description |
 | --- | --- |
