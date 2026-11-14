@@ -55,6 +55,11 @@ This file does not restate row rules (each links its contract), defines no thres
 
 A control that repeatedly misses or misfires → `asdd learn` pattern → steering proposal (CTL-05); an unsettlable precedence conflict → Tech Lead `dissent` session, not an agent edit.
 
+## Prohibitions
+
+Never skip, waive, or widen a sensor to pass a gate; dismiss findings only through `asdd triage` with a reason.
+When the precedence above does not settle a conflict: HALT and escalate to the Tech Lead.
+
 ## Session close
 
 Leave a clean state before handoff:

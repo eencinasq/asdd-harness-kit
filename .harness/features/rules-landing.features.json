@@ -10,15 +10,28 @@
       "status": "passing",
       "priority": 1,
       "owner": "devin",
-      "req_ids": ["D-7", "D-10"],
+      "req_ids": [
+        "D-7",
+        "D-10"
+      ],
       "depends_on": [],
       "verification": [
-        "bash -n scripts/install-into.sh && node --check scripts/generate-versions.mjs",
-        "node scripts/generate-versions.mjs  # .agents/rules/_rule-profile.md stamped @3.8.1",
-        "bash scripts/test-install-into.sh  # '== rule collision guard ==' OK + all prior blocks"
+        "node --check cli/src/install/rule-collisions.mjs && node --check cli/src/kit/versions.mjs",
+        "node cli/bin/asdd.mjs kit versions  # .agents/rules/_rule-profile.md stamped @3.10.0",
+        "bash cli/test/install.sh  # \"== rule collision guard ==\" OK + all prior blocks"
       ],
-      "evidence": "test-install-into.sh full pass incl. new rule-guard block (halt on unmanaged same-name, --force no bypass, --dry-run reports, LEGACY INSTALL halt, unique-name payments.md survives, kit _rule-profile.md installs). versions.json artifact count 157 incl. .agents/rules/_rule-profile.md.",
-      "evidence_commit": "505d820"
+      "evidence": "Re-verified post-rebase (CLI era): bash cli/test/install.sh exit 0 incl. \"== rule collision guard ==\" block; node --check rule-collisions.mjs + versions.mjs OK; versions.json regenerated (122 artifacts). Recorded commands updated from retired scripts/* to cli/* equivalents.",
+      "scope_paths": [
+        "cli/rules/_rule-profile.md",
+        ".agents/rules/_rule-profile.md",
+        "cli/src/install/rule-collisions.mjs",
+        "cli/src/install/phases.mjs",
+        "cli/src/install/index.mjs",
+        "cli/src/kit/versions.mjs",
+        "cli/test/install.sh",
+        "cli/versions.json"
+      ],
+      "evidence_hash": "4fe67e1aad034d886dad9ee64a3e7dc86037750d291205e1d1c58a382729e724"
     },
     {
       "id": "TASK-002",
@@ -27,13 +40,23 @@
       "status": "passing",
       "priority": 2,
       "owner": "devin",
-      "req_ids": ["D-8", "IC-2", "AR-7-interim"],
-      "depends_on": ["TASK-001"],
+      "req_ids": [
+        "D-8",
+        "IC-2",
+        "AR-7-interim"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
       "verification": [
         "grep -n '## Modular rules' AGENTS.md  # section present, links .agents/rules/_rule-profile.md"
       ],
       "evidence": "AGENTS.md +9 lines between System of record and Working rules; names the canonical root, _-prefix contract-doc convention, interim dispatch-path clause, and deferred routing entries.",
-      "evidence_commit": "89fec10"
+      "scope_paths": [
+        "AGENTS.md",
+        "cli/AGENTS.md"
+      ],
+      "evidence_hash": "a490f884491aa69bc659d132af52f540d5dab3086b93545dbe125ec98d4020e6"
     }
   ]
 }

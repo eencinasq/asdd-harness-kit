@@ -3,11 +3,11 @@
   "session_id": "sess-rules-landing-003",
   "timestamp": "2026-11-11T05:21:00.000Z",
   "agent": "devin",
-  "human": "",
+  "human": "ougarte",
   "slice_id": "rules-landing",
   "event_type": "phase_completed",
   "phase": "knowledge",
   "mode": "lite",
-  "evidence": "Slice complete — rules v1 Phase-1 landing done at 505d820 + 89fec10. Two commits per landing checklist (L-1+L-2 atomic, L-3 separate). Ripple for sibling awareness: .agents/rules/ root now exists; guard_rule_collisions landed (agents/v2 D-7 guard_agent_collisions still unlanded — AR-6 parity note recorded in the L-1/L-2 commit message); _runtime-template.md mount-propagation remains Phase-2 AR-7.",
+  "evidence": "Slice complete \u2014 rules v1 Phase-1 landing done at 505d820 + 89fec10. Two commits per landing checklist (L-1+L-2 atomic, L-3 separate). Ripple for sibling awareness: .agents/rules/ root now exists; guard_rule_collisions landed (agents/v2 D-7 guard_agent_collisions still unlanded \u2014 AR-6 parity note recorded in the L-1/L-2 commit message); _runtime-template.md mount-propagation remains Phase-2 AR-7.",
   "concerns": []
 }

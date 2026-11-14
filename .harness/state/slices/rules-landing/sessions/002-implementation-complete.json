@@ -3,11 +3,11 @@
   "session_id": "sess-rules-landing-002",
   "timestamp": "2026-11-11T05:20:00.000Z",
   "agent": "devin",
-  "human": "",
+  "human": "ougarte",
   "slice_id": "rules-landing",
   "event_type": "phase_completed",
   "phase": "implementation",
   "mode": "lite",
-  "evidence": "Landed rules proposal v1 Phase-1 checklist L-1+L-2 (commit 505d820): .agents/rules/_rule-profile.md contract-doc; install_rules_core with [[ -d ]] precondition inside install_agents_core; guard_rule_collisions (file-level, managed_files provenance, legacy halt, --force no bypass, --dry-run reports) invoked in main() before install_agents_core; generate-versions.mjs .agents/rules walk + _rule-profile.md stamped @3.8.1; test-install-into.sh rule-guard parity block — full suite passes. L-3 (commit 89fec10): AGENTS.md ## Modular rules section (D-8 reference discovery + AR-7 interim dispatch-path clause). Phase-2 guardrails AR-1..AR-7 stay deferred; .harness/steering/* untouched (Q-R1). check-invariants DRIFT-02 FAILs verified pre-existing at 1891ace via stash-and-recheck — baseline drift, not introduced by this slice.",
+  "evidence": "Landed rules proposal v1 Phase-1 checklist L-1+L-2 (commit 505d820): .agents/rules/_rule-profile.md contract-doc; install_rules_core with [[ -d ]] precondition inside install_agents_core; guard_rule_collisions (file-level, managed_files provenance, legacy halt, --force no bypass, --dry-run reports) invoked in main() before install_agents_core; generate-versions.mjs .agents/rules walk + _rule-profile.md stamped @3.8.1; test-install-into.sh rule-guard parity block \u2014 full suite passes. L-3 (commit 89fec10): AGENTS.md ## Modular rules section (D-8 reference discovery + AR-7 interim dispatch-path clause). Phase-2 guardrails AR-1..AR-7 stay deferred; .harness/steering/* untouched (Q-R1). check-invariants DRIFT-02 FAILs verified pre-existing at 1891ace via stash-and-recheck \u2014 baseline drift, not introduced by this slice.",
   "concerns": []
 }

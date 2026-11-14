@@ -1,40 +1,21 @@
 {
   "kit": {
+    ".harness/steering/README.md": {
+      "class": "index",
+      "inclusion": "always",
+      "coverage": "always"
+    },
     ".harness/steering/_steering-profile.md": {
       "class": "contract-doc",
       "inclusion": "none",
       "coverage": "none",
       "note": "normative profile doc; no frontmatter by design"
     },
-    ".harness/steering/README.md": {
-      "class": "index",
-      "inclusion": "always",
-      "coverage": "always"
-    },
-    ".harness/steering/controls.md": {
-      "class": "portable",
-      "inclusion": "always",
-      "coverage": "always"
-    },
-    ".harness/steering/manifest.md": {
-      "class": "portable",
-      "inclusion": "always",
-      "coverage": "always"
-    },
-    ".harness/steering/security-rules.md": {
-      "class": "portable",
-      "inclusion": "always",
-      "coverage": "always"
-    },
-    ".harness/steering/session-loop.md": {
-      "class": "portable",
-      "inclusion": "always",
-      "coverage": "always"
-    },
-    ".harness/steering/skills.md": {
-      "class": "hybrid-index",
-      "inclusion": "always",
-      "coverage": "always"
+    ".harness/steering/_template-profile.md": {
+      "class": "contract-doc",
+      "inclusion": "none",
+      "coverage": "none",
+      "note": "normative artifact-template profile doc; no frontmatter by design"
     },
     ".harness/steering/asdd-lite.md": {
       "class": "portable",
@@ -42,6 +23,11 @@
       "coverage": [
         "lite"
       ]
+    },
+    ".harness/steering/controls.md": {
+      "class": "portable",
+      "inclusion": "always",
+      "coverage": "always"
     },
     ".harness/steering/design-system.md": {
       "class": "binding",
@@ -62,7 +48,7 @@
         "implementation",
         "qa"
       ],
-      "note": "G-3 starvation — duties span 6 keys, tagged 2"
+      "note": "G-3 starvation \u2014 duties span 6 keys, tagged 2"
     },
     ".harness/steering/domain-layer.project.md": {
       "class": "binding",
@@ -75,7 +61,7 @@
         "implementation",
         "qa"
       ],
-      "note": "G-3 starvation — binding must track contract coverage"
+      "note": "G-3 starvation \u2014 binding must track contract coverage"
     },
     ".harness/steering/knowledge.md": {
       "class": "portable",
@@ -92,7 +78,12 @@
         "refactor",
         "lite"
       ],
-      "note": "G-1 pseudo-always — Phase 2 decides reclass-always (recorded budget decision) vs retag"
+      "note": "G-1 pseudo-always \u2014 Phase 2 decides reclass-always (recorded budget decision) vs retag"
+    },
+    ".harness/steering/manifest.md": {
+      "class": "portable",
+      "inclusion": "always",
+      "coverage": "always"
     },
     ".harness/steering/product.md": {
       "class": "binding",
@@ -100,6 +91,25 @@
       "coverage": [
         "discovery"
       ]
+    },
+    ".harness/steering/quality-gates.exec.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "task_planning",
+        "implementation",
+        "qa",
+        "refactor"
+      ],
+      "note": "G-14 split \u2014 execution gates (QG-IMPL/QA/REFAC)"
+    },
+    ".harness/steering/quality-gates.learn.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "knowledge"
+      ],
+      "note": "G-14 split \u2014 QG-LEARN knowledge-phase gate"
     },
     ".harness/steering/quality-gates.md": {
       "class": "portable",
@@ -117,7 +127,20 @@
         "refactor",
         "lite"
       ],
-      "note": "G-2 starvation — gates defined for untagged phases (QG-DIS/SPEC/DES); QG-DEC-09 chain applies at every phase transition; QG-LEARN is the knowledge-phase gate; G-14 split planned"
+      "note": "G-2 starvation \u2014 gates defined for untagged phases (QG-DIS/SPEC/DES); QG-DEC-09 chain applies at every phase transition; QG-LEARN is the knowledge-phase gate; G-14 split planned"
+    },
+    ".harness/steering/quality-gates.phases.md": {
+      "class": "portable",
+      "inclusion": "auto",
+      "coverage": [
+        "discovery",
+        "spec",
+        "validation",
+        "domain",
+        "design",
+        "task_planning"
+      ],
+      "note": "G-14 split \u2014 phase-transition gates (QG-DIS/SPEC/VAL/DOM/DES/PLAN)"
     },
     ".harness/steering/quality-gates.project.md": {
       "class": "binding",
@@ -126,7 +149,22 @@
         "validation",
         "qa"
       ],
-      "note": "GT-1/AR-5 — gate-eval timing unverified; audit in Phase-2 before retag"
+      "note": "GT-1/AR-5 \u2014 gate-eval timing unverified; audit in Phase-2 before retag"
+    },
+    ".harness/steering/security-rules.md": {
+      "class": "portable",
+      "inclusion": "always",
+      "coverage": "always"
+    },
+    ".harness/steering/session-loop.md": {
+      "class": "portable",
+      "inclusion": "always",
+      "coverage": "always"
+    },
+    ".harness/steering/skills.md": {
+      "class": "hybrid-index",
+      "inclusion": "always",
+      "coverage": "always"
     },
     ".harness/steering/spec-drift.md": {
       "class": "portable",

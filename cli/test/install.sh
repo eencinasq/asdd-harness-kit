@@ -28,7 +28,7 @@ mkdir -p "$TMP/existing-app/scripts" && echo '// old kit copy' >"$TMP/existing-a
 # Prior install tracked those scrum-era files as kit-managed (the collision guard reads this manifest)
 mkdir -p "$TMP/existing-app/.harness/config"
 cat >"$TMP/existing-app/.harness/config/installed-versions.json" <<'EOF'
-{"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/skills/product-delivery/agents/sprint-planning.md",".agents/skills/user-story-decomposition/SKILL.md",".agents/skills/open-code-review/SKILL.md","scripts/migrate-v2-v3.mjs"]}
+{"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/skills/product-delivery/agents/sprint-planning.md",".agents/skills/user-story-decomposition/SKILL.md",".agents/skills/open-code-review/SKILL.md","scripts/migrate-v2-v3.mjs",".agents/mcp/spec-drift-auditor.mjs",".agents/mcp/knowledge-server.mjs",".agents/mcp/ui/drift-dashboard.html",".agents/mcp/bin/codegraph-mcp.cjs",".harness/steering/codegraph.md"]}
 EOF
 # Consumer-authored skill at a NON-colliding name — must survive the whole install
 # (conforming: the profile linter also gates non-waived consumer bundles)
@@ -590,6 +590,14 @@ mkdir -p "$MTMP/legacy-app/.harness/cli/bin" "$MTMP/legacy-app/.cursor"
 printf '// old kit copy\n' >"$MTMP/legacy-app/.harness/cli/bin/asdd.mjs"
 printf '%s\n' '{"version":1,"hooks":{"beforeShellExecution":[{"command":"node .harness/cli/bin/asdd.mjs gate","timeout":30,"failClosed":true}],"stop":[{"command":"node .harness/cli/bin/asdd.mjs verify"}]}}' >"$MTMP/legacy-app/.cursor/hooks.json"
 printf 'old\n' >"$MTMP/legacy-app/.agents/mcp/jev-gate-server.mjs"
+# The retired file is provably kit-managed (an old kit recorded it) — the provenance-gated retire then removes it
+node -e '
+  const fs = require("fs");
+  const p = process.argv[1];
+  const d = JSON.parse(fs.readFileSync(p, "utf8"));
+  d.managed_files = [...new Set([...(d.managed_files ?? []), ".agents/mcp/jev-gate-server.mjs", ".harness/steering/jev.md"])];
+  fs.writeFileSync(p, JSON.stringify(d, null, 2) + "\n");
+' "$MTMP/legacy-app/.harness/config/installed-versions.json"
 node -e '
   const fs = require("fs");
   const [p, m] = process.argv.slice(1);

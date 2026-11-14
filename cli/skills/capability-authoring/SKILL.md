@@ -10,8 +10,8 @@ metadata:
 
 # Capability Authoring
 
-Defines a skill *from* a capability specification. **Operational boundary
-(mode-aware):** writes only `.agents/skills/<new-name>/` and regenerates
+Defines a skill *from* a capability specification. **Operational boundary:**
+writes only `.agents/skills/<new-name>/` and regenerates
 `.harness/steering/skills.md`; **kit mode** additionally refreshes
 `.harness/config/versions.json` — via `generate-versions.mjs` only, never
 hand-edited; **consumer mode** modifies no `.harness/config/` file. Source
@@ -132,7 +132,7 @@ profile linter is Phase 2 (G-6). Until then:
    with level-matched proof shapes, relative links resolve, mode-appropriate
    write boundary honored. The completed checklist is verification evidence,
    reported in the final message (transient — never persisted).
-4. **Scoped delta check:** compare the post-run
+4. **Scoped delta check (negative check):** compare the post-run
    `git status --porcelain --untracked-files=all` against the Precondition-5
    baseline (git availability is a declared prerequisite — see Precondition
    5). New/changed paths must fall inside the declared allowlist —
@@ -145,7 +145,7 @@ profile linter is Phase 2 (G-6). Until then:
 
 ## Escalation Gate
 
-Halt and report **Context → Options → Recommendation → Decision Needed** when:
+**HALT** and report **Context → Options → Recommendation → Decision Needed** when:
 the capability spec is missing or self-contradictory; a required profile slot
 has no spec/repo evidence; the requested name collides or violates S-002; a
 Step 2b overlap classifies **ambiguous**; repo-context probes resolve

@@ -37,3 +37,9 @@ Reviewer-enforced on slices touching auth, tokens, PII, encryption, payments, or
 ## Escalation
 
 Threat-model/data-class dispute → Tech Lead `dissent` session; a new class or rule → steering proposal, not a mid-slice inline edit.
+
+## Prohibitions and halt
+
+Never commit, log, or paste into a prompt or tracker a secret, token, password, or raw PII; never weaken auth, TLS, or
+input validation to pass a test or gate. When a change needs a secret you lack or would cross these rules: HALT and
+escalate to the Tech Lead. Sensors: `asdd audit` Semgrep rules and the project's secret scanning.
