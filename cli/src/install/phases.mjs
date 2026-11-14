@@ -6,31 +6,36 @@ import { basename, dirname, join } from 'node:path';
 import { CliError, KIT_REF, KIT_REMOTE, TEMPLATES } from '../paths.mjs';
 import { c, info, log, warn } from '../ui.mjs';
 import { filesUnder, isSymlink, previousManaged } from './context.mjs';
-
-const STEERING = [
-  'domain-layer.md', 'quality-gates.md', 'quality-gates.phases.md', 'quality-gates.exec.md',
-  'quality-gates.learn.md', 'manifest.md', 'session-loop.md', 'asdd-lite.md', 'knowledge.md',
-  'skills.md', 'security-rules.md', 'controls.md', 'spec-drift.md', 'README.md',
-  '_steering-profile.md', '_template-profile.md',
-];
+import { registryFiles, retiredPaths } from './registry.mjs';
 
 /** Where the shipped steering lives in the kit: the CLI. The kit's own .harness/steering holds only its bindings (and links). */
 export const STEERING_SOURCE = 'cli/steering';
-/** The .harness/ skeleton the kit owns in a project: project path → kit source (all in the CLI). */
-export const HARNESS_FILES = [
-  ['.harness/audits/README.md', 'cli/scaffold/audits/README.md'],
-  ['.harness/config/project.schema.json', 'cli/scaffold/config/project.schema.json'],
-  ['.harness/config/README.md', 'cli/scaffold/config/README.md'],
-  ['.harness/features/feature.schema.json', 'cli/scaffold/features/feature.schema.json'],
-  ['.harness/config/versions.json', 'cli/versions.json'],
-  ['.harness/config/models.json', 'cli/scaffold/config/models.json'],
-  ['.harness/config/skill-profile-waivers.json', 'cli/scaffold/config/skill-profile-waivers.json'],
-  ['.harness/config/steering.registry.json', 'cli/scaffold/config/steering.registry.json'],
-  // The telemetry contract (schema + README); copyTree never prunes, so a project's spans.jsonl stays.
-  ['.harness/state/telemetry', 'cli/scaffold/state/telemetry'],
-];
+const KIT_ROOT = join(import.meta.dirname, '../../..');
+/**
+ * Portable steering = the top-level files of cli/steering (templates/ ships via copyTree below). The directory is
+ * the source of truth: a new file installs by existing — the old hardcoded list could silently omit it (G-8).
+ */
+const STEERING = Object.freeze(
+  readdirSync(join(KIT_ROOT, STEERING_SOURCE), { withFileTypes: true })
+    .filter((e) => e.isFile())
+    .map((e) => e.name)
+    .sort(),
+);
+/**
+ * File-level install rows come from the registry (`files` section) — the single enumeration SoT. Derived views
+ * keep the old export shapes so consumers don't change: refresh rows install kit-owned, create rows seed
+ * project-owned, seeded rows are written once inline, and `self` rows join the kit's own self-copy set.
+ */
+const FILES = registryFiles(KIT_ROOT);
+const REFRESH_FILES = FILES.filter((f) => f.install === 'refresh');
+export const HARNESS_FILES = REFRESH_FILES.filter((f) => !f.dest.startsWith('.agents/')).map((f) => [f.dest, f.src]);
+const AGENTS_REFRESH_FILES = REFRESH_FILES.filter((f) => f.dest.startsWith('.agents/'));
+const SCAFFOLD_CREATE_FILES = FILES.filter((f) => f.install === 'create' && f.dest.startsWith('.harness/') && f.class !== 'binding');
+const DOCS_CREATE_FILES = FILES.filter((f) => f.install === 'create' && !f.dest.startsWith('.harness/') && f.class !== 'binding');
+const BINDING_FILES = FILES.filter((f) => f.class === 'binding');
 /** READMEs of the project's own folders: written once, then the project's. */
-const FOLDER_READMES = ['specs', 'features', 'state/slices', 'state/archive'];
+const FOLDER_READMES = FILES.filter((f) => f.install === 'seeded')
+  .map((f) => f.dest.slice('.harness/'.length, -'/README.md'.length));
 
 /**
  * What the kit repo copies into its own .harness/ when it installs itself (project path → source): the files a
@@ -38,26 +43,21 @@ const FOLDER_READMES = ['specs', 'features', 'state/slices', 'state/archive'];
  */
 export const SELF_COPIES = [
   ...STEERING.map((f) => [`.harness/steering/${f}`, `${STEERING_SOURCE}/${f}`]),
-  ['.harness/steering/templates', `${STEERING_SOURCE}/templates`],
-  ...HARNESS_FILES,
-  ...FOLDER_READMES.map((d) => [`.harness/${d}/README.md`, `cli/scaffold/${d}/README.md`]),
-  // What .agents/ and the root get: agents, skills, the MCP config and launchers, and the agent map.
-  ['.agents/agents', 'cli/agents'],
-  ['.agents/skills', 'cli/skills'],
-  ['.agents/rules', 'cli/rules'],
-  ['.agents/mcp/bin', 'cli/mcp/bin'],
-  ['.agents/mcp/sync-runtime-mcp.cjs', 'cli/mcp/sync-runtime-mcp.cjs'],
-  ['.agents/mcp/README.md', 'cli/mcp/README.md'],
-  ['.agents/mcp/mcp.json', 'cli/mcp/mcp.json'],
-  ['AGENTS.md', 'cli/AGENTS.md'],
+  ...FILES.filter((f) => f.self).map((f) => [f.dest, f.src]),
 ];
+
+/** Copy one registry file row: dirs go through copyTree, files through copyFile; `optional` rows skip missing srcs. */
+function installFileRow(ctx, f, policy) {
+  const src = join(ctx.kit, f.src);
+  if (f.optional && !existsSync(src)) return;
+  const dest = join(ctx.target, f.dest);
+  if (statSync(src).isDirectory()) ctx.copyTree(src, dest, policy);
+  else ctx.copyFile(src, dest, policy);
+}
 
 export function installPortableSteering(ctx) {
   for (const f of STEERING) ctx.copyFile(join(ctx.kit, STEERING_SOURCE, f), join(ctx.target, '.harness/steering', f), 'refresh');
-  ctx.copyTree(join(ctx.kit, STEERING_SOURCE, 'templates'), join(ctx.target, '.harness/steering/templates'), 'refresh');
 }
-
-const BINDINGS = ['product.md', 'structure.md', 'tech.md', 'domain-layer.project.md', 'quality-gates.project.md', 'design-system.md'];
 
 /** Binding stubs live in cli/templates/bindings: the kit's own .harness/steering bindings describe the kit itself and never ship. */
 export function installBindings(ctx) {
@@ -65,9 +65,9 @@ export function installBindings(ctx) {
     info('Skipping bindings');
     return;
   }
-  for (const f of BINDINGS) {
-    const src = join(ctx.kit, 'cli/templates/bindings', f);
-    const dest = join(ctx.target, '.harness/steering', f);
+  for (const f of BINDING_FILES) {
+    const src = join(ctx.kit, f.src);
+    const dest = join(ctx.target, f.dest);
     if (ctx.forceBindings) ctx.forced(() => ctx.copyFile(src, dest, 'refresh'));
     else ctx.copyFile(src, dest, 'create');
   }
@@ -88,28 +88,8 @@ export const LEGACY_PROJECT_BIN = `${LEGACY_PROJECT_CLI}/bin/asdd.mjs`;
 export const projectAsdd = (verb) =>
   `b=node_modules/.bin/asdd; [ -x "$b" ] || b=asdd; command -v "$b" >/dev/null 2>&1 || { echo "asdd is not installed: npm i -D asdd-harness-kit (or npm i -g asdd-harness-kit)" >&2; exit 2; }; exec "$b" ${verb}`;
 
-/**
- * Claude Code runs hooks in the session's current directory, which can be a subfolder; asdd and the kit's relative
- * cli/bin path need the project root. Claude Code sets CLAUDE_PROJECT_DIR for hooks (fallback: the current directory).
- */
-export const CLAUDE_ROOT_CD = 'cd "${CLAUDE_PROJECT_DIR:-.}"';
-
-/** A Claude Code hook command that starts at the project root; `onFail` is the exit code when that cd fails. */
-export const claudeHook = (command, onFail = 2) =>
-  String(command).startsWith(CLAUDE_ROOT_CD) ? command : `${CLAUDE_ROOT_CD} || exit ${onFail}; ${command}`;
-
 /** The command a target's hooks run for `verb`: the resolver in a project, cli/ in the kit repo. */
 export const asddCommand = (ctx, verb) => (ctx.self ? `node ${KIT_BIN} ${verb}` : projectAsdd(verb));
-
-/**
- * The load hook (`asdd observe <runtime>`), fail-open unlike the gate resolver: asdd missing, failing, or slow, the
- * command prints nothing and exits 0 (a Claude Code hook exiting 2 reaches the model). Only Claude Code gets one:
- * Cursor is hookless for guidance loads (D-3, cli/test/fixtures/telemetry/cursor/README.md).
- */
-export const observeCommand = (ctx, runtime) =>
-  ctx.self
-    ? `node ${KIT_BIN} observe ${runtime} >/dev/null 2>&1; exit 0`
-    : `b=node_modules/.bin/asdd; [ -x "$b" ] || b=asdd; command -v "$b" >/dev/null 2>&1 && "$b" observe ${runtime} >/dev/null 2>&1; exit 0`;
 
 /** The asdd the installer itself runs on the target (checks, skills index): this kit's, never one the project had. */
 export const installerBin = (ctx) => join(ctx.kit, KIT_BIN);
@@ -188,15 +168,9 @@ function removeLegacyScripts(ctx) {
 export function installHarnessScaffold(ctx) {
   const { kit, target } = ctx;
   retireProjectCli(ctx);
-  // Examples only: the target's .github/ is never touched
-  ctx.copyFile(join(kit, '.github/CODEOWNERS.harness.example'), join(target, '.harness/examples/CODEOWNERS.harness.example'), 'refresh');
-  ctx.copyFile(join(kit, '.github/workflows/harness-audit.yml.example'), join(target, '.harness/examples/harness-audit.yml.example'), 'refresh');
-  for (const [dest, src] of HARNESS_FILES) {
-    if (statSync(join(kit, src)).isDirectory()) ctx.copyTree(join(kit, src), join(target, dest), 'refresh');
-    else ctx.copyFile(join(kit, src), join(target, dest), 'refresh');
-  }
-  ctx.copyFile(join(TEMPLATES, 'PROGRESS.md'), join(target, '.harness/PROGRESS.md'), 'create');
-  ctx.copyFile(join(TEMPLATES, 'manifest.json'), join(target, '.harness/state/manifest.json'), 'create');
+  // Examples only: the target's .github/ is never touched (their rows are refresh but self:false)
+  for (const f of REFRESH_FILES) if (!f.dest.startsWith('.agents/')) installFileRow(ctx, f, 'refresh');
+  for (const f of SCAFFOLD_CREATE_FILES) ctx.copyFile(join(kit, f.src), join(target, f.dest), 'create');
 
   for (const d of FOLDER_READMES) {
     const dir = join(target, '.harness', d);
@@ -311,7 +285,13 @@ export function installProjectAdapter(ctx) {
 }
 
 /** MCP servers that live under tools/ in the kit repo. Projects never receive a copy; agents use `asdd` instead. */
-export const KIT_TOOL_SERVERS = ['knowledge', 'spec-drift', 'jev-gate'];
+/** Kit MCP servers = the tools/ directories (each ships a bin/ launcher). */
+export const KIT_TOOL_SERVERS = Object.freeze(
+  readdirSync(join(KIT_ROOT, 'tools'), { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort(),
+);
 
 const mcpFile = (ctx) => join(ctx.target, '.agents/mcp/mcp.json');
 
@@ -421,13 +401,7 @@ function seedProjectMcp(ctx) {
 
 export function installAgentsCore(ctx) {
   const { kit, target } = ctx;
-  ctx.copyTree(join(kit, 'cli/agents'), join(target, '.agents/agents'), 'refresh');
-  ctx.copyTree(join(kit, 'cli/skills'), join(target, '.agents/skills'), 'refresh');
-  // .agents/rules/ — modular policy root (rules proposal D-7); absent until the kit ships rules
-  if (existsSync(join(kit, 'cli/rules'))) ctx.copyTree(join(kit, 'cli/rules'), join(target, '.agents/rules'), 'refresh');
-  ctx.copyTree(join(kit, 'cli/mcp/bin'), join(target, '.agents/mcp/bin'), 'refresh');
-  ctx.copyFile(join(kit, 'cli/mcp/sync-runtime-mcp.cjs'), join(target, '.agents/mcp/sync-runtime-mcp.cjs'), 'refresh');
-  ctx.copyFile(join(kit, 'cli/mcp/README.md'), join(target, '.agents/mcp/README.md'), 'refresh');
+  for (const f of AGENTS_REFRESH_FILES) installFileRow(ctx, f, 'refresh');
   // tools/* MCP servers stay in the kit; projects use `asdd knowledge|drift|audit`.
   removeInstalledToolSources(ctx);
   seedProjectMcp(ctx);
@@ -443,12 +417,8 @@ export function installAgentsCore(ctx) {
 export function installDocsRoot(ctx) {
   if (ctx.skipDocs) return;
   const { kit, target } = ctx;
-  ctx.copyFile(join(kit, 'cli/AGENTS.md'), join(target, 'AGENTS.md'), 'create');
   // The kit's own domain model and logs (its history) never ship; projects get the stubs
-  ctx.copyFile(join(TEMPLATES, 'docs/domain-model.md'), join(target, 'docs/architecture/domain-model.md'), 'create');
-  ctx.copyFile(join(TEMPLATES, 'docs/agent-failure-log.md'), join(target, 'docs/agent-failure-log.md'), 'create');
-  ctx.copyFile(join(TEMPLATES, 'docs/dissent-log.md'), join(target, 'docs/dissent-log.md'), 'create');
-  ctx.copyFile(join(kit, 'docs/knowledge-base/README.md'), join(target, 'docs/knowledge-base/README.md'), 'create');
+  for (const f of DOCS_CREATE_FILES) ctx.copyFile(join(kit, f.src), join(target, f.dest), 'create');
 }
 
 export function removeRuntimeDocs(ctx) {
@@ -466,29 +436,7 @@ export function removeRuntimeDocs(ctx) {
  * Kit files no longer installed into projects; they were kit-owned and refreshed on every install.
  * Scrum-era product-delivery files, retired migration scripts (use `asdd repair`), retired MCP servers.
  */
-const RETIRED_KIT_PATHS = [
-  'scripts/harness-migrate.mjs',
-  'scripts/migrate-v2-v3.mjs',
-  '.agents/skills/product-delivery/agents',
-  '.agents/skills/product-delivery/contracts/discovery.schema.yaml',
-  '.agents/skills/product-delivery/contracts/delivery-map.schema.yaml',
-  '.agents/skills/product-delivery/contracts/sprint-plan.schema.yaml',
-  '.agents/skills/product-delivery/contracts/tech-spec.schema.yaml',
-  '.agents/skills/product-delivery/contracts/user-story.schema.yaml',
-  '.agents/skills/product-delivery/references/technical-diagrams.md',
-  '.agents/skills/user-story-decomposition',
-  '.agents/skills/capability-prioritization',
-  '.agents/mcp/spec-drift-auditor.mjs',
-  '.agents/mcp/ui/drift-dashboard.html',
-  '.agents/mcp/jev-gate-server.mjs',
-  '.agents/mcp/knowledge-server.mjs',
-  // Codegraph is a skill on the codegraph CLI now: its MCP launcher and steering go.
-  '.agents/mcp/bin/codegraph-mcp.cjs',
-  // The open-code-review skill (ocr CLI) is no longer part of the kit.
-  '.agents/skills/open-code-review',
-  '.harness/steering/codegraph.md',
-  '.harness/steering/codegraph-agents.md',
-];
+const RETIRED_KIT_PATHS = retiredPaths(KIT_ROOT, 'kit_paths');
 
 /** The bash installer the kit copied into projects before the CLI; removed only while it is still the kit's copy. */
 const LEGACY_INSTALLER = 'scripts/install-into.sh';
@@ -509,7 +457,43 @@ function provablyKitOwned(ctx, rel) {
   return files.length > 0 && files.every((f) => managed.has(`${rel}/${f}`));
 }
 
+/**
+ * Global .harness/state/manifest.json is retired (RV1-AR-1): the generated registry.json is the slice index.
+ * Its one project-authored field (domain_model_version) is preserved into .harness/config/project.json before
+ * removal. Removed by shape (schema+active_slices = the kit format), not by managed-list proof.
+ */
+export function migrateGlobalManifest(ctx) {
+  const rel = '.harness/state/manifest.json';
+  const path = join(ctx.target, rel);
+  if (!existsSync(path)) return;
+  let data;
+  try {
+    data = JSON.parse(readFileSync(path, 'utf8'));
+  } catch {
+    data = null;
+  }
+  if (!data || !Array.isArray(data.active_slices)) {
+    warn(`${rel} has unrecognized content — kept for manual reconciliation`);
+    return;
+  }
+  const projectRel = join(ctx.target, '.harness/config/project.json');
+  if (existsSync(projectRel) && data.domain_model_version) {
+    try {
+      const project = JSON.parse(readFileSync(projectRel, 'utf8'));
+      if (project.domain_model_version === undefined) {
+        project.domain_model_version = data.domain_model_version;
+        if (!ctx.dryRun) writeFileSync(projectRel, `${JSON.stringify(project, null, 2)}\n`);
+        log(`${c.blue('MIGRATE')} ${rel} domain_model_version → .harness/config/project.json`);
+      }
+    } catch {
+      warn(`could not preserve domain_model_version from ${rel}`);
+    }
+  }
+  ctx.remove(path, 'superseded by generated registry.json');
+}
+
 export function removeRetiredKitFiles(ctx) {
+  migrateGlobalManifest(ctx);
   for (const rel of RETIRED_KIT_PATHS) {
     const path = join(ctx.target, rel);
     if (!existsSync(path)) continue;

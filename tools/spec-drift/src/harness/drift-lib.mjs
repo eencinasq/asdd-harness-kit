@@ -168,14 +168,15 @@ function readJsonSafe(p) {
 }
 
 export function listSlices(root) {
-  const manifest = readJsonSafe(join(root, '.harness/state/manifest.json'));
-  const entries = Array.isArray(manifest?.active_slices) ? manifest.active_slices : [];
+  // The generated global index (registry.json); global state/manifest.json retired — RV1-AR-1.
+  const manifest = readJsonSafe(join(root, '.harness/state/registry.json'));
+  const entries = Array.isArray(manifest?.slices) ? manifest.slices : [];
   return entries
     .map((s) => (typeof s === 'string' ? { slice_id: s } : s))
     .filter((s) => s?.slice_id)
     .map((s) => {
       const perSlice = readJsonSafe(join(root, '.harness/state/slices', s.slice_id, 'manifest.json'));
-      const featuresRel = s.features || `.harness/features/${s.slice_id}.features.json`;
+      const featuresRel = perSlice?.paths?.features || s.features || `.harness/features/${s.slice_id}.features.json`;
       const features = readJsonSafe(join(root, featuresRel));
       return {
         slice_id: s.slice_id,

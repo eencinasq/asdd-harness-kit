@@ -15,8 +15,8 @@ function harnessRoot() {
   const root = mkdtempSync(join(tmpdir(), 'asdd-init-slice-'));
   mkdirSync(join(root, '.harness/state/slices'), { recursive: true });
   writeFileSync(
-    join(root, '.harness/state/manifest.json'),
-    JSON.stringify({ schema_version: '3.0', active_slices: [] }, null, 2),
+    join(root, '.harness/state/registry.json'),
+    JSON.stringify({ schema_version: '3.0', slices: [] }, null, 2),
   );
   return root;
 }

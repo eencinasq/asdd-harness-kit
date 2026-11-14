@@ -23,7 +23,7 @@ function git(root, ...args) {
 /** Slice s1 at qa owns src/a.js; REQ-002 has no feature; lib/orphan.js is unowned. */
 function fixture({ auditCommands } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'audit-'));
-  write(root, '.harness/state/manifest.json', { schema_version: '3.0', active_slices: [{ slice_id: 's1', phase: 'qa', status: 'in_progress' }] });
+  write(root, '.harness/state/registry.json', { schema_version: '3.0', slices: [{ slice_id: 's1', phase: 'qa', status: 'in_progress' }] });
   write(root, '.harness/state/slices/s1/manifest.json', { slice_id: 's1', phase: 'qa', status: 'in_progress' });
   write(root, '.harness/specs/s1/intent.md', '# s1\n\nMapped: `src/a.js`\n');
   write(root, '.harness/specs/s1/requirements.md', '- **REQ-001.** The system shall a.\n- **REQ-002.** The system shall b.\n');

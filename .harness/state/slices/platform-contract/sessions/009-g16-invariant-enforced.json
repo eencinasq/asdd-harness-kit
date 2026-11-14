@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-platform-contract-009",
+  "timestamp": "2026-11-14T10:00:00Z",
+  "agent": "devin",
+  "slice_id": "platform-contract",
+  "event_type": "checkpoint",
+  "phase": "qa",
+  "mode": "full",
+  "evidence": "G-16/D-11 invariant enforcement: loadRegistry now fails closed on a tracked non-state class with no source_root (installed-side-only artifacts can neither ship nor stamp; trust:state classes exempt — sessions/summaries/trackers are authored in place). Class table verified by inspection: every tracked non-state class declares source_root; vocabulary boundary clean (DOM-10 — no span-kind leakage). +1 registry test. Suite 222/222.",
+  "concerns": [],
+  "scope_paths": [
+    "cli/src/install/registry.mjs",
+    "cli/test/registry.test.mjs"
+  ]
+}

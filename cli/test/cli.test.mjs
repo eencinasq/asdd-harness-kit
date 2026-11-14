@@ -63,8 +63,8 @@ test('repair restores missing slice sessions, specs, and features', () => {
   try {
     mkdirSync(join(dir, '.harness/state/slices/broken'), { recursive: true });
     writeFileSync(
-      join(dir, '.harness/state/manifest.json'),
-      `${JSON.stringify({ schema_version: '3.0', domain_model_version: '0.0.0', active_slices: [{ slice_id: 'broken', phase: 'implementation', status: 'in_progress', mode: 'lite' }] }, null, 2)}\n`,
+      join(dir, '.harness/state/registry.json'),
+      `${JSON.stringify({ schema_version: '3.0', domain_model_version: '0.0.0', slices: [{ slice_id: 'broken', phase: 'implementation', status: 'in_progress', mode: 'lite' }] }, null, 2)}\n`,
     );
     const res = spawnSync(process.execPath, [BIN, 'repair', '--json'], { cwd: dir, encoding: 'utf8' });
     assert.equal(res.status, 0, res.stderr || res.stdout);

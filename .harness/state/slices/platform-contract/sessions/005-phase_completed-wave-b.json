@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-platform-contract-005",
+  "timestamp": "2026-11-14T22:45:00.000Z",
+  "agent": "devin",
+  "slice_id": "platform-contract",
+  "event_type": "phase_completed",
+  "phase": "implementation",
+  "mode": "lite",
+  "evidence": "Wave A landed: registry files[] (38 rows, classified, install+self flags) is the enumeration SoT; HARNESS_FILES/BINDINGS/FOLDER_READMES/SELF_COPIES/installAgentsCore/installDocsRoot all derive; enableOne manifest-driven (switch deleted); MODULES derived from cli/modules dirs; steering templates + github examples folded into files table. Parity verified: SELF_COPIES=40, HARNESS_FILES=14. Verified: build OK, self/vendor --check OK, install.sh + lifecycle.sh OK, node --test 211/211 (+4 registry tests).",
+  "concerns": [
+    "remaining D-9 sites: RETIRED_JEV_FILES/RETIRED_KIT_PATHS/ignored.mjs/RUNTIME_DIRS/KIT_TOOL_SERVERS/command tables; PHASES constants; gitattributes/gitignore generation; kit regen umbrella \u2014 follow-on waves"
+  ],
+  "summary": "Wave B: ignore/stamp/runtime/retired enumerations \u2192 registry. Registry +learning_signals class (27), ignore_patterns on untracked classes, runtimes/committed_checks/retired sections. Derived: COMMITTED_PATHS, RUNTIME_PATHS, RUNTIMES, RUNTIME_DIRS, installHarnessIgnores, KIT_TOOL_SERVERS (tools/ walk), RETIRED_KIT_PATHS, RETIRED_JEV_FILES, uninstall KIT_IGNORES+KIT_MCP_SERVERS. gitignoreLines fails closed on tracked-class patterns. Telemetry ignore rows now emit on install (machinery ready ahead of profiling Phase 2). npm test 213/213.",
+  "files_changed": [
+    "cli/registry/contribution-points.json",
+    "cli/src/install/registry.mjs",
+    "cli/src/install/ignored.mjs",
+    "cli/src/install/options.mjs",
+    "cli/src/install/index.mjs",
+    "cli/src/install/phases.mjs",
+    "cli/src/install/modules.mjs",
+    "cli/src/uninstall.mjs",
+    "cli/test/registry.test.mjs"
+  ]
+}

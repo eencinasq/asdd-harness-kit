@@ -11,6 +11,7 @@ import { fileHash, InstallContext } from './context.mjs';
 import { describe, ignoreReport } from './ignored.mjs';
 import { enableModules, retireJev } from './modules.mjs';
 import { INSTALL_HELP, list, MODULES, parseInstallArgs, RUNTIMES } from './options.mjs';
+import { gitattributeLines, gitignoreLines, runtimeMap } from './registry.mjs';
 import { guardRuleCollisions } from './rule-collisions.mjs';
 import { guardSkillCollisions } from './skill-collisions.mjs';
 import { guardSteeringCollisions } from './steering-collisions.mjs';
@@ -51,7 +52,9 @@ function resolveKit(o, cleanup) {
   return kit;
 }
 
-const RUNTIME_DIRS = { cursor: '.cursor', claude: '.claude', opencode: '.opencode', kimi: '.kimi-code', junie: '.junie', devin: '.devin', kiro: '.kiro' };
+const RUNTIME_DIRS = Object.fromEntries(
+  Object.entries(runtimeMap(KIT_ROOT)).map(([name, r]) => [name, r.dir]),
+);
 
 const isDir = (p) => {
   try {
@@ -113,14 +116,39 @@ function installHarnessIgnores(ctx) {
     }
     removeGitignoreLine(ctx, '.harness/node_modules');
   }
-  ctx.ensureGitignore('.harness/knowledge');
-  // raw learning signals are local; learn.mjs commits weekly summaries instead
-  ctx.ensureGitignore('.harness/state/learning/signals');
-  // telemetry data is local: the span stream and the per-slice rollups (the contract files are committed)
-  ctx.ensureGitignore('.harness/state/telemetry/spans.jsonl');
-  ctx.ensureGitignore('.harness/state/telemetry/slices/');
-  // integration keys (embeddings) are loaded from these files — never commit
+  for (const line of gitignoreLines(ctx.kit)) ctx.ensureGitignore(line);
+  // integration keys (embeddings) are loaded from these files — never commit (kit policy, not an artifact class)
   ctx.ensureGitignore('.env.local');
+}
+
+const ATTR_BLOCK_BEGIN = '# --- asdd merge policy (generated from contribution-points registry — regen: asdd install) ---';
+const ATTR_BLOCK_END = '# --- end asdd merge policy ---';
+
+/**
+ * .gitattributes: the kit's merge-policy block derives from registry `attribute_globs` + `merge.driver` (D-4).
+ * The file is project-owned — only the marked block is managed; lines outside it are the project's own.
+ */
+function installGitattributes(ctx) {
+  const file = join(ctx.target, '.gitattributes');
+  // merge=ours rows: never hand-resolve — regenerate. -merge rows: kit-owned, `git checkout --ours` then re-install.
+  const runbook = '# conflicts: merge=ours rows regenerate (asdd sync / asdd kit versions); -merge rows are kit-owned — git checkout --ours <path>, then asdd install .';
+  const block = [ATTR_BLOCK_BEGIN, runbook, ...gitattributeLines(ctx.kit), ATTR_BLOCK_END].join('\n');
+  const text = existsSync(file) ? readFileSync(file, 'utf8') : '';
+  const begin = text.indexOf(ATTR_BLOCK_BEGIN);
+  const end = text.indexOf(ATTR_BLOCK_END);
+  let next;
+  if (begin >= 0 && end > begin) {
+    next = `${text.slice(0, begin)}${block}${text.slice(end + ATTR_BLOCK_END.length)}`;
+  } else {
+    next = `${text}${text && !text.endsWith('\n') ? '\n' : ''}${block}\n`;
+  }
+  if (next === text) return;
+  if (ctx.dryRun) {
+    log(`${c.dim('GITATTR')}  ${file} (merge-policy block)`);
+    return;
+  }
+  writeFileSync(file, next);
+  log(`${c.blue('GITATTR')}  ${file}`);
 }
 
 /**
@@ -243,7 +271,7 @@ function printSummary(ctx, previous) {
     log('  Review .harness/config/models.json for tier rationale.');
     if (runtimes.includes('cursor')) log('  Cursor:  verify-on-stop + command-gate hooks active in .cursor/hooks.json');
     if (runtimes.includes('claude')) {
-      log('  Claude:  .claude/settings.json PreToolUse(Bash)+Stop hooks, PostToolUse(Read|Skill) guidance load hook (fail-open)');
+      log('  Claude:  .claude/settings.json PreToolUse(Bash)+Stop hooks');
       log('  Claude:  read CLAUDE.md for session instructions');
     }
     if (runtimes.includes('opencode')) log('  OpenCode: config written to opencode.json');
@@ -316,6 +344,7 @@ function selfInstall(ctx) {
   }
   wireRuntimes(ctx);
   installHarnessIgnores(ctx);
+  installGitattributes(ctx);
   installVersionManifest(ctx);
   if (!ctx.dryRun) verify(ctx);
   const { created, updated } = ctx.stats;
@@ -373,6 +402,7 @@ export function runInstall(o, kit) {
   refreshSkillsIndex(ctx);
   wireRuntimes(ctx);
   installHarnessIgnores(ctx);
+  installGitattributes(ctx);
   installVersionManifest(ctx);
   // Every file is written: a failing check below is the project's state, not an interrupted install.
   if (!ctx.dryRun) rmSync(marker, { force: true });

@@ -66,9 +66,13 @@ function dirExists(rel) {
   return existsSync(join(root, rel));
 }
 
-const manifest = readJson('.harness/state/manifest.json');
+// The global slice index is the generated registry (state/manifest.json retired — RV1-AR-1). Its absence is a
+// legitimate state (AR-2: zero-slice project / pre-sync fresh clone), so it is read softly — validators/manifest.mjs
+// owns the missing-versus-absent verdict.
+const registryPath = join(root, '.harness/state/registry.json');
+const registry = existsSync(registryPath) ? readJson('.harness/state/registry.json') : null;
 
-const ctx = { root, fail, warn, readJson, dirExists, manifest };
+const ctx = { root, fail, warn, readJson, dirExists, registry };
 
 validatePaths(ctx);
 validateManifest(ctx);

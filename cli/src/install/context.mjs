@@ -43,7 +43,7 @@ export function fileHash(path) {
 const REGENERATED = new Set(['.harness/steering/skills.md']);
 
 /** Files a kit tree never installs: OS junk and the kit's own tests. */
-const SKIPPED = /^(\.DS_Store|\._.*|.*\.test\..*|.*\.spec\..*)$/;
+export const SKIPPED = /^(\.DS_Store|\._.*|.*\.test\..*|.*\.spec\..*)$/;
 
 /**
  * Files the PREVIOUS install recorded as kit-managed (`managed_files` in installed-versions.json), or null when the

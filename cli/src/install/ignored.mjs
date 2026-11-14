@@ -1,24 +1,19 @@
 // What a project's .gitignore must not hide: the harness files the team commits. An ignored one installs fine
 // locally but never reaches the repository, so every other clone (and CI) runs without it.
 import { spawnSync } from 'node:child_process';
+import { join } from 'node:path';
 
-/** One representative path per committed harness area (the files need not exist: git checks the rules). */
-export const COMMITTED_PATHS = [
-  'AGENTS.md',
-  '.harness/config/project.json',
-  '.harness/steering/controls.md',
-  '.harness/features/example.features.json',
-  '.harness/specs/example/spec.md',
-  '.harness/state/slices/example/sessions/001.json',
-  '.harness/PROGRESS.md',
-  '.agents/skills/codegraph/SKILL.md',
-];
+import { committedChecks, runtimeMap } from './registry.mjs';
 
-/** The runtime files that wire the hooks, per runtime (only these runtimes have committed hook files). */
-export const RUNTIME_PATHS = {
-  cursor: ['.cursor/hooks.json'],
-  claude: ['.claude/settings.json'],
-};
+const KIT_ROOT = join(import.meta.dirname, '../../..');
+
+/** One representative path per committed harness area (registry committed_checks.paths — the files need not exist: git checks the rules). */
+export const COMMITTED_PATHS = committedChecks(KIT_ROOT);
+
+/** The runtime files that wire the hooks, per runtime (registry runtimes.<name>.committed; only some have committed hook files). */
+export const RUNTIME_PATHS = Object.fromEntries(
+  Object.entries(runtimeMap(KIT_ROOT)).map(([name, r]) => [name, r.committed]),
+);
 
 /**
  * The paths of `paths` that `dir`'s ignore rules hide, each with the rule (`source:line:pattern`).

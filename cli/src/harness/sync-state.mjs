@@ -63,8 +63,28 @@ function readSessions(sliceDir) {
 
 export { readSessions };
 
-// Ordered pipeline. 'refactor' is optional and handled in derivePhase.
-export const PHASES = ['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'knowledge'];
+/**
+ * Phase + mode vocabulary comes from the platform registry (D-3), not constants. Lookup order: the project's
+ * installed copy (pin fidelity — the kit version the project runs), then the registry bundled with this CLI copy
+ * (kit repo, npm package, vendored tools trees). Absent vocabulary degrades to empty lists: bare dirs keep working.
+ */
+function platformVocabulary() {
+  for (const p of [
+    join(root, '.harness/config/contribution-points.json'),
+    join(import.meta.dirname, '../../registry/contribution-points.json'),
+  ]) {
+    const r = readJson(p);
+    if (r?.vocabulary) return r.vocabulary;
+  }
+  return null;
+}
+const VOCAB = platformVocabulary();
+if (!VOCAB && existsSync(join(root, '.harness'))) {
+  console.error('asdd: .harness/config/contribution-points.json missing — run `asdd install` to install the platform registry');
+}
+
+// Ordered pipeline (registry vocabulary.phases, by `order`). 'refactor' is optional and handled in derivePhase.
+export const PHASES = (VOCAB?.phases ? [...VOCAB.phases].sort((a, b) => a.order - b.order).map((p) => p.id) : []);
 
 export function derivePhase(sessions) {
   const phaseEvents = sessions.filter((s) =>
@@ -81,7 +101,7 @@ export function derivePhase(sessions) {
   return latest.phase;
 }
 
-export const SLICE_MODES = ['lite', 'hotfix', 'full', 'escalated'];
+export const SLICE_MODES = VOCAB?.modes ?? [];
 
 /** Serial modes: at most one in_progress feature; escalation signals block DONE. */
 export function isSerialMode(mode) {

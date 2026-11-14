@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { PHASES, SLICE_MODES } from '../sync-state.mjs';
 import { validateFeatureExecution } from './features.mjs';
 
 const VALID_EVENT_TYPES = [
@@ -36,7 +37,7 @@ function validateSessionFile(data, rel, fail) {
   if (data.human !== undefined && (typeof data.human !== 'string' || !data.human.trim())) {
     fail(`${rel}: human must be a non-empty string`);
   }
-  if (data.phase !== undefined && !['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'knowledge'].includes(data.phase)) {
+  if (data.phase !== undefined && !PHASES.includes(data.phase)) {
     fail(`${rel}: invalid phase "${data.phase}"`);
   }
   if (data.feature_id !== undefined && (typeof data.feature_id !== 'string' || !data.feature_id.trim())) {
@@ -64,41 +65,64 @@ function validateSessionFile(data, rel, fail) {
 }
 
 export default function validate(ctx) {
-  const { root, fail, warn, readJson, dirExists, manifest } = ctx;
+  const { root, fail, warn, readJson, dirExists, registry } = ctx;
 
-  // Global manifest schema v2.0 or v3.0
-  if (manifest) {
-    const isV3Global = manifest.schema_version === '3.0';
-    const isV2Global = manifest.schema_version === '2.0';
-    if (!isV2Global && !isV3Global) {
-      fail(`global manifest schema_version should be "2.0" or "3.0", got "${manifest.schema_version}"`);
-    }
-    if (!Array.isArray(manifest.active_slices)) {
-      fail('global manifest missing active_slices array');
-    }
-    if (manifest.active_slices && manifest.active_slices.length === 0) {
-      warn('global manifest has no active_slices');
-    }
+  const slicesDir = join(root, '.harness/state/slices');
+  const sliceDirNames = existsSync(slicesDir)
+    ? readdirSync(slicesDir, { withFileTypes: true })
+        .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
+        .map((e) => e.name)
+    : [];
+  const featuresDir = join(root, '.harness/features');
+  const hasState =
+    sliceDirNames.length > 0 ||
+    (existsSync(featuresDir) && readdirSync(featuresDir).some((n) => n.endsWith('.features.json')));
 
-    // Normalize active_slices to array of { slice_id, ... } objects
-    const normalizedSlices = (manifest.active_slices || []).map((s) =>
-      typeof s === 'string' ? { slice_id: s } : s,
-    );
+  // AR-2: a missing generated index fails only when state exists to index; zero-slice absence is legitimate.
+  if (!registry) {
+    if (hasState) fail('generated state missing: .harness/state/registry.json — run: asdd sync');
+    else warn('registry.json not found — legitimate on a zero-slice project (run: asdd sync)');
+  }
 
-    // Validate each slice reference in global manifest
-    for (const slice of normalizedSlices) {
+  // Registry schema (the generated global index; global state/manifest.json retired — RV1-AR-1)
+  const slices = [];
+  if (registry) {
+    if (registry.schema_version !== '3.0') {
+      fail(`registry schema_version should be "3.0", got "${registry.schema_version}"`);
+    }
+    if (!Array.isArray(registry.slices)) {
+      fail('registry.json missing slices array');
+    } else {
+      if (registry.slices.length === 0 && hasState) {
+        warn('registry lists no slices but state exists — run: asdd sync');
+      }
+      for (const s of registry.slices) slices.push(typeof s === 'string' ? { slice_id: s } : s);
+    }
+  }
+
+  // State on disk that the index does not list: a stale or missing regen (orphan detection below refines it).
+  const indexed = new Set(slices.map((s) => s.slice_id).filter(Boolean));
+
+    // Validate each slice — indexed slices first, then dirs the index missed
+    const allSlices = [...slices];
+    for (const name of sliceDirNames) if (!indexed.has(name)) allSlices.push({ slice_id: name });
+    for (const slice of allSlices) {
       if (!slice.slice_id) {
-        fail('active_slices entry missing slice_id');
+        fail('registry slices entry missing slice_id');
         continue;
       }
       if (slice.status && !['DONE', 'in_progress', 'PARKED', 'ABANDONED'].includes(slice.status)) {
         fail(`slice "${slice.slice_id}" has invalid status "${slice.status}" (expected DONE, in_progress, PARKED, or ABANDONED)`);
       }
-      if (slice.phase && !['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'knowledge'].includes(slice.phase)) {
+      if (slice.phase && !PHASES.includes(slice.phase)) {
         fail(`slice "${slice.slice_id}" has invalid phase "${slice.phase}"`);
       }
 
       const sliceDir = join(root, '.harness/state/slices', slice.slice_id);
+      if (indexed.has(slice.slice_id) && !existsSync(sliceDir)) {
+        fail(`registry lists slice "${slice.slice_id}" but ${sliceDir.slice(root.length + 1)} is absent — run: asdd sync`);
+        continue;
+      }
       const v2ManifestPath = join(sliceDir, 'manifest.json');
       const sessionsDir = join(sliceDir, 'sessions');
       const manifestExists = existsSync(v2ManifestPath);
@@ -131,8 +155,8 @@ export default function validate(ctx) {
             if (sliceManifest.slice_id !== slice.slice_id) {
               fail(`slice "${slice.slice_id}" manifest slice_id mismatch: ${sliceManifest.slice_id}`);
             }
-            if (sliceManifest.mode && !['full', 'lite', 'hotfix', 'escalated'].includes(sliceManifest.mode)) {
-              fail(`slice "${slice.slice_id}" has invalid mode "${sliceManifest.mode}" (expected full, lite, hotfix, or escalated)`);
+            if (sliceManifest.mode && !SLICE_MODES.includes(sliceManifest.mode)) {
+              fail(`slice "${slice.slice_id}" has invalid mode "${sliceManifest.mode}" (expected ${SLICE_MODES.join(', ')})`);
             }
 
             // Phase/status consistency with global manifest
@@ -184,7 +208,21 @@ export default function validate(ctx) {
         if (sessionFiles.length === 0) {
           warn(`slice "${slice.slice_id}" sessions directory is empty`);
         }
+        // AR-3/AR-1: session filenames are NNN-<slug>.json forward-only — no merge driver; a duplicated sequence
+        // number is a visible collision to rename, never content-merge.
+        const seenSeq = new Map();
         for (const sf of sessionFiles) {
+          if (!/^\d{3}-.+\.json$/.test(sf)) {
+            warn(`slice "${slice.slice_id}" session "${sf}" does not follow NNN-<slug>.json naming (AR-3)`);
+          } else {
+            const seq = sf.slice(0, 3);
+            const prior = seenSeq.get(seq);
+            if (prior) {
+              warn(`slice "${slice.slice_id}" sessions "${prior}" and "${sf}" share sequence ${seq} — rename one (AR-3: collisions resolve by rename, never merge)`);
+            } else {
+              seenSeq.set(seq, sf);
+            }
+          }
           const sessionRel = `.harness/state/slices/${slice.slice_id}/sessions/${sf}`;
           const sessionData = readJson(sessionRel);
           if (sessionData) {
@@ -225,77 +263,48 @@ export default function validate(ctx) {
         }
       }
     }
-  }
-
-  // Registry validation
-  const registryPath = join(root, '.harness/state/registry.json');
-  if (existsSync(registryPath)) {
-    const registry = readJson('.harness/state/registry.json');
-    if (registry) {
-      if (!Array.isArray(registry.slices)) {
-        fail('registry.json missing slices array');
-      } else {
-        const activeSliceIds = new Set(
-          Array.isArray(manifest?.active_slices)
-            ? manifest.active_slices.map((s) => typeof s === 'string' ? s : s.slice_id)
-            : [],
-        );
-        const registrySliceIds = new Set(registry.slices.map((s) => s.slice_id).filter(Boolean));
-        for (const sliceId of activeSliceIds) {
-          if (!registrySliceIds.has(sliceId)) {
-            fail(`slice "${sliceId}" is in global active_slices but missing from registry.json`);
-          }
-        }
-        for (const sliceId of registrySliceIds) {
-          if (!activeSliceIds.has(sliceId)) {
-            warn(`slice "${sliceId}" is in registry.json but not in global active_slices`);
-          }
-        }
-      }
-    }
-  } else {
-    warn('registry.json not found — skipping registry validation');
-  }
 
   // Project bindings completeness
   const projectConfig = readJson('.harness/config/project.json');
   if (projectConfig && projectConfig.bindings_complete === false) {
-    // v3: phase info is in per-slice manifests, not global — skip late-phase check from global
     warn('project bindings are scaffolded but still require project-specific content (bindings_complete = false)');
   }
 
-  // Orphan slice detection
-  const slicesDir = join(root, '.harness/state/slices');
-  if (existsSync(slicesDir)) {
-    const knownSliceIds = new Set(
-      Array.isArray(manifest?.active_slices)
-        ? manifest.active_slices.map((s) => typeof s === 'string' ? s : s.slice_id)
-        : [],
-    );
+  // Orphan slice detection + AR-2: expected-generated files absent while their state inputs exist.
+  for (const sliceName of sliceDirNames) {
+    const sliceManifestPath = join(slicesDir, sliceName, 'manifest.json');
+    const sliceSessionsDir = join(slicesDir, sliceName, 'sessions');
+    const hasV2 = existsSync(sliceManifestPath);
+    const hasV3 = existsSync(sliceSessionsDir);
 
-    for (const name of readdirSync(slicesDir, { withFileTypes: true })) {
-      if (!name.isDirectory() || name.name.startsWith('.')) continue;
-      const sliceName = name.name;
-      const sliceManifestPath = join(slicesDir, sliceName, 'manifest.json');
-      const sliceSessionsDir = join(slicesDir, sliceName, 'sessions');
-      const hasV2 = existsSync(sliceManifestPath);
-      const hasV3 = existsSync(sliceSessionsDir);
-
-      if (!hasV2 && !hasV3) {
-        // Empty slice directory — check if it has specs
-        const specDir = join(root, '.harness/specs', sliceName);
-        if (existsSync(specDir) && readdirSync(specDir).length > 0) {
-          fail(`orphan slice "${sliceName}" has specs but no manifest or sessions`);
-        } else if (existsSync(specDir)) {
-          // Empty specs dir + empty state dir — stale empty directories
-          warn(`empty slice directories detected for "${sliceName}" (no specs, no manifest, no sessions)`);
-        }
-        continue;
+    if (!hasV2 && !hasV3) {
+      // Empty slice directory — check if it has specs
+      const specDir = join(root, '.harness/specs', sliceName);
+      if (existsSync(specDir) && readdirSync(specDir).length > 0) {
+        fail(`orphan slice "${sliceName}" has specs but no manifest or sessions`);
+      } else if (existsSync(specDir)) {
+        // Empty specs dir + empty state dir — stale empty directories
+        warn(`empty slice directories detected for "${sliceName}" (no specs, no manifest, no sessions)`);
       }
-
-      if (!knownSliceIds.has(sliceName)) {
-        fail(`orphan slice "${sliceName}" has state but is not in global active_slices`);
-      }
+      continue;
     }
+
+    if (!indexed.has(sliceName)) {
+      fail(`orphan slice "${sliceName}" has state but is not in registry.json — run: asdd sync`);
+    }
+    // Sessions are state; the generated per-slice manifest must be regenerable, not absent.
+    if (hasV3 && !hasV2) {
+      fail(`generated state missing: .harness/state/slices/${sliceName}/manifest.json — run: asdd sync`);
+    }
+  }
+
+  // AR-2: learning summaries (tracked inputs) exist but the derived patterns file does not.
+  const summariesDir = join(root, '.harness/state/learning/summaries');
+  if (
+    existsSync(summariesDir) &&
+    readdirSync(summariesDir).some((n) => n.endsWith('.json')) &&
+    !existsSync(join(root, '.harness/state/learning/patterns.json'))
+  ) {
+    fail('generated state missing: .harness/state/learning/patterns.json — run: asdd learn');
   }
 }

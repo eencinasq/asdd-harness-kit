@@ -26,9 +26,9 @@ function git(root, ...args) {
 
 function fixture({ phase = 'implementation', features, requirements, intent, withGit = true } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'drift-lib-'));
-  write(root, '.harness/state/manifest.json', {
+  write(root, '.harness/state/registry.json', {
     schema_version: '3.0',
-    active_slices: [{ slice_id: 's1', phase, status: 'in_progress' }],
+    slices: [{ slice_id: 's1', phase, status: 'in_progress' }],
   });
   write(root, '.harness/state/slices/s1/manifest.json', { slice_id: 's1', phase, status: 'in_progress' });
   write(root, '.harness/specs/s1/intent.md', intent ?? '# s1\n\nMapped: `src/a.js`, `lib/`\n');

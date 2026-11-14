@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "name": "bruno",
+  "version": "1.0.0",
+  "description": "Bruno API testing skill + integration-tester agent",
+  "engines": { "asdd": ">=3.12.0" },
+  "trust": "declarative",
+  "activation": { "flag": "project.json modules.bruno" },
+  "contributes": {
+    "agents": [
+      { "path": "asdd-integration-tester.md", "mount": ".agents/agents/asdd-integration-tester.md" }
+    ],
+    "skills": [
+      { "path": "skills", "mount": ".agents/skills" }
+    ]
+  }
+}

@@ -1,0 +1,1099 @@
+{
+  "schema_version": "1.0",
+  "contribution_points": {
+    "kit_source": {
+      "schema": null,
+      "source_root": "cli/**",
+      "mount": null,
+      "generator": null,
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "declarative",
+      "notes": "All cli/ sources incl. cli/registry/, cli/templates/, cli/scaffold/ — hand-authored. This file itself is kit_source."
+    },
+    "steering": {
+      "schema": "cli/steering/_steering-profile.md + cli/scaffold/config/steering.registry.json (instance catalog)",
+      "source_root": "cli/steering",
+      "mount": ".harness/steering",
+      "generator": "self",
+      "freshness_check": "asdd kit self --check",
+      "merge": {
+        "tracked": true,
+        "driver": "-merge",
+        "regen": "asdd kit self"
+      },
+      "trust": "declarative",
+      "notes": "steering.registry.json is the instance catalog (DOM-6); this class is the class-level registration."
+    },
+    "binding": {
+      "schema": "cli/templates/bindings stubs",
+      "source_root": "cli/templates/bindings",
+      "mount": ".harness/steering",
+      "generator": null,
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "declarative",
+      "notes": "Project-owned after create-only seed."
+    },
+    "agent": {
+      "schema": "agent.spec + cli/agents/_runtime-template.md",
+      "source_root": "cli/agents",
+      "mount": ".agents/agents",
+      "generator": "self",
+      "freshness_check": "asdd kit self --check",
+      "merge": {
+        "tracked": true,
+        "driver": "-merge",
+        "regen": "asdd kit self"
+      },
+      "trust": "declarative"
+    },
+    "skill": {
+      "schema": "skill.spec + skill-profile",
+      "source_root": "cli/skills",
+      "mount": ".agents/skills",
+      "generator": "self",
+      "freshness_check": "asdd kit self --check",
+      "merge": {
+        "tracked": true,
+        "driver": "-merge",
+        "regen": "asdd kit self"
+      },
+      "trust": "declarative"
+    },
+    "rule": {
+      "schema": "rule.spec + _rule-profile.md",
+      "source_root": "cli/rules",
+      "mount": ".agents/rules",
+      "generator": "self",
+      "freshness_check": "asdd kit self --check",
+      "merge": {
+        "tracked": true,
+        "driver": "-merge",
+        "regen": "asdd kit self"
+      },
+      "trust": "declarative"
+    },
+    "adapter": {
+      "schema": "spec-drift-adapter contract {id,description,run({root,sliceId,readBinding})}",
+      "source_root": "cli/modules/*/adapters",
+      "mount": ".agents/mcp/adapters",
+      "generator": "self",
+      "freshness_check": "asdd kit self --check",
+      "merge": {
+        "tracked": true,
+        "driver": "-merge",
+        "regen": "asdd kit self"
+      },
+      "trust": "executable",
+      "notes": "copyTree SKIPPED filter excludes *.test.*/*.spec.* (context.mjs:46,199-205)."
+    },
+    "mcp_server": {
+      "schema": "mcp.json fragment",
+      "source_root": "cli/mcp",
+      "mount": ".agents/mcp/mcp.json",
+      "generator": "self",
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "executable",
+      "notes": "patchJson merge — managed config semantics."
+    },
+    "runtime_adapter": {
+      "schema": "cli/runtimes/<name>/ recipe",
+      "source_root": "cli/runtimes",
+      "mount": "runtime dirs (.cursor, .claude, .opencode, .kimi-code, .junie, .devin, .kiro)",
+      "generator": "install",
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "executable",
+      "notes": "Mixed — asdd-steering.mdc is partially_generated."
+    },
+    "module": {
+      "schema": "module.json (D-1)",
+      "source_root": "cli/modules/<name>",
+      "mount": "per contributes mounts",
+      "generator": "self",
+      "freshness_check": "asdd kit self --check",
+      "merge": {
+        "tracked": true,
+        "driver": "-merge",
+        "regen": "asdd kit self"
+      },
+      "trust": "per contributions"
+    },
+    "hook": {
+      "schema": "per-runtime hook file + asddCommand resolver",
+      "source_root": "cli/runtimes",
+      "mount": ".cursor/hooks.json etc.",
+      "generator": "install",
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "executable",
+      "notes": "patchJson merge into runtime settings."
+    },
+    "command": {
+      "schema": "HARNESS_COMMANDS (commands.mjs:5-66)",
+      "source_root": "cli/src/harness",
+      "mount": "dispatcher — kit-internal only in Phase 1",
+      "generator": null,
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "executable",
+      "notes": "Consumer contributes.commands fails closed (Q-NEW-3)."
+    },
+    "session": {
+      "schema": "session JSON",
+      "source_root": null,
+      "mount": ".harness/state/slices/*/sessions/NNN-<event>-<id>.json",
+      "generator": null,
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "state",
+      "notes": "Create-only; unique naming forward-only; NO union driver (AR-3)."
+    },
+    "learning_summary": {
+      "schema": "weekly author summary JSON (learning-lib.mjs:8-11,205-235)",
+      "source_root": null,
+      "mount": ".harness/state/learning/summaries/<week>-<author>.json",
+      "generator": "learn",
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "state",
+      "notes": "Committed input for patterns.json regen across clones (DOM-9)."
+    },
+    "feature_tracker": {
+      "schema": "feature.schema.json",
+      "source_root": null,
+      "mount": ".harness/features/<id>.features.json",
+      "generator": "init-slice + sync-state stampEvidence",
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "state",
+      "notes": "Hybrid: authored state + in-place evidence_hash stamp (RV1-GT-3)."
+    },
+    "derived_singleton": {
+      "schema": null,
+      "source_root": null,
+      "mount": ".harness/state/registry.json, .harness/state/slices/*/manifest.json, .harness/state/learning/patterns.json",
+      "generator": "sync-state",
+      "freshness_check": "asdd check",
+      "merge": {
+        "tracked": false,
+        "driver": null,
+        "regen": "asdd sync (state), asdd learn (patterns)"
+      },
+      "trust": "derived",
+      "notes": "Untrack+regen per D-4a. Global state/manifest.json retired by RV1-AR-1 reader migration (registry.json is the global index; domain_model_version moves to config/project.json).",
+      "ignore_patterns": [
+        ".harness/state/registry.json",
+        ".harness/state/slices/*/manifest.json",
+        ".harness/state/learning/patterns.json"
+      ]
+    },
+    "progress_doc": {
+      "schema": "cli/templates/PROGRESS.md",
+      "source_root": "cli/templates",
+      "mount": ".harness/PROGRESS.md",
+      "generator": "sync-state",
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "ours",
+        "regen": "asdd sync"
+      },
+      "trust": "derived",
+      "attribute_globs": [
+        ".harness/PROGRESS.md"
+      ]
+    },
+    "installed_copy": {
+      "schema": null,
+      "source_root": "cli/",
+      "mount": ".harness/steering, .agents, .cursor, AGENTS.md",
+      "generator": "self",
+      "freshness_check": "asdd kit self --check",
+      "merge": {
+        "tracked": true,
+        "driver": "-merge",
+        "regen": "asdd kit self"
+      },
+      "trust": "copy",
+      "notes": "-merge = intentional conflict; resolution = regen + git add, never hunks.",
+      "attribute_globs": [
+        ".harness/steering/**",
+        ".agents/**",
+        ".cursor/**",
+        "AGENTS.md"
+      ]
+    },
+    "vendored_copy": {
+      "schema": "// GENERATED header",
+      "source_root": "cli/src/harness",
+      "mount": "tools/*/src/harness",
+      "generator": "vendor",
+      "freshness_check": "asdd kit vendor --check",
+      "merge": {
+        "tracked": true,
+        "driver": "-merge",
+        "regen": "asdd kit vendor"
+      },
+      "trust": "executable",
+      "attribute_globs": [
+        "tools/*/src/harness/**"
+      ]
+    },
+    "partially_generated": {
+      "schema": "steering-gen: markers",
+      "source_root": "cli/runtimes/*/asdd-steering.mdc",
+      "mount": ".cursor/rules/",
+      "generator": "runtime-steering",
+      "freshness_check": "asdd kit generate-runtime-steering --check",
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": "asdd kit generate-runtime-steering"
+      },
+      "trust": "mixed",
+      "notes": "Text merge human regions; regen marked regions."
+    },
+    "version_stamp": {
+      "schema": "versions.json",
+      "source_root": "cli/",
+      "mount": "cli/versions.json, .harness/config/versions.json",
+      "generator": "versions",
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "ours",
+        "regen": "asdd kit versions"
+      },
+      "trust": "derived",
+      "attribute_globs": [
+        "cli/versions.json",
+        ".harness/config/versions.json"
+      ]
+    },
+    "managed_config": {
+      "schema": "project.schema.json",
+      "source_root": "cli/scaffold/config",
+      "mount": ".harness/config/* (incl. installed-versions.json fingerprints index.mjs:163-195), project.json, mcp.json",
+      "generator": "install",
+      "freshness_check": "asdd check-config",
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "config",
+      "notes": "patchJson merge; installer rewrites on install."
+    },
+    "state_derived_read": {
+      "schema": null,
+      "source_root": null,
+      "mount": ".harness/knowledge/",
+      "generator": "sync-knowledge",
+      "freshness_check": null,
+      "merge": {
+        "tracked": false,
+        "driver": null,
+        "regen": "asdd knowledge sync"
+      },
+      "trust": "derived",
+      "ignore_patterns": [
+        ".harness/knowledge"
+      ]
+    },
+    "seeded_scaffold": {
+      "schema": "scaffold docs",
+      "source_root": "cli/scaffold/**",
+      "mount": ".harness/{specs,features,state/*,progress,config,audits,steering}/README.md",
+      "generator": "install",
+      "freshness_check": null,
+      "merge": {
+        "tracked": true,
+        "driver": "text",
+        "regen": null
+      },
+      "trust": "declarative",
+      "notes": "Create-only; project-owned after seed. telemetry.schema.json+README gain cli/ source_root via cli/scaffold/state/telemetry/ (G-16 fix)."
+    },
+    "telemetry_stream": {
+      "schema": "telemetry.schema.json (profiling-owned grammar)",
+      "source_root": null,
+      "mount": ".harness/state/telemetry/spans.jsonl",
+      "generator": null,
+      "freshness_check": null,
+      "merge": {
+        "tracked": false,
+        "driver": null,
+        "regen": null
+      },
+      "trust": "state",
+      "ignore_patterns": [
+        ".harness/state/telemetry/spans.jsonl"
+      ],
+      "notes": "Append-only runtime stream; never merged, never regenerated. Absent = legitimate (AR-2 rule extended)."
+    },
+    "profiling_rollup": {
+      "schema": "derived of telemetry_stream",
+      "source_root": null,
+      "mount": ".harness/state/telemetry/slices/<id>/profiling.json",
+      "generator": "harness-profile",
+      "freshness_check": null,
+      "merge": {
+        "tracked": false,
+        "driver": null,
+        "regen": "node .harness/scripts/harness-profile.mjs --slice <id>"
+      },
+      "trust": "derived",
+      "ignore_patterns": [
+        ".harness/state/telemetry/slices/"
+      ]
+    },
+    "learning_signals": {
+      "schema": "raw learning signal files (learn.mjs input)",
+      "source_root": null,
+      "mount": ".harness/state/learning/signals/**",
+      "generator": null,
+      "freshness_check": null,
+      "merge": {
+        "tracked": false,
+        "driver": null,
+        "regen": null
+      },
+      "trust": "state",
+      "ignore_patterns": [
+        ".harness/state/learning/signals"
+      ],
+      "notes": "Raw signals are local-only; learn.mjs commits weekly summaries (learning_summary) instead."
+    }
+  },
+  "files": [
+    {
+      "src": ".github/CODEOWNERS.harness.example",
+      "dest": ".harness/examples/CODEOWNERS.harness.example",
+      "class": "installed_copy",
+      "install": "refresh",
+      "self": false
+    },
+    {
+      "src": ".github/workflows/harness-audit.yml.example",
+      "dest": ".harness/examples/harness-audit.yml.example",
+      "class": "installed_copy",
+      "install": "refresh",
+      "self": false
+    },
+    {
+      "src": "cli/scaffold/audits/README.md",
+      "dest": ".harness/audits/README.md",
+      "class": "installed_copy",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/config/project.schema.json",
+      "dest": ".harness/config/project.schema.json",
+      "class": "managed_config",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/config/README.md",
+      "dest": ".harness/config/README.md",
+      "class": "managed_config",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/features/feature.schema.json",
+      "dest": ".harness/features/feature.schema.json",
+      "class": "installed_copy",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/versions.json",
+      "dest": ".harness/config/versions.json",
+      "class": "version_stamp",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/config/models.json",
+      "dest": ".harness/config/models.json",
+      "class": "managed_config",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/config/skill-profile-waivers.json",
+      "dest": ".harness/config/skill-profile-waivers.json",
+      "class": "managed_config",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/config/steering.registry.json",
+      "dest": ".harness/config/steering.registry.json",
+      "class": "managed_config",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/registry/contribution-points.json",
+      "dest": ".harness/config/contribution-points.json",
+      "class": "managed_config",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/state/telemetry/README.md",
+      "dest": ".harness/state/telemetry/README.md",
+      "class": "installed_copy",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/state/telemetry/telemetry.schema.json",
+      "dest": ".harness/state/telemetry/telemetry.schema.json",
+      "class": "installed_copy",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/templates/PROGRESS.md",
+      "dest": ".harness/PROGRESS.md",
+      "class": "progress_doc",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/templates/bindings/product.md",
+      "dest": ".harness/steering/product.md",
+      "class": "binding",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/templates/bindings/structure.md",
+      "dest": ".harness/steering/structure.md",
+      "class": "binding",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/templates/bindings/tech.md",
+      "dest": ".harness/steering/tech.md",
+      "class": "binding",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/templates/bindings/domain-layer.project.md",
+      "dest": ".harness/steering/domain-layer.project.md",
+      "class": "binding",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/templates/bindings/quality-gates.project.md",
+      "dest": ".harness/steering/quality-gates.project.md",
+      "class": "binding",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/templates/bindings/design-system.md",
+      "dest": ".harness/steering/design-system.md",
+      "class": "binding",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/scaffold/specs/README.md",
+      "dest": ".harness/specs/README.md",
+      "class": "seeded_scaffold",
+      "install": "seeded",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/features/README.md",
+      "dest": ".harness/features/README.md",
+      "class": "seeded_scaffold",
+      "install": "seeded",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/state/slices/README.md",
+      "dest": ".harness/state/slices/README.md",
+      "class": "seeded_scaffold",
+      "install": "seeded",
+      "self": true
+    },
+    {
+      "src": "cli/scaffold/state/archive/README.md",
+      "dest": ".harness/state/archive/README.md",
+      "class": "seeded_scaffold",
+      "install": "seeded",
+      "self": true
+    },
+    {
+      "src": "cli/agents",
+      "dest": ".agents/agents",
+      "class": "agent",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/skills",
+      "dest": ".agents/skills",
+      "class": "skill",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/rules",
+      "dest": ".agents/rules",
+      "class": "rule",
+      "install": "refresh",
+      "self": true,
+      "optional": true
+    },
+    {
+      "src": "cli/mcp/bin",
+      "dest": ".agents/mcp/bin",
+      "class": "mcp_server",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/mcp/sync-runtime-mcp.cjs",
+      "dest": ".agents/mcp/sync-runtime-mcp.cjs",
+      "class": "mcp_server",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/mcp/README.md",
+      "dest": ".agents/mcp/README.md",
+      "class": "mcp_server",
+      "install": "refresh",
+      "self": true
+    },
+    {
+      "src": "cli/mcp/mcp.json",
+      "dest": ".agents/mcp/mcp.json",
+      "class": "managed_config",
+      "install": null,
+      "self": true
+    },
+    {
+      "src": "cli/AGENTS.md",
+      "dest": "AGENTS.md",
+      "class": "installed_copy",
+      "install": "create",
+      "self": true
+    },
+    {
+      "src": "cli/templates/docs/domain-model.md",
+      "dest": "docs/architecture/domain-model.md",
+      "class": "seeded_scaffold",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/templates/docs/agent-failure-log.md",
+      "dest": "docs/agent-failure-log.md",
+      "class": "seeded_scaffold",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/templates/docs/dissent-log.md",
+      "dest": "docs/dissent-log.md",
+      "class": "seeded_scaffold",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "docs/knowledge-base/README.md",
+      "dest": "docs/knowledge-base/README.md",
+      "class": "seeded_scaffold",
+      "install": "create",
+      "self": false
+    },
+    {
+      "src": "cli/steering/templates",
+      "dest": ".harness/steering/templates",
+      "class": "steering",
+      "install": "refresh",
+      "self": true
+    }
+  ],
+  "runtimes": {
+    "cursor": {
+      "dir": ".cursor",
+      "committed": [
+        ".cursor/hooks.json"
+      ]
+    },
+    "claude": {
+      "dir": ".claude",
+      "committed": [
+        ".claude/settings.json"
+      ]
+    },
+    "opencode": {
+      "dir": ".opencode",
+      "committed": []
+    },
+    "kimi": {
+      "dir": ".kimi-code",
+      "committed": []
+    },
+    "junie": {
+      "dir": ".junie",
+      "committed": []
+    },
+    "devin": {
+      "dir": ".devin",
+      "committed": []
+    },
+    "kiro": {
+      "dir": ".kiro",
+      "committed": []
+    }
+  },
+  "committed_checks": {
+    "paths": [
+      "AGENTS.md",
+      ".harness/config/project.json",
+      ".harness/steering/controls.md",
+      ".harness/features/example.features.json",
+      ".harness/specs/example/spec.md",
+      ".harness/state/slices/example/sessions/001.json",
+      ".harness/PROGRESS.md",
+      ".agents/skills/codegraph/SKILL.md"
+    ]
+  },
+  "retired": {
+    "jev_files": [
+      ".harness/cli/src/harness/jev-client.mjs",
+      ".harness/cli/src/harness/jev-gates.mjs",
+      ".harness/cli/dist/harness/jev-client.mjs",
+      ".harness/cli/dist/harness/jev-gates.mjs",
+      ".harness/steering/jev.md"
+    ],
+    "kit_paths": [
+      "scripts/harness-migrate.mjs",
+      "scripts/migrate-v2-v3.mjs",
+      ".agents/skills/product-delivery/agents",
+      ".agents/skills/product-delivery/contracts/discovery.schema.yaml",
+      ".agents/skills/product-delivery/contracts/delivery-map.schema.yaml",
+      ".agents/skills/product-delivery/contracts/sprint-plan.schema.yaml",
+      ".agents/skills/product-delivery/contracts/tech-spec.schema.yaml",
+      ".agents/skills/product-delivery/contracts/user-story.schema.yaml",
+      ".agents/skills/product-delivery/references/technical-diagrams.md",
+      ".agents/skills/user-story-decomposition",
+      ".agents/skills/capability-prioritization",
+      ".agents/mcp/spec-drift-auditor.mjs",
+      ".agents/mcp/ui/drift-dashboard.html",
+      ".agents/mcp/jev-gate-server.mjs",
+      ".agents/mcp/knowledge-server.mjs",
+      ".agents/mcp/bin/codegraph-mcp.cjs",
+      ".agents/skills/open-code-review",
+      ".harness/steering/codegraph.md",
+      ".harness/steering/codegraph-agents.md"
+    ]
+  },
+  "generators": {
+    "self": {
+      "run": "asdd kit self",
+      "check": "asdd kit self --check",
+      "owns": [
+        "installed_copy",
+        "steering",
+        "agent",
+        "skill",
+        "rule",
+        "adapter",
+        "module"
+      ]
+    },
+    "vendor": {
+      "run": "asdd kit vendor",
+      "check": "asdd kit vendor --check",
+      "owns": [
+        "vendored_copy"
+      ],
+      "notes": "Q-R3 Phase-2 arm resolved: vendoring kept — bundle-consumption restructure declined (D-4c). tools/*/src/harness copies stay tracked with -merge; conflict resolution = asdd kit vendor, never hunk-editing."
+    },
+    "runtime-steering": {
+      "run": "asdd kit generate-runtime-steering",
+      "check": "asdd kit generate-runtime-steering --check",
+      "owns": [
+        "partially_generated"
+      ]
+    },
+    "versions": {
+      "run": "asdd kit versions",
+      "check": null,
+      "owns": [
+        "version_stamp"
+      ]
+    },
+    "sync-state": {
+      "run": "asdd sync",
+      "check": "asdd check",
+      "owns": [
+        "derived_singleton",
+        "progress_doc",
+        "feature_tracker"
+      ]
+    },
+    "learn": {
+      "run": "asdd learn",
+      "check": null,
+      "owns": [
+        "learning_summary",
+        "derived_singleton"
+      ]
+    },
+    "sync-knowledge": {
+      "run": "asdd knowledge sync",
+      "check": null,
+      "owns": [
+        "state_derived_read"
+      ]
+    },
+    "skills-index": {
+      "run": "asdd skills-index --write",
+      "check": "asdd skills-index",
+      "owns": [
+        "skill"
+      ]
+    },
+    "build": {
+      "run": "npm run build",
+      "check": "bin stale-dist refusal",
+      "owns": [
+        "kit_source"
+      ]
+    },
+    "install": {
+      "run": "npx asdd-harness-kit install <dir>",
+      "check": "cli/test/install.sh + lifecycle.sh",
+      "owns": [
+        "managed_config",
+        "seeded_scaffold",
+        "binding",
+        "hook",
+        "runtime_adapter",
+        "mcp_server"
+      ]
+    },
+    "harness-profile": {
+      "run": "node .harness/scripts/harness-profile.mjs --slice <id>",
+      "check": null,
+      "owns": [
+        "profiling_rollup"
+      ],
+      "notes": "Phase 2 — profiling lineage"
+    }
+  },
+  "vocabulary": {
+    "phases": [
+      {
+        "id": "discovery",
+        "order": 1,
+        "gate": "capability.md",
+        "owning_agents": [
+          "asdd-discovery-agent"
+        ],
+        "steering_tag": "discovery"
+      },
+      {
+        "id": "spec",
+        "order": 2,
+        "gate": "requirements.md",
+        "owning_agents": [
+          "asdd-spec-agent"
+        ],
+        "steering_tag": "spec"
+      },
+      {
+        "id": "validation",
+        "order": 3,
+        "gate": "spec-validation-report.md",
+        "owning_agents": [
+          "asdd-validation-agent"
+        ],
+        "steering_tag": "validation"
+      },
+      {
+        "id": "domain",
+        "order": 4,
+        "gate": "domain-model.md",
+        "owning_agents": [
+          "asdd-domain-agent"
+        ],
+        "steering_tag": "domain"
+      },
+      {
+        "id": "design",
+        "order": 5,
+        "gate": "design.md",
+        "owning_agents": [
+          "asdd-design-agent"
+        ],
+        "steering_tag": "design"
+      },
+      {
+        "id": "task_planning",
+        "order": 6,
+        "gate": "tasks.md",
+        "owning_agents": [
+          "asdd-task-planning-agent"
+        ],
+        "steering_tag": "task_planning"
+      },
+      {
+        "id": "implementation",
+        "order": 7,
+        "gate": "features passing",
+        "owning_agents": [
+          "asdd-implementation-agent"
+        ],
+        "steering_tag": "implementation"
+      },
+      {
+        "id": "qa",
+        "order": 8,
+        "gate": "spec-coverage-report.md",
+        "owning_agents": [
+          "asdd-qa-agent"
+        ],
+        "steering_tag": "qa"
+      },
+      {
+        "id": "knowledge",
+        "order": 9,
+        "gate": "learn proposals",
+        "owning_agents": [
+          "asdd-knowledge-agent"
+        ],
+        "steering_tag": "knowledge"
+      }
+    ],
+    "modes": [
+      "lite",
+      "hotfix",
+      "full",
+      "escalated"
+    ],
+    "roles": [
+      "review",
+      "ui"
+    ]
+  },
+  "commands": {
+    "harness": {
+      "check": {
+        "script": "check-invariants.mjs",
+        "help": "every harness invariant and spec drift (Verify-on-Stop runs it)"
+      },
+      "verify": {
+        "script": "verify-on-stop.mjs",
+        "help": "the Stop hook: runs check --live, blocks the session on FAIL (stdin: hook payload)"
+      },
+      "gate": {
+        "script": "command-gate.mjs",
+        "help": "the shell command hook: allow / deny (stdin: hook payload)"
+      },
+      "drift": {
+        "script": "check-spec-drift.mjs",
+        "help": "spec drift DRIFT-01…07 [--json] [--base <ref>] [--target <ref>] [--slice <id>] [--requirements]"
+      },
+      "check-config": {
+        "script": "check-project-config.mjs",
+        "help": ".harness/config/project.json against its schema"
+      },
+      "skills-index": {
+        "script": "check-skills-index.mjs",
+        "help": "the skills index in skills.md [--write]"
+      },
+      "status": {
+        "script": "harness-status.mjs",
+        "help": "slices, phases, open learning patterns [--metrics] [--json] [--html]"
+      },
+      "converge": {
+        "script": "converge.mjs",
+        "help": "cheap feature converge: req_ids, test mentions, evidence [--slice <id>] [--strict] [--json]"
+      },
+      "converge-eval": {
+        "script": "converge-eval.mjs",
+        "help": "score EARS/converge fixtures under cli/eval/converge-ears [--json] [--cases <dir>]"
+      },
+      "waves": {
+        "script": "waves.mjs",
+        "help": "parallelism hints from feature owners/deps/scopes [--slice <id>] [--json]"
+      },
+      "portfolio": {
+        "script": "portfolio.mjs",
+        "help": "read-only multi-repo summary from .harness/config/portfolio.json [--json]"
+      },
+      "tracker-sync": {
+        "script": "tracker-sync.mjs",
+        "help": "plan bi-directional tracker sync from handoff+sessions [--slice <id>] [--json] [--apply]"
+      },
+      "spec-source": {
+        "script": "spec-source.mjs",
+        "help": "experimental REQ inventory (requires capabilities.spec_as_source) [--slice <id>] [--json]"
+      },
+      "init-flow": {
+        "script": "init-flow.mjs",
+        "help": "15-minute brownfield path: install (if needed), one lite slice, minimal feature, asdd check"
+      },
+      "sync": {
+        "script": "sync-state.mjs",
+        "help": "regenerate manifests, registry, PROGRESS.md, knowledge [--slice <id>]"
+      },
+      "repair": {
+        "script": "repair.mjs",
+        "help": "repair harness layout (slices, state, specs, features) then sync [--dry-run] [--slice <id>] [--json]"
+      },
+      "slice": {
+        "sub": {
+          "init": {
+            "script": "init-slice.mjs",
+            "help": "start a slice: slice init <id> [--full | --hotfix]"
+          },
+          "escalate": {
+            "script": "escalate-slice.mjs",
+            "help": "lite/hotfix → escalated: slice escalate <id> --reasons \"E1,E4\" [--by <owner>] [--note \"why\"]"
+          },
+          "amend": {
+            "script": "amend-slice.mjs",
+            "help": "reopen DONE slice: slice amend <id> [--note \"…\"] [--by <owner>]"
+          }
+        }
+      },
+      "knowledge": {
+        "sub": {
+          "sync": {
+            "script": "sync-knowledge.mjs",
+            "help": "rebuild the knowledge index [--status] [--embed] [--backend=jsonl|sqlite|auto]"
+          },
+          "search": {
+            "script": "knowledge-query.mjs",
+            "pass": true,
+            "help": "knowledge search \"<query>\" [--k 5] [--slice <id>]"
+          },
+          "trace": {
+            "script": "knowledge-query.mjs",
+            "pass": true,
+            "help": "knowledge trace <node-id> [--depth 2]"
+          },
+          "slice": {
+            "script": "knowledge-query.mjs",
+            "pass": true,
+            "help": "knowledge slice <slice-id>"
+          },
+          "status": {
+            "script": "knowledge-query.mjs",
+            "pass": true,
+            "help": "knowledge status"
+          },
+          "patterns": {
+            "script": "knowledge-query.mjs",
+            "pass": true,
+            "help": "knowledge patterns [--status <s>]"
+          }
+        }
+      },
+      "learn": {
+        "script": "learn.mjs",
+        "help": "learning patterns [--all|--json|--summary|--signatures|--export|--propose <LP-id>]"
+      },
+      "audit": {
+        "script": "audit-codebase.mjs",
+        "help": "codebase audit [--json] [--no-write] [--hotspots N] [--since 90.days]"
+      },
+      "triage": {
+        "script": "audit-triage.mjs",
+        "help": "TL triage: triage <finding-id> --dismiss --reason \"…\" | --confirm | --clear | --list"
+      },
+      "skill-eval": {
+        "script": "skill-eval.mjs",
+        "help": "score skill fixtures under cli/eval/skills [--skill <name>] [--baseline <ref>] [--json]"
+      },
+      "intake": {
+        "script": "intake.mjs",
+        "help": "import a tracker Intent item as a slice: intake --from <file|-> --ref <url> [--accept-stale] [--dry-run] [--json]"
+      },
+      "ui": {
+        "script": "ui-server.mjs",
+        "help": "read-only local harness UI on 127.0.0.1 [--port <n>]"
+      },
+      "gate-decide": {
+        "script": "gate-decide.mjs",
+        "help": "Tech Lead override for a WARN gate: gate-decide <slice> --phase <phase> --note \"…\""
+      },
+      "profile": {
+        "script": "harness-profile.mjs",
+        "help": "read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation [--slice <id>] [--bottlenecks] [--json]"
+      },
+      "observe": {
+        "script": "telemetry-observe.mjs",
+        "help": "the load hook (fail-open): records a steering/skill load as an activation record (stdin: hook payload) <claude|cursor>"
+      }
+    },
+    "kit": {
+      "versions": "./kit/versions.mjs",
+      "build": "./kit/build.mjs",
+      "vendor": "./kit/vendor.mjs",
+      "guidance": "./kit/guidance.mjs",
+      "skills-lint": "./kit/skills-lint.mjs",
+      "agents-lint": "./kit/agents-lint.mjs",
+      "self": "./kit/self.mjs",
+      "regen": "./kit/regen.mjs",
+      "generate-runtime-steering": "./kit/generate-runtime-steering.mjs"
+    }
+  }
+}

@@ -10,8 +10,10 @@
  * version per release means every kit-owned file is refreshed on upgrade —
  * nothing stays stale because a per-file bump was missed.
  */
-import { existsSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
+
+import { registryFiles } from '../install/registry.mjs';
 
 /** The kit checkout this CLI belongs to. */
 const root = join(import.meta.dirname, '../../..');
@@ -48,23 +50,17 @@ function collectArtifacts() {
   const version = getKitVersion();
   const record = (rel) => {
     if (/\.(test|spec)\./.test(rel)) return; // kit tests are not installed into clients
-    if (existsSync(join(root, rel))) artifacts[rel] = version; // listed files may be retired
+    const p = join(root, rel);
+    if (existsSync(p) && statSync(p).isFile()) artifacts[rel] = version; // files-table dir mounts are not artifacts
   };
+
+  // Registry files table: every installer-owned src is a shipped artifact (steering, bindings, doc stubs,
+  // scaffold pieces, examples, AGENTS.md, versions.json, the registry itself — the former explicit lists).
+  for (const f of registryFiles(root)) record(f.src);
 
   // Portable steering and its templates (cli/steering)
   for (const path of walk(join(root, 'cli/steering'))) {
     record(relative(root, path));
-  }
-
-  // Domain model stub (the kit's own docs/architecture/domain-model.md is never shipped)
-  for (const f of ['domain-model.md', 'agent-failure-log.md', 'dissent-log.md']) record(`cli/templates/docs/${f}`);
-
-  // Binding stubs (the kit's own .harness/steering bindings are never shipped)
-  for (const f of [
-    'product.md', 'structure.md', 'tech.md', 'domain-layer.project.md',
-    'quality-gates.project.md', 'design-system.md',
-  ]) {
-    record(`cli/templates/bindings/${f}`);
   }
 
   // The CLI itself is not copied into projects: asdd is the npm package (a devDependency, or global).
@@ -73,7 +69,6 @@ function collectArtifacts() {
   for (const path of walk(join(root, 'cli/scaffold'))) {
     record(relative(root, path));
   }
-  record('cli/versions.json');
 
   // Agents
   for (const path of walk(join(root, 'cli/agents'))) {
@@ -95,26 +90,15 @@ function collectArtifacts() {
     record(relative(root, path));
   }
 
-  // Docs
-  for (const f of [
-    'knowledge-base/README.md',
-  ]) {
-    record(`docs/${f}`);
-  }
-  for (const f of [
-    'architecture/knowledge-scaling.md',
-  ]) {
-    record(`docs/${f}`);
+  // Contribution-point registry (installed as .harness/config/contribution-points.json)
+  for (const path of walk(join(root, 'cli/registry'))) {
+    record(relative(root, path));
   }
 
-  // Root kit files
-  record('cli/AGENTS.md');
+  // Shipped but never installed (kit-side docs; not a files-table row)
+  record('docs/architecture/knowledge-scaling.md');
 
-  // Audit + CI examples (copied into .harness/)
-  record('.github/CODEOWNERS.harness.example');
-  record('.github/workflows/harness-audit.yml.example');
-
-  // Runtime recipes (only files that get copied, not symlinked)
+  // Runtime recipes copied by the runtime wirer, not the files table (only files that get copied, not symlinked)
   for (const f of ['asdd-steering.mdc']) {
     if (existsSync(join(root, 'cli/runtimes/cursor', f))) {
       record(`cli/runtimes/cursor/${f}`);

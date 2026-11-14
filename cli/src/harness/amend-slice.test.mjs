@@ -54,8 +54,8 @@ function doneSliceRoot(sliceId = 'closed') {
     }),
   );
   writeFileSync(
-    join(root, '.harness/state/manifest.json'),
-    JSON.stringify({ schema_version: '3.0', active_slices: [{ slice_id: sliceId }] }),
+    join(root, '.harness/state/registry.json'),
+    JSON.stringify({ schema_version: '3.0', slices: [{ slice_id: sliceId }] }),
   );
   spawnSync(process.execPath, [SYNC, '--slice', sliceId], { cwd: root, encoding: 'utf8' });
   return root;

@@ -1,8 +1,19 @@
 // `asdd install` options: parsing and help.
-import { CliError } from '../paths.mjs';
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
 
-export const RUNTIMES = ['cursor', 'claude', 'opencode', 'kimi', 'junie', 'devin', 'kiro'];
-export const MODULES = ['bruno', 'playwright-e2e', 'web-ui', 'http-api'];
+import { CliError } from '../paths.mjs';
+import { runtimeMap } from './registry.mjs';
+
+const KIT_ROOT = join(import.meta.dirname, '../../..');
+export const RUNTIMES = Object.keys(runtimeMap(KIT_ROOT));
+/** Registered modules = the cli/modules/ directories (each must carry module.json — validated at install). */
+export const MODULES = Object.freeze(
+  readdirSync(join(KIT_ROOT, 'cli/modules'), { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort(),
+);
 
 export const INSTALL_HELP = `Install or upgrade asdd-harness-kit in an existing repository.
 
@@ -15,7 +26,7 @@ Options:
   --no-interactive        Never prompt, even in TTY
   --from-git              Clone the kit into a temp dir and install from it
   --kit-dir <path>        Kit source (default: the kit this CLI belongs to)
-  --modules=<list>        bruno,playwright-e2e,web-ui,http-api — or "all"
+  --modules=<list>        ${MODULES.join(',')} — or "all"
   --runtime=<name>        cursor | claude | opencode | kimi | junie | devin | kiro
                           comma-separated values or none (default: none)
   --force                 Overwrite portable kit files that already exist

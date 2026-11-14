@@ -29,7 +29,7 @@ test -f .harness/state/slices/demo-slice/sessions/001-initial.json
 test -f .harness/state/slices/demo-slice/manifest.json
 test -f .harness/features/demo-slice.features.json
 test -f .harness/specs/demo-slice/tasks.md
-grep -q '"slice_id": "demo-slice"' .harness/state/manifest.json
+grep -q '"slice_id": "demo-slice"' .harness/state/registry.json
 grep -q '| demo-slice |' .harness/PROGRESS.md
 
 echo "== lite-first: default mode is lite, --full opts in =="

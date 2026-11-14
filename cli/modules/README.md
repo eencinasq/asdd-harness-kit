@@ -11,6 +11,29 @@ Opt-in agents and skills. Enable them with `asdd install <dir> --modules=<a,b>` 
 
 Module agents and skills follow the same grammar as the core ones (`asdd kit agents-lint`, `asdd kit skills-lint`). A module may name core skills and agents and its own, never another module's: a project may enable one without the other. Each skill in a module adds a row to the always-loaded skills index.
 
+## Authoring a module: `module.json`
+
+Every directory here carries a `module.json` manifest (the extension manifest — D-1); mounts derive from it at install — there is no switch to update. Validation is fail-closed before any copy.
+
+```json
+{
+  "schema_version": "1.0",
+  "name": "http-api",                    // must equal the directory name
+  "version": "1.0.0",
+  "trust": "declarative",                // or "executable" when contributing adapters/mcp/hooks
+  "engines": { "asdd": ">=3.12.0" },     // semver range; install fails closed on mismatch
+  "contributes": {
+    "skills":   [{ "path": "skills/x",    "mount": ".agents/skills/x" }],
+    "agents":   [{ "path": "y.md",        "mount": ".agents/agents/y.md" }],
+    "adapters": [{ "path": "adapters/z.mjs", "mount": ".agents/mcp/adapters/z.mjs", "contract": "spec-drift-adapter" }]
+  }
+}
+```
+
+- Contribution types: `agents`, `skills`, `rules`, `steering`, `bindings`, `adapters`, `mcp`, `hooks` — each must map to a registered class in `cli/registry/contribution-points.json` (unregistered → fail closed). `commands`/`phases` are kit-internal (Q-NEW-3).
+- A `path` may be a file (mounted verbatim) or a directory (walked; `*.test.*`/`*.spec.*` skipped). Mounts must be relative project paths inside the module's claim — **cross-module mount collisions fail** (G-15).
+- `adapters`/`mcp`/`hooks` are executable contributions: they require `trust: "executable"` plus a `contract` naming a known contract (`spec-drift-adapter`, `harness-telemetry`), and the adapter file must literal-export `{ id, description, run }` and make no filesystem-write calls (G-13).
+
 ## Spec compliance adapters
 
 A module can ship adapters for the `verify_spec_compliance` tool of the `spec-drift` MCP server. The server loads every `*.mjs` (except `*.test.mjs`) from `.agents/mcp/adapters/` and, in the kit repo, from `cli/modules/<module>/adapters/` for modules set to `true` in `.harness/config/project.json` → `modules`.
