@@ -18,14 +18,17 @@
  *   - dismissed  Tech Lead dismissals in .harness/audits/triage.json
  *   - audit      recurring findings in the latest audit report
  *   - escalation lite escalation signals (E1…E5), once per slice
+ *   - review     draft comments a human removed from a spec-drift PR review, per checklist rule: ingested by
+ *                ingestReviewMetrics from the reviewer's local metrics.jsonl into the weekly summary (counts only)
  *
- * Writers: writeSensorSignal (check-invariants), compactSignals and writePatterns (learn.mjs).
+ * Writers: writeSensorSignal (check-invariants), compactSignals, ingestReviewMetrics and writePatterns (learn.mjs).
  * Cutoffs mirror QG-LEARN-* in .harness/steering/quality-gates.md.
  */
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { homedir } from 'node:os';
+import { basename, join } from 'node:path';
 import { readBinding } from './drift-lib.mjs';
 import { latestReport, loadTriage } from './audit-lib.mjs';
 import { deriveEscalationSignals, readSessions } from './sync-state.mjs';
@@ -45,7 +48,7 @@ const DEFAULT_FAILURE_LOG = 'docs/agent-failure-log.md';
 export const PROPOSAL_STATUSES = ['proposed', 'accepted', 'rejected', 'applied'];
 export const CHANGE_TYPES = ['add-guide', 'tighten-guide', 'add-sensor', 'tighten-sensor', 'loosen-sensor', 'remove-sensor', 'product-code'];
 // Noise sources mean a sensor fires or blocks without catching a real defect.
-const NOISE_SOURCES = new Set(['override', 'dismissed', 'warn']);
+const NOISE_SOURCES = new Set(['override', 'dismissed', 'warn', 'review']);
 // WARN lines that are already signals of their own, or about the loop itself.
 const SKIPPED_WARNS = [/^QG-LEARN-/, /^lite slice "/];
 
@@ -231,6 +234,138 @@ export function compactSignals(root, { author = authorSlug(root) } = {}) {
   return { compacted: files.length, summaries: written };
 }
 
+// ── PR review quality (review-quality REQ-005) ─────────────────────────────────
+
+/**
+ * The spec-drift PR reviewer's publish log on this machine: `$PR_REVIEW_ROOT/metrics.jsonl`, else
+ * `$XDG_STATE_HOME/pr-review/metrics.jsonl` (default `~/.local/state`), as the server writes it.
+ */
+export function reviewMetricsFile(env = process.env) {
+  const base = env.PR_REVIEW_ROOT || join(env.XDG_STATE_HOME || join(homedir(), '.local/state'), 'pr-review');
+  return join(base, 'metrics.jsonl');
+}
+
+/** The reviewer names a project by its repository folder; HARNESS_REVIEW_PROJECT overrides it. */
+export function reviewProject(root, env = process.env) {
+  return env.HARNESS_REVIEW_PROJECT || basename(root);
+}
+
+const reviewKey = (r) => `${r.pr}@${r.revision}`;
+
+const tallyOf = (t) => ({
+  drafted: Number(t?.drafted) || 0,
+  kept: Number(t?.kept) || 0,
+  edited: Number(t?.edited) || 0,
+  removed: Number(t?.removed) || 0,
+});
+
+function summaryFiles(root) {
+  const dir = join(root, SUMMARIES_DIR);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((n) => n.endsWith('.json'))
+    .sort()
+    .map((n) => ({ rel: `${SUMMARIES_DIR}/${n}`, data: readJson(join(dir, n)) }))
+    .filter((f) => f.data);
+}
+
+/** Every recorded review of this project across all authors' summaries, once per PR revision. */
+export function recordedReviews(root) {
+  const out = new Map();
+  for (const { data } of summaryFiles(root)) {
+    for (const [key, r] of Object.entries(data.reviews ?? {})) if (!out.has(key)) out.set(key, { key, author: data.author, ...r });
+  }
+  return [...out.values()].sort((a, b) => String(a.at).localeCompare(String(b.at)));
+}
+
+/**
+ * Fold this project's published reviews from the local publish log into the author's weekly summaries (one writer per
+ * file): counts per checklist rule, the PR number and revision — never comment text. A review already recorded by
+ * anyone is skipped. Never throws: learning must not break a command.
+ */
+export function ingestReviewMetrics(root, { author = authorSlug(root), file = reviewMetricsFile(), project = reviewProject(root) } = {}) {
+  try {
+    if (!existsSync(file)) return { ingested: 0, file, project };
+    const known = new Set(recordedReviews(root).map((r) => r.key));
+    const byWeek = new Map();
+    for (const line of readFileSync(file, 'utf8').split('\n')) {
+      let r;
+      try {
+        r = line.trim() ? JSON.parse(line) : null;
+      } catch {
+        r = null;
+      }
+      if (!r || r.project !== project || !Number.isInteger(r.pr) || !r.at || known.has(reviewKey(r))) continue;
+      known.add(reviewKey(r));
+      const week = isoWeek(r.at);
+      if (!byWeek.has(week)) byWeek.set(week, []);
+      byWeek.get(week).push({
+        key: reviewKey(r),
+        at: r.at,
+        pr: r.pr,
+        revision: r.revision ?? 1,
+        mode: r.mode ?? null,
+        event: r.event ?? null,
+        suggested_event: r.suggestedEvent ?? null,
+        comments: { ...tallyOf(r.comments), added: Number(r.comments?.added) || 0 },
+        by_rule: Object.fromEntries(Object.entries(r.byRule ?? {}).map(([rule, t]) => [rule, tallyOf(t)])),
+      });
+    }
+    let ingested = 0;
+    for (const [week, reviews] of byWeek) {
+      const rel = `${SUMMARIES_DIR}/${week}-${author}.json`;
+      const summary = readJson(join(root, rel)) ?? { schema_version: '1.0', author, week, signatures: {} };
+      summary.reviews ??= {};
+      for (const { key, ...r } of reviews) summary.reviews[key] = r;
+      mkdirSync(join(root, SUMMARIES_DIR), { recursive: true });
+      writeFileSync(join(root, rel), `${JSON.stringify(summary, null, 2)}\n`);
+      ingested += reviews.length;
+    }
+    return { ingested, file, project };
+  } catch {
+    return { ingested: 0, file, project };
+  }
+}
+
+/** One `review:<rule>` noise signal per rule and review with removed draft comments, weighted by how many. */
+function reviewSignals(root) {
+  const out = [];
+  for (const r of recordedReviews(root)) {
+    for (const [rule, t] of Object.entries(r.by_rule ?? {})) {
+      if (!t.removed) continue;
+      out.push({ signature: `review:${rule}`, source: 'review', at: r.at, slice_id: null, detail: `PR #${r.pr} r${r.revision}: ${t.removed} of ${t.drafted} draft comment(s) removed`, weight: t.removed });
+    }
+  }
+  return out;
+}
+
+/** Team review quality from every recorded review: totals and the rules whose comments humans remove most. */
+export function reviewQuality(root, { limit = 10 } = {}) {
+  const reviews = recordedReviews(root);
+  if (!reviews.length) return null;
+  const totals = { drafted: 0, kept: 0, edited: 0, removed: 0, added: 0 };
+  const rules = new Map();
+  for (const r of reviews) {
+    for (const k of Object.keys(totals)) totals[k] += Number(r.comments?.[k]) || 0;
+    for (const [rule, t] of Object.entries(r.by_rule ?? {})) {
+      const acc = rules.get(rule) ?? { rule, drafted: 0, kept: 0, edited: 0, removed: 0 };
+      for (const k of ['drafted', 'kept', 'edited', 'removed']) acc[k] += Number(t[k]) || 0;
+      rules.set(rule, acc);
+    }
+  }
+  return {
+    reviews: reviews.length,
+    authors: [...new Set(reviews.map((r) => r.author).filter(Boolean))].sort(),
+    first_at: reviews[0].at,
+    last_at: reviews.at(-1).at,
+    ...totals,
+    acceptance: totals.drafted ? (totals.kept + totals.edited) / totals.drafted : null,
+    by_rule: [...rules.values()]
+      .sort((a, b) => b.removed - a.removed || b.drafted - a.drafted || a.rule.localeCompare(b.rule))
+      .slice(0, limit),
+  };
+}
+
 function runSignals(root, slices) {
   const out = [];
   for (const f of rawSignalFiles(root)) out.push(...rawEntries(f.data, slices));
@@ -351,7 +486,7 @@ export function collectSignals(root) {
   const slices = sliceIds(root);
   const failures = failureSignals(root);
   return {
-    signals: [...runSignals(root, slices), ...failures.signals, ...sessionSignals(root, slices), ...auditSignals(root)],
+    signals: [...runSignals(root, slices), ...failures.signals, ...sessionSignals(root, slices), ...auditSignals(root), ...reviewSignals(root)],
     unsigned_failures: failures.unsigned,
   };
 }
@@ -501,6 +636,8 @@ export function learningReport(root, { limit = 50 } = {}) {
             : `Tech Lead: set status accepted or rejected, and decided_by, in ${pr.file}`,
       };
     }),
+    // Team PR review quality (review-quality REQ-005); null until `asdd learn` has recorded a review.
+    review_quality: reviewQuality(root),
   };
 }
 

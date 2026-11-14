@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-adoption",
+  "concerns": [],
+  "session_id": "sess-spec-drift-adoption-009",
+  "timestamp": "2026-11-13T01:36:55.191Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/domain/trend.ts",
+    "tools/spec-drift/src/analysis/domain/trend.spec.ts",
+    "tools/spec-drift/src/analysis/analysis.tools.ts",
+    "tools/spec-drift/src/audit/audit.service.ts",
+    "tools/spec-drift/test/trend.e2e-spec.ts",
+    "tools/spec-drift/test/mcp.e2e-spec.ts",
+    "tools/spec-drift/src/analysis/analysis.service.ts",
+    "tools/spec-drift/src/analysis/analysis.types.ts",
+    "tools/spec-drift/src/analysis/analysis.output.ts",
+    "tools/spec-drift/src/analysis/analysis.presenter.ts",
+    "tools/spec-drift/src/cli",
+    "tools/spec-drift/src/main.ts",
+    "tools/spec-drift/bin/spec-drift.mjs",
+    "tools/spec-drift/ui/analysis-dashboard",
+    "tools/spec-drift/ui/analysis-dashboard.html"
+  ],
+  "evidence": "Start TASK-002 (REQ-002)."
+}

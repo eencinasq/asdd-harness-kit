@@ -14,10 +14,12 @@ import {
   failureSignatures,
   isoWeek,
   derivePatterns,
+  ingestReviewMetrics,
   invariantSignature,
   nextProposalId,
   parseFailureLog,
   patternId,
+  reviewMetricsFile,
   writeSensorSignal,
 } from './learning-lib.mjs';
 import validateLearning, { appliedCommitFinding, proposalFindings } from './validators/learning.mjs';
@@ -331,3 +333,49 @@ test('spec-drift-apps REQ-002: learningReport lists patterns and proposals with 
   assert.equal(report.summary.proposals, 1);
 }));
 
+
+test('review-quality REQ-005: review metrics are ingested once per review, for this project only, without comment text', withFixture((root) => {
+  const review = (pr, at, byRule, project = 'shop') => ({
+    at, project, pr, revision: 1, mode: 'submitted', event: 'COMMENT', suggestedEvent: 'COMMENT',
+    comments: Object.values(byRule).reduce((a, t) => ({ drafted: a.drafted + t.drafted, kept: a.kept + t.kept, edited: a.edited + t.edited, removed: a.removed + t.removed, added: 0 }), { drafted: 0, kept: 0, edited: 0, removed: 0, added: 0 }),
+    summaryEdited: false, bySeverity: {}, byRule,
+  });
+  const noisy = { drafted: 2, kept: 1, edited: 0, removed: 1 };
+  const metrics = join(root, 'state/metrics.jsonl');
+  write(root, 'state/metrics.jsonl', [
+    review(1, '2026-11-02T10:00:00Z', { 'python.performance': noisy, 'python.dead-code': { drafted: 1, kept: 1, edited: 0, removed: 0 } }),
+    review(2, '2026-11-03T10:00:00Z', { 'python.performance': noisy }),
+    review(3, '2026-11-10T10:00:00Z', { 'python.performance': noisy }),
+    review(9, '2026-11-10T10:00:00Z', { 'python.performance': noisy }, 'other-repo'),
+    'not json',
+  ].map((r) => (typeof r === 'string' ? r : JSON.stringify(r))).join('\n'));
+
+  assert.equal(reviewMetricsFile({ PR_REVIEW_ROOT: '/x' }), '/x/metrics.jsonl');
+  assert.equal(reviewMetricsFile({ XDG_STATE_HOME: '/s' }), '/s/pr-review/metrics.jsonl');
+  const first = ingestReviewMetrics(root, { author: 'ana', file: metrics, project: 'shop' });
+  assert.equal(first.ingested, 3, "only this project's reviews");
+  assert.equal(ingestReviewMetrics(root, { author: 'ana', file: metrics, project: 'shop' }).ingested, 0, 'each review once');
+  assert.equal(ingestReviewMetrics(root, { author: 'luis', file: metrics, project: 'shop' }).ingested, 0, 'recorded by anyone counts');
+  const summaries = readdirSync(join(root, '.harness/state/learning/summaries')).sort();
+  assert.deepEqual(summaries, ['2026-W45-ana.json', '2026-W46-ana.json'], 'weekly summaries of the author');
+
+  const { patterns } = derivePatterns(root);
+  const noise = patterns.find((p) => p.signature === 'review:python.performance');
+  assert.equal(noise.kind, 'noise');
+  assert.equal(noise.occurrences, 3);
+  assert.equal(noise.status, 'open');
+  assert.ok(!patterns.some((p) => p.signature === 'review:python.dead-code'), 'a kept rule is no signal');
+
+  const quality = learningReport(root).review_quality;
+  assert.equal(quality.reviews, 3);
+  assert.deepEqual([quality.drafted, quality.kept, quality.removed], [7, 4, 3]);
+  assert.equal(quality.acceptance, 4 / 7);
+  assert.equal(quality.by_rule[0].rule, 'python.performance');
+  assert.deepEqual(quality.authors, ['ana']);
+  assert.equal(learningReport(mkdtempSync(join(tmpdir(), 'learning-empty-'))).review_quality, null, 'null with no review');
+}));
+
+test('review-quality REQ-005: a missing metrics file ingests nothing and never throws', withFixture((root) => {
+  assert.equal(ingestReviewMetrics(root, { file: join(root, 'nope.jsonl'), project: 'shop' }).ingested, 0);
+  assert.ok(!existsSync(join(root, '.harness/state/learning/summaries')));
+}));

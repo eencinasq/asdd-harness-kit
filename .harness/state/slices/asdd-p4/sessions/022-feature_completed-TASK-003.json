@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "asdd-p4",
+  "concerns": [],
+  "session_id": "sess-asdd-p4-022",
+  "timestamp": "2026-11-14T02:55:16.121Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_completed",
+  "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/spec-source-lib.test.mjs && test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md` exits 0."
+}

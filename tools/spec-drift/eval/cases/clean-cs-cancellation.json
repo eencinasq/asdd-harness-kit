@@ -1,0 +1,8 @@
+{
+	"id": "clean-cs-cancellation",
+	"description": "Passes the request's CancellationToken through to the async client.",
+	"language": "csharp",
+	"category": "clean",
+	"diff": "diff --git a/src/Api/Controllers/OrdersController.cs b/src/Api/Controllers/OrdersController.cs\n--- a/src/Api/Controllers/OrdersController.cs\n+++ b/src/Api/Controllers/OrdersController.cs\n@@ -5,5 +5,6 @@\n     public OrdersController(IOrderClient client) => _client = client;\n \n     [HttpGet(\"{id}\")]\n-    public async Task<IActionResult> Get(string id) => Ok(await _client.GetAsync(id));\n+    public async Task<IActionResult> Get(string id, CancellationToken cancellationToken) =>\n+        Ok(await _client.GetAsync(id, cancellationToken));\n }\n",
+	"expected": []
+}

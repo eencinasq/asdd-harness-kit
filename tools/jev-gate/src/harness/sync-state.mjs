@@ -76,10 +76,15 @@ export function derivePhase(sessions) {
   return latest.phase;
 }
 
-export const SLICE_MODES = ['lite', 'full', 'escalated'];
+export const SLICE_MODES = ['lite', 'hotfix', 'full', 'escalated'];
+
+/** Serial modes: at most one in_progress feature; escalation signals block DONE. */
+export function isSerialMode(mode) {
+  return mode === 'lite' || mode === 'hotfix';
+}
 
 // Lite-first: slices are lite by default. The latest session declaring a mode
-// (init-slice --full, or an escalation checkpoint) wins. An already-generated
+// (init-slice --full / --hotfix, or an escalation checkpoint) wins. An already-generated
 // manifest mode is honored for back-compat with pre-lite-first state.
 export function deriveMode(sessions, existingMode) {
   let mode = SLICE_MODES.includes(existingMode) ? existingMode : 'lite';
@@ -149,10 +154,12 @@ export function deriveEscalationSignals(sessions) {
 export const MANUAL_STATUSES = ['PARKED', 'ABANDONED'];
 
 // The latest checkpoint carrying `status` wins: PARKED/ABANDONED hold until a later
-// checkpoint sets `in_progress`, which hands the status back to the sessions.
+// checkpoint sets `in_progress` (resume / amend), which returns the slice to active work
+// even after knowledge was completed (DONE).
 export function deriveStatus(sessions) {
   const manual = sessions.filter((s) => s.event_type === 'checkpoint' && typeof s.status === 'string').at(-1)?.status;
   if (MANUAL_STATUSES.includes(manual)) return manual;
+  if (manual === 'in_progress') return 'in_progress';
   const activeFeatures = deriveActiveFeatures(sessions);
   if (activeFeatures.length > 0) return 'in_progress';
   const allPhases = sessions.filter((s) => s.event_type === 'phase_completed');
@@ -288,8 +295,9 @@ function generateSliceManifest(sliceId, sessions) {
   const existing = readJson(join(sliceDir, 'manifest.json')) || {};
   const mode = deriveMode(sessions, existing.mode);
   const escalationSignals = deriveEscalationSignals(sessions);
-  const escalationRequired = mode === 'lite' && escalationSignals.length > 0;
-  const escalatedFromLite = mode === 'escalated' && sessions.some((s) => s.mode === 'lite');
+  const escalationRequired = isSerialMode(mode) && escalationSignals.length > 0;
+  const escalatedFromLite =
+    mode === 'escalated' && sessions.some((s) => s.mode === 'lite' || s.mode === 'hotfix');
   let status = deriveStatus(sessions);
   if (status === 'DONE' && escalationRequired) {
     // Lite-first closure gate: a lite slice cannot complete with unaddressed

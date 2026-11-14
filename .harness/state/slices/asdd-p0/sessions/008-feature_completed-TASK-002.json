@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p0",
+  "concerns": [],
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/src/harness/init-flow.mjs",
+    "cli/src/harness/init-flow.test.mjs",
+    "cli/src/harness/commands.mjs",
+    "docs/guides/spec-kit-to-asdd.md",
+    "docs/ASDD-ROADMAP.md",
+    "cli/README.md"
+  ],
+  "evidence": "TASK-002 passing: init-flow + Spec Kit guide.",
+  "session_id": "sess-asdd-p0-008",
+  "timestamp": "2026-11-13T02:38:56.000Z"
+}

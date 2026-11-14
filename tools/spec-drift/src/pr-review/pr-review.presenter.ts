@@ -1,5 +1,6 @@
 import type { PrReviewView } from './pr-review.types.ts';
 import { statusLabel } from './requirements/requirements-report.ts';
+import { readFirst } from './risk/file-risk.ts';
 
 const DASHBOARD_RULE_PREVIEW = 4000;
 
@@ -42,6 +43,10 @@ const toText = (view: PrReviewView, options: PresentOptions): string => {
 			lines.push(
 				`architecture: ${view.architecture.status} · findings=${view.architecture.findingCount} · ${view.architecture.rulesDir}`,
 			);
+		}
+		const first = view.risk ? readFirst(view.risk, 3) : [];
+		if (first.length) {
+			lines.push(`read first (risk): ${first.map((f) => `${f.path} (${f.level}, score ${f.score})`).join(', ')}`);
 		}
 	}
 	if (view.requirements) {

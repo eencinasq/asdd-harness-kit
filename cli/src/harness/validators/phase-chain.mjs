@@ -42,7 +42,7 @@ export function phaseChainFindings(sessions) {
     }
     if (s.event_type !== 'phase_completed') continue;
 
-    if (mode !== 'lite') {
+    if (mode !== 'lite' && mode !== 'hotfix') {
       const prev = predecessorOf(phase, gates);
       const gate = prev ? gates[prev] : null;
       const at = s.session_id || s.timestamp;

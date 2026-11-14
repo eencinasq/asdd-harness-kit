@@ -1,7 +1,9 @@
 import { App } from '@modelcontextprotocol/ext-apps';
 
 import '../shared/styles.css';
+import './trend.css';
 import type { Finding, PackSummary, ScanSummary, SpecDriftItem } from '../../src/analysis/analysis.types.ts';
+import { buildFixPrompt } from '../../src/analysis/domain/fix-prompt.ts';
 import {
 	$,
 	baseName,
@@ -19,10 +21,13 @@ import {
 	toolErrorText,
 	withBusyButton,
 } from '../shared/ui.ts';
+import { type BaselineFilter, baselineHint, defaultBaselineFilter, matchesBaseline } from './baseline-view.ts';
 import { noRulesView } from './no-rules.ts';
 import { formatAgentPrompt, remediationFor } from './remediations.ts';
+import { adrCoverageView, testBadge } from './rule-coverage.ts';
+import { CHART, nearestIndex, trendModel } from './trend-chart.ts';
 
-type Tab = 'findings' | 'drift';
+type Tab = 'findings' | 'drift' | 'adrs' | 'trend';
 type Domain = 'ALL' | 'architecture' | 'standards';
 
 const PAGE_SIZE = 50;
@@ -45,15 +50,19 @@ const findingsList = $('findings-list');
 const findingsCount = $('findings-count');
 const severityFilterEl = $('severity-filter');
 const domainFilterEl = $('domain-filter');
+const baselineFilterEl = $('baseline-filter');
 const searchInput = $<HTMLInputElement>('search');
 const showMoreBtn = $<HTMLButtonElement>('show-more');
 const panelDrift = $('panel-drift');
+const panelAdrs = $('panel-adrs');
+const panelTrend = $('panel-trend');
 const modeSelect = $<HTMLSelectElement>('mode');
 const rescanBtn = $<HTMLButtonElement>('rescan');
 const setStatus = createStatus($('status'));
 
 let current: ScanSummary | null = null;
 let severityFilter = 'ALL';
+let baselineFilter: BaselineFilter = 'all';
 let domainFilter: Domain = 'ALL';
 let query = '';
 let visibleLimit = PAGE_SIZE;
@@ -88,7 +97,8 @@ const renderSummary = (s: ScanSummary): void => {
 	$('kpi-findings-hint').textContent =
 		s.findingCount === 0
 			? 'No violations'
-			: [errors && `${errors} error`, warnings && `${warnings} warning`].filter(Boolean).join(' · ') || 'Info only';
+			: (baselineHint(s) ??
+				([errors && `${errors} error`, warnings && `${warnings} warning`].filter(Boolean).join(' · ') || 'Info only'));
 	setKpiTone($('kpi-findings-card'), errors > 0 ? 'danger' : warnings > 0 ? 'warning' : 'success');
 
 	const { driftingRules, cleanRules, totalRules } = s.drift;
@@ -136,6 +146,7 @@ const renderPacks = (rows: readonly PackSummary[]): void => {
 // ── Findings ─────────────────────────────────────────────────────────────────
 
 const matches = (finding: Finding): boolean => {
+	if (!matchesBaseline(finding, baselineFilter)) return false;
 	if (severityFilter !== 'ALL' && finding.severity !== severityFilter) return false;
 	if (domainFilter !== 'ALL' && domainOf(finding) !== domainFilter) return false;
 	if (!query) return true;
@@ -153,6 +164,7 @@ const renderFinding = (finding: Finding, index: number): string => {
 			<code class="item-title" title="${escapeHtml(finding.checkId)}">${escapeHtml(shortRuleId(finding.checkId))}</code>
 			<span class="badge">${escapeHtml(finding.pack)}</span>
 			${finding.adr ? `<span class="badge tone-info">${escapeHtml(finding.adr)}</span>` : ''}
+			${finding.baseline === 'new' ? '<span class="badge tone-warning">new</span>' : ''}
 		</div>
 		<div class="item-path">${escapeHtml(finding.path)}:${finding.startLine}</div>
 		<p class="item-body">${escapeHtml(finding.message)}</p>
@@ -220,16 +232,24 @@ const renderFindings = (): void => {
 
 // ── Spec drift ───────────────────────────────────────────────────────────────
 
+/** The rule's test result as a badge (rule-coverage REQ-005). */
+const testBadgeHtml = (ruleId: string): string => {
+	const badge = testBadge(current?.ruleTests, ruleId);
+	return badge ? `<span class="badge ${badge.tone}">${escapeHtml(badge.label)}</span>` : '';
+};
+
 const renderDriftRow = (item: SpecDriftItem): string => `
 	<tr>
 		<td><span class="badge ${severityClass(item.severity)}">${severityLabel(item.severity)}</span></td>
 		<td>
 			<code title="${escapeHtml(item.ruleId)}">${escapeHtml(shortRuleId(item.ruleId))}</code>
 			${item.adr ? `<span class="badge tone-info">${escapeHtml(item.adr)}</span>` : ''}
+			${testBadgeHtml(item.ruleId)}
 			<div class="subtle">${escapeHtml(item.message)}</div>
 		</td>
 		<td class="num">${item.violationCount}</td>
 		<td>${item.samplePaths.map((p) => `<div class="item-path">${escapeHtml(p)}</div>`).join('')}</td>
+		<td><button type="button" class="btn btn-sm" data-action="fix-rule" data-rule="${escapeHtml(item.ruleId)}">Ask the agent to fix</button></td>
 	</tr>`;
 
 const renderDrift = (s: ScanSummary): void => {
@@ -241,7 +261,7 @@ const renderDrift = (s: ScanSummary): void => {
 	const clean = s.drift.items.filter((i) => i.status === 'clean');
 	const driftTable = drifting.length
 		? `<div class="table-wrap"><table>
-				<thead><tr><th scope="col">Severity</th><th scope="col">Rule</th><th scope="col" class="num">Violations</th><th scope="col">Examples</th></tr></thead>
+				<thead><tr><th scope="col">Severity</th><th scope="col">Rule</th><th scope="col" class="num">Violations</th><th scope="col">Examples</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
 				<tbody>${drifting.map(renderDriftRow).join('')}</tbody>
 			</table></div>`
 		: emptyState('No spec drift', 'Every declared rule is clean.', 'success');
@@ -250,12 +270,158 @@ const renderDrift = (s: ScanSummary): void => {
 				<summary>${plural(clean.length, 'clean rule')}</summary>
 				<div class="disclosure-body"><ul class="list">${clean
 					.map(
-						(r) => `<li><code>${escapeHtml(r.ruleId)}</code> <span class="subtle">${escapeHtml(r.message)}</span></li>`,
+						(r) =>
+							`<li><code>${escapeHtml(r.ruleId)}</code> ${testBadgeHtml(r.ruleId)} <span class="subtle">${escapeHtml(r.message)}</span></li>`,
 					)
 					.join('')}</ul></div>
 			</details>`
 		: '';
 	panelDrift.innerHTML = `${driftTable}${cleanList}`;
+};
+
+// ── Trend (spec-drift-adoption REQ-002) ──────────────────────────────────────
+
+const shortDate = (iso: string): string => iso.slice(0, 10);
+
+const renderTrend = (s: ScanSummary): void => {
+	const model = trendModel(s.trend);
+	if (!model) {
+		panelTrend.innerHTML = emptyState(
+			'No history yet',
+			'Record a snapshot with `spec-drift record` (at the end of a sprint, or from a scheduled CI job) and commit it; each one adds a point here.',
+		);
+		return;
+	}
+	const last = model.points.at(-1);
+	const grid = model.ticks
+		.map(
+			(t) =>
+				`<line class="trend-grid" x1="${CHART.left}" x2="${CHART.width - CHART.right}" y1="${t.y}" y2="${t.y}"></line><text class="trend-axis-label" x="${CHART.left - 6}" y="${t.y + 4}" text-anchor="end">${Number.isInteger(t.value) ? t.value : t.value.toFixed(1)}</text>`,
+		)
+		.join('');
+	const dots = model.points.map((p) => `<circle class="trend-dot" cx="${p.x}" cy="${p.y}" r="4"></circle>`).join('');
+	const first = model.points[0];
+	const xLabels = [first, ...(model.points.length > 1 ? [last] : [])]
+		.map((p, i) =>
+			p
+				? `<text class="trend-axis-label" x="${p.x}" y="${CHART.height - 6}" text-anchor="${i === 0 && model.points.length > 1 ? 'start' : 'end'}">${escapeHtml(shortDate(p.at))}</text>`
+				: '',
+		)
+		.join('');
+	const endLabel = last ? `<text class="trend-end-label" x="${last.x + 8}" y="${last.y + 4}">${last.value}</text>` : '';
+	const rows = model.points
+		.map(
+			(p) =>
+				`<tr><td>${escapeHtml(shortDate(p.at))}</td><td class="num">${p.value}</td><td class="subtle">${escapeHtml(p.label)}</td></tr>`,
+		)
+		.join('');
+	panelTrend.innerHTML = `
+		<p><span class="badge ${model.verdict.tone}"><span aria-hidden="true">${model.verdict.icon}</span> ${escapeHtml(model.verdict.text)}</span></p>
+		<h3>${escapeHtml(model.title)}</h3>
+		<div class="trend-chart">
+			<svg viewBox="0 0 ${CHART.width} ${CHART.height}" role="img" tabindex="0" aria-label="${escapeHtml(`${model.title}: ${model.verdict.text}. Use the arrow keys to read each point.`)}">
+				${grid}
+				<path class="trend-line" d="${model.path}"></path>
+				${dots}
+				${endLabel}
+				${xLabels}
+				<line class="trend-crosshair" y1="${CHART.top}" y2="${CHART.height - CHART.bottom}" visibility="hidden"></line>
+				<rect class="trend-hit" x="${CHART.left - 12}" y="0" width="${CHART.width - CHART.left - CHART.right + 24}" height="${CHART.height}" fill="transparent"></rect>
+			</svg>
+			<div class="trend-tooltip" hidden><strong></strong><span></span></div>
+		</div>
+		<details class="disclosure"><summary>Table</summary><div class="disclosure-body table-wrap"><table>
+			<thead><tr><th scope="col">Date</th><th scope="col" class="num">Value</th><th scope="col">Snapshot</th></tr></thead>
+			<tbody>${rows}</tbody>
+		</table></div></details>`;
+	wireTrend(model);
+};
+
+/** Crosshair + one tooltip, on pointer and keyboard; values stay reachable in the table view. */
+const wireTrend = (model: NonNullable<ReturnType<typeof trendModel>>): void => {
+	const svg = panelTrend.querySelector<SVGSVGElement>('svg');
+	const crosshair = panelTrend.querySelector<SVGLineElement>('.trend-crosshair');
+	const tip = panelTrend.querySelector<HTMLElement>('.trend-tooltip');
+	if (!svg || !crosshair || !tip) return;
+	const xs = model.points.map((p) => p.x);
+	let index = model.points.length - 1;
+	const show = (i: number) => {
+		const p = model.points[i];
+		if (!p) return;
+		index = i;
+		crosshair.setAttribute('x1', String(p.x));
+		crosshair.setAttribute('x2', String(p.x));
+		crosshair.setAttribute('visibility', 'visible');
+		(tip.querySelector('strong') as HTMLElement).textContent = String(p.value);
+		(tip.querySelector('span') as HTMLElement).textContent = `${shortDate(p.at)} · ${p.label}`;
+		tip.hidden = false;
+		const box = svg.getBoundingClientRect();
+		const left = (p.x / CHART.width) * box.width;
+		tip.style.left = `${Math.min(Math.max(0, left - tip.offsetWidth / 2), box.width - tip.offsetWidth)}px`;
+		// Inside the band above the plot (CHART.top), never over the title above the chart.
+		tip.style.top = `${Math.max(0, (CHART.top / CHART.height) * box.height - tip.offsetHeight - 4)}px`;
+	};
+	const hide = () => {
+		crosshair.setAttribute('visibility', 'hidden');
+		tip.hidden = true;
+	};
+	svg.addEventListener('pointermove', (event) => {
+		const box = svg.getBoundingClientRect();
+		show(nearestIndex(xs, ((event.clientX - box.left) / box.width) * CHART.width));
+	});
+	svg.addEventListener('pointerleave', hide);
+	svg.addEventListener('focus', () => show(index));
+	svg.addEventListener('blur', hide);
+	svg.addEventListener('keydown', (event) => {
+		if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+		event.preventDefault();
+		show(Math.min(model.points.length - 1, Math.max(0, index + (event.key === 'ArrowRight' ? 1 : -1))));
+	});
+};
+
+// ── ADR coverage (rule-coverage REQ-002, REQ-005) ───────────────────────────────
+
+/** Uncovered ADRs, by list index (for the per-ADR "Ask the agent" action). */
+let uncoveredAdrs: { id: string; prompt: string }[] = [];
+
+const renderAdrs = (s: ScanSummary): number => {
+	const view = adrCoverageView(s.adrCoverage);
+	uncoveredAdrs = view ? [...view.uncovered] : [];
+	if (!view) {
+		panelAdrs.innerHTML = emptyState('ADR coverage unavailable', 'The ADR folder could not be read.');
+		return 0;
+	}
+	const uncovered = view.uncovered.length
+		? `<h3>No rule enforces</h3><ul class="list">${view.uncovered
+				.map(
+					(a, i) => `<li data-adr-index="${i}">
+						<code>${escapeHtml(a.id)}</code> ${escapeHtml(a.title)} <span class="subtle">${escapeHtml(a.path)}</span>
+						<div class="toolbar"><button type="button" class="btn btn-sm" data-action="ask-adr-rule">Ask the agent to write the rule</button></div>
+					</li>`,
+				)
+				.join('')}</ul>`
+		: '';
+	const covered = view.covered.length
+		? `<details class="disclosure"><summary>${plural(view.covered.length, 'covered ADR')}</summary><div class="disclosure-body"><ul class="list">${view.covered
+				.map(
+					(a) =>
+						`<li><code>${escapeHtml(a.id)}</code> ${escapeHtml(a.title)} <span class="subtle">${a.rules.map(escapeHtml).join(', ')}</span></li>`,
+				)
+				.join('')}</ul></div></details>`
+		: '';
+	const dangling = view.dangling.length
+		? `<h3>Rules citing an ADR that does not stand</h3><ul class="list">${view.dangling
+				.map(
+					(d) =>
+						`<li><code>${escapeHtml(d.ruleId)}</code> → ${escapeHtml(d.adr)} <span class="subtle">${escapeHtml(d.reason)}</span></li>`,
+				)
+				.join('')}</ul>`
+		: '';
+	const exempt = view.exempt
+		? `<p class="subtle">${plural(view.exempt, 'ADR')} marked Enforcement: manual (not counted).</p>`
+		: '';
+	panelAdrs.innerHTML = `<p><span class="badge ${view.tone}">${escapeHtml(view.headline)}</span></p>${uncovered}${dangling}${covered}${exempt}`;
+	return view.uncovered.length;
 };
 
 // ── Whole view ───────────────────────────────────────────────────────────────
@@ -286,6 +452,8 @@ const render = (s: ScanSummary): void => {
 		tabsEl.hidden = true;
 		$('panel-findings').hidden = true;
 		panelDrift.hidden = true;
+		panelAdrs.hidden = true;
+		panelTrend.hidden = true;
 		setStatus('');
 		return;
 	}
@@ -305,8 +473,15 @@ const render = (s: ScanSummary): void => {
 
 	$('count-findings').textContent = String(s.findingCount);
 	$('count-drift').textContent = String(s.drift.driftingRules);
+	$('count-adrs').textContent = String(renderAdrs(s));
+	renderTrend(s);
 	renderSeverityFilter(s);
 	const domains = new Set(s.findings.map(domainOf));
+	baselineFilterEl.hidden = !s.baseline;
+	baselineFilter = defaultBaselineFilter(s);
+	for (const b of baselineFilterEl.querySelectorAll<HTMLButtonElement>('button[data-value]')) {
+		b.setAttribute('aria-pressed', String(b.dataset['value'] === baselineFilter));
+	}
 	domainFilterEl.hidden = domains.size < 2;
 	if (domainFilterEl.hidden) domainFilter = 'ALL';
 	renderFindings();
@@ -380,7 +555,31 @@ const askForRules = (): Promise<void> =>
 		}
 	});
 
+/** Every violation of one rule, as one request to the agent (spec-drift-demand REQ-002); the agent edits, not the server. */
+const askToFixRule = (button: HTMLButtonElement, ruleId: string): Promise<void> =>
+	withBusyButton(button, 'Sending…', async () => {
+		const item = current?.drift.items.find((i) => i.ruleId === ruleId);
+		if (!current || !item) return;
+		const prompt = buildFixPrompt({
+			rule: { id: item.ruleId, severity: item.severity, message: item.message, adr: item.adr },
+			findings: current.findings,
+		});
+		try {
+			const result = await app.sendMessage({ role: 'user', content: [{ type: 'text', text: prompt }] });
+			if (result.isError) setStatus('The host did not accept the message.', 'danger');
+			else setStatus(`Asked the agent to fix ${shortRuleId(ruleId)}. Re-scan when it is done.`, 'success');
+		} catch (error) {
+			setStatus(errorMessage(error), 'danger');
+		}
+	});
+
 // ── Events ───────────────────────────────────────────────────────────────────
+
+panelDrift.addEventListener('click', (event) => {
+	const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-action="fix-rule"]');
+	const rule = button?.dataset['rule'];
+	if (button && rule) void askToFixRule(button, rule);
+});
 
 askRulesBtn.addEventListener('click', () => void askForRules());
 copyRulesBtn.addEventListener('click', () => {
@@ -392,6 +591,11 @@ copyRulesBtn.addEventListener('click', () => {
 
 createSegmented(severityFilterEl, (value) => {
 	severityFilter = value;
+	visibleLimit = PAGE_SIZE;
+	renderFindings();
+});
+createSegmented(baselineFilterEl, (value) => {
+	baselineFilter = value as BaselineFilter;
 	visibleLimit = PAGE_SIZE;
 	renderFindings();
 });
@@ -414,6 +618,24 @@ searchInput.addEventListener('input', () => {
 showMoreBtn.addEventListener('click', () => {
 	visibleLimit += PAGE_SIZE;
 	renderFindings();
+});
+
+panelAdrs.addEventListener('click', (event) => {
+	const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-action="ask-adr-rule"]');
+	const index = Number(button?.closest<HTMLElement>('[data-adr-index]')?.dataset['adrIndex']);
+	const adr = uncoveredAdrs[index];
+	if (!button || !adr) return;
+	// The agent writes the rule and its test in the host, at the user's request; the server writes nothing.
+	void withBusyButton(button, 'Sending…', async () => {
+		try {
+			const result = await app.sendMessage({ role: 'user', content: [{ type: 'text', text: adr.prompt }] });
+			if (result.isError)
+				setStatus('The host did not accept the message. Use the MCP prompt write-adr-rule instead.', 'danger');
+			else setStatus(`Asked the agent to write the rule for ${adr.id}. Re-scan when it exists.`, 'success');
+		} catch (error) {
+			setStatus(errorMessage(error), 'danger');
+		}
+	});
 });
 
 findingsList.addEventListener('click', (event) => {

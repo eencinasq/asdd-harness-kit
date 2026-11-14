@@ -4,6 +4,7 @@ import { Tool } from '@nestjs/mcp';
 import {
 	type PatternsInput,
 	PatternsInputSchema,
+	PipelineStatusInputSchema,
 	type SearchInput,
 	SearchInputSchema,
 	type SliceInput,
@@ -84,5 +85,17 @@ export class KnowledgeTools {
 	})
 	async patterns(args: PatternsInput) {
 		return present(await this.knowledge.patterns(args.status));
+	}
+
+	@Tool({
+		name: 'pipeline_status',
+		title: 'Pipeline status',
+		annotations: LOCAL_READ,
+		description:
+			'ASDD pipeline adoption metrics (same as `asdd status --json`): lite share, escalation rate, phase medians, stop-FAIL counts, open learning patterns. Read-only; writes nothing.',
+		inputSchema: PipelineStatusInputSchema,
+	})
+	pipelineStatus() {
+		return present(this.knowledge.pipelineStatus());
 	}
 }

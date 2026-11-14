@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-044",
+  "timestamp": "2026-11-14T01:50:29.712Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-005 (DRIFT-02 after the docs update).",
+  "scope_paths": [
+    "tools/spec-drift/README.md",
+    "tools/spec-drift/docs/ROADMAP.md"
+  ]
+}

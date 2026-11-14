@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p3",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/waves-lib.mjs",
+    "cli/src/harness/waves-lib.test.mjs",
+    "cli/src/harness/waves.mjs",
+    "cli/src/harness/commands.mjs"
+  ],
+  "session_id": "sess-asdd-p3-005",
+  "timestamp": "2026-11-13T12:04:17.000Z"
+}

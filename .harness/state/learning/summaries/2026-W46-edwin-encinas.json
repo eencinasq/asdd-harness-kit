@@ -14,6 +14,42 @@
       "examples": [
         "denied: rm -rf"
       ]
+    },
+    "sensor:DRIFT-01:docs": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-13T02:25:45.463Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by agents-use-scripts, asdd-cli, cli-harness, jev-gate-nest, knowledge-nest, mcp-standalone, modules-top-level, spec-drift-merge, spec-drift-adoption (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-02": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-13T02:25:45.463Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
+      ]
+    },
+    "warn:QG-DEC-09": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-13T02:25:45.463Z",
+          "slice_id": "sensor-fixes"
+        }
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ]
     }
   }
 }

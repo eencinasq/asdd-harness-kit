@@ -1,9 +1,8 @@
 ---
 name: api-and-interface-design
 description: >-
-  Designs and changes typed contracts between systems (REST, GraphQL, DTOs, module exports). Use when designing or
-  changing an endpoint, schema, or public contract. Do NOT use for the ADR or docs — use documentation-and-adrs; or for
-  handler tests — use test-driven-development.
+  Designs typed contracts (REST, GraphQL, DTOs). Use when changing an endpoint or schema. Do NOT use for ADRs — use
+  documentation-and-adrs.
 metadata:
   tier: leaf
 ---

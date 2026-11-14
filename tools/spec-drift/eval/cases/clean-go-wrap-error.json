@@ -1,0 +1,8 @@
+{
+	"id": "clean-go-wrap-error",
+	"description": "Wraps a returned error with context using %w; callers can still errors.Is it.",
+	"language": "go",
+	"category": "clean",
+	"diff": "diff --git a/internal/store/read.go b/internal/store/read.go\n--- a/internal/store/read.go\n+++ b/internal/store/read.go\n@@ -1,11 +1,14 @@\n package store\n \n-import \"os\"\n+import (\n+\t\"fmt\"\n+\t\"os\"\n+)\n \n func Read(path string) ([]byte, error) {\n \tdata, err := os.ReadFile(path)\n \tif err != nil {\n-\t\treturn nil, err\n+\t\treturn nil, fmt.Errorf(\"read %s: %w\", path, err)\n \t}\n \treturn data, nil\n }\n",
+	"expected": []
+}

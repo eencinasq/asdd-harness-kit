@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-12T19:57:28.416Z",
+  "generated_at": "2026-11-14T03:00:53.571Z",
   "threshold": 3,
   "summary": {
-    "patterns": 17,
+    "patterns": 18,
     "open": 0,
     "in_flight": 3,
     "verified": 0,
@@ -14,12 +14,12 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 18,
+      "occurrences": 29,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-11-12T19:57:27.294Z",
+      "last_seen": "2026-11-14T03:00:52.524Z",
       "sources": [
         "escalation"
       ],
@@ -27,18 +27,29 @@
         "agents-spec",
         "agents-use-scripts",
         "asdd-cli",
+        "asdd-p0",
+        "asdd-p1",
+        "asdd-p2",
+        "asdd-p3",
+        "asdd-p4",
         "cli-harness",
         "drift-consistency",
+        "harness-green",
         "jev-gate-nest",
         "jev-module",
         "kit-hygiene",
+        "kit-playbook",
         "knowledge-nest",
         "knowledge-simplify",
         "mcp-standalone",
         "modules-top-level",
+        "review-quality",
+        "rule-coverage",
         "sensor-fixes",
         "skills-spec",
+        "spec-drift-adoption",
         "spec-drift-apps",
+        "spec-drift-depth",
         "spec-drift-empty",
         "spec-drift-merge",
         "unified-versioning"
@@ -186,6 +197,48 @@
       "examples": [
         "Tech Lead accepts the QG-SPEC-08 WARN: UNCOV-006 (error-path tests) stays documented in spec-coverage-report.md.",
         "Tech Lead accepts the QG-SPEC-08 WARN: UNCOV-003 (REQ-012 error path) and UNCOV-004 (REQ-013 has no separate error behavior) stay documented in spec-coverage-report.md."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-06528643",
+      "signature": "sensor:DRIFT-01:docs",
+      "kind": "escape",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T13:22:35.735Z",
+      "last_seen": "2026-11-13T02:25:45.463Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "jev-module"
+      ],
+      "examples": [
+        "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by agents-use-scripts, asdd-cli, cli-harness, jev-gate-nest, knowledge-nest, mcp-standalone, modules-top-level, spec-drift-merge, spec-drift-adoption (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-f374bf6d",
+      "signature": "sensor:DRIFT-02",
+      "kind": "escape",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:34:26.022Z",
+      "last_seen": "2026-11-13T02:25:45.463Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [],
+      "examples": [
+        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
       ],
       "proposals": []
     },
@@ -377,42 +430,23 @@
       "proposals": []
     },
     {
-      "id": "LP-06528643",
-      "signature": "sensor:DRIFT-01:docs",
-      "kind": "escape",
+      "id": "LP-b028f255",
+      "signature": "warn:QG-DEC-09",
+      "kind": "noise",
       "occurrences": 1,
-      "threshold": 3,
+      "threshold": 5,
       "status": "watching",
       "reopened": false,
-      "first_seen": "2026-10-28T13:22:35.735Z",
-      "last_seen": "2026-10-28T13:22:35.735Z",
+      "first_seen": "2026-11-13T02:25:45.463Z",
+      "last_seen": "2026-11-13T02:25:45.463Z",
       "sources": [
-        "sensor"
+        "warn"
       ],
       "slices": [
-        "jev-module"
+        "sensor-fixes"
       ],
       "examples": [
-        "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)"
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-f374bf6d",
-      "signature": "sensor:DRIFT-02",
-      "kind": "escape",
-      "occurrences": 1,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-10-28T01:34:26.022Z",
-      "last_seen": "2026-10-28T01:34:26.022Z",
-      "sources": [
-        "sensor"
-      ],
-      "slices": [],
-      "examples": [
-        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification"
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
       ],
       "proposals": []
     }

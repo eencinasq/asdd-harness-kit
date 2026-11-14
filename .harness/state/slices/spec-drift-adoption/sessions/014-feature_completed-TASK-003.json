@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-adoption",
+  "concerns": [],
+  "session_id": "sess-spec-drift-adoption-014",
+  "timestamp": "2026-11-13T20:05:42.617Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: typecheck OK, lint no errors (2 warnings + 1 info pre-existing), test 187/187, build OK, test:e2e 116/116. toolsets.spec: default all, list parsing, unknown name error naming the valid set. toolsets.e2e (stdio server as a process): 'review' lists only pr_review_* tools, prompt review-pr, no spec:// or audit view resources; 'analysis,audit' has analyze/drift_trend/audit tools and their prompts, no review; 'reviews' exits non-zero with the valid set on stderr and a clean stdout. Server instructions name only the enabled toolsets."
+}

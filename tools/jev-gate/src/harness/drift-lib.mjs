@@ -262,7 +262,7 @@ export function testFiles(root, gitAvailable) {
   return trackedFiles(root, gitAvailable).filter((f) => !isExempt(f, managed) && isTest(f));
 }
 
-function mentionedRequirementIds(root, files, ids) {
+export function mentionedRequirementIds(root, files, ids) {
   const found = new Set();
   if (ids.length === 0) return found;
   const res = ids.map((id) => [id, new RegExp(`\\b${id}\\b`)]);

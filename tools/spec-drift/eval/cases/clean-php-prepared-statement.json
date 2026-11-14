@@ -1,0 +1,8 @@
+{
+	"id": "clean-php-prepared-statement",
+	"description": "Moves a query to a prepared statement with a bound parameter.",
+	"language": "php",
+	"category": "clean",
+	"diff": "diff --git a/src/Repo/UserRepo.php b/src/Repo/UserRepo.php\n--- a/src/Repo/UserRepo.php\n+++ b/src/Repo/UserRepo.php\n@@ -6,7 +6,8 @@\n \n     public function byEmail(string $email): ?array\n     {\n-        $stmt = $this->db->query(\"SELECT * FROM users WHERE email = '\" . addslashes($email) . \"'\");\n+        $stmt = $this->db->prepare('SELECT * FROM users WHERE email = :email');\n+        $stmt->execute(['email' => $email]);\n         return $stmt->fetch() ?: null;\n     }\n }\n",
+	"expected": []
+}

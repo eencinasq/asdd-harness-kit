@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-018",
+  "timestamp": "2026-11-12T23:35:53.399Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift/README.md: 34 tools, adr_coverage and validate_rules rows, 'Rules come with tests' (fixtures, --exclude + explicit path filter, ruleTests, readiness thresholds), 'ADR coverage' (discovery order, number matching, exempt/superseded, ask action, write-adr-rule), prompt row; docs/ROADMAP.md P1 status (done). biome format applied; pnpm lint no errors."
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p4",
+  "concerns": [],
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": ["cli/src/harness/stop-mode.mjs", "cli/src/harness/stop-mode.test.mjs", "cli/src/harness/verify-on-stop.mjs", "cli/src/harness/check-project-config.mjs", ".harness/config/project.schema.json"],
+  "evidence": "TASK-002 passing: stop-mode.test 3/3.",
+  "session_id": "sess-asdd-p4-011",
+  "timestamp": "2026-11-13T12:17:42.000Z"
+}

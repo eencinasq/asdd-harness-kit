@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-p1-006",
+  "timestamp": "2026-11-13T02:50:28.713Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "asdd-p1",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1"
+  ],
+  "evidence": "scope spans cli and tools/knowledge (pipeline_status MCP)",
+  "concerns": []
+}

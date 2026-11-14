@@ -1,0 +1,15 @@
+{
+	"id": "gha-pr-target-checkout",
+	"description": "pull_request_target runs with secrets; checking out and running the PR head lets a fork execute code with them.",
+	"language": "yaml",
+	"category": "security",
+	"diff": "diff --git a/.github/workflows/preview.yml b/.github/workflows/preview.yml\n--- a/.github/workflows/preview.yml\n+++ b/.github/workflows/preview.yml\n@@ -1,9 +1,13 @@\n name: preview\n on:\n-  pull_request:\n+  pull_request_target:\n jobs:\n   build:\n     runs-on: ubuntu-latest\n     steps:\n       - uses: actions/checkout@v4\n+        with:\n+          ref: ${{ github.event.pull_request.head.sha }}\n       - run: npm ci && npm run build\n+        env:\n+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}\n",
+	"expected": [
+		{
+			"path": ".github/workflows/preview.yml",
+			"startLine": 10,
+			"ruleId": "github_workflows.security",
+			"note": "untrusted checkout under pull_request_target"
+		}
+	]
+}

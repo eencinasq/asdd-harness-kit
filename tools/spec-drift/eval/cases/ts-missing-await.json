@@ -1,0 +1,15 @@
+{
+	"id": "ts-missing-await",
+	"description": "saveOrder returns a promise; without await the try/catch never sees its rejection and the handler answers 201 before the write.",
+	"language": "typescript",
+	"category": "correctness",
+	"diff": "diff --git a/src/orders/handler.ts b/src/orders/handler.ts\n--- a/src/orders/handler.ts\n+++ b/src/orders/handler.ts\n@@ -2,5 +2,10 @@\n \n export async function createOrder(req: Request): Promise<Response> {\n \tconst order = await req.json();\n+\ttry {\n+\t\tsaveOrder(order);\n+\t} catch (error) {\n+\t\treturn Response.json({ error: String(error) }, { status: 500 });\n+\t}\n \treturn Response.json(order, { status: 201 });\n }\n",
+	"expected": [
+		{
+			"path": "src/orders/handler.ts",
+			"startLine": 6,
+			"ruleId": "ts_js_tsx_jsx.async-handling-standards",
+			"note": "promise not awaited"
+		}
+	]
+}

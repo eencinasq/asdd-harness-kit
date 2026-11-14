@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-014",
+  "timestamp": "2026-11-12T23:31:32.616Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_completed",
+  "evidence": "npm test exit 0 (137/137); semgrep-lib.test 10/10 incl. 'rule-coverage REQ-003': scan args carry --exclude .semgrep, a fixture named as a target is dropped, only-fixture paths scan nothing. Real Semgrep 1.183 via runSemgrepScan on a temp repo (.semgrep/architecture rule + annotated fixture + src/a.ts): findings only src/a.ts, with and without explicit paths. Steering spec-drift.md: .semgrep/ is never code; validate_rules and adr_coverage named. asdd kit vendor and kit self refreshed the copies."
+}

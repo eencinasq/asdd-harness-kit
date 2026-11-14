@@ -6,6 +6,7 @@
  */
 import type { ReviewFinding } from '../engine';
 import type { CommentsCheck } from '../pr-review.types.ts';
+import type { ReviewCost } from './review-cost.ts';
 
 type Tally = { drafted: number; kept: number; edited: number; removed: number };
 const tally = (): Tally => ({ drafted: 0, kept: 0, edited: 0, removed: 0 });
@@ -33,6 +34,8 @@ export type PublishMetrics = {
 	readonly byRule: Readonly<Record<string, Tally>>;
 	readonly verification?: { readonly confirmed: number; readonly plausible: number; readonly rejected: number };
 	readonly requirements?: Readonly<Record<string, number>>;
+	/** Time and calls of the review (spec-drift-demand REQ-003). */
+	readonly cost?: ReviewCost;
 };
 
 /** The comments.md key a finding becomes (see commentKey in comments-format). */
@@ -54,6 +57,7 @@ export const buildPublishMetrics = (options: {
 	/** Rule doc of the group each file belongs to (used when a finding cites no checklist item). */
 	readonly ruleOfFile: (path: string) => string | undefined;
 	readonly requirements?: Readonly<Record<string, number>>;
+	readonly cost?: ReviewCost;
 	readonly now?: Date;
 }): PublishMetrics => {
 	const byKey = new Map(options.findings.map((f) => [findingKey(f), f]));
@@ -99,6 +103,7 @@ export const buildPublishMetrics = (options: {
 				}
 			: {}),
 		...(options.requirements ? { requirements: options.requirements } : {}),
+		...(options.cost ? { cost: options.cost } : {}),
 	};
 };
 

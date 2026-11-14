@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "asdd-p1",
+  "concerns": [],
+  "session_id": "sess-asdd-p1-025",
+  "timestamp": "2026-11-14T02:55:16.067Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-003 (DRIFT-02 after the 3.11.0 bump).",
+  "scope_paths": [
+    "cli/src/harness/converge-lib.mjs",
+    "cli/src/harness/converge-lib.test.mjs",
+    "cli/src/harness/converge.mjs",
+    "cli/src/harness/check-invariants.mjs",
+    "cli/src/harness/commands.mjs",
+    "package.json",
+    "docs/ASDD-ROADMAP.md"
+  ]
+}

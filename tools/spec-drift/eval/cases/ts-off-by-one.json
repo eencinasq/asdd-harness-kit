@@ -1,0 +1,15 @@
+{
+	"id": "ts-off-by-one",
+	"description": "The loop reads one element past the end: the last iteration adds undefined.price and the total becomes NaN.",
+	"language": "typescript",
+	"category": "correctness",
+	"diff": "diff --git a/src/cart/total.ts b/src/cart/total.ts\n--- a/src/cart/total.ts\n+++ b/src/cart/total.ts\n@@ -1,3 +1,9 @@\n export type Line = { price: number; qty: number };\n \n-export const total = (lines: Line[]): number => lines.reduce((sum, l) => sum + l.price * l.qty, 0);\n+export const total = (lines: Line[]): number => {\n+\tlet sum = 0;\n+\tfor (let i = 0; i <= lines.length; i++) {\n+\t\tsum += lines[i].price * lines[i].qty;\n+\t}\n+\treturn sum;\n+};\n",
+	"expected": [
+		{
+			"path": "src/cart/total.ts",
+			"startLine": 5,
+			"ruleId": "ts_js_tsx_jsx.code-quality-checks",
+			"note": "off-by-one"
+		}
+	]
+}

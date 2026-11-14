@@ -73,8 +73,11 @@ export type LearningLib = {
 };
 
 export type KnowledgeStore = {
-	edgesIncident(id: string): Promise<KnowledgeEdge[]>;
-	nodeById(id: string): Promise<KnowledgeNode | null>;
+	edgesIncident(id: string): Promise<KnowledgeEdge[]> | KnowledgeEdge[];
+	nodeById(id: string): Promise<KnowledgeNode | null> | KnowledgeNode | null;
+	nodesBySlice(sliceId: string): Promise<KnowledgeNode[]> | KnowledgeNode[];
+	meta?(): { generated_at?: string } | null;
+	close?(): void;
 };
 
 export type HarnessLibs = {

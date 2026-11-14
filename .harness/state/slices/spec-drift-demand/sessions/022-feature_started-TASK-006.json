@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-022",
+  "timestamp": "2026-11-14T01:50:29.737Z",
+  "phase": "implementation",
+  "feature_id": "TASK-006",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-006 (DRIFT-02 after the docs update).",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/domain/repos-overview.ts",
+    "tools/spec-drift/src/analysis/domain/repos-overview.spec.ts",
+    "tools/spec-drift/src/analysis/analysis.service.ts",
+    "tools/spec-drift/src/analysis/analysis.tools.ts",
+    "tools/spec-drift/src/analysis/analysis.output.ts",
+    "tools/spec-drift/src/config/env.schema.ts",
+    "tools/spec-drift/test/repos-overview.e2e-spec.ts",
+    "tools/spec-drift/README.md",
+    "tools/spec-drift/docs",
+    "tools/spec-drift/test/mcp.e2e-spec.ts"
+  ]
+}

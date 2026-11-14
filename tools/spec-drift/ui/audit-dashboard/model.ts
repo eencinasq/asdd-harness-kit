@@ -9,7 +9,7 @@ export const SEVERITIES = ['fail', 'warn', 'advisory'] as const;
 // biome-ignore lint/suspicious/noExplicitAny: tool payloads are open JSON from the harness scripts.
 export type Payload = Record<string, any>;
 
-export type Kind = 'diff' | 'compliance' | 'audit' | 'architecture' | 'finding' | 'ci' | 'learning';
+export type Kind = 'diff' | 'compliance' | 'audit' | 'architecture' | 'finding' | 'ci' | 'learning' | 'traceability';
 export type Mode = 'author' | 'review';
 export type Level = 'blocking' | 'warning' | 'clean' | 'unknown';
 
@@ -62,7 +62,9 @@ export type ViewModel = {
 	hotspots?: Hotspot[];
 	unconfigured?: string[];
 	semgrep?: Payload | null;
-	learning?: { summary: Payload; patterns: Payload[]; proposals: Payload[]; note?: string };
+	learning?: { summary: Payload; patterns: Payload[]; proposals: Payload[]; note?: string; reviews?: Payload | null };
+	/** traceability_matrix (spec-drift-depth REQ-001). */
+	traceability?: { rows: Payload[]; totals: Payload; markdown: string; note?: string };
 };
 
 /**
@@ -93,6 +95,7 @@ export const payloadOf = (result: unknown): Payload | null => {
 export const kindOf = (payload: Payload | null): Kind | null => {
 	if (!payload) return null;
 	if (payload['finding']) return 'finding';
+	if (Array.isArray(payload['matrix'])) return 'traceability';
 	if (Array.isArray(payload['patterns']) && Array.isArray(payload['proposals'])) return 'learning';
 	if (payload['provider'] && 'content' in payload) return 'ci';
 	if (payload['adapters']) return 'compliance';
@@ -271,6 +274,20 @@ export const viewModel = (payload: Payload | null): ViewModel | null => {
 	if (kind === 'finding') {
 		return { kind, findings: [payload['finding']], trace: payload['trace'] ?? null, summary: {}, checks: [] };
 	}
+	if (kind === 'traceability') {
+		return {
+			kind,
+			traceability: {
+				rows: payload['matrix'],
+				totals: payload['totals'] ?? {},
+				markdown: String(payload['markdown'] ?? ''),
+				note: payload['note'],
+			},
+			findings: [],
+			summary: {},
+			checks: [],
+		};
+	}
 	if (kind === 'learning') {
 		return {
 			kind,
@@ -279,6 +296,7 @@ export const viewModel = (payload: Payload | null): ViewModel | null => {
 				patterns: payload['patterns'],
 				proposals: payload['proposals'],
 				note: payload['commands_note'],
+				reviews: payload['review_quality'] ?? null,
 			},
 			findings: [],
 			summary: {},

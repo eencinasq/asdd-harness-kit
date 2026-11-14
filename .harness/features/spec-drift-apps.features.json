@@ -17,7 +17,7 @@
       "verification": [
         "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e"
       ],
-      "evidence": "tools/spec-drift typecheck OK, lint no errors, test 116/116, test:e2e 101/101 (after spec-drift-empty: output schemas gained no_data/generate_prompt/no-rules; output-schemas e2e gives its root a manifest).",
+      "evidence": "Re-verified after spec-drift-demand changed shared spec-drift files: typecheck OK, lint no errors (2 pre-existing warnings), test 226/226, build OK, test:e2e 140/140; ROADMAP.md has its P sections (grep #### P = 12).",
       "scope_paths": [
         "tools/spec-drift/src/audit/audit.output.ts",
         "tools/spec-drift/src/audit/audit.tools.ts",
@@ -26,7 +26,7 @@
         "tools/spec-drift/test/output-schemas.e2e-spec.ts",
         "tools/spec-drift/test/audit.e2e-spec.ts"
       ],
-      "evidence_hash": "7303f55ce8074a83afee24b7f1a89186c1ce558ea140ef1c2d38c6834a673c9d"
+      "evidence_hash": "054d67106d1791fd2c60f65e0edfc78eb330f1a47fc8ef4782f3a8ddb138b878"
     },
     {
       "id": "TASK-002",
@@ -42,7 +42,7 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "proposalFindings moved from validators/learning.mjs into learning-lib.mjs (one implementation; the validator re-exports it, so asdd check's QG-LEARN-03 findings are unchanged). New learningReport(root, {limit}): summary counts, every pattern (id, signature, kind, occurrences, threshold, status, reopened, slices, last_seen, linked proposals) with the next command ('asdd learn --propose <LP>' when open; fill/decide/apply guidance when in flight), and every proposal with its missing fields (proposalFindings) and the next step (edit <file>: <first missing>, or the Tech Lead decision). Read-only. Test 'spec-drift-apps REQ-002: learningReport ...' (open + proposed patterns, unfilled SP-001, no file written, same findings as the invariants): learning-lib tests 19/19. asdd kit vendor refreshed the copies in tools/spec-drift, tools/jev-gate, tools/knowledge. npm test 132/132 (incl. kit vendor --check); tools/knowledge 8/8; tools/jev-gate typecheck + lint + test 14/14.",
+      "evidence": "npm test 136/136 (after review-quality extended learning-lib.mjs: review metrics ingestion, review_quality; vendored copies refreshed).",
       "scope_paths": [
         "cli/src/harness/learning-lib.mjs",
         "cli/src/harness/validators/learning.mjs",
@@ -51,7 +51,7 @@
         "tools/jev-gate/src/harness/learning-lib.mjs",
         "tools/knowledge/src/harness/learning-lib.mjs"
       ],
-      "evidence_hash": "efcca4df510f682c8d3adc5e93a8e018cd3c2b4de8a3e596b9ed737d8f68cf79"
+      "evidence_hash": "4d5ae60c99f8945af73ffb3ac3d8fbc13235f26beff07d0136a60356b8a141fa"
     },
     {
       "id": "TASK-003",
@@ -72,7 +72,7 @@
       "verification": [
         "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e"
       ],
-      "evidence": "tools/spec-drift typecheck OK, lint no errors, test 116/116, test:e2e 101/101 (after spec-drift-empty: audit service no_data, audit_query no_data, dashboard No data).",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e` exits 0.",
       "scope_paths": [
         "tools/spec-drift/src/audit/audit.schemas.ts",
         "tools/spec-drift/src/audit/audit.service.ts",
@@ -87,7 +87,7 @@
         "tools/spec-drift/test/insight.e2e-spec.ts",
         "tools/spec-drift/test/mcp.e2e-spec.ts"
       ],
-      "evidence_hash": "c49518091dc7e7da8100a2fffbb95264f28cb09c62ac187587947429af73c134"
+      "evidence_hash": "44044f00d9beb4741b1ec8b51c2bbf42f49435cd755783a734ad1c0718186b96"
     },
     {
       "id": "TASK-004",
@@ -108,11 +108,11 @@
       "verification": [
         "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e"
       ],
-      "evidence": "tools/spec-drift lint no errors, test 116/116, test:e2e 101/101 (README extended by spec-drift-empty).",
+      "evidence": "Re-verified after the README / PLAYBOOK / ROADMAP update (P0-P4 state, P4.5 deferred to a later version): typecheck OK, lint no errors (2 pre-existing warnings), test 226/226, build OK, test:e2e 140/140; ROADMAP.md has its P sections (grep #### P = 12).",
       "scope_paths": [
         "tools/spec-drift/README.md"
       ],
-      "evidence_hash": "a8c5774e61cbe06b63e94e918671d9cd2155d6090b7f5e5bbe35c4305f789625"
+      "evidence_hash": "d95f5fb90637f104fd9ab53b21fee20381bca73b95f368269cd6775d1daad266"
     }
   ]
 }

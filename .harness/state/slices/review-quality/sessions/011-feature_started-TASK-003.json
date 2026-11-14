@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "review-quality",
+  "concerns": [],
+  "session_id": "sess-review-quality-011",
+  "timestamp": "2026-11-12T21:11:42.033Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/learning-lib.mjs",
+    "cli/src/harness/learning-lib.test.mjs",
+    "cli/src/harness/learn.mjs",
+    "tools/spec-drift/src/harness/learning-lib.mjs",
+    "tools/jev-gate/src/harness/learning-lib.mjs",
+    "tools/knowledge/src/harness/learning-lib.mjs",
+    "cli/steering/quality-gates.md",
+    ".harness/steering/quality-gates.md"
+  ],
+  "evidence": "Start TASK-003 (REQ-005)."
+}

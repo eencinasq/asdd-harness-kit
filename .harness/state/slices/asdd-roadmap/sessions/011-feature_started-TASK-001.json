@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": ["docs/ASDD-ROADMAP.md"],
+  "evidence": "Keep TASK-001 active for DRIFT-01 mapping of the new roadmap file.",
+  "session_id": "sess-asdd-roadmap-011",
+  "timestamp": "2026-11-13T02:28:17.000Z"
+}

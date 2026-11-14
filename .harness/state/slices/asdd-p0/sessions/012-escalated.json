@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-p0-012",
+  "timestamp": "2026-11-13T02:40:22.011Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "asdd-p0",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "cli harness + docs guide (guide now under cli/docs; history still touched docs/)",
+  "concerns": []
+}

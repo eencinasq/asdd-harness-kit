@@ -90,6 +90,22 @@ describe('pack selection', () => {
 		);
 	});
 
+	test('spec-drift-depth REQ-003: architecture mode includes the dependencies set, alone when Semgrep has none', () => {
+		const deps = pack('dependencies', 'set', 'dependencies');
+		assert.deepEqual(
+			packsForMode('architecture', [...AVAILABLE, deps]).map((p) => p.id),
+			['architecture', 'dependencies'],
+		);
+		assert.deepEqual(
+			packsForMode('architecture', [deps]).map((p) => p.id),
+			['dependencies'],
+		);
+		assert.deepEqual(
+			packsForMode('standards', [...AVAILABLE, deps]).map((p) => p.id),
+			['standards'],
+		);
+	});
+
 	test('unknown packs and missing sets fail with what exists', () => {
 		assert.throws(
 			() => packsForMode('all', AVAILABLE, ['nope']),

@@ -43,8 +43,18 @@ if (config) {
 			requireString(config.kit, key, configPath + '.kit');
 		}
 	}
-	if (!['full', 'lite', 'escalated'].includes(config.mode)) {
-		errors.push(`${configPath}.mode must be "full", "lite", or "escalated"`);
+	if (!['full', 'lite', 'hotfix', 'escalated'].includes(config.mode)) {
+		errors.push(`${configPath}.mode must be "full", "lite", "hotfix", or "escalated"`);
+	}
+	if (config.stop !== undefined) {
+		if (!config.stop || typeof config.stop !== 'object') {
+			errors.push(`${configPath}.stop must be an object`);
+		} else if (config.stop.mode !== undefined && !['fail_closed', 'advisory'].includes(config.stop.mode)) {
+			errors.push(`${configPath}.stop.mode must be "fail_closed" or "advisory"`);
+		}
+	}
+	if (config.capabilities?.spec_as_source !== undefined && typeof config.capabilities.spec_as_source !== 'boolean') {
+		errors.push(`${configPath}.capabilities.spec_as_source must be a boolean`);
 	}
 
 	const requiredPaths = [

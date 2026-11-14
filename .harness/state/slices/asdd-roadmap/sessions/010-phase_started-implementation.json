@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "concerns": [],
+  "event_type": "phase_started",
+  "phase": "implementation",
+  "evidence": "Hold slice open in implementation so docs/ASDD-ROADMAP.md stays mapped for DRIFT-01 until the change is committed.",
+  "session_id": "sess-asdd-roadmap-010",
+  "timestamp": "2026-11-13T02:28:17.000Z"
+}

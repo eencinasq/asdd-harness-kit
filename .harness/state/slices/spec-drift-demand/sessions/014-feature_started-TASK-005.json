@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-014",
+  "timestamp": "2026-11-14T01:35:13.167Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/engines/codeql",
+    "tools/spec-drift/src/app.module.ts",
+    "tools/spec-drift/src/config/env.schema.ts",
+    "tools/spec-drift/test/codeql.e2e-spec.ts",
+    "tools/spec-drift/src/config/engine.ts"
+  ],
+  "evidence": "Start TASK-005 (REQ-005)."
+}

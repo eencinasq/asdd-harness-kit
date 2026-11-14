@@ -54,7 +54,13 @@ export type ReviewedRepo = {
 	readonly added: { readonly appTs: readonly number[]; readonly utilPy: readonly number[] };
 };
 
-export const createReviewedRepo = (options: { withSemgrep?: boolean } = {}): ReviewedRepo => {
+export const createReviewedRepo = (
+	options: {
+		withSemgrep?: boolean;
+		/** Extra files of the base commit (e.g. the repository's `.harness/` data). */
+		baseFiles?: Record<string, string>;
+	} = {},
+): ReviewedRepo => {
 	const origin = tmpDir('mcp-origin');
 	git(origin, 'init', '-q', '--bare', '-b', 'main');
 
@@ -68,6 +74,7 @@ export const createReviewedRepo = (options: { withSemgrep?: boolean } = {}): Rev
 		// Review profile on the base branch: test files are skipped, as the lifecycle tests expect.
 		'.pr-review.yml': 'reviewTests: false\n',
 		...(options.withSemgrep === false ? {} : { '.semgrep/architecture/rules.yml': REVIEWED_REPO_RULES }),
+		...options.baseFiles,
 	});
 	git(repo, 'add', '-A');
 	git(repo, 'commit', '-q', '-m', 'base');

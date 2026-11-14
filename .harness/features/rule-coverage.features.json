@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "rule-coverage",
+  "source_tasks": ".harness/specs/rule-coverage/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "ADR coverage",
+      "user_visible_behavior": "The Tech Lead sees which ADRs no rule enforces and which rules cite missing or superseded ADRs.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e` exits 0.",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis/domain/adr-coverage.ts",
+        "tools/spec-drift/src/analysis/domain/adr-coverage.spec.ts",
+        "tools/spec-drift/src/analysis/analysis.service.ts",
+        "tools/spec-drift/src/analysis/analysis.tools.ts",
+        "tools/spec-drift/src/analysis/analysis.prompts.ts",
+        "tools/spec-drift/src/analysis/analysis.output.ts",
+        "tools/spec-drift/src/analysis/analysis.types.ts",
+        "tools/spec-drift/src/analysis/analysis.presenter.ts",
+        "tools/spec-drift/test/rule-coverage.e2e-spec.ts",
+        "tools/spec-drift/test/mcp.e2e-spec.ts"
+      ],
+      "evidence_hash": "cdc0a7546d7c9548b981365a02c3ba578ef465e69a7f8a3fea4b5a4634423fb8"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Rule tests and validate_rules",
+      "user_visible_behavior": "Generated rules come with tests; validate_rules says which rules are ready to accept.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e` exits 0.",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis/domain/rule-readiness.ts",
+        "tools/spec-drift/src/analysis/domain/rule-readiness.spec.ts",
+        "tools/spec-drift/src/analysis/ports",
+        "tools/spec-drift/src/analysis/engines",
+        "tools/spec-drift/src/analysis/analysis.service.spec.ts",
+        "tools/spec-drift/src/pr-review/architecture/architecture-scan.service.ts",
+        "tools/spec-drift/test/rule-tests.e2e-spec.ts",
+        "tools/spec-drift/src/analysis/analysis.service.ts",
+        "tools/spec-drift/src/analysis/analysis.tools.ts",
+        "tools/spec-drift/src/analysis/analysis.output.ts",
+        "tools/spec-drift/src/analysis/analysis.types.ts",
+        "tools/spec-drift/src/analysis/analysis.presenter.ts",
+        "tools/spec-drift/test/mcp.e2e-spec.ts"
+      ],
+      "evidence_hash": "fd95b60677994fd4244059716f35b8ba70e7977e8b25a6766b514c82efda5adf"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Kit scan excludes .semgrep",
+      "user_visible_behavior": "Rule test fixtures never count as architecture findings in the kit audit.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test"
+      ],
+      "evidence": "npm test exit 0 (137/137); semgrep-lib.test 10/10 incl. 'rule-coverage REQ-003': scan args carry --exclude .semgrep, a fixture named as a target is dropped, only-fixture paths scan nothing. Real Semgrep 1.183 via runSemgrepScan on a temp repo (.semgrep/architecture rule + annotated fixture + src/a.ts): findings only src/a.ts, with and without explicit paths. Steering spec-drift.md: .semgrep/ is never code; validate_rules and adr_coverage named. asdd kit vendor and kit self refreshed the copies.",
+      "scope_paths": [
+        "cli/src/harness/semgrep-lib.mjs",
+        "cli/src/harness/semgrep-lib.test.mjs",
+        "tools/spec-drift/src/harness/semgrep-lib.mjs",
+        "cli/steering/spec-drift.md",
+        ".harness/steering/spec-drift.md"
+      ],
+      "evidence_hash": "e62d51d425c1ff816bddbe496e59393c9584d72cee119e47e9bbc706e899957e"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Dashboard ADR tab and test badges",
+      "user_visible_behavior": "The dashboard shows ADR coverage with an ask action and each rule test status.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002",
+        "REQ-005"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after spec-drift-demand changed shared spec-drift files: typecheck OK, lint no errors (2 pre-existing warnings), test 226/226, build OK, test:e2e 140/140; ROADMAP.md has its P sections (grep #### P = 12).",
+      "scope_paths": [
+        "tools/spec-drift/ui/analysis-dashboard",
+        "tools/spec-drift/ui/analysis-dashboard.html"
+      ],
+      "evidence_hash": "0fcdadb01cc936480c722ac01a0b4a89e0c61fcfe5c4b1ad876879de37aa4d35"
+    },
+    {
+      "id": "TASK-005",
+      "title": "Docs and roadmap",
+      "user_visible_behavior": "README and roadmap describe ADR coverage and rule validation.",
+      "status": "passing",
+      "priority": 5,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005"
+      ],
+      "depends_on": [
+        "TASK-003",
+        "TASK-004"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm lint"
+      ],
+      "evidence": "Re-verified after the README / PLAYBOOK / ROADMAP update (P0-P4 state, P4.5 deferred to a later version): typecheck OK, lint no errors (2 pre-existing warnings), test 226/226, build OK, test:e2e 140/140; ROADMAP.md has its P sections (grep #### P = 12).",
+      "scope_paths": [
+        "tools/spec-drift/README.md",
+        "tools/spec-drift/docs/ROADMAP.md"
+      ],
+      "evidence_hash": "1a52702050431168d5f579d86385009b840b688628347477edb0a47a6cc5c029"
+    }
+  ]
+}

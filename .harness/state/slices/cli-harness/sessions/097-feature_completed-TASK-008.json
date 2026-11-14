@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "session_id": "sess-cli-harness-097",
+  "timestamp": "2026-11-14T02:20:38.543Z",
+  "phase": "implementation",
+  "feature_id": "TASK-008",
+  "event_type": "feature_completed",
+  "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `npm test && cd tools/knowledge && pnpm test` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e."
+}

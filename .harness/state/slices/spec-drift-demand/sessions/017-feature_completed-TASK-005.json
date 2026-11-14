@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-017",
+  "timestamp": "2026-11-14T01:35:13.356Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_completed",
+  "evidence": "typecheck OK, lint no errors (2 pre-existing warnings; the new noTemplateCurlyInString on the intentional GitHub expression in ci-review.ts is annotated), test 226/226, build OK, test:e2e 140/140. codeql.spec 4/4 with a stubbed CLI (query metadata, SARIF mapping, database create/analyze args, path filter, missing CLI); codeql.e2e 1/1 with SPEC_DRIFT_ENGINE=codeql: packs listed, scan names the missing CLI. CodeQL is not installed here: no run against real CodeQL."
+}

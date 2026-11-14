@@ -1,7 +1,33 @@
+import type { AdrCoverage } from './domain/adr-coverage.ts';
+import type { BaselineStatus } from './domain/baseline.ts';
+import type { Trend } from './domain/trend.ts';
+
 /**
  * Engine-neutral analysis model. Every analyzer (Semgrep today, CodeQL or others tomorrow) maps its
  * own output onto these types, so drift reports, tools and dashboards never depend on one tool.
  */
+
+/** ADR coverage with, per uncovered ADR, the prompt that asks the host agent for its rule (rule-coverage REQ-002). */
+export type AdrCoverageResult = Omit<AdrCoverage, 'uncovered'> & {
+	readonly uncovered: readonly {
+		readonly id: string;
+		readonly title: string;
+		readonly path: string;
+		readonly prompt: string;
+	}[];
+};
+
+/**
+ * Result of the engine's rule tests (rule-coverage REQ-003, REQ-004): per rule with a test, passed or failed; a rule
+ * missing from `byRule` has no test. `unavailable` when the engine cannot run tests (not installed, no support).
+ */
+export type RuleTestReport = {
+	readonly status: 'ok' | 'unavailable' | 'failed';
+	readonly byRule: Readonly<Record<string, 'passed' | 'failed'>>;
+	/** Rule files the engine could not load. */
+	readonly invalidFiles: readonly string[];
+	readonly message?: string;
+};
 
 export const SEVERITIES = ['ERROR', 'WARNING', 'INFO'] as const;
 export type Severity = (typeof SEVERITIES)[number];
@@ -57,6 +83,8 @@ export type Finding = {
 	readonly category: string;
 	readonly adr: string | null;
 	readonly pack: string;
+	/** With a baseline (spec-drift-adoption REQ-001): whether the baseline already had this finding. */
+	readonly baseline?: 'new' | 'existing';
 };
 
 export type SpecDriftItem = {
@@ -116,4 +144,12 @@ export type ScanSummary = {
 	readonly drift: SpecDriftReport;
 	readonly packSummaries: readonly PackSummary[];
 	readonly stderrTail: string;
+	/** Which ADRs the repo's rules enforce (rule-coverage REQ-001); null when it could not be read. */
+	readonly adrCoverage?: AdrCoverageResult | null;
+	/** The rule tests of the repo's rules (rule-coverage REQ-005: test status per rule in the dashboard). */
+	readonly ruleTests?: RuleTestReport;
+	/** New / existing / resolved against `.semgrep/baseline.json`; null when the repo has no baseline. */
+	readonly baseline?: BaselineStatus | null;
+	/** The last recorded snapshots (spec-drift-adoption REQ-002), for the dashboard chart; null without history. */
+	readonly trend?: Omit<Trend, 'changes'> | null;
 };

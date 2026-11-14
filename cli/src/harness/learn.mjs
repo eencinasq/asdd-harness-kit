@@ -10,7 +10,9 @@
  *   asdd learn --export [--out <file>]  # lessons on kit-owned controls, for an upstream issue
  *
  * Every run first folds local raw signals into this author's weekly summary
- * (compactSignals); set HARNESS_AUTHOR to name the author (CI: `ci`).
+ * (compactSignals); set HARNESS_AUTHOR to name the author (CI: `ci`). It also
+ * records this project's published spec-drift PR reviews from the local publish
+ * log (ingestReviewMetrics: counts per checklist rule; PR_REVIEW_ROOT, HARNESS_REVIEW_PROJECT).
  *   asdd learn --propose LP-…  # scaffold docs/knowledge-base/steering-proposals/SP-NNN.md
  *
  * sync-state.mjs runs the derive step after every state sync. Agents never set a
@@ -25,6 +27,7 @@ import {
   KIT_REPO,
   compactSignals,
   exportLessons,
+  ingestReviewMetrics,
   failureSignatures,
   nextProposalId,
   writePatterns,
@@ -45,6 +48,7 @@ if (argv.includes('--signatures')) {
   process.exit(0);
 }
 
+const reviews = ingestReviewMetrics(root);
 const compacted = compactSignals(root);
 const data = writePatterns(root);
 data.summary.compacted = compacted.compacted;
@@ -110,6 +114,7 @@ const shown = argv.includes('--all') ? data.patterns : data.patterns.filter((p) 
 const s = data.summary;
 console.log(`learning → ${s.patterns} patterns: ${s.open} open, ${s.in_flight} in flight, ${s.verified} verified (${PATTERNS_FILE})`);
 if (compacted.compacted) console.log(`compacted ${compacted.compacted} local signal file(s) into ${compacted.summaries.join(', ')}`);
+if (reviews.ingested) console.log(`recorded ${reviews.ingested} published PR review(s) of ${reviews.project} from ${reviews.file}`);
 if (s.unsigned_failures) console.log(`note: ${s.unsigned_failures} failure-log entr${s.unsigned_failures === 1 ? 'y has' : 'ies have'} no **Signature:** line and cannot be counted`);
 for (const p of shown) {
   const props = p.proposals.length ? ` [${p.proposals.map((x) => `${x.id}:${x.status}`).join(', ')}]` : '';

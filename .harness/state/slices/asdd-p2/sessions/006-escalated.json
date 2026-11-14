@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-p2-006",
+  "timestamp": "2026-11-13T03:05:31.213Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "asdd-p2",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1"
+  ],
+  "evidence": "scope spans cli, docs, package.json, .harness features schema",
+  "concerns": []
+}

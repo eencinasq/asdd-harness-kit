@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-apps",
+  "concerns": [],
+  "session_id": "sess-spec-drift-apps-026",
+  "timestamp": "2026-11-12T21:19:50.370Z",
+  "phase": "implementation",
+  "event_type": "feature_started",
+  "feature_id": "TASK-002",
+  "evidence": "Re-verify TASK-002 (DRIFT-02).",
+  "scope_paths": [
+    "cli/src/harness/learning-lib.mjs",
+    "cli/src/harness/validators/learning.mjs",
+    "cli/src/harness/learning-lib.test.mjs",
+    "tools/spec-drift/src/harness/learning-lib.mjs",
+    "tools/jev-gate/src/harness/learning-lib.mjs",
+    "tools/knowledge/src/harness/learning-lib.mjs"
+  ]
+}

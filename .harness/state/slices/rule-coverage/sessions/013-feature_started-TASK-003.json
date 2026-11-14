@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-013",
+  "timestamp": "2026-11-12T23:29:48.905Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/semgrep-lib.mjs",
+    "cli/src/harness/semgrep-lib.test.mjs",
+    "tools/spec-drift/src/harness/semgrep-lib.mjs",
+    "cli/steering/spec-drift.md",
+    ".harness/steering/spec-drift.md"
+  ],
+  "evidence": "Start TASK-003 (REQ-003)."
+}

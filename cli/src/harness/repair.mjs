@@ -120,8 +120,8 @@ function seedSessions(sliceId, fromManifest, fromGlobal) {
     : PHASES.includes(fromGlobal?.phase) ? fromGlobal.phase
       : 'discovery';
   const status = fromManifest?.status || fromGlobal?.status || 'in_progress';
-  const mode = ['lite', 'full', 'escalated'].includes(fromManifest?.mode) ? fromManifest.mode
-    : ['lite', 'full', 'escalated'].includes(fromGlobal?.mode) ? fromGlobal.mode
+  const mode = ['lite', 'hotfix', 'full', 'escalated'].includes(fromManifest?.mode) ? fromManifest.mode
+    : ['lite', 'hotfix', 'full', 'escalated'].includes(fromGlobal?.mode) ? fromGlobal.mode
       : 'lite';
   const done = status === 'DONE';
 
@@ -249,7 +249,7 @@ function ensureGlobalManifest(sliceIds) {
       slice_id: id,
       phase: PHASES.includes(prev.phase) ? prev.phase : 'discovery',
       status: ['DONE', 'in_progress', 'PARKED', 'ABANDONED'].includes(prev.status) ? prev.status : 'in_progress',
-      mode: ['lite', 'full', 'escalated'].includes(prev.mode) ? prev.mode : 'lite',
+      mode: ['lite', 'hotfix', 'full', 'escalated'].includes(prev.mode) ? prev.mode : 'lite',
       manifest: `.harness/state/slices/${id}/manifest.json`,
       features: `.harness/features/${id}.features.json`,
     });

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { Env } from '../config/env.schema.ts';
+import { whenToolset } from '../config/toolsets.ts';
 import { AuditPrompts } from './audit.prompts.ts';
 import { AUDIT_OPTIONS, type AuditOptions, AuditService } from './audit.service.ts';
 import { AuditTools } from './audit.tools.ts';
@@ -25,9 +26,7 @@ import { AuditInsightTools } from './audit-insight.tools.ts';
 			},
 		},
 		AuditService,
-		AuditTools,
-		AuditInsightTools,
-		AuditPrompts,
+		...whenToolset('audit', [AuditTools, AuditInsightTools, AuditPrompts]),
 	],
 	exports: [AuditService],
 })

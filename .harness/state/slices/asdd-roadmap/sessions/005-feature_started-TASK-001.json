@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": ["docs/ASDD-ROADMAP.md"],
+  "evidence": "Start TASK-001 (REQ-001).",
+  "session_id": "sess-asdd-roadmap-005",
+  "timestamp": "2026-11-13T02:25:42.000Z"
+}

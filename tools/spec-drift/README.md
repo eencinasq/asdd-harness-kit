@@ -1,6 +1,7 @@
-# Architecture MCP
+# spec-drift
 
-An MCP server (NestJS) that gives an AI agent three jobs, each with an interactive dashboard (MCP App):
+**spec-drift** (formerly "Architecture MCP"; one name for the folder, the package, and the server) is an MCP server
+(NestJS) that gives an AI agent three jobs, each with an interactive dashboard (MCP App):
 
 1. **Static analysis.** Runs a repo's architecture and coding-standard rule packs and reports **spec
    drift**: which ADR / `AGENTS.md` rules the code breaks today. The engine is pluggable — **Semgrep** by
@@ -17,6 +18,44 @@ An MCP server (NestJS) that gives an AI agent three jobs, each with an interacti
 
 **How and when to use it:** see the [Playbook](docs/PLAYBOOK.md). This README is the reference.
 
+## Install in 5 minutes
+
+From a checkout of [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit) (the server is not published as a
+package; it runs from the checkout):
+
+```bash
+cd asdd-harness-kit/tools/spec-drift
+nvm install && corepack enable && pnpm install && pnpm build    # Node 24 (.nvmrc), pnpm
+brew install semgrep && gh auth login                           # analysis / PR review (see Requirements)
+node bin/spec-drift.mjs config --client cursor                  # or claude-code, claude-desktop
+```
+
+`spec-drift config` prints the configuration for that client with every path already resolved — this checkout's
+launcher (`bin/mcp-stdio`), the folders of `node`, `semgrep`, `gh` and `git` on `PATH`, and the project roots — and says
+where to paste it. Nothing to edit by hand:
+
+- **Cursor:** without `--project`, the roots are `${workspaceFolder}`, so one config follows the open folder.
+- **Claude Code:** it prints a `claude mcp add …` command; run it inside the project (`$PWD` is the root).
+- **Claude Desktop:** pass `--project /path/to/repo`, or leave it out and let the agent pass `repoPath`.
+- **Fewer tools:** `--toolsets analysis,review` loads only those jobs ([Toolsets](#toolsets)).
+
+Restart the client (Cursor: Settings → MCP, toggle the server). The sections under [Connect a client](#connect-a-client)
+explain what the generated config contains.
+
+## Toolsets
+
+`SPEC_DRIFT_TOOLSETS` (comma-separated; all three when unset) loads only the tools, prompts and dashboards of the jobs a
+team uses — fewer tools in every model call, fewer wrong picks:
+
+| Toolset    | Loads                                                                                                                                                                                              |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `analysis` | `analyze_*`, `rescan`, `list_rule_packs`, `adr_coverage`, `validate_rules`, `drift_trend`, `analysis_start`, `analysis_job`, `drift_origin`, `repos_overview`; the analysis dashboard; its prompts |
+| `review`   | `pr_review_*`; the PR Review dashboard; `review-pr`                                                                                                                                                |
+| `audit`    | `audit_*`, `verify_*`, `generate_ci_gate`, `learning_report`, `traceability_matrix`; the audit dashboard; `spec://` resources; its prompts                                                         |
+
+The services stay loaded whatever the toolsets (the audit and the PR review use the analysis services). An unknown name
+stops the server with the valid ones.
+
 ## Requirements
 
 | Need                   | Check                                        | Used for                                 |
@@ -25,6 +64,8 @@ An MCP server (NestJS) that gives an AI agent three jobs, each with an interacti
 | pnpm 12                | `corepack enable` or `npm i -g pnpm`         | install / build                          |
 | Semgrep                | `semgrep --version` (`brew install semgrep`) | analysis tools, PR architecture scan     |
 | GitHub CLI, logged in  | `gh auth status`                             | PR review (diff, issues, pending review) |
+| git                    | `git --version`                              | PR review, drift origin, traceability    |
+| CodeQL CLI (optional)  | `codeql version`                             | only with `SPEC_DRIFT_ENGINE=codeql`     |
 
 ```bash
 nvm install && pnpm install && pnpm build
@@ -32,7 +73,7 @@ nvm install && pnpm install && pnpm build
 
 ## Tools
 
-32 tools. Five are **dashboard-only** (`visibility: ["app"]`): the dashboard calls them, and hosts that
+40 tools (all toolsets). Five are **dashboard-only** (`visibility: ["app"]`): the dashboard calls them, and hosts that
 support MCP Apps visibility hide them from the model.
 
 **Typed results.** Every analysis and harness-audit tool declares an `outputSchema` (zod, in `*.output.ts`), and
@@ -42,13 +83,19 @@ never turns a result into an error; `{ error }` results are tool errors (`isErro
 
 ### Static analysis
 
-| Tool                   | Result    | Purpose                                                                             |
-| ---------------------- | --------- | ----------------------------------------------------------------------------------- |
-| `analyze_spec_drift`   | dashboard | Every rule pack; drift grouped by rule / ADR (`mode`, `packs`, `paths`, `severity`) |
-| `analyze_architecture` | dashboard | The `architecture/` set only                                                        |
-| `analyze_standards`    | dashboard | The `standards/` set only                                                           |
-| `list_rule_packs`      | text      | Sets and packs discovered under `<repo>/.semgrep/`                                  |
-| `rescan`               | app-only  | Re-run from the dashboard                                                           |
+| Tool                   | Result    | Purpose                                                                                                                   |
+| ---------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `analyze_spec_drift`   | dashboard | Every rule pack; drift grouped by rule / ADR (`mode`, `packs`, `paths`, `severity`)                                       |
+| `analyze_architecture` | dashboard | The `architecture/` set only                                                                                              |
+| `analyze_standards`    | dashboard | The `standards/` set only                                                                                                 |
+| `list_rule_packs`      | text      | Sets and packs discovered under `<repo>/.semgrep/`                                                                        |
+| `rescan`               | app-only  | Re-run from the dashboard                                                                                                 |
+| `adr_coverage`         | text      | Which ADRs a rule enforces (`metadata.adr`): coverage, uncovered ADRs (each with a rule prompt), dangling rule references |
+| `validate_rules`       | text      | Before accepting rules: per rule, test result (`semgrep --test`), hits and files on the repo, flags, ready or not         |
+| `analysis_start`       | text      | Start a scan in the background (same input as `analyze_spec_drift`); returns a job id at once                             |
+| `analysis_job`         | text      | A background scan's status, last progress message and, when done, the same result as the analyze tool; no id lists jobs   |
+| `drift_origin`         | text      | Why a finding is there: the commit that last changed its line (blame) and the oldest commit that added its text, with PR  |
+| `repos_overview`       | text      | Several repositories (`SPEC_DRIFT_REPOS`): latest snapshot, trend direction, audit level and spec compliance per repo     |
 
 **No rules is not a pass.** When the repo has no rules for the mode (no `.semgrep/architecture/` for
 `analyze_architecture`, nothing under `.semgrep/` for `analyze_spec_drift`), the result has `status: "no-rules"`, no
@@ -58,6 +105,22 @@ repo has `.harness/`, from its steering bindings and ADRs — into `.semgrep/arc
 them for the user to confirm, and validate them. The same prompt is the MCP prompt `generate-architecture-rules`. The
 agent writes the files in the host; this server writes nothing. A pack named in `packs` that does not exist is still an
 input error.
+
+**Rules come with tests.** The authoring guide (and so every rule prompt) asks for a test file next to each rule file —
+`boundaries.yml` → `boundaries.ts`, with `ruleid: <id>` above a line the rule must flag and `ok: <id>` above one it must
+not — and a passing `semgrep --test .semgrep`. `.semgrep/` is never scanned as code (those fixtures violate the rules on
+purpose): the analysis, the PR review and the kit's audit pass `--exclude .semgrep` and drop explicit paths under it,
+because Semgrep does not apply `--exclude` to named targets. Every scan summary carries `ruleTests` (passed / failed per
+tested rule) and the dashboard shows a test badge per rule. `validate_rules` turns that into a verdict: a rule is
+**ready** when its test passes and it is not noisy (≥ 50 hits or hits in ≥ 20 files); no test, a failing test, tests
+that could not run (no Semgrep) and noise each keep it out.
+
+**ADR coverage.** `adr_coverage` (and the dashboard's **ADRs** tab, from every scan) reads the project's ADR files — the
+`ADR index` row of `.harness/steering/structure.md`, else `.adr-dir`, else `docs/decisions`, `docs/adr`, `docs/adrs`,
+`doc/adr`, `docs/architecture/decisions` or `adr` — and matches them to the rules' `metadata.adr` by number (`ADR-10` =
+`ADR-0010` = `0010-x.md`). It reports the ratio over active, enforceable ADRs (superseded, deprecated and rejected ones
+do not count; an ADR with `Enforcement: manual` is exempt), the ADRs no rule enforces — each with **Ask the agent to
+write the rule** and the MCP prompt `write-adr-rule` — and rules citing an ADR that has no file or no longer stands.
 
 ### PR review
 
@@ -80,6 +143,46 @@ input error.
 | `pr_review_ui_save` / `pr_review_ui_reload` | app-only     | Dashboard persistence                                                                                |
 | `pr_review_ui_publish`                      | app-only     | **Submit** the review — a human clicks it, with a confirmation step                                  |
 | `pr_review_ui_requirements`                 | app-only     | A human corrects criterion verdicts                                                                  |
+
+**Dependency-graph rules.** Semgrep matches import strings, so it cannot resolve `../../infra/db` to a layer or see a
+cycle. When the analyzed repo's `.harness/steering/domain-layer.project.md` has a `Dependency layers` table, every
+architecture or full analysis also runs a `dependencies` pack built from it:
+
+```markdown
+## Dependency layers
+
+| Layer          | Paths                | May depend on       |
+| -------------- | -------------------- | ------------------- |
+| Domain         | `src/domain/**`      | —                   |
+| Application    | `src/application/**` | Domain              |
+| Infrastructure | `src/infra/**`       | Domain, Application |
+```
+
+`dep-layer` (ERROR) flags an import from one layer into a layer it may not depend on; `dep-cycle` (WARNING) flags files
+that import each other in a cycle (`**Dependency cycles:** allow` turns it off). Imports are read from JavaScript /
+TypeScript (relative paths, `index` files, `.js` specifiers of `.ts` files, `tsconfig` `paths`), Python, Go (`go.mod`
+module) and Java / Kotlin (package imports) and resolved to repository files; packages are ignored. TypeScript
+`import type` counts for layers, not for cycles (it is erased at runtime). The findings sit at the import line, so the
+baseline, the trend, the dashboard and the PR review treat them like any rule; in a PR review only the PR's files are
+checked for layers (a cycle needs the whole graph). Without the table there is no pack. The kit's binding template
+documents the table.
+
+**Where a drift came from, and fixing it.** `drift_origin` takes a finding's path and line and returns the commit that
+last changed the line (`git blame`) and the oldest commit whose diff added its text (`git log -S`), each with author,
+date, subject and PR number. Each drifting rule in the dashboard has **Ask the agent to fix** (and the MCP prompt
+`fix-rule-violations`): a request listing that rule's violations, asking the agent to show its plan and wait for the
+user's confirmation, fix the cause without silencing the rule, and rescan the changed paths. The agent edits; the server
+only reads.
+
+**Several repositories.** Set `SPEC_DRIFT_REPOS` to a comma-separated list of repository paths and `repos_overview`
+summarizes each from its files — the latest `spec-drift record` snapshot and its trend, the latest `asdd audit` report —
+without running a scan.
+
+**Long scans in the background.** A full scan of a large repository can take minutes. `analysis_start` takes the same
+input as `analyze_spec_drift`, starts the scan, and returns a job id at once; `analysis_job` returns its status and last
+progress message, and — when done — the same result the analyze tool returns. Jobs live in this server process (at most
+20; a finished job is kept an hour). MCP Tasks are not used: protocol revision 2026-07-28, which this server speaks,
+removed them.
 
 ### Harness audit
 
@@ -111,10 +214,19 @@ rules**; the kit's audit selects the `.semgrep/architecture/` folder that prompt
 | `audit_finding`             | One finding with its knowledge-graph trace (REQ → feature → file)                                                                                                                                                                     |
 | `audit_query`               | Filter (slice, severity, check, source, path prefix) and group (slice, severity, check, top-level path) findings on the server: totals, per-group counts, at most `limit` findings. Text only — use it to summarize instead of paging |
 | `learning_report`           | The self-improving loop: patterns, steering proposals with the fields each still lacks, and the `asdd` command a human runs next                                                                                                      |
+| `traceability_matrix`       | Requirement → features (status) → owned files → tests → PRs, one row per requirement from the knowledge index, with gaps (`no-feature`, `no-test`, `not-passing`), totals, and a Markdown table; `slice_id`, `gaps_only`              |
 
 Results stay under 8 KB (Cursor stops mounting MCP Apps above about 13 KB): larger ones carry the first findings,
 full counts and a `page.token`; call the same tool with `page_token` and `offset` for the rest. Source texts are
 left out unless `include_text: true`.
+
+**Traceability matrix.** `traceability_matrix` answers the audit question "which requirement does this code implement,
+which test proves it, which PR brought it": one row per requirement of the kit's knowledge index (`asdd knowledge sync`),
+with the features that implement it and their status, the files they own (folders and globs expanded to tracked files),
+the test files among them, and the PR numbers of the commits that touched them (from squash `(#N)` and
+`Merge pull request #N` subjects, the latest 5 000 commits, no network). Gaps: `no-feature`, `no-test`, `not-passing`.
+The dashboard shows it with **Copy as Markdown**; without an index the result is **No data** naming
+`asdd knowledge sync`.
 
 ### Prompts and resources
 
@@ -123,6 +235,8 @@ left out unless `include_text: true`.
 | Prompt            | `review-pr` (`pr`, `repoPath?`, `focus?`, `ticket?`)                         | Slash command that runs the whole review                                                                                       |
 | Prompt            | `spec-drift-report` (`paths?`, `severity?`)                                  | Slash command for a drift report grouped by ADR                                                                                |
 | Prompt            | `generate-architecture-rules`                                                | Have the agent write `.semgrep/architecture/` and `.semgrep/standards/` rules from this codebase (and its harness ADRs)        |
+| Prompt            | `write-adr-rule` (`adr_id`)                                                  | Have the agent encode one ADR no rule enforces as a rule with a test                                                           |
+| Prompt            | `fix-rule-violations` (`rule_id`, `max?`)                                    | Have the agent fix a rule's current violations (after you confirm its plan) and rescan                                         |
 | Prompt            | `architecture-review` (`paths?`)                                             | Harness: inferential architecture review (codebase-audit skill)                                                                |
 | Prompt            | `spec-alignment` (`slice_id`)                                                | Harness: per-REQ satisfied / violated / unclear for one slice                                                                  |
 | Prompt            | `pr-review` (`base_branch`, `target_branch`, `pr_body?`)                     | Harness: Tech Lead drift review of a branch, draft comments only (not the GitHub `review-pr`)                                  |
@@ -170,6 +284,24 @@ as a secrets file is listed under "Not reviewed" and turns APPROVE into COMMENT.
 Publishing is blocked until every step is done. Each step is saved to disk, so a review survives restarts
 and works across clients.
 
+**Read first.** `pr_review_start` ranks the changed files by risk with the formula of `asdd audit` hotspots —
+`churn + 2 × requirement links + 5 × findings` — where churn is the commits that touched the file in the last 90 days
+(base branch history), requirement links are the requirement ids of the repo's features (`.harness/features/`) whose
+scope covers it, and findings are this PR's architecture findings plus the latest `.harness/audits/` report's. A file is
+**high** with any finding or a score of 10, **medium** from 4. The prompt names the top files to read first, the text
+says it in one line, and the Coverage tab shows them with their reasons; sources a repo does not have count 0 and are
+listed. The group order does not change.
+
+**Cost and time.** Every review tool call is logged in the review's `calls.jsonl` (tool, characters returned, time).
+At publish, the metrics line gets `cost`: minutes since the last `pr_review_start`, calls by tool, characters, and an
+estimate of the tokens the host read from this server (characters / 4 — the server cannot see the model's own tokens).
+`pr_review_metrics` reports the medians.
+
+**Structured questions.** On a client that declares the MCP `elicitation` capability (protocol 2026-07-28),
+`pr_review_start` without a ticket asks for one (suggesting a reference found in the PR; blank or declined reviews without
+it), and `pr_review_publish` asks to confirm before creating the pending review (declined: nothing is published). Other
+clients — and 2025-era connections, which this stateless server cannot ask — behave as before.
+
 ### What keeps the review precise and cheap
 
 - **Quote-first anchoring.** A finding goes where its quoted code (`existingCode`) is in the diff; the line
@@ -190,14 +322,19 @@ and works across clients.
   `pnpm measure:context` prints what a full loop returns per tool call.
 - **Metrics.** Every publish appends to `metrics.jsonl` (in `PR_REVIEW_ROOT`, default
   `~/.local/state/pr-review/`): how many drafted comments humans kept, edited or removed, by severity and
-  checklist item. `pr_review_metrics` summarizes them and names the noisiest items.
+  checklist item. `pr_review_metrics` summarizes them and names the noisiest items. In a repo with the
+  asdd-harness-kit, `asdd learn` records that project's reviews (counts per checklist item, no comment text) in the
+  committed weekly learning summaries, so the whole team's review quality shows in `learning_report`, and a rule whose
+  comments humans keep removing becomes a `review:<rule>` noise pattern.
 - **Stable fingerprints.** Each finding gets a fingerprint (path + rule + the code it is on, not the line
   number). A re-review's report says what is **new**, **still open** and **gone** since the last one.
 - **SARIF.** Each draft also writes `findings.sarif` (SARIF 2.1.0), the format of GitHub code scanning and
   CodeQL. To track the findings as code-scanning alerts, a human uploads it:
   `gh api repos/OWNER/REPO/code-scanning/sarifs -f commit_sha=<head> -f ref=refs/pull/<n>/head -f sarif="$(gzip -c findings.sarif | base64)"`.
-- **Offline evaluation.** [`eval/`](eval/README.md) scores the reviewer on labelled cases (precision, recall,
-  F1) before and after a change to the prompt, the rules or the model.
+- **Offline evaluation.** [`eval/`](eval/README.md) scores the reviewer on 35 labelled cases (9 languages, a third
+  clean; checked in `pnpm test`): precision, recall and F1 per language and category, compared with a saved baseline
+  (`pnpm eval score … --baseline`, exit 1 on a drop). `pnpm eval harvest` turns your published reviews into private
+  cases.
 
 ### Review profile
 
@@ -257,7 +394,8 @@ none, the Architecture tab offers a prompt for the agent to write them from the 
 Every client starts the server through **`bin/mcp-stdio`**. GUI apps don't load nvm and start servers from an
 arbitrary directory, so the launcher picks the Node from `.nvmrc` (override with `MCP_NODE=/path/to/node`),
 points tsx at this project's `tsconfig.json` (needed for Nest decorators) and keeps stdout clean for the
-protocol. Replace `/path/to/spec-drift` with this directory's absolute path.
+protocol. `node bin/spec-drift.mjs config --client <client>` writes these blocks for you with the paths resolved; the
+examples below show their shape (`/path/to/spec-drift` is this directory).
 
 **Which repo it works on.** Clients start the server outside your project, so tell it which repo to use:
 `PR_REVIEW_REPO` (PR review) and `ANALYSIS_REPO_ROOT` (analysis), or let the agent pass `repoPath`.
@@ -350,6 +488,42 @@ The package is `private` until it is published to a registry (e.g. GitHub Packag
 config only after publishing it there, with npm pointed at that registry: an unscoped `spec-drift` would
 otherwise resolve to whatever package of that name is on the public npm registry.
 
+## Review in CI
+
+```bash
+node bin/spec-drift.mjs ci-review --kit-repo <owner>/asdd-harness-kit --kit-ref <commit> > .github/workflows/spec-drift-review.yml
+```
+
+prints a GitHub Actions workflow (it writes nothing): on a ready pull request (or by hand with a PR number) it builds this
+server from the kit, installs Semgrep, and runs Claude Code (`anthropics/claude-code-action@v1`) with only the review
+tools allowed and a prompt that ends in `pr_review_publish` — a **pending** review. A pending review belongs to the token
+that created it, so `gh` runs with `SPEC_DRIFT_REVIEWER_TOKEN`, a fine-grained token of the person who submits reviews:
+they find the draft on the PR and submit it, edit it, or drop it. Secrets: `ANTHROPIC_API_KEY` and
+`SPEC_DRIFT_REVIEWER_TOKEN`. Drafts and fork PRs are skipped. With `CI=true` the server keeps `GH_TOKEN` for `gh`
+(locally it drops it, because a stale GUI token breaks `gh`).
+
+## Baseline and trend
+
+Two commands a person (or a CI job) runs — the MCP server only reads what they write, and both files are meant to be
+committed:
+
+```bash
+node bin/spec-drift.mjs baseline --repo /path/to/repo           # dry run: what it would accept
+node bin/spec-drift.mjs baseline --repo /path/to/repo --write   # .semgrep/baseline.json
+node bin/spec-drift.mjs record --repo /path/to/repo             # .semgrep/history/<date>.json (one per day)
+```
+
+- **Baseline.** On a legacy repo the first scan shows every existing violation. `baseline --write` accepts them: each
+  finding is fingerprinted by rule, path, and the normalized text of its line, so a moved line stays existing and an
+  edited one becomes new. Every scan then marks each finding **new** or **existing** and counts **resolved** ones
+  (whole-repository scans only); the dashboard opens on new findings (**New / All**), and the text leads with them.
+  Re-run `baseline --write` deliberately (after a reformat, every line is new).
+- **Trend.** `record` writes a snapshot of a whole-repository scan (totals, per rule / ADR / pack / severity, new
+  findings, ADR coverage, the commit). `drift_trend` compares the snapshots — or the kit's `.harness/audits/` reports with
+  `source: "audit"` — and answers whether drift is going **down (better)**, **up (worse)** or **flat** (within 5 %),
+  with the rules / ADRs / checks / slices that moved most; the dashboard's **Trend** tab charts the last 12 snapshots
+  (crosshair, table view). Record at the end of each sprint, or from a scheduled CI job that commits the file.
+
 ## Configuration
 
 Validated at startup (`src/config/env.schema.ts`); an invalid value stops the server with a clear error.
@@ -368,6 +542,10 @@ Validated at startup (`src/config/env.schema.ts`); an invalid value stops the se
 | `PORT` / `HOST`                | `3010` / `127.0.0.1`        | HTTP transport                                                                      |
 | `MCP_API_KEY`                  | —                           | HTTP shared secret (≥ 16 chars); **required** when `HOST` is not loopback           |
 | `MCP_ALLOWED_ORIGINS`          | —                           | Extra browser origins allowed on `/mcp` (comma-separated); localhost always allowed |
+| `SPEC_DRIFT_TOOLSETS`          | all                         | `analysis`, `review`, `audit` to load ([Toolsets](#toolsets))                       |
+| `SPEC_DRIFT_ENGINE`            | `semgrep`                   | `codeql` to run the analysis on CodeQL queries under `codeql/`                      |
+| `CODEQL_LANGUAGE`              | detected                    | CodeQL extractor (e.g. `javascript-typescript`, `python`, `java-kotlin`)            |
+| `SPEC_DRIFT_REPOS`             | the analyzed repo           | Repositories for `repos_overview` (comma-separated paths)                           |
 | `MCP_NODE`                     | Node from `.nvmrc`          | Node binary used by `bin/mcp-stdio`                                                 |
 
 ### Security model
@@ -404,6 +582,17 @@ AnalysisModule.forRoot({ engine: CodeqlEngineModule }); // any module that provi
 | `loadRules(packs)`    | parse YAML `rules:` (id, severity, message, ADR) | read query metadata (`@id`, `@problem.severity`, `@name`, tags)                |
 | `run(request)`        | `semgrep --config … --json -- <paths>`           | `codeql database create` + `database analyze --format=sarif-latest`, map SARIF |
 | `authoringGuide()`    | how to write Semgrep rules                       | how to write CodeQL queries                                                    |
+
+**CodeQL.** `SPEC_DRIFT_ENGINE=codeql` switches to the CodeQL adapter (`engines/codeql/`): queries under
+`<repo>/codeql/` (top-level folders are sets, `.ql` / `.qls` files packs), rule metadata from the QLDoc header (`@id`,
+`@name`, `@problem.severity`, `adr:ADR-0007` in `@tags`), `codeql database create` (language from `CODEQL_LANGUAGE` or
+the most common source language) and `codeql database analyze` to SARIF in a temporary folder. Without the `codeql` CLI
+a scan fails with a message naming it. The adapter is tested with a stubbed CLI; it has not been run against a real
+CodeQL installation in this repository's CI.
+
+The Semgrep module wires a `CompositeAnalyzer`: Semgrep plus the dependency-graph engine
+(`engines/dependencies/`), whose rules come from the `Dependency layers` table. Each pack goes to the engine that listed
+it, findings are merged, and the engine identity, rule tests and rules folder stay Semgrep's.
 
 The contract (relative paths never parsed as options; `run` resolves on violations and returns
 `status: 'failed'` when the tool produced nothing; findings carry declared rule ids) is exercised by
@@ -443,15 +632,19 @@ src/
 ├── app.module.ts              Config + MCP + feature modules, MCP error interceptor
 ├── config/                    zod-validated environment, paths
 ├── common/                    process runner (the only place that spawns git / gh / analyzers),
-│                              HTTP guards, locks, atomic writes, MCP Apps helpers
+│                              HTTP guards, locks, atomic writes, MCP Apps helpers, elicitation
 ├── health/                    GET /health
+├── cli/                       spec-drift baseline / record / config / ci-review (run once, no MCP)
 ├── analysis/                  AnalysisModule.forRoot({ engine })
 │   ├── analysis.tools.ts / .prompts.ts / .service.ts / .schemas.ts / .presenter.ts / .types.ts
 │   ├── ports/                 CodeAnalyzer port + CODE_ANALYZER token
-│   ├── domain/                pure: pack selection, drift report, pack summary
-│   └── engines/semgrep/       Semgrep adapter
+│   ├── domain/                pure: pack selection, drift report, pack summary, baseline, trend, ADR coverage,
+│   │                          rule readiness, drift origin, fix prompt, repos overview
+│   ├── jobs/                  background scans (analysis_start / analysis_job), process memory
+│   └── engines/               composite analyzer; semgrep/ (default), codeql/, dependencies/ (layer and cycle rules)
 ├── audit/                     harness audit (former spec-drift-auditor): tools, prompts, spec:// resources
 │   ├── audit.service.ts       thin projection of the vendored harness checks (harness-libs.ts → src/harness/)
+│   ├── domain/                pure: traceability matrix
 │   └── audit-paging.ts        pure: fit results to the MCP App budget, page tokens
 ├── harness/                   GENERATED copies of cli/src/harness libs (drift, semgrep, audit, learning, knowledge store)
 └── pr-review/
@@ -464,7 +657,8 @@ src/
     ├── verification/          verification pass
     ├── requirements/          ticket → criteria, verdicts, summary block, TicketService
     ├── context/               per-group diff, code reading, existing comments, re-review
-    ├── metrics/               kept / edited / removed per published review
+    ├── metrics/               kept / edited / removed and cost per published review; offline eval scoring
+    ├── risk/                  changed files ranked by risk ("Read first")
     ├── prompt/                agent prompt with calibration examples
     └── engine/                review engine (third-party notices: THIRD_PARTY_NOTICES.md):
                                parse, filter, rules + item ids, bundling, anchoring, checks, profile, SARIF

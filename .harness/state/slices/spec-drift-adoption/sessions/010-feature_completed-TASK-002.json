@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-adoption",
+  "concerns": [],
+  "session_id": "sess-spec-drift-adoption-010",
+  "timestamp": "2026-11-13T20:01:02.950Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: typecheck OK, lint no errors (2 warnings + 1 info pre-existing), test 186/186, build OK, test:e2e 113/113. trend.spec (5): direction +-5% flat, points oldest first, per-key change, new as measure with a baseline, audit points by check/slice. trend-chart.spec: nice scale, geometry, verdict, crosshair snapping. trend.e2e: no history -> record command named; spec-drift record (process) writes then replaces today's snapshot; drift_trend analysis 4 -> 1 better with per-rule change; scan summary carries trend; server writes nothing; audit trend by check and by slice (triage.json skipped). ui.e2e in Chromium: Trend tab verdict, 4 dots, table with 4 rows, tooltip on hover. Rendered and inspected light/dark screenshots; fixed tooltip covering the title and oversized axis text; series color #2f6fde / #5f93ee passes the dataviz validator in both modes."
+}

@@ -136,7 +136,7 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "asdd kit agents-lint (cli/src/kit/agents-lint.mjs, registered in main.mjs HELP and kit dispatch, documented in cli/README.md): A-001/002/003/005/007/008/009/010/011/013/016/017/018/019/020/022/023/024/025 and the fleet promotions AL-101 (A-014), AL-103 (A-021 + tier vs capabilities: subagent_tools only for the orchestrator), AL-303 (A-015); fleet AL-301 handoff cycles (redirects excluded), AL-302 dangling/cross-module agent names and unknown mounted skills; kit or project mode; --only. Reuses the install parser (agent-frontmatter.mjs). On HEAD's QA and knowledge agents it reports 15 rules each incl. A-023 (manifest write). cli/test/agents-lint.test.mjs 10/10 (fixtures per rule, shipped-content AC-001/AC-002 checks, renderer projection per runtime). npm test runs kit agents-lint and the tests: 131/131. cli/versions.json regenerated (new agent and module skills, template removed). | Re-verified after the version bump 3.9.0 -> 3.10.0 (package.json, package-lock.json, cli/versions.json via asdd kit versions bump): npm test 131/131 (incl. install.sh version checks, kit skills-lint, kit agents-lint). | Re-verified after the README update for 3.10 (README.md: rendered runtime agents, tiers/envelopes, kit lints, upgrade note; cli/README.md layout and install phases; cli/modules/README.md; cli/runtimes READMEs): npm test 131/131.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit agents-lint && npm test` exits 0.",
       "scope_paths": [
         "cli/src/kit/agents-lint.mjs",
         "cli/src/main.mjs",
@@ -145,7 +145,7 @@
         "cli/README.md",
         "cli/versions.json"
       ],
-      "evidence_hash": "ea15f8f83e8d3b6015cea9d7b9fecf5a4c6bbed662744a99bc4154b05e3ff221"
+      "evidence_hash": "af6ee89cba138ca3d390c4a0787b3f88106a2614548890926b0c08ffec08fffc"
     }
   ]
 }

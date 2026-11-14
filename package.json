@@ -1,6 +1,6 @@
 {
   "name": "asdd-harness-kit",
-  "version": "3.10.0",
+  "version": "3.11.0",
   "description": "Portable process layer for Agent Specification-Driven Development (ASDD) and Harness Engineering",
   "bin": {
     "asdd": "cli/bin/asdd.mjs",
@@ -31,7 +31,7 @@
     "build:obfuscate": "node cli/src/kit/build.mjs --obfuscate",
     "prepack": "npm run build",
     "prepublishOnly": "npm test",
-    "test": "npm run build && node cli/bin/asdd.mjs kit vendor --check && node cli/bin/asdd.mjs kit self --check && bash cli/test/install.sh && bash cli/test/lifecycle.sh && node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit agents-lint && node --test cli/test/guidance.test.mjs cli/test/skills-lint.test.mjs cli/test/agents-lint.test.mjs cli/test/cli.test.mjs cli/test/install-lifecycle.test.mjs cli/src/harness/command-gate.test.mjs cli/src/harness/sync-knowledge.test.mjs cli/src/harness/sync-state.test.mjs cli/src/harness/drift-lib.test.mjs cli/src/harness/semgrep-lib.test.mjs cli/src/harness/audit-codebase.test.mjs cli/src/harness/learning-lib.test.mjs cli/modules/http-api/adapters/openapi.test.mjs",
+    "test": "npm run build && node cli/bin/asdd.mjs kit vendor --check && node cli/bin/asdd.mjs kit self --check && bash cli/test/install.sh && bash cli/test/lifecycle.sh && node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit agents-lint && node --test cli/test/guidance.test.mjs cli/test/skills-lint.test.mjs cli/test/agents-lint.test.mjs cli/test/cli.test.mjs cli/test/install-lifecycle.test.mjs cli/src/harness/command-gate.test.mjs cli/src/harness/sync-knowledge.test.mjs cli/src/harness/sync-state.test.mjs cli/src/harness/drift-lib.test.mjs cli/src/harness/semgrep-lib.test.mjs cli/src/harness/audit-codebase.test.mjs cli/src/harness/learning-lib.test.mjs cli/src/harness/pipeline-metrics.test.mjs cli/src/harness/init-flow.test.mjs cli/src/harness/converge-lib.test.mjs cli/src/harness/pipeline-html.test.mjs cli/src/harness/asdd-skills.test.mjs cli/src/harness/init-slice.test.mjs cli/src/harness/amend-slice.test.mjs cli/src/harness/hill-lib.test.mjs cli/src/harness/waves-lib.test.mjs cli/src/harness/portfolio-lib.test.mjs cli/src/harness/converge-eval-lib.test.mjs cli/src/harness/tracker-sync-lib.test.mjs cli/src/harness/stop-mode.test.mjs cli/src/harness/spec-source-lib.test.mjs cli/modules/http-api/adapters/openapi.test.mjs",
     "test:full-flow": "bash cli/test/full-flow.sh",
     "vendor:harness": "node cli/bin/asdd.mjs kit vendor",
     "versions": "node cli/bin/asdd.mjs kit versions",

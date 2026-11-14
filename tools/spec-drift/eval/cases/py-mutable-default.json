@@ -1,0 +1,15 @@
+{
+	"id": "py-mutable-default",
+	"description": "The default list is created once; every call without `tags` appends to the same list.",
+	"language": "python",
+	"category": "correctness",
+	"diff": "diff --git a/app/catalog.py b/app/catalog.py\n--- a/app/catalog.py\n+++ b/app/catalog.py\n@@ -1,2 +1,3 @@\n-def make_item(name):\n-    return {\"name\": name, \"tags\": []}\n+def make_item(name, tags=[]):\n+    tags.append(\"new\")\n+    return {\"name\": name, \"tags\": tags}\n",
+	"expected": [
+		{
+			"path": "app/catalog.py",
+			"startLine": 1,
+			"ruleId": "python.mutable-default-arguments-and-shared-state",
+			"note": "mutable default argument"
+		}
+	]
+}

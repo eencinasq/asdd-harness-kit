@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": true,
   "created_at": "2026-11-10T02:28:26.326Z",
-  "updated_at": "2026-11-12T19:57:28.308Z",
+  "updated_at": "2026-11-14T03:00:53.501Z",
   "paths": {
     "specs": ".harness/specs/spec-drift-merge",
     "tasks": ".harness/specs/spec-drift-merge/tasks.md",

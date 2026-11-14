@@ -1,0 +1,15 @@
+{
+	"id": "java-string-identity",
+	"description": "`==` compares references: a role read from the token is never the same object as the literal.",
+	"language": "java",
+	"category": "correctness",
+	"diff": "diff --git a/src/main/java/com/acme/auth/Access.java b/src/main/java/com/acme/auth/Access.java\n--- a/src/main/java/com/acme/auth/Access.java\n+++ b/src/main/java/com/acme/auth/Access.java\n@@ -2,6 +2,6 @@\n \n public final class Access {\n     public static boolean canDelete(User user) {\n-        return user.isOwner();\n+        return user.isOwner() || user.getRole() == \"admin\";\n     }\n }\n",
+	"expected": [
+		{
+			"path": "src/main/java/com/acme/auth/Access.java",
+			"startLine": 5,
+			"ruleId": "java.logic-error-detection",
+			"note": "string compared with =="
+		}
+	]
+}

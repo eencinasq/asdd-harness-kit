@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-030",
+  "timestamp": "2026-11-14T01:12:21.477Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-001 (DRIFT-02 after spec-drift-depth).",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/domain/adr-coverage.ts",
+    "tools/spec-drift/src/analysis/domain/adr-coverage.spec.ts",
+    "tools/spec-drift/src/analysis/analysis.service.ts",
+    "tools/spec-drift/src/analysis/analysis.tools.ts",
+    "tools/spec-drift/src/analysis/analysis.prompts.ts",
+    "tools/spec-drift/src/analysis/analysis.output.ts",
+    "tools/spec-drift/src/analysis/analysis.types.ts",
+    "tools/spec-drift/src/analysis/analysis.presenter.ts",
+    "tools/spec-drift/test/rule-coverage.e2e-spec.ts",
+    "tools/spec-drift/test/mcp.e2e-spec.ts"
+  ]
+}

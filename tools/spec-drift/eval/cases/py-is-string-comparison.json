@@ -1,0 +1,15 @@
+{
+	"id": "py-is-string-comparison",
+	"description": "`is` compares identity, not value: a status read from the database is a different string object.",
+	"language": "python",
+	"category": "correctness",
+	"diff": "diff --git a/app/users.py b/app/users.py\n--- a/app/users.py\n+++ b/app/users.py\n@@ -1,2 +1,2 @@\n def can_login(user):\n-    return user.active\n+    return user.active and user.status is \"verified\"\n",
+	"expected": [
+		{
+			"path": "app/users.py",
+			"startLine": 2,
+			"ruleId": "python.identity-and-equality-comparisons",
+			"note": "is with a string literal"
+		}
+	]
+}

@@ -2,7 +2,8 @@
 /**
  * Verify-on-Stop hook (dual protocol, auto-detected from the stdin payload).
  * Runs `asdd check --live` (check-invariants.mjs next to this file) and, on failure,
- * blocks the session end so the agent fixes the harness first.
+ * blocks the session end so the agent fixes the harness first — unless stop mode is
+ * `advisory` (`stop.mode` in project.json or `HARNESS_STOP_MODE=advisory`).
  *
  * Cursor:       `.cursor/hooks.json` → stop hook. Output `{}` or `{ "followup_message": "..." }`.
  * Claude Code:  `.claude/settings.json` → Stop hook. Output `{}` or `{ "decision": "block", "reason": "..." }`
@@ -15,6 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isAdvisoryStop } from './stop-mode.mjs';
 
 const MAX_OUTPUT = 12000;
 
@@ -85,10 +87,19 @@ if (result.status === 0) {
 
 const output = `${result.stdout || ''}${result.stderr || ''}`.trim();
 const clipped = output.length > MAX_OUTPUT ? `${output.slice(0, MAX_OUTPUT)}\n…(truncated)` : output;
+const detail = clipped || `check-invariants.mjs exited ${result.status} with no output.`;
+
+if (isAdvisoryStop(root)) {
+  // Advisory: still ran --live (learning signals), but do not block the session.
+  console.error(['Verify-on-Stop advisory: asdd check reported FAILs (session not blocked).', detail].join('\n'));
+  emit({});
+  process.exit(0);
+}
+
 emitBlock([
   'Verify-on-Stop failed. Do not mark the task passing and do not end the session.',
   'Fix every FAIL from `asdd check`. The stop hook runs that command again when you finish.',
   '',
-  clipped || `check-invariants.mjs exited ${result.status} with no output.`,
+  detail,
 ].join('\n'));
 process.exit(0);

@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "spec-drift-adoption",
+  "source_tasks": ".harness/specs/spec-drift-adoption/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Baseline",
+      "user_visible_behavior": "A Tech Lead freezes existing violations; the analysis shows what is new.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after spec-drift-demand changed shared spec-drift files: typecheck OK, lint no errors (2 pre-existing warnings), test 226/226, build OK, test:e2e 140/140; ROADMAP.md has its P sections (grep #### P = 12).",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis/domain/baseline.ts",
+        "tools/spec-drift/src/analysis/domain/baseline.spec.ts",
+        "tools/spec-drift/test/baseline.e2e-spec.ts",
+        "tools/spec-drift/src/analysis/analysis.service.ts",
+        "tools/spec-drift/src/analysis/analysis.types.ts",
+        "tools/spec-drift/src/analysis/analysis.output.ts",
+        "tools/spec-drift/src/analysis/analysis.presenter.ts",
+        "tools/spec-drift/src/cli",
+        "tools/spec-drift/src/main.ts",
+        "tools/spec-drift/bin/spec-drift.mjs",
+        "tools/spec-drift/ui/analysis-dashboard",
+        "tools/spec-drift/ui/analysis-dashboard.html"
+      ],
+      "evidence_hash": "650e66a3635abc1f3492d49d3f8c34f4c44e6dd55ddef7622bfe65c78df87762"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Trend",
+      "user_visible_behavior": "drift_trend and the dashboard chart answer whether drift goes up or down.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e` exits 0.",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis/domain/trend.ts",
+        "tools/spec-drift/src/analysis/domain/trend.spec.ts",
+        "tools/spec-drift/src/analysis/analysis.tools.ts",
+        "tools/spec-drift/src/audit/audit.service.ts",
+        "tools/spec-drift/test/trend.e2e-spec.ts",
+        "tools/spec-drift/test/mcp.e2e-spec.ts",
+        "tools/spec-drift/src/analysis/analysis.service.ts",
+        "tools/spec-drift/src/analysis/analysis.types.ts",
+        "tools/spec-drift/src/analysis/analysis.output.ts",
+        "tools/spec-drift/src/analysis/analysis.presenter.ts",
+        "tools/spec-drift/src/cli",
+        "tools/spec-drift/src/main.ts",
+        "tools/spec-drift/bin/spec-drift.mjs",
+        "tools/spec-drift/ui/analysis-dashboard",
+        "tools/spec-drift/ui/analysis-dashboard.html",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "c3ab19aed726bf387292a64348ada8c7b574fd866b7bf606be6db1c81311830e"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Toolsets",
+      "user_visible_behavior": "A team loads only the analysis, review, or audit tools.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after spec-drift-demand changed shared spec-drift files: typecheck OK, lint no errors (2 pre-existing warnings), test 226/226, build OK, test:e2e 140/140; ROADMAP.md has its P sections (grep #### P = 12).",
+      "scope_paths": [
+        "tools/spec-drift/src/config",
+        "tools/spec-drift/src/app.module.ts",
+        "tools/spec-drift/src/analysis/analysis.module.ts",
+        "tools/spec-drift/src/audit/audit.module.ts",
+        "tools/spec-drift/src/pr-review/pr-review.module.ts",
+        "tools/spec-drift/test/toolsets.e2e-spec.ts"
+      ],
+      "evidence_hash": "adb1e3441b81671b817a55e96b90900ab9cad8bc843d8703563ad05e140d09b5"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Install guide and config command",
+      "user_visible_behavior": "A teammate installs spec-drift by pasting a generated config.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e` exits 0.",
+      "scope_paths": [
+        "tools/spec-drift/src/cli",
+        "tools/spec-drift/README.md",
+        "tools/spec-drift/docs",
+        "tools/spec-drift/package.json",
+        "cli/mcp/README.md",
+        "tools/spec-drift/test/config.e2e-spec.ts",
+        "tools/spec-drift/src/pr-review/prompt/review-prompt.ts",
+        "tools/spec-drift/src/pr-review/engine/findings-format.ts",
+        "tools/spec-drift/src/pr-review/engine/types.ts",
+        "tools/spec-drift/bin/spec-drift.mjs"
+      ],
+      "evidence_hash": "d6c31da6b5c6ea0b2fbdb9c650f52aa6d02f5a485c91ebdacc400bb13fef3773"
+    }
+  ]
+}

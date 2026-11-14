@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-016",
+  "timestamp": "2026-11-12T23:35:26.769Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: typecheck OK, lint no errors (2 warnings + 1 info pre-existing), test 175/175, build OK, test:e2e 107/107 (ui.e2e 'analysis dashboard renders a real spec-drift result' with the new ADRs tab). rule-coverage.spec (UI): test badge passed/failed/no test/tests not run; ADR tab view (headline, uncovered with prompt, covered, dangling, exempt count, no folder). Dashboard: ADRs tab with 'Ask the agent to write the rule' per uncovered ADR (sendMessage, as PR review does), dangling rules, covered list; test badge per rule in the drift tab; panel hidden in the no-rules state."
+}

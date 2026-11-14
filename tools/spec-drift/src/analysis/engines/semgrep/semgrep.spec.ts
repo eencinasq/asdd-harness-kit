@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
 import { countBy } from '../../domain/count-by.ts';
-import { normalizeCheckId, parseFindings, parseSemgrepJson } from './semgrep-output.ts';
+import { SemgrepAnalyzer } from './semgrep.analyzer.ts';
+import { normalizeCheckId, parseFindings, parseSemgrepJson, parseTestOutput } from './semgrep-output.ts';
 import { packIdFromFile, parseRuleCatalog, toSeverity } from './semgrep-rules.ts';
 
 const BOUNDARIES_YAML = `rules:
@@ -110,5 +111,31 @@ describe('rule files', () => {
 			['CRITICAL', 'high', 'Error', 'MEDIUM', 'warning', 'LOW', 'INFO', 'odd'].map((s) => toSeverity(s)),
 			['ERROR', 'ERROR', 'ERROR', 'WARNING', 'WARNING', 'INFO', 'INFO', 'INFO'],
 		);
+	});
+});
+
+describe('rule-coverage REQ-003/004: rule tests', () => {
+	test('semgrep --test output → passed / failed per annotated rule, and the files with errors', () => {
+		const out = JSON.stringify({
+			config_missing_tests: ['.semgrep/standards/x.yml'],
+			config_with_errors: [{ file: '.semgrep/broken.yml' }],
+			results: {
+				'.semgrep/architecture/a.yml': {
+					checks: { 'demo.ok': { passed: true }, 'demo.bad': { passed: false } },
+				},
+			},
+		});
+		assert.deepEqual(parseTestOutput(out), {
+			byRule: { 'demo.ok': 'passed', 'demo.bad': 'failed' },
+			invalidFiles: ['.semgrep/broken.yml'],
+		});
+		assert.equal(parseTestOutput('not json'), undefined);
+	});
+
+	test('the authoring guide requires a test file per rule file and semgrep --test', () => {
+		const guide = new SemgrepAnalyzer({} as never).authoringGuide().join('\n');
+		assert.match(guide, /ruleid: <rule id>/);
+		assert.match(guide, /ok: <rule id>/);
+		assert.match(guide, /semgrep --test \.semgrep/);
 	});
 });

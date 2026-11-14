@@ -113,6 +113,11 @@
             "minLength": 1
           }
         },
+        "hill": {
+          "type": "string",
+          "enum": ["uphill", "downhill"],
+          "description": "Shape Up hill-chart position for this feature: uphill (unknowns) or downhill (execution)."
+        },
         "notes": {
           "type": "string",
           "description": "Optional free text: REQ links, blockers (session-loop.md)."

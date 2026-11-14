@@ -1,4 +1,5 @@
 import * as query from '../harness/knowledge-query.mjs';
+import { computePipelineMetrics as computePipelineMetricsFn } from '../harness/pipeline-metrics.mjs';
 
 /**
  * The knowledge queries are the harness's own `cli/src/harness/knowledge-query.mjs` (the CLI agents and skills
@@ -19,3 +20,6 @@ export type KnowledgeQuery = {
 
 /** Bundled with the server: no runtime lookup of the project's harness CLI. */
 export const knowledgeQuery = query as unknown as KnowledgeQuery;
+
+/** Same object as `asdd status --json` (ASDD-ROADMAP P1.2). */
+export const computePipelineMetrics = (root: string) => computePipelineMetricsFn({ root }) as Record<string, unknown>;

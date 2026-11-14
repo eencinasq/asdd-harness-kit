@@ -7,6 +7,7 @@ import { McpStdioLogger, McpStdioServer } from '@nestjs/mcp';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 
 import { AppModule } from './app.module.ts';
+import { CLI_COMMANDS } from './cli/cli.ts';
 import type { Env } from './config/env.schema.ts';
 
 /**
@@ -70,7 +71,18 @@ const bootstrapStdio = async (): Promise<void> => {
 	await app.close();
 };
 
-const bootstrap = process.argv.includes('--stdio') ? bootstrapStdio : bootstrapHttp;
+/** `spec-drift <command>`: a CLI command a person runs (spec-drift-adoption ADR-002), not the MCP server. */
+const runCommand = async (command: string): Promise<void> => {
+	const { runCli } = await import('./cli/cli.ts');
+	process.exitCode = await runCli(command as never, process.argv.slice(3));
+};
+
+const command = process.argv[2];
+const bootstrap = CLI_COMMANDS.includes(command as never)
+	? () => runCommand(command as string)
+	: process.argv.includes('--stdio')
+		? bootstrapStdio
+		: bootstrapHttp;
 
 bootstrap().catch((error: unknown) => {
 	console.error(error);

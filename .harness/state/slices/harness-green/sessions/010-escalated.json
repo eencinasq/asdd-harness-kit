@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-harness-green-010",
+  "timestamp": "2026-11-14T02:22:25.831Z",
+  "agent": "harness",
+  "human": "harness",
+  "slice_id": "harness-green",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Escalating lite → escalated: E1-scope-spread",
+  "concerns": []
+}

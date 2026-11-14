@@ -2,12 +2,18 @@
 /**
  * harness-status.mjs — compact project health dashboard (v3.0).
  * Reads generated registry.json and per-slice manifests.
- * Usage: asdd status
+ * Usage: asdd status [--metrics] [--json] [--html]
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { computePipelineMetrics, formatPipelineMetrics } from './pipeline-metrics.mjs';
+import { renderPipelineHtml } from './pipeline-html.mjs';
 
 const root = process.cwd();
+const argv = process.argv.slice(2);
+const wantMetrics = argv.includes('--metrics');
+const wantJson = argv.includes('--json');
+const wantHtml = argv.includes('--html');
 
 function readJson(rel) {
   const p = join(root, rel);
@@ -27,6 +33,20 @@ function fmtDate(iso) {
 
 function pad(s, w) {
   return String(s).padEnd(w);
+}
+
+if (wantHtml) {
+  process.stdout.write(renderPipelineHtml({ root }));
+  process.exit(0);
+}
+
+if (wantMetrics || wantJson) {
+  const metrics = computePipelineMetrics({ root });
+  if (wantJson) {
+    process.stdout.write(`${JSON.stringify(metrics, null, 2)}\n`);
+    process.exit(0);
+  }
+  process.stdout.write(`${formatPipelineMetrics(metrics)}\n`);
 }
 
 const registry = readJson('.harness/state/registry.json');
@@ -84,6 +104,21 @@ for (const s of slices) {
   }
 }
 if (!anySignal) console.log('  (none)');
+
+console.log('');
+console.log('== Hill (uphill) ==');
+{
+  const { listUphillFeatures } = await import('./hill-lib.mjs');
+  const uphill = listUphillFeatures(root);
+  if (uphill.length === 0) {
+    console.log('  (none)');
+  } else {
+    for (const u of uphill) {
+      const late = u.phase === 'qa' || u.phase === 'knowledge' ? ' — late in cycle' : '';
+      console.log(`  [${u.slice_id}] ${u.feature_id} (${u.status}) @${u.phase || '—'}${late}`);
+    }
+  }
+}
 
 console.log('');
 console.log('== Gate Summary ==');

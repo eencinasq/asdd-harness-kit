@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-empty",
+  "concerns": [],
+  "session_id": "sess-spec-drift-empty-040",
+  "timestamp": "2026-11-14T01:35:39.231Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-001 (DRIFT-02 after spec-drift-demand).",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis",
+    "tools/spec-drift/src/pr-review/architecture",
+    "tools/spec-drift/ui/analysis-dashboard",
+    "tools/spec-drift/ui/analysis-dashboard.html",
+    "tools/spec-drift/test/empty-analysis.e2e-spec.ts"
+  ]
+}

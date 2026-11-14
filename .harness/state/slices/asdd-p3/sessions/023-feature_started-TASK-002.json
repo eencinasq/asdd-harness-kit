@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "asdd-p3",
+  "concerns": [],
+  "session_id": "sess-asdd-p3-023",
+  "timestamp": "2026-11-14T02:55:16.097Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-002 (DRIFT-02 after the 3.11.0 bump).",
+  "scope_paths": [
+    "cli/src/harness/portfolio-lib.mjs",
+    "cli/src/harness/portfolio-lib.test.mjs",
+    "cli/src/harness/portfolio.mjs",
+    "cli/src/harness/commands.mjs",
+    "cli/README.md"
+  ]
+}

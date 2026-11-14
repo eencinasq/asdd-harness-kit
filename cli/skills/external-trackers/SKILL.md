@@ -1,9 +1,8 @@
 ---
 name: external-trackers
 description: >-
-  Reads a bet pitch from a tracker (Linear, Jira, GitHub, manual) into the ASDD handoff fields and syncs ASDD status
-  back. Use when a pitch or intent references a tracker item, or to sync status. Do NOT use for splitting a pitch into
-  intents — use product-delivery; or for shaping — use shape-up.
+  Syncs a tracker pitch with the ASDD handoff. Use when an intent cites a tracker item. Do NOT use to split pitches —
+  use product-delivery.
 metadata:
   tier: leaf
 ---
@@ -85,12 +84,14 @@ comments, ticks, and closes on the tracker items of this pitch. It never writes 
 
 ### Step 4: Sync status back (only when enabled)
 
-- **Action:** map the event to its tracker action: slice created → comment with the slice ID and intent path; phase
-  completed → comment with the phase and evidence summary; feature passing → tick the matching must-have; slice
-  completed → close the scope issue; dissent logged → comment with the note and severity; appetite warning → comment
-  that the scope may not fit the cycle (hill chart still uphill late).
-- **Target:** the tracker item of this pitch or scope.
-- **Assertion:** reading the item back through the MCP shows the comment or state change.
+- **Action:** first run `asdd tracker-sync --slice <id>` (add `--json` for the machine plan). It derives the outbound
+  actions from sessions + `handoff.yaml` (slice created, phase completed, feature passing, slice DONE, dissent). Apply
+  each action through the tracker MCP (comment / tick / close). Use `asdd tracker-sync --apply` only to store a **local
+  receipt** under `.harness/state/tracker-sync/` after you performed the MCP writes — it does not call the tracker.
+  Appetite warning (hill still uphill late) remains a manual comment when relevant.
+- **Target:** the tracker item of this pitch or scope; optional local receipt.
+- **Assertion:** reading the item back through the MCP shows the comment or state change; `asdd tracker-sync --json`
+  lists the same event set.
 
 Guardrails: do not reshape (flag `PENDING_DEFINITION`); do not expand scope (ask before starting nice-to-haves); do not
 invent estimates (report progress against the appetite); a no-go is a hard boundary that needs a new pitch and bet.

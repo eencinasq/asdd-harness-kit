@@ -1,0 +1,174 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "spec-drift-demand",
+  "source_tasks": ".harness/specs/spec-drift-demand/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Drift origin",
+      "user_visible_behavior": "A Tech Lead sees the commit and PR that introduced a finding.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e` exits 0.",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis/domain/drift-origin.ts",
+        "tools/spec-drift/src/analysis/domain/drift-origin.spec.ts",
+        "tools/spec-drift/src/analysis/analysis.service.ts",
+        "tools/spec-drift/src/analysis/analysis.tools.ts",
+        "tools/spec-drift/src/analysis/analysis.output.ts",
+        "tools/spec-drift/src/analysis/analysis.schemas.ts",
+        "tools/spec-drift/test/drift-origin.e2e-spec.ts",
+        "tools/spec-drift/test/mcp.e2e-spec.ts"
+      ],
+      "evidence_hash": "b043dff00939069ba4b0aa6f8afa9db8503a64035f1cee1bcb0ca8cb77241e7e"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Guided fix",
+      "user_visible_behavior": "The agent can be asked to fix a rule's violations and rescan.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e` exits 0.",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis/domain/fix-prompt.ts",
+        "tools/spec-drift/src/analysis/domain/fix-prompt.spec.ts",
+        "tools/spec-drift/src/analysis/analysis.prompts.ts",
+        "tools/spec-drift/ui/analysis-dashboard",
+        "tools/spec-drift/test/fix-prompt.e2e-spec.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts",
+        "tools/spec-drift/src/analysis/analysis.service.ts",
+        "tools/spec-drift/test/ui/host.ts",
+        "tools/spec-drift/test/mcp.e2e-spec.ts"
+      ],
+      "evidence_hash": "06fb9cda7138d76c80f0e9df8116d4a287a9d824d48af7d06237afb2be7d6df3"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Review cost and time",
+      "user_visible_behavior": "Each published review records its time and calls.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "typecheck OK, lint no errors (2 pre-existing warnings; the new noTemplateCurlyInString on the intentional GitHub expression in ci-review.ts is annotated), test 226/226, build OK, test:e2e 140/140. review-cost.spec 2/2; pr-review.e2e 29/29 asserts cost (minutes, byTool start=1, submit_findings>=2, chars, estTokens = chars/4) and the medians line in pr_review_metrics.",
+      "scope_paths": [
+        "tools/spec-drift/src/pr-review/metrics",
+        "tools/spec-drift/src/pr-review/pr-review.service.ts",
+        "tools/spec-drift/src/pr-review/pr-review.tools.ts",
+        "tools/spec-drift/src/pr-review/workspace",
+        "tools/spec-drift/test/pr-review.e2e-spec.ts"
+      ],
+      "evidence_hash": "d4fa4c58a94e6a057a742bf261d122623111d4c4c3e12df1b729847d9bd3ede6"
+    },
+    {
+      "id": "TASK-004",
+      "title": "CI mode",
+      "user_visible_behavior": "A CI workflow drafts a pending review a human submits.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "typecheck OK, lint no errors (2 pre-existing warnings; the new noTemplateCurlyInString on the intentional GitHub expression in ci-review.ts is annotated), test 226/226, build OK, test:e2e 140/140. ci-review.spec 1/1 (workflow parses; claude-code-action@v1; reviewer token; allowedTools = the 9 review tools; pending-only prompt; forks skipped); ci-review.e2e 2/2 (CLI prints, writes nothing, bad --kit-repo exits 2; GH_TOKEN kept only with CI=true). Not run on GitHub Actions.",
+      "scope_paths": [
+        "tools/spec-drift/src/cli",
+        "tools/spec-drift/bin/spec-drift.mjs",
+        "tools/spec-drift/src/common/process/process-runner.service.ts",
+        "tools/spec-drift/test/ci-review.e2e-spec.ts",
+        "tools/spec-drift/src/cli/ci-review.ts",
+        "tools/spec-drift/src/cli/ci-review.spec.ts"
+      ],
+      "evidence_hash": "3fbbae6d55e6fc43f614d69f1d79a6f60df209141c59d37a61841c17b26f1cc2"
+    },
+    {
+      "id": "TASK-005",
+      "title": "CodeQL engine",
+      "user_visible_behavior": "CodeQL can replace Semgrep as the engine.",
+      "status": "passing",
+      "priority": 5,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-005"
+      ],
+      "depends_on": [
+        "TASK-004"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "typecheck OK, lint no errors (2 pre-existing warnings; the new noTemplateCurlyInString on the intentional GitHub expression in ci-review.ts is annotated), test 226/226, build OK, test:e2e 140/140. codeql.spec 4/4 with a stubbed CLI (query metadata, SARIF mapping, database create/analyze args, path filter, missing CLI); codeql.e2e 1/1 with SPEC_DRIFT_ENGINE=codeql: packs listed, scan names the missing CLI. CodeQL is not installed here: no run against real CodeQL.",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis/engines/codeql",
+        "tools/spec-drift/src/app.module.ts",
+        "tools/spec-drift/src/config/env.schema.ts",
+        "tools/spec-drift/test/codeql.e2e-spec.ts",
+        "tools/spec-drift/src/config/engine.ts"
+      ],
+      "evidence_hash": "de5d2d16fd0897944f8ad3f4b086690d1fd46ce46cad188b1ccb5035e1cdc10d"
+    },
+    {
+      "id": "TASK-006",
+      "title": "Multi-repo overview and docs",
+      "user_visible_behavior": "One view summarizes several repositories.",
+      "status": "passing",
+      "priority": 6,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-006"
+      ],
+      "depends_on": [
+        "TASK-005"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e` exits 0.",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis/domain/repos-overview.ts",
+        "tools/spec-drift/src/analysis/domain/repos-overview.spec.ts",
+        "tools/spec-drift/src/analysis/analysis.service.ts",
+        "tools/spec-drift/src/analysis/analysis.tools.ts",
+        "tools/spec-drift/src/analysis/analysis.output.ts",
+        "tools/spec-drift/src/config/env.schema.ts",
+        "tools/spec-drift/test/repos-overview.e2e-spec.ts",
+        "tools/spec-drift/README.md",
+        "tools/spec-drift/docs",
+        "tools/spec-drift/test/mcp.e2e-spec.ts"
+      ],
+      "evidence_hash": "30d51bc9bd7b4927ad211f07fea5fac946aa58cc2affb33c4fdf23ad44e7479f"
+    }
+  ]
+}

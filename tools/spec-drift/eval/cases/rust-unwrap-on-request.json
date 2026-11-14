@@ -1,0 +1,15 @@
+{
+	"id": "rust-unwrap-on-request",
+	"description": "A missing or non-numeric header panics the worker: untrusted input reaches unwrap().",
+	"language": "rust",
+	"category": "error-handling",
+	"diff": "diff --git a/src/handlers/page.rs b/src/handlers/page.rs\n--- a/src/handlers/page.rs\n+++ b/src/handlers/page.rs\n@@ -1,5 +1,5 @@\n use crate::http::Request;\n \n-pub fn page(_req: &Request) -> usize {\n-    1\n+pub fn page(req: &Request) -> usize {\n+    req.header(\"x-page\").unwrap().parse::<usize>().unwrap()\n }\n",
+	"expected": [
+		{
+			"path": "src/handlers/page.rs",
+			"startLine": 4,
+			"ruleId": "rust.error-handling-and-panics",
+			"note": "unwrap on request input"
+		}
+	]
+}

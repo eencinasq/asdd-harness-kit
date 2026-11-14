@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "spec-drift-roadmap",
+  "concerns": [],
+  "session_id": "sess-spec-drift-roadmap-010",
+  "timestamp": "2026-11-12T21:09:02.117Z",
+  "phase": "implementation",
+  "event_type": "feature_started",
+  "feature_id": "TASK-001",
+  "evidence": "Re-verify TASK-001: ROADMAP.md fails biome format.",
+  "scope_paths": [
+    "tools/spec-drift/docs/ROADMAP.md"
+  ]
+}

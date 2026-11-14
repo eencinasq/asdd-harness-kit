@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-roadmap",
+  "concerns": [],
+  "session_id": "sess-spec-drift-roadmap-018",
+  "timestamp": "2026-11-14T01:35:39.242Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-001 (DRIFT-02 after spec-drift-demand).",
+  "scope_paths": [
+    "tools/spec-drift/docs/ROADMAP.md"
+  ]
+}

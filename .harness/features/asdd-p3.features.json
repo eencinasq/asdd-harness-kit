@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "asdd-p3",
+  "source_tasks": ".harness/specs/asdd-p3/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Wave orchestration hints",
+      "user_visible_behavior": "asdd waves shows ready/blocked features and which can run in parallel from owners+deps+scopes.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/waves-lib.test.mjs"
+      ],
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/waves-lib.test.mjs` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "scope_paths": [
+        "cli/src/harness/waves-lib.mjs",
+        "cli/src/harness/waves-lib.test.mjs",
+        "cli/src/harness/waves.mjs",
+        "cli/src/harness/commands.mjs"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "a145f643fd1d1aebca8f295f71507081f730d2d5fd466ec12344a604cfdd6aba"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Portfolio multi-repo read-only",
+      "user_visible_behavior": "asdd portfolio summarizes sibling harness repos from portfolio.json without writing them.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/src/harness/portfolio-lib.test.mjs"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/portfolio-lib.test.mjs` exits 0.",
+      "scope_paths": [
+        "cli/src/harness/portfolio-lib.mjs",
+        "cli/src/harness/portfolio-lib.test.mjs",
+        "cli/src/harness/portfolio.mjs",
+        "cli/src/harness/commands.mjs",
+        "cli/README.md"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "b5da7a9ba83db2bca7ff8da9a7c9b612124e46ecec6e76d7d4f241696d9defac"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Semantic converge-eval batch",
+      "user_visible_behavior": "asdd converge-eval scores cli/eval/converge-ears fixtures and fails on mismatches.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "node --test cli/src/harness/converge-eval-lib.test.mjs",
+        "node cli/bin/asdd.mjs converge-eval"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/converge-eval-lib.test.mjs && node cli/bin/asdd.mjs converge-eval` exits 0.",
+      "scope_paths": [
+        "cli/src/harness/converge-eval-lib.mjs",
+        "cli/src/harness/converge-eval-lib.test.mjs",
+        "cli/src/harness/converge-eval.mjs",
+        "cli/eval/converge-ears/cases",
+        "cli/src/harness/commands.mjs",
+        "docs/ASDD-ROADMAP.md",
+        "package.json"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "851dd07dbd519cc3f70b03293b432b0449e8ccb26fee939d24f0cbbf709b75d9"
+    }
+  ]
+}

@@ -9,13 +9,45 @@ export const HARNESS_COMMANDS = {
   drift: { script: 'check-spec-drift.mjs', help: 'spec drift DRIFT-01…07 [--json] [--base <ref>] [--target <ref>] [--slice <id>] [--requirements]' },
   'check-config': { script: 'check-project-config.mjs', help: '.harness/config/project.json against its schema' },
   'skills-index': { script: 'check-skills-index.mjs', help: 'the skills index in skills.md [--write]' },
-  status: { script: 'harness-status.mjs', help: 'slices, phases, open learning patterns' },
+  status: {
+    script: 'harness-status.mjs',
+    help: 'slices, phases, open learning patterns [--metrics] [--json] [--html]',
+  },
+  converge: {
+    script: 'converge.mjs',
+    help: 'cheap feature converge: req_ids, test mentions, evidence [--slice <id>] [--strict] [--json]',
+  },
+  'converge-eval': {
+    script: 'converge-eval.mjs',
+    help: 'score EARS/converge fixtures under cli/eval/converge-ears [--json] [--cases <dir>]',
+  },
+  waves: {
+    script: 'waves.mjs',
+    help: 'parallelism hints from feature owners/deps/scopes [--slice <id>] [--json]',
+  },
+  portfolio: {
+    script: 'portfolio.mjs',
+    help: 'read-only multi-repo summary from .harness/config/portfolio.json [--json]',
+  },
+  'tracker-sync': {
+    script: 'tracker-sync.mjs',
+    help: 'plan bi-directional tracker sync from handoff+sessions [--slice <id>] [--json] [--apply]',
+  },
+  'spec-source': {
+    script: 'spec-source.mjs',
+    help: 'experimental REQ inventory (requires capabilities.spec_as_source) [--slice <id>] [--json]',
+  },
+  'init-flow': {
+    script: 'init-flow.mjs',
+    help: '15-minute brownfield path: install (if needed), one lite slice, minimal feature, asdd check',
+  },
   sync: { script: 'sync-state.mjs', help: 'regenerate manifests, registry, PROGRESS.md, knowledge [--slice <id>]' },
   repair: { script: 'repair.mjs', help: 'repair harness layout (slices, state, specs, features) then sync [--dry-run] [--slice <id>] [--json]' },
   slice: {
     sub: {
-      init: { script: 'init-slice.mjs', help: 'start a slice: slice init <id> [--full]' },
-      escalate: { script: 'escalate-slice.mjs', help: 'lite → full: slice escalate <id> --reasons "E1,E4" [--by <owner>] [--note "why"]' },
+      init: { script: 'init-slice.mjs', help: 'start a slice: slice init <id> [--full | --hotfix]' },
+      escalate: { script: 'escalate-slice.mjs', help: 'lite/hotfix → escalated: slice escalate <id> --reasons "E1,E4" [--by <owner>] [--note "why"]' },
+      amend: { script: 'amend-slice.mjs', help: 'reopen DONE slice: slice amend <id> [--note "…"] [--by <owner>]' },
     },
   },
   knowledge: {

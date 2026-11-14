@@ -284,7 +284,34 @@ const renderCoverage = (view: PrReviewView): void => {
 				<p class="subtle">${plural(req.criteria.length, 'criterion', 'criteria')} from ${escapeHtml(req.ticket.ref ?? req.ticket.source)}, verified against the whole PR.</p>
 			</li>`
 		: '';
-	coveragePanel.innerHTML = `${next}<ul class="list">${groupItems}${verificationItem}${requirementsItem}</ul>${findings}${skipped}`;
+	coveragePanel.innerHTML = `${readFirstBlock(view)}${next}<ul class="list">${groupItems}${verificationItem}${requirementsItem}</ul>${findings}${skipped}`;
+};
+
+/** Where to read first: changed files ranked by risk (spec-drift-depth REQ-002). Advisory: the groups keep their order. */
+const RISK_TONE: Record<string, string> = { high: 'tone-danger', medium: 'tone-warning', low: '' };
+const readFirstBlock = (view: PrReviewView): string => {
+	const risk = view.risk;
+	const top = risk?.files.filter((f) => f.score > 0).slice(0, 5) ?? [];
+	if (!risk || !top.length) return '';
+	const rows = top
+		.map(
+			(f) => `<li class="item">
+				<div class="item-head">
+					<span class="badge ${RISK_TONE[f.level] ?? ''}">${escapeHtml(f.level)}</span>
+					<code class="item-path">${escapeHtml(f.path)}</code>
+					<span class="subtle">score ${f.score}</span>
+				</div>
+				<p class="subtle">${escapeHtml(f.reasons.join(' · '))}</p>
+			</li>`,
+		)
+		.join('');
+	const missing = risk.unavailable.length
+		? `<p class="subtle">Not available here: ${escapeHtml(risk.unavailable.join(', '))}.</p>`
+		: '';
+	return `<details class="disclosure" id="read-first" open>
+			<summary>Read first · ${plural(top.length, 'file')} ranked by risk</summary>
+			<div class="disclosure-body"><ul class="list">${rows}</ul><p class="subtle">${escapeHtml(risk.formula)}.</p>${missing}</div>
+		</details>`;
 };
 
 // ── Architecture ─────────────────────────────────────────────────────────────

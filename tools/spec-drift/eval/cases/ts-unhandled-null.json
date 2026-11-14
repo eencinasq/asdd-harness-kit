@@ -1,6 +1,8 @@
 {
 	"id": "ts-unhandled-null",
 	"description": "findById can return undefined for unknown ids; the handler dereferences it. The rename is noise-free.",
+	"language": "typescript",
+	"category": "correctness",
 	"diff": "diff --git a/src/orders.ts b/src/orders.ts\n--- a/src/orders.ts\n+++ b/src/orders.ts\n@@ -1,6 +1,8 @@\n const orders = new Map<string, { items: string[] }>();\n-export const findById = (id: string) => orders.get(id);\n+export const findOrder = (id: string) => orders.get(id);\n \n export const itemCount = (id: string): number => {\n-\treturn 0;\n+\tconst order = findOrder(id);\n+\treturn order.items.length;\n };\n+export const clear = () => orders.clear();\n",
 	"expected": [
 		{

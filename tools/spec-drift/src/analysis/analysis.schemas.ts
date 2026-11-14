@@ -31,5 +31,29 @@ export const scopedAnalyzeSchema = <M extends 'architecture' | 'standards'>(mode
 
 export const EmptyInputSchema = z.object({});
 
+export const TrendInputSchema = z.object({
+	source: z
+		.enum(['analysis', 'audit'])
+		.default('analysis')
+		.describe('analysis: the snapshots `spec-drift record` wrote; audit: the kit reports in .harness/audits/'),
+	by: z
+		.enum(['rule', 'adr', 'pack', 'severity', 'check', 'slice'])
+		.optional()
+		.describe('Group the per-key changes: rule / adr / pack / severity (analysis), check / slice / severity (audit)'),
+	limit: z.number().int().min(2).max(200).default(30).describe('Most recent points to compare'),
+});
+export type TrendInput = z.infer<typeof TrendInputSchema>;
+
 export type AnalyzeInput = z.infer<typeof AnalyzeInputSchema>;
 export type ScopedAnalyzeInput = Omit<AnalyzeInput, 'mode'>;
+
+export const AnalysisJobInputSchema = z.object({
+	id: z.string().max(64).optional().describe('Job id from analysis_start; omit to list the jobs'),
+});
+export type AnalysisJobInput = z.infer<typeof AnalysisJobInputSchema>;
+
+export const DriftOriginInputSchema = z.object({
+	path: RepoRelativePath.describe('File of the finding, relative to the analyzed repo'),
+	line: z.number().int().min(1).describe('Line of the finding (startLine)'),
+});
+export type DriftOriginInput = z.infer<typeof DriftOriginInputSchema>;

@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "kit-playbook",
+  "source_tasks": ".harness/specs/kit-playbook/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "ASDD + Harness playbook, linked",
+      "user_visible_behavior": "A team finds what to do in each situation in docs/PLAYBOOK.md.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "test -f docs/PLAYBOOK.md && test $(grep -c '^### Play ' docs/PLAYBOOK.md) -ge 12 && grep -q 'docs/PLAYBOOK.md' README.md && grep -q 'docs/PLAYBOOK.md' cli/README.md && grep -q 'kit playbook' tools/spec-drift/docs/PLAYBOOK.md"
+      ],
+      "evidence": "docs/PLAYBOOK.md: 6 sections like the spec-drift playbook, 12 plays (adopt, lite, shaped bet, hotfix, escalate, red check, amend, parallel, PR gate, health check, learning loop, portfolio), quick reference with commands from asdd help; linked from README (contents, session flow, documentation table, upgrade note), cli/README, and the spec-drift playbook. Verification command exits 0.",
+      "scope_paths": [
+        "docs/PLAYBOOK.md",
+        "tools/spec-drift/docs/PLAYBOOK.md",
+        "README.md",
+        "cli/README.md"
+      ],
+      "evidence_hash": "0bc604e7eeb40414895b7dc9d88318e93f97c27eee15ef866e366211d7601cd6"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Version 3.11.0 (servers 1.1.0)",
+      "user_visible_behavior": "Re-running asdd install refreshes every kit file to 3.11.0.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "npm test && cd tools/knowledge && pnpm test && cd ../spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "asdd kit versions bump 3.11.0 (package.json, lock, 114 artifacts) + asdd kit self; spec-drift and knowledge 1.1.0 (package.json, APP_VERSION, health test). npm test exit 0; tools/knowledge 8/8; tools/spec-drift typecheck OK, lint no errors, 226 unit, build OK, 140/140 e2e.",
+      "scope_paths": [
+        "package.json",
+        "package-lock.json",
+        "cli/versions.json",
+        "tools/spec-drift/package.json",
+        "tools/spec-drift/src/app.constants.ts",
+        "tools/spec-drift/test/mcp.e2e-spec.ts",
+        "tools/knowledge/package.json",
+        "tools/knowledge/src/app.constants.ts"
+      ],
+      "evidence_hash": "fae0b106ae1addbca5188752bd61e9f53e10b3fa46fa6acac586870df7837b2e"
+    }
+  ]
+}

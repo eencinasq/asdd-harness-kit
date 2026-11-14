@@ -88,11 +88,11 @@ export type ReviewFinding = {
 	readonly category?: FindingCategory;
 	readonly severity?: FindingSeverity;
 	readonly thinking?: string;
-	/** Reviewer's confidence that this is a real defect, 0–100 (Architecture MCP extension). */
+	/** Reviewer's confidence that this is a real defect, 0–100 (spec-drift extension). */
 	readonly confidence?: number;
-	/** Why it is real: the code path, input or caller that triggers it (Architecture MCP extension). */
+	/** Why it is real: the code path, input or caller that triggers it (spec-drift extension). */
 	readonly evidence?: string;
-	/** Result of the verification pass (Architecture MCP extension). */
+	/** Result of the verification pass (spec-drift extension). */
 	readonly verdict?: 'confirmed' | 'plausible' | 'rejected';
 	readonly verifyNote?: string;
 	/** Checklist item it breaks, e.g. `python.mutable-default-arguments` (see system-rules.ts). */

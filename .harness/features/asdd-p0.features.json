@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "asdd-p0",
+  "source_tasks": ".harness/specs/asdd-p0/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Pipeline metrics on asdd status",
+      "user_visible_behavior": "asdd status --metrics shows lite share, escalation rate, phase durations, stop-FAIL counts, and open patterns; --json prints the object.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/pipeline-metrics.test.mjs"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/pipeline-metrics.test.mjs` exits 0.",
+      "scope_paths": [
+        "cli/src/harness/pipeline-metrics.mjs",
+        "cli/src/harness/pipeline-metrics.test.mjs",
+        "cli/src/harness/harness-status.mjs",
+        "cli/src/harness/commands.mjs",
+        "cli/README.md"
+      ],
+      "evidence_hash": "3838b42aad9ddbd91d36420ded7845c170f13d11cc1a413b640bd0fd789bbbb0"
+    },
+    {
+      "id": "TASK-002",
+      "title": "init-flow and Spec Kit guide",
+      "user_visible_behavior": "asdd init-flow scaffolds a lite slice to a green asdd check; cli/docs/guides/spec-kit-to-asdd.md maps Spec Kit to ASDD.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/src/harness/init-flow.test.mjs",
+        "test -f cli/docs/guides/spec-kit-to-asdd.md && grep -q \"Spec Kit\" cli/docs/guides/spec-kit-to-asdd.md"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/init-flow.test.mjs && test -f cli/docs/guides/spec-kit-to-asdd.md && grep -q \"Spec Kit\" cli/docs/guides/spec-kit-to-asdd.md` exits 0.",
+      "scope_paths": [
+        "cli/src/harness/init-flow.mjs",
+        "cli/src/harness/init-flow.test.mjs",
+        "cli/src/harness/commands.mjs",
+        "cli/docs/guides/spec-kit-to-asdd.md",
+        "cli/README.md",
+        "package.json"
+      ],
+      "evidence_hash": "4135663fc5a65644f769d77fd15b981e0bc84067e76c172f3a43a24aa99e09e7"
+    }
+  ]
+}

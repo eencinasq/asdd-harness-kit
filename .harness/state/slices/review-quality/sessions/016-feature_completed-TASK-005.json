@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "review-quality",
+  "concerns": [],
+  "session_id": "sess-review-quality-016",
+  "timestamp": "2026-11-12T21:17:54.783Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_completed",
+  "evidence": "eval/README.md rewritten (case fields language/category/noise, the pnpm test check, check/score --json/--baseline/--max-drop, harvest and the client-code rule); README.md Metrics and Offline evaluation bullets (asdd learn \u2192 learning_report, 35 cases, baseline, harvest); docs/ROADMAP.md P0 status (done, first baseline pending). biome format: no changes needed; pnpm lint no errors."
+}

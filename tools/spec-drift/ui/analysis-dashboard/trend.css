@@ -1,0 +1,69 @@
+/* Trend chart (spec-drift-adoption REQ-002). One series; color validated for both modes (dataviz validator). */
+:root {
+	--trend-line: light-dark(#2f6fde, #5f93ee);
+}
+.trend-chart {
+	position: relative;
+}
+.trend-chart svg {
+	display: block;
+	width: 100%;
+	/* The chart scales with its width; capped so 11px axis text stays about that size. */
+	max-width: 660px;
+	height: auto;
+	overflow: visible;
+}
+.trend-chart svg:focus-visible {
+	outline: 2px solid var(--ring);
+	outline-offset: 2px;
+	border-radius: var(--radius-sm);
+}
+.trend-grid {
+	stroke: var(--border-soft);
+	stroke-width: 1;
+}
+.trend-axis-label {
+	fill: var(--text-3);
+	font-size: 11px;
+	font-family: var(--font);
+}
+.trend-line {
+	fill: none;
+	stroke: var(--trend-line);
+	stroke-width: 2;
+	stroke-linejoin: round;
+	stroke-linecap: round;
+}
+.trend-dot {
+	fill: var(--trend-line);
+	stroke: var(--bg);
+	stroke-width: 2;
+}
+.trend-end-label {
+	fill: var(--text);
+	font-size: 12px;
+	font-weight: var(--weight-semibold);
+	font-family: var(--font);
+}
+.trend-crosshair {
+	stroke: var(--text-3);
+	stroke-width: 1;
+}
+.trend-tooltip {
+	position: absolute;
+	top: 0;
+	pointer-events: none;
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	box-shadow: var(--shadow);
+	padding: 4px 8px;
+	font-size: var(--text-xs);
+	color: var(--text-2);
+	white-space: nowrap;
+}
+.trend-tooltip strong {
+	display: block;
+	color: var(--text);
+	font-size: var(--text-sm);
+}

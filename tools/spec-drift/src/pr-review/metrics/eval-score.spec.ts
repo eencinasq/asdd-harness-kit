@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
-import { type EvalCase, formatEval, scoreCase, summarizeEval } from './eval-score.ts';
+import { compareWithBaseline, type EvalCase, formatEval, scoreCase, summarizeEval } from './eval-score.ts';
 
 const evalCase: EvalCase = {
 	id: 'py-eval',
@@ -40,5 +40,41 @@ describe('offline evaluation', () => {
 		assert.match(formatEval(summary), /^Precision 67% · Recall 100% · F1 80% over 2 case\(s\)/);
 		assert.match(formatEval(summary), /\| clean \| 0 \| 1 \| 0 \| a\.ts:1 \| — \|/);
 		assert.equal(summarizeEval([]).precision, undefined);
+	});
+});
+
+describe('review-quality REQ-002: breakdowns and baseline', () => {
+	const c = (id: string, language: string, category: string): EvalCase => ({
+		id,
+		language,
+		category,
+		diff: '',
+		expected: [{ path: 'a', startLine: 1 }],
+	});
+	test('scores are broken down by language and category', () => {
+		const summary = summarizeEval([
+			scoreCase(c('a', 'python', 'security'), [{ path: 'a', startLine: 1 }]),
+			scoreCase(c('b', 'go', 'security'), [{ path: 'a', startLine: 9 }]),
+		]);
+		assert.equal(summary.byLanguage?.['python']?.precision, 1);
+		assert.equal(summary.byLanguage?.['go']?.precision, 0);
+		assert.equal(summary.byCategory?.['security']?.cases, 2);
+		assert.match(formatEval(summary), /\| Language \| Cases/);
+	});
+
+	test('a precision drop over the limit is a regression; a smaller one is not', () => {
+		const baseline = { precision: 0.8, recall: 0.6, f1: 0.69 };
+		assert.equal(compareWithBaseline({ precision: 0.74, recall: 0.6, f1: 0.66 }, baseline).regressed, true);
+		assert.equal(compareWithBaseline({ precision: 0.76, recall: 0.6, f1: 0.67 }, baseline).regressed, false);
+		assert.equal(compareWithBaseline({ precision: 0.8, recall: 0.5, f1: 0.62 }, baseline, 5).regressed, true);
+		assert.match(
+			compareWithBaseline({ precision: 0.74, recall: 0.6, f1: 0.66 }, baseline).lines[0] ?? '',
+			/REGRESSION/,
+		);
+	});
+
+	test('a false positive on a known-noise label is counted as repeated noise', () => {
+		const noisy: EvalCase = { id: 'n', diff: '', expected: [], noise: [{ path: 'a', startLine: 5 }] };
+		assert.equal(scoreCase(noisy, [{ path: 'a', startLine: 6 }]).repeatedNoise, 1);
 	});
 });

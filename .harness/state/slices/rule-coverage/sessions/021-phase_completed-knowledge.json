@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-021",
+  "timestamp": "2026-11-12T23:36:40.419Z",
+  "phase": "knowledge",
+  "event_type": "phase_completed",
+  "evidence": "Lessons: (1) Semgrep scans .semgrep/ test fixtures as code and does not apply --exclude to explicit targets \u2014 every scan must exclude AND filter named paths (found by trying it, not by reading docs); (2) semgrep --test only reports annotated rules, so 'no test' is absence, not a status; (3) ADR ids must match by number (ADR-10 = ADR-0010 = 0010-x.md); (4) a free-text binding cell ('none yet \u2026') is not a path; (5) zsh does not word-split unquoted variables \u2014 shell probes need ${=var}."
+}

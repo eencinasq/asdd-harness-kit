@@ -39,13 +39,13 @@
       ],
       "depends_on": [],
       "verification": [
-        "pnpm test:e2e (tools/spec-drift)"
+        "cd tools/spec-drift && pnpm test:e2e"
       ],
-      "evidence": "tools/spec-drift pnpm test:e2e 101/101 (after spec-drift-empty added the generate-architecture-rules prompt to the contract in mcp.e2e-spec.ts).",
+      "evidence": "Re-verified after the 3.11.0 bump: `cd tools/spec-drift && pnpm test:e2e` 140/140 (the recorded command was prose, \"pnpm test:e2e (tools/spec-drift)\"; made runnable).",
       "scope_paths": [
         "tools/spec-drift/test/mcp.e2e-spec.ts"
       ],
-      "evidence_hash": "fa9baf28b4e0ad707548958eb84586151b5e5499f6fdc3d3d5d496907e5dceda"
+      "evidence_hash": "f79355a042408294ff1ac883c4d7e55e392dda461dfd97951a759796cdb5a314"
     }
   ]
 }

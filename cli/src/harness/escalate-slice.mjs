@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * escalate-slice.mjs — transition a lite slice to escalated mode.
+ * escalate-slice.mjs — transition a lite/hotfix slice to escalated mode.
  *
  * Appends a checkpoint session with mode=escalated and re-syncs state. The
  * harness blocks lite slices from reaching DONE while escalation signals are
@@ -76,7 +76,7 @@ const session = {
   event_type: 'checkpoint',
   mode: 'escalated',
   escalation_reasons: reasons,
-  evidence: note || `Escalating lite → escalated: ${reasons.join(', ')}`,
+  evidence: note || `Escalating ${manifest.mode || 'lite'} → escalated: ${reasons.join(', ')}`,
   concerns: [],
 };
 

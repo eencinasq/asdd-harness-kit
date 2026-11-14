@@ -1,0 +1,18 @@
+{
+  "id": "converge-03-passing-no-evidence",
+  "clean": false,
+  "slice_id": "demo",
+  "requirements": [
+    { "id": "REQ-001", "must": true, "text": "The service SHALL emit metrics." }
+  ],
+  "features": [
+    {
+      "id": "TASK-001",
+      "status": "passing",
+      "req_ids": ["REQ-001"],
+      "evidence": ""
+    }
+  ],
+  "test_mentions": ["REQ-001"],
+  "expected_codes": ["CONVERGE-03"]
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-depth",
+  "concerns": [],
+  "session_id": "sess-spec-drift-depth-005",
+  "timestamp": "2026-11-14T00:41:55.993Z",
+  "phase": "design",
+  "event_type": "phase_completed",
+  "evidence": "design.md ADR-001..006 (PRs from commit subjects, test files by path, composite analyzer, no MCP Tasks, advisory risk, regex imports)."
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "asdd-p2",
+  "concerns": [],
+  "session_id": "sess-asdd-p2-021",
+  "timestamp": "2026-11-14T02:20:38.493Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-003 (DRIFT-02; slice harness-green).",
+  "scope_paths": [
+    "cli/scaffold/features/feature.schema.json",
+    ".harness/features/feature.schema.json",
+    "cli/src/harness/harness-status.mjs",
+    "cli/src/harness/check-invariants.mjs",
+    "cli/src/harness/hill-lib.mjs",
+    "cli/src/harness/hill-lib.test.mjs",
+    "docs/ASDD-ROADMAP.md",
+    "package.json"
+  ]
+}

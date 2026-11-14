@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p4",
+  "concerns": [],
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "lite design for P4.1/P4.3/P4.4 (P4.2 deferred).",
+  "session_id": "sess-asdd-p4-003",
+  "timestamp": "2026-11-13T12:14:23.000Z"
+}

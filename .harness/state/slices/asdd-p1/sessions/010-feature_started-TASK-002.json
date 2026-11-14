@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p1",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/src/harness/pipeline-html.mjs",
+    "cli/src/harness/pipeline-html.test.mjs",
+    "cli/src/harness/harness-status.mjs",
+    "cli/src/kit/vendor.mjs",
+    "tools/knowledge/src/knowledge",
+    "cli/README.md"
+  ],
+  "session_id": "sess-asdd-p1-010",
+  "timestamp": "2026-11-13T02:51:37.000Z"
+}

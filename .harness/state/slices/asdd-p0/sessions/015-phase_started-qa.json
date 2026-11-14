@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p0",
+  "concerns": [],
+  "event_type": "phase_started",
+  "phase": "qa",
+  "evidence": "QA hold for DRIFT-01 mapping until commit.",
+  "session_id": "sess-asdd-p0-015",
+  "timestamp": "2026-11-13T02:40:50.000Z"
+}

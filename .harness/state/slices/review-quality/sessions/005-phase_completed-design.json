@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "review-quality",
+  "concerns": [],
+  "session_id": "sess-review-quality-005",
+  "timestamp": "2026-11-12T21:05:46.039Z",
+  "phase": "design",
+  "event_type": "phase_completed",
+  "evidence": "design.md: ADR-001 CLI ingests (server read-only), ADR-002 no client code in the repo, ADR-003 CI validates/sessions measure, ADR-004 removed comments are the noise signal, ADR-005 substring labels. Domain phase skipped. Confidence 0.86 (QG-DES-01)."
+}

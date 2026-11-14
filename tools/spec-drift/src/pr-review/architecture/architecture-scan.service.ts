@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { packsForMode } from '../../analysis/domain/pack-selection.ts';
+import { isRulesPath } from '../../analysis/domain/rule-readiness.ts';
 import { CODE_ANALYZER, type CodeAnalyzer } from '../../analysis/ports/code-analyzer.port.ts';
 import type { Env } from '../../config/env.schema.ts';
 import type { ArchitectureReviewView } from './architecture.types.ts';
@@ -94,7 +95,17 @@ export class ArchitectureScanService {
 				message: 'No PR files to scan (the PR only deletes files).',
 			};
 		}
-		const targetPaths = options.paths?.length ? [...options.paths] : ['.'];
+		// Rule test fixtures (the rules folder) are not code; Semgrep scans explicit targets despite --exclude (rule-coverage REQ-003).
+		const codePaths = options.paths?.filter((p) => !isRulesPath(engine.rulesDir, p));
+		if (options.paths?.length && !codePaths?.length) {
+			return {
+				...base,
+				status: 'scanned',
+				scannedPaths: [],
+				message: `No PR files to scan (only ${engine.rulesDir}/ rules and their tests changed).`,
+			};
+		}
+		const targetPaths = codePaths?.length ? codePaths : ['.'];
 		try {
 			const packs = packsForMode('all', await this.analyzer.listPacks(options.repoRoot), undefined, engine.rulesDir);
 			const run = await this.analyzer.run({
@@ -104,7 +115,7 @@ export class ArchitectureScanService {
 				// PR file names come from GitHub; the analyzer passes them after `--`.
 				paths: targetPaths,
 				targetRoot: options.targetRoot,
-				exclude: EXCLUDES,
+				exclude: [...EXCLUDES, engine.rulesDir],
 				timeoutMs: this.timeoutMs,
 			});
 			if (run.status === 'failed') {

@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "spec-drift-roadmap",
+  "source_tasks": ".harness/specs/spec-drift-roadmap/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Spec-drift roadmap document",
+      "user_visible_behavior": "The team reads the spec-drift gaps and prioritized roadmap in tools/spec-drift/docs/ROADMAP.md.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "test -f tools/spec-drift/docs/ROADMAP.md && grep -c \"^#### P\" tools/spec-drift/docs/ROADMAP.md",
+        "cd tools/spec-drift && pnpm lint"
+      ],
+      "evidence": "Re-verified after the README / PLAYBOOK / ROADMAP update (P0-P4 state, P4.5 deferred to a later version): typecheck OK, lint no errors (2 pre-existing warnings), test 226/226, build OK, test:e2e 140/140; ROADMAP.md has its P sections (grep #### P = 12).",
+      "scope_paths": [
+        "tools/spec-drift/docs/ROADMAP.md"
+      ],
+      "evidence_hash": "23b466dc40baef91812b2f138bea23ac11490e1f840a15292b4e8bd4a6e78839"
+    }
+  ]
+}

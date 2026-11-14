@@ -343,3 +343,28 @@ test('spec-drift-empty REQ-003: an architecture check with no rules carries the 
 	assert.equal(view(diff).details.architecture.generate_prompt, '# Generate');
 	assert.equal(view({ ...arch, generate_prompt: undefined }).details.architecture.generate_prompt, null);
 });
+
+test('review-quality REQ-005: the learning view carries team review quality', () => {
+	const reviews = { reviews: 3, drafted: 7, kept: 4, edited: 0, removed: 3, acceptance: 4 / 7, by_rule: [] };
+	const vm = view({ summary: {}, patterns: [], proposals: [], commands_note: 'n', review_quality: reviews });
+	assert.equal(vm.kind, 'learning');
+	assert.deepEqual(vm.learning.reviews, reviews);
+	assert.equal(view({ summary: {}, patterns: [], proposals: [], commands_note: 'n' }).learning.reviews, null);
+});
+
+test('spec-drift-depth REQ-001: a traceability_matrix result is the traceability view, also when empty', () => {
+	const row = { slice: 's', req_id: 'REQ-001', title: 't', features: [], tests: [], prs: [], gaps: ['no-feature'] };
+	const payload = { matrix: [row], totals: { requirements: 1, with_gaps: 1 }, markdown: '| x |\n', note: 'n' };
+	assert.equal(kindOf(payload), 'traceability');
+	const vm = view(payload);
+	assert.equal(vm.traceability.rows[0].req_id, 'REQ-001');
+	assert.equal(vm.traceability.totals.with_gaps, 1);
+	assert.equal(vm.traceability.markdown, '| x |\n');
+	const empty = view({
+		matrix: [],
+		totals: null,
+		no_data: { reason: 'No knowledge index', next: 'asdd knowledge sync' },
+	});
+	assert.equal(empty.kind, 'traceability');
+	assert.equal(empty.noData.next, 'asdd knowledge sync');
+});

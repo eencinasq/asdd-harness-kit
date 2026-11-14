@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-026",
+  "timestamp": "2026-11-14T02:55:16.236Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-002 (DRIFT-02 after the 3.11.0 bump).",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/domain/fix-prompt.ts",
+    "tools/spec-drift/src/analysis/domain/fix-prompt.spec.ts",
+    "tools/spec-drift/src/analysis/analysis.prompts.ts",
+    "tools/spec-drift/ui/analysis-dashboard",
+    "tools/spec-drift/test/fix-prompt.e2e-spec.ts",
+    "tools/spec-drift/test/ui.e2e-spec.ts",
+    "tools/spec-drift/src/analysis/analysis.service.ts",
+    "tools/spec-drift/test/ui/host.ts",
+    "tools/spec-drift/test/mcp.e2e-spec.ts"
+  ]
+}

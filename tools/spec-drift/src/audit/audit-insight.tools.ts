@@ -12,6 +12,9 @@ import {
 	type LearningReportInput,
 	LearningReportInputSchema,
 	LearningReportOutput,
+	type TraceabilityInput,
+	TraceabilityInputSchema,
+	TraceabilityOutput,
 } from './audit-insight.output.ts';
 import { queryFindings } from './audit-query.ts';
 
@@ -70,5 +73,19 @@ export class AuditInsightTools {
 	})
 	async learningReport(args: LearningReportInput) {
 		return result(await this.audit.learningReport(args.limit));
+	}
+
+	@Tool({
+		name: 'traceability_matrix',
+		title: 'Traceability matrix',
+		annotations: READ_ONLY,
+		description:
+			'Requirement → features (status) → owned files → test files → PR numbers, one row per requirement from the knowledge index, with gaps (no-feature, no-test, not-passing), totals, and a Markdown table for an audit document. Opens the audit dashboard. Writes nothing; run asdd knowledge sync first when specs changed.',
+		inputSchema: TraceabilityInputSchema,
+		outputSchema: TraceabilityOutput,
+		_meta: appToolMeta(AUDIT_UI_URI),
+	})
+	async traceabilityMatrix(args: TraceabilityInput) {
+		return result(await this.audit.traceabilityMatrix(args));
 	}
 }

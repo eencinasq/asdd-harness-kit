@@ -10,6 +10,8 @@ declare global {
 		callServerTool(params: unknown): Promise<unknown>;
 		sendToolResult(result: unknown): Promise<void>;
 		viewReady: Promise<void>;
+		/** Messages the view asked the host to add to the chat (ui/message). */
+		sentMessages: unknown[];
 	}
 }
 
@@ -17,6 +19,11 @@ const iframe = document.getElementById('view') as HTMLIFrameElement;
 const bridge = new AppBridge(null, { name: 'ui-test-host', version: '0.0.0' }, { serverTools: {}, logging: {} });
 
 bridge.oncalltool = async (params) => (await window.callServerTool(params)) as any;
+window.sentMessages = [];
+bridge.onmessage = async (params) => {
+	window.sentMessages.push(params);
+	return {};
+};
 window.sendToolResult = (result) => bridge.sendToolResult(result as Parameters<AppBridge['sendToolResult']>[0]);
 window.viewReady = new Promise<void>((resolve) => {
 	bridge.oninitialized = () => resolve();

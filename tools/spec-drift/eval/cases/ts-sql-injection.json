@@ -1,0 +1,15 @@
+{
+	"id": "ts-sql-injection",
+	"description": "The search term from the query string is interpolated into SQL; the old code used a parameter.",
+	"language": "typescript",
+	"category": "security",
+	"diff": "diff --git a/src/products/search.ts b/src/products/search.ts\n--- a/src/products/search.ts\n+++ b/src/products/search.ts\n@@ -1,5 +1,6 @@\n import { db } from '../db';\n \n-export async function search(term: string) {\n-\treturn db.query('SELECT * FROM products WHERE name LIKE $1', [`%${term}%`]);\n+export async function search(term: string, sort = 'name') {\n+\tconst orderBy = sort === 'price' ? 'price' : 'name';\n+\treturn db.query(`SELECT * FROM products WHERE name LIKE '%${term}%' ORDER BY ${orderBy}`);\n }\n",
+	"expected": [
+		{
+			"path": "src/products/search.ts",
+			"startLine": 5,
+			"ruleId": "ts_js_tsx_jsx.code-security-checks",
+			"note": "user input interpolated into SQL"
+		}
+	]
+}

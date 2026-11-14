@@ -20,7 +20,7 @@ const SCRIPTS = join(ROOT, 'cli/src/harness');
 export const VENDORED = {
   'spec-drift': ['drift-lib.mjs', 'semgrep-lib.mjs', 'audit-lib.mjs', 'learning-lib.mjs', 'knowledge-store.mjs'],
   'jev-gate': ['env-loader.mjs', 'command-gate.mjs'],
-  knowledge: ['knowledge-query.mjs'],
+  knowledge: ['knowledge-query.mjs', 'pipeline-metrics.mjs'],
 };
 
 const IMPORT = /(?:\bfrom\s*|\bimport\s*\(\s*)['"](\.{1,2}\/[^'"]+)['"]/g;

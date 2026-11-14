@@ -61,6 +61,7 @@ import {
 } from './engine/index.ts';
 import { findingsToSarif, SARIF_FILE } from './engine/sarif.ts';
 import { GithubService, repoSlugFromPrUrl } from './github/github.service.ts';
+import { CALLS_FILE, costSummary, parseCalls, reviewCost } from './metrics/review-cost.ts';
 import { buildPublishMetrics, parseMetricsLog, summarizeMetrics } from './metrics/review-metrics.ts';
 import type {
 	ImportArchitectureInput,
@@ -96,6 +97,8 @@ import {
 } from './requirements/requirements-report.ts';
 import { TicketService } from './requirements/ticket.service.ts';
 import { detectTicketRefs } from './requirements/ticket-refs.ts';
+import { CHURN_WINDOW, churnFromLog, type PrRisk, rankRisk, readFirst } from './risk/file-risk.ts';
+import { firstOf, type RepoReader, readFeatures, readLatestAudit } from './risk/risk-sources.ts';
 import {
 	applyVerification,
 	draftFindings,
@@ -142,6 +145,12 @@ const nextStep = (
  * Each step reads and writes the PR workspace on disk, so the flow survives restarts and works over
  * stateless HTTP. Every method returns a `PrReviewView` for the model and the dashboard.
  */
+/** One message line naming the files to read first (spec-drift-depth REQ-002). */
+const riskLine = (risk: PrRisk): string => {
+	const top = readFirst(risk, 3);
+	return top.length ? `Read first (risk): ${top.map((f) => `${f.path} (${f.level}, ${f.score})`).join(', ')}.` : '';
+};
+
 @Injectable()
 export class PrReviewService {
 	/** In-process queue (cheap, ordered) + lock file (other server processes, e.g. another client). */
@@ -213,6 +222,30 @@ export class PrReviewService {
 		return this.exclusive(input, () => this.uiSaveUnlocked(input));
 	}
 
+	/**
+	 * Whether pr_review_start should ask for the ticket (spec-drift-depth REQ-004): not when the review already has one;
+	 * the suggestion is the first reference found in the PR. Reads only.
+	 */
+	async ticketSuggestion({ pr, repoPath }: PrInput): Promise<{ ask: boolean; suggestion?: string }> {
+		const paths = await this.workspace.resolve({ pr, repoPath });
+		if (await this.artifacts.loadRequirements(paths)) return { ask: false };
+		const metadata = await this.github.fetchPrMetadata(pr, paths.repoRoot);
+		const suggestion = detectTicketRefs(metadata)[0]?.ref;
+		return { ask: true, ...(suggestion ? { suggestion } : {}) };
+	}
+
+	/** Inline comments of the draft, for the publish confirmation; null without a readable comments.md. */
+	async draftCommentCount({ pr, repoPath }: PrInput): Promise<number | null> {
+		const paths = await this.workspace.resolve({ pr, repoPath });
+		const markdown = await this.artifacts.readText(paths.comments);
+		if (!markdown) return null;
+		try {
+			return parseCommentsMarkdown(markdown).comments.length;
+		} catch {
+			return null;
+		}
+	}
+
 	setTicket(input: SetTicketInput): Promise<PrReviewView> {
 		return this.exclusive(input, () => this.setTicketUnlocked(input));
 	}
@@ -251,11 +284,24 @@ export class PrReviewService {
 	}
 
 	/** Acceptance of drafted comments across published reviews (see metrics/review-metrics.ts). */
+	/** Appends one tool call to the review's call log (best effort: a cost diagnostic never fails a call). */
+	async recordCall({ pr, repoPath }: { pr: number; repoPath?: string }, tool: string, chars: number): Promise<void> {
+		try {
+			const paths = await this.workspace.resolve({ pr, repoPath });
+			await this.artifacts.appendLine(
+				path.join(paths.base, CALLS_FILE),
+				JSON.stringify({ tool, chars, at: new Date().toISOString() }),
+			);
+		} catch {
+			// no review workspace yet
+		}
+	}
+
 	async metrics({ project, last }: MetricsInput): Promise<string> {
 		const text = (await this.artifacts.readText(this.workspace.metricsFile)) ?? '';
 		let records = parseMetricsLog(text).filter((r) => !project || r.project === project);
 		if (last) records = records.slice(-last);
-		return summarizeMetrics(records);
+		return [summarizeMetrics(records), costSummary(records.map((r) => r.cost))].filter(Boolean).join('\n');
 	}
 
 	// ── implementations ──────────────────────────────────────────────────────
@@ -326,6 +372,9 @@ export class PrReviewService {
 			metadata.headRefOid,
 		);
 
+		const risk = await this.computeRisk(paths, baseSha, changedFiles, architecture);
+		await this.artifacts.saveRisk(paths, risk);
+
 		await call.reportProgress(3, 4, 'Reading existing PR comments and what changed since the last review');
 		const existingComments = await this.fetchExistingComments(pr, metadata.url, paths, warnings);
 		const reReview =
@@ -353,6 +402,7 @@ export class PrReviewService {
 			units,
 			architecture,
 			requirements,
+			risk,
 			existingComments,
 			reReview,
 		});
@@ -376,6 +426,7 @@ export class PrReviewService {
 				units,
 				architecture,
 				requirements,
+				risk,
 				...(ticketRefs.length ? { ticketRefs } : {}),
 				progress: toLiveProgress(progress),
 				...(warnings.length ? { warnings } : {}),
@@ -383,6 +434,7 @@ export class PrReviewService {
 					`Prepared PR #${pr}: ${units.selectedCount}/${units.fileCount} files in ${units.groups.length} group(s).`,
 					coverageSummary(progress),
 					architecture.message,
+					riskLine(risk),
 					ticketLine,
 					progress.complete
 						? 'No groups to review — call pr_review_status to open the dashboard once for human edit, then pr_review_publish.'
@@ -593,6 +645,7 @@ export class PrReviewService {
 		const progress = await this.artifacts.loadProgress(paths);
 		const architecture = await this.artifacts.loadArchitecture(paths);
 		const requirements = await this.artifacts.loadRequirements(paths);
+		const risk = await this.artifacts.loadRisk(paths);
 		const base = {
 			kind: 'pr-review' as const,
 			pr,
@@ -603,6 +656,7 @@ export class PrReviewService {
 			units,
 			architecture,
 			requirements,
+			risk,
 			progress: progress ? toLiveProgress(progress) : undefined,
 		};
 		const reviewing = progress !== undefined && !progress.complete;
@@ -975,6 +1029,36 @@ export class PrReviewService {
 	}
 
 	/** Attach (or replace) the ticket of a review; its criteria become the last coverage step. */
+	/**
+	 * Changed files ranked by risk (spec-drift-depth REQ-002): churn and the harness data come from the base branch (the
+	 * checkout's working tree as a fallback for uncommitted audit reports). Advisory; never fails the review.
+	 */
+	private async computeRisk(
+		paths: ResolvedPaths,
+		baseSha: string,
+		files: readonly string[],
+		architecture: ArchitectureReviewView,
+	): Promise<PrRisk> {
+		const repoRoot = paths.repoRoot;
+		const atBase: RepoReader = {
+			list: (dir) => this.github.listDirAt(repoRoot, baseSha, dir).catch(() => undefined),
+			read: (file) => this.github.showFile(repoRoot, baseSha, file).catch(() => undefined),
+		};
+		const onDisk: RepoReader = {
+			list: (dir) => fs.readdir(path.join(repoRoot, dir)).catch(() => undefined),
+			read: (file) => fs.readFile(path.join(repoRoot, file), 'utf8').catch(() => undefined),
+		};
+		const reader = firstOf(atBase, onDisk);
+		const log = await this.github.churn(repoRoot, baseSha, CHURN_WINDOW, files).catch(() => undefined);
+		return rankRisk({
+			files,
+			churn: log === undefined ? undefined : churnFromLog(log),
+			features: await readFeatures(reader),
+			architectureFindings: architecture.status === 'scanned' ? architecture.findings : undefined,
+			audit: await readLatestAudit(reader),
+		});
+	}
+
 	private async setTicketUnlocked({ pr, repoPath, ticket }: SetTicketInput): Promise<PrReviewView> {
 		const paths = await this.workspace.resolve({ pr, repoPath });
 		const units = await this.artifacts.loadReviewUnits(paths);
@@ -1175,6 +1259,10 @@ export class PrReviewService {
 				findings,
 				ruleOfFile,
 				...(requirements?.status === 'done' ? { requirements: countByStatus(requirements) } : {}),
+				cost: reviewCost(
+					parseCalls((await this.artifacts.readText(path.join(paths.base, CALLS_FILE))) ?? ''),
+					new Date(),
+				),
 			});
 			await this.artifacts.appendLine(this.workspace.metricsFile, JSON.stringify(metrics));
 		} catch {

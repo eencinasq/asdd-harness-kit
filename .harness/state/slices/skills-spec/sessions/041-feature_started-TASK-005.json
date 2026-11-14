@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-041",
+  "timestamp": "2026-11-14T02:20:38.572Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-005 (DRIFT-02; slice harness-green).",
+  "scope_paths": [
+    "cli/steering/skills.md",
+    "cli/steering/controls.md",
+    "cli/steering/README.md",
+    "cli/steering/security-rules.md",
+    "cli/agents/asdd-design-agent.md"
+  ]
+}

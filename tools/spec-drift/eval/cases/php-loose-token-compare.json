@@ -1,0 +1,15 @@
+{
+	"id": "php-loose-token-compare",
+	"description": "Loose `==` on tokens is open to type juggling (\"0e…\" strings) and is not constant-time; use hash_equals.",
+	"language": "php",
+	"category": "security",
+	"diff": "diff --git a/src/Auth/ResetController.php b/src/Auth/ResetController.php\n--- a/src/Auth/ResetController.php\n+++ b/src/Auth/ResetController.php\n@@ -4,6 +4,6 @@\n {\n     public function valid(string $given, string $stored): bool\n     {\n-        return hash_equals($stored, $given);\n+        return md5($given) == $stored;\n     }\n }\n",
+	"expected": [
+		{
+			"path": "src/Auth/ResetController.php",
+			"startLine": 7,
+			"ruleId": "php.type-juggling-equality-and-null-semantics",
+			"note": "loose comparison of a token"
+		}
+	]
+}

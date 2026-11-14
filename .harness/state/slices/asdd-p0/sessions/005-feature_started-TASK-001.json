@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p0",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/pipeline-metrics.mjs",
+    "cli/src/harness/pipeline-metrics.test.mjs",
+    "cli/src/harness/harness-status.mjs",
+    "cli/src/harness/commands.mjs",
+    "cli/README.md"
+  ],
+  "evidence": "Start TASK-001 (REQ-001, REQ-002).",
+  "session_id": "sess-asdd-p0-005",
+  "timestamp": "2026-11-13T02:34:39.000Z"
+}

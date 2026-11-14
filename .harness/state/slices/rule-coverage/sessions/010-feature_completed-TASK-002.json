@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-010",
+  "timestamp": "2026-11-12T23:29:48.690Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: typecheck OK, lint no errors (2 warnings + 1 info pre-existing), test 173/173, build OK, test:e2e 107/107. rule-readiness.spec: ready = test passed and not noisy; no-test, test-failed, noisy (>= 50 hits / >= 20 files), tests-unavailable and scan-failed flagged; no hits not flagged; isRulesPath. semgrep.spec: parseTestOutput (passed/failed per rule, config_with_errors), authoring guide requires ruleid/ok test file and semgrep --test. analysis.service.spec: rules folder excluded and explicit rules paths dropped (analysis + PR scan); an engine without testRules is never ready. rule-tests.e2e with Semgrep 1.183: the .semgrep fixture is not a finding (also when named), summary.ruleTests {demo.no-console: passed}; validate_rules: tested rule ready (1 hit), untested rule no-test. Contract: 34 tools (validate_rules text-only)."
+}

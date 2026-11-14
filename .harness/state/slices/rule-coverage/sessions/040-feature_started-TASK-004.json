@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-040",
+  "timestamp": "2026-11-14T01:35:39.149Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-004 (DRIFT-02 after spec-drift-demand).",
+  "scope_paths": [
+    "tools/spec-drift/ui/analysis-dashboard",
+    "tools/spec-drift/ui/analysis-dashboard.html"
+  ]
+}

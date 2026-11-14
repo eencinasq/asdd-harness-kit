@@ -1,0 +1,15 @@
+{
+	"id": "ts-test-assertion-never-runs",
+	"description": "The assertion is inside a then() whose promise the test neither returns nor awaits: the test passes before it runs.",
+	"language": "typescript",
+	"category": "tests",
+	"diff": "diff --git a/src/cart/total.test.ts b/src/cart/total.test.ts\n--- a/src/cart/total.test.ts\n+++ b/src/cart/total.test.ts\n@@ -1,6 +1,13 @@\n import { expect, test } from 'vitest';\n+import { fetchCart } from './api';\n import { total } from './total';\n \n test('empty cart', () => {\n \texpect(total([])).toBe(0);\n });\n+\n+test('remote cart total', () => {\n+\tfetchCart('c1').then((lines) => {\n+\t\texpect(total(lines)).toBe(30);\n+\t});\n+});\n",
+	"expected": [
+		{
+			"path": "src/cart/total.test.ts",
+			"startLine": 10,
+			"ruleId": "tests.assertions-that-cannot-fail",
+			"note": "promise not awaited in test"
+		}
+	]
+}

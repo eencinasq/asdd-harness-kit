@@ -7,6 +7,15 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { AnalysisService } from '../analysis/analysis.service.ts';
 import type { AuditFinding, AuditPayload, NoData, Trace } from './audit.types.ts';
+import {
+	buildMatrix,
+	matrixMarkdown,
+	PR_LOG_LIMIT,
+	prsByFileFromLog,
+	RECORD_SEPARATOR,
+	type TraceFeature,
+	type TraceRequirement,
+} from './domain/traceability.ts';
 import { type ArchitectureSource, type HarnessLibs, harnessLibs, type SemgrepScan } from './harness-libs.ts';
 
 export const AUDIT_OPTIONS = Symbol('AUDIT_OPTIONS');
@@ -423,7 +432,7 @@ export class AuditService {
 		const { learning } = await this.libs();
 		const report = learning.learningReport(this.root, { limit });
 		const s = report['summary'] as Record<string, number> | undefined;
-		const empty = !s?.['patterns'] && !s?.['proposals'] && !s?.['unsigned_failures'];
+		const empty = !s?.['patterns'] && !s?.['proposals'] && !s?.['unsigned_failures'] && !report['review_quality'];
 		return {
 			...report,
 			commands_note,
@@ -494,6 +503,92 @@ export class AuditService {
 		const finding = pool.find((f) => f.id === id);
 		if (!finding) return { error: `finding ${id} not found in the latest audit_diff or audit report` };
 		return { finding, trace: await this.traceNode(finding.node) };
+	}
+
+	// ── traceability (spec-drift-depth REQ-001) ───────────────────────────────
+
+	/**
+	 * Requirement → features → owned files → tests → PRs from the knowledge index, plus one `git log` pass for PR numbers.
+	 * Reads only.
+	 */
+	async traceabilityMatrix({
+		slice_id,
+		gaps_only = false,
+	}: {
+		slice_id?: string;
+		gaps_only?: boolean;
+	} = {}): Promise<AuditPayload> {
+		const empty = { matrix: [], totals: null };
+		if (!this.installed) return { ...empty, no_data: this.notInstalled };
+		const store = await (await this.libs()).openKnowledgeStore(this.root);
+		if (!store) {
+			return {
+				...empty,
+				no_data: {
+					reason: 'No knowledge index in .harness/knowledge/: the matrix is built from it.',
+					next: 'Run asdd knowledge sync (it indexes specs, features, and sessions), then call traceability_matrix again.',
+				},
+			};
+		}
+		try {
+			const registry = this.readJson<{ slices?: unknown[] }>('.harness/state/registry.json');
+			const all = (registry?.slices ?? []).map(sliceIdOf).filter(Boolean);
+			if (slice_id && !all.includes(slice_id)) {
+				return { ...empty, error: `Unknown slice "${slice_id}". Slices: ${all.join(', ') || '(none)'}.` };
+			}
+			const requirements: TraceRequirement[] = [];
+			const features: TraceFeature[] = [];
+			for (const slice of slice_id ? [slice_id] : all) {
+				for (const node of await store.nodesBySlice(slice)) {
+					if (node['type'] === 'requirement') {
+						requirements.push({
+							key: node.id,
+							slice,
+							id: String(node['req_id'] ?? node.id),
+							title: String(node.title ?? ''),
+						});
+					} else if (node['type'] === 'feature') {
+						const edges = await store.edgesIncident(node.id);
+						features.push({
+							key: node.id,
+							slice,
+							id: String(node['feature_id'] ?? node.id),
+							status: String(node['status'] ?? 'unknown'),
+							reqs: edges.filter((e) => e.from === node.id && e.rel === 'IMPLEMENTS_REQ').map((e) => e.to),
+							owns: edges.filter((e) => e.from === node.id && e.rel === 'OWNS').map((e) => e.to.replace(/^file:/, '')),
+						});
+					}
+				}
+			}
+			if (!requirements.length) {
+				return {
+					...empty,
+					no_data: {
+						reason: `The knowledge index has no requirements${slice_id ? ` for slice ${slice_id}` : ''}.`,
+						next: 'Write requirements (REQ-…) in the slice specs, then run asdd knowledge sync.',
+					},
+				};
+			}
+			const tracked = (this.git(['ls-files']) ?? '').split('\n').filter(Boolean);
+			const log = this.git(['log', '-n', String(PR_LOG_LIMIT), `--format=${RECORD_SEPARATOR}%s`, '--name-only']);
+			const { rows, totals } = buildMatrix({
+				requirements,
+				features,
+				trackedFiles: tracked,
+				prsByFile: prsByFileFromLog(log ?? ''),
+			});
+			const matrix = gaps_only ? rows.filter((r) => r.gaps.length > 0) : rows;
+			return {
+				matrix,
+				totals,
+				markdown: matrixMarkdown(matrix, totals),
+				index_generated_at: store.meta?.()?.generated_at ?? null,
+				sources: { knowledge_index: true, git: log !== null },
+				note: 'Built from the knowledge index: run asdd knowledge sync first when specs or features changed. PR numbers come from commit subjects "(#N)" and "Merge pull request #N" (latest 5000 commits). Writes nothing.',
+			};
+		} finally {
+			store.close?.();
+		}
 	}
 
 	// ── resources ─────────────────────────────────────────────────────────────

@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "asdd-p3",
+  "concerns": [],
+  "session_id": "sess-asdd-p3-017",
+  "timestamp": "2026-11-14T02:20:38.501Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-001 (DRIFT-02; slice harness-green).",
+  "scope_paths": [
+    "cli/src/harness/waves-lib.mjs",
+    "cli/src/harness/waves-lib.test.mjs",
+    "cli/src/harness/waves.mjs",
+    "cli/src/harness/commands.mjs"
+  ]
+}

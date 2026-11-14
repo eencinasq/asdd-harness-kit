@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-038",
+  "timestamp": "2026-11-14T01:35:39.144Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-002 (DRIFT-02 after spec-drift-demand).",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/domain/rule-readiness.ts",
+    "tools/spec-drift/src/analysis/domain/rule-readiness.spec.ts",
+    "tools/spec-drift/src/analysis/ports",
+    "tools/spec-drift/src/analysis/engines",
+    "tools/spec-drift/src/analysis/analysis.service.spec.ts",
+    "tools/spec-drift/src/pr-review/architecture/architecture-scan.service.ts",
+    "tools/spec-drift/test/rule-tests.e2e-spec.ts",
+    "tools/spec-drift/src/analysis/analysis.service.ts",
+    "tools/spec-drift/src/analysis/analysis.tools.ts",
+    "tools/spec-drift/src/analysis/analysis.output.ts",
+    "tools/spec-drift/src/analysis/analysis.types.ts",
+    "tools/spec-drift/src/analysis/analysis.presenter.ts",
+    "tools/spec-drift/test/mcp.e2e-spec.ts"
+  ]
+}

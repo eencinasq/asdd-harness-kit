@@ -38,6 +38,17 @@ Used when `Semgrep rules` is unfilled and the repo has no `.semgrep.yml`. The ar
 |-------|-----------------|
 | `…` | `…` |
 
+## Dependency layers
+
+Optional. The spec-drift MCP server turns this table into dependency-graph rules: `dep-layer` (a file imports a layer
+its layer may not depend on) and `dep-cycle` (files that import each other in a cycle). Relative imports and tsconfig
+`paths` are resolved, so they catch what an import-string pattern cannot. Paths are globs; "May depend on" names other
+layers (`—` for none); a layer may always import itself. Write `**Dependency cycles:** allow` to turn off the cycle rule.
+
+| Layer | Paths | May depend on |
+|-------|-------|---------------|
+| … | `…` | … |
+
 ## Exceptions
 
 Document justified exceptions and cite ADRs. Existing code alone is not enough.

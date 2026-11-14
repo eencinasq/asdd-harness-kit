@@ -1,0 +1,15 @@
+{
+	"id": "go-map-data-race",
+	"description": "Handlers run concurrently and write the shared map without a lock: a data race that can crash the process.",
+	"language": "go",
+	"category": "concurrency",
+	"diff": "diff --git a/internal/cache/visits.go b/internal/cache/visits.go\n--- a/internal/cache/visits.go\n+++ b/internal/cache/visits.go\n@@ -1,7 +1,16 @@\n package cache\n+\n+import \"net/http\"\n \n var visits = map[string]int{}\n \n func Count(path string) int {\n \treturn visits[path]\n }\n+\n+func Middleware(next http.Handler) http.Handler {\n+\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\n+\t\tvisits[r.URL.Path]++\n+\t\tnext.ServeHTTP(w, r)\n+\t})\n+}\n",
+	"expected": [
+		{
+			"path": "internal/cache/visits.go",
+			"startLine": 13,
+			"ruleId": "go.channels-locks-and-shared-state",
+			"note": "concurrent map write"
+		}
+	]
+}

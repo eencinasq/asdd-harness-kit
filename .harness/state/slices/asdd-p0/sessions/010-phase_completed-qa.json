@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p0",
+  "concerns": [],
+  "event_type": "phase_completed",
+  "phase": "qa",
+  "evidence": "QA-Lite: pipeline-metrics 5/5, init-flow 1/1.",
+  "session_id": "sess-asdd-p0-010",
+  "timestamp": "2026-11-13T02:38:56.000Z"
+}

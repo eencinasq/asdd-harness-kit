@@ -1,9 +1,11 @@
 import { type DynamicModule, Module, type Type } from '@nestjs/common';
 
+import { whenToolset } from '../config/toolsets.ts';
 import { AnalysisPrompts } from './analysis.prompts.ts';
 import { AnalysisService } from './analysis.service.ts';
 import { AnalysisTools } from './analysis.tools.ts';
 import { SemgrepEngineModule } from './engines/semgrep/semgrep-engine.module.ts';
+import { AnalysisJobs } from './jobs/analysis-jobs.ts';
 
 export type AnalysisModuleOptions = {
 	/**
@@ -26,7 +28,12 @@ export class AnalysisModule {
 			module: AnalysisModule,
 			global: true,
 			imports: [engine],
-			providers: [AnalysisService, AnalysisTools, AnalysisPrompts],
+			providers: [
+				AnalysisService,
+				// Background scans live in this process (spec-drift-depth REQ-004).
+				{ provide: AnalysisJobs, useFactory: () => new AnalysisJobs() },
+				...whenToolset('analysis', [AnalysisTools, AnalysisPrompts]),
+			],
 			exports: [AnalysisService, engine],
 		};
 	}

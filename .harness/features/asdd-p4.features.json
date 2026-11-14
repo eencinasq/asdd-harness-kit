@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "asdd-p4",
+  "source_tasks": ".harness/specs/asdd-p4/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Tracker-sync plan and receipts",
+      "user_visible_behavior": "asdd tracker-sync prints a bi-directional sync plan from handoff + sessions; --apply writes a local receipt only.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/tracker-sync-lib.test.mjs"
+      ],
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/tracker-sync-lib.test.mjs` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "scope_paths": [
+        "cli/src/harness/tracker-sync-lib.mjs",
+        "cli/src/harness/tracker-sync-lib.test.mjs",
+        "cli/src/harness/tracker-sync.mjs",
+        "cli/skills/external-trackers/SKILL.md",
+        "cli/src/harness/commands.mjs"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "b0d9e34cbaa5aa202a22d26f5635dd6a8a807ef17445032ff251f889b8c6cd51"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Advisory-only Stop mode",
+      "user_visible_behavior": "stop.mode=advisory (or HARNESS_STOP_MODE) runs check without blocking the session.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/src/harness/stop-mode.test.mjs"
+      ],
+      "evidence": "stop-mode.test REQ-002 3/3; verify-on-stop honors advisory.",
+      "scope_paths": [
+        "cli/src/harness/stop-mode.mjs",
+        "cli/src/harness/stop-mode.test.mjs",
+        "cli/src/harness/verify-on-stop.mjs",
+        "cli/src/harness/check-project-config.mjs",
+        ".harness/config/project.schema.json"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "618ef8f46e20cbdde5113bbbe84fdc36dd778b259ee498c6f08b0912f3c69468"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Spec-as-source experimental pilot",
+      "user_visible_behavior": "asdd spec-source inventories MUST REQs vs implementation when capabilities.spec_as_source is true; docs state it is not default SoT.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "node --test cli/src/harness/spec-source-lib.test.mjs",
+        "test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/spec-source-lib.test.mjs && test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md` exits 0.",
+      "scope_paths": [
+        "cli/src/harness/spec-source-lib.mjs",
+        "cli/src/harness/spec-source-lib.test.mjs",
+        "cli/src/harness/spec-source.mjs",
+        "cli/docs/guides/spec-as-source.md",
+        "cli/src/harness/commands.mjs",
+        "cli/README.md",
+        "docs/ASDD-ROADMAP.md",
+        "package.json"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "bfeabca97fa6afebc416c0dff7db5411d6171450f15ba5c4cc5cb6529a2b9d86"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-11-12T19:57:28.309Z",
+  "generated_at": "2026-11-14T03:00:53.504Z",
   "slices": [
     {
       "slice_id": "agents-spec",
@@ -12,7 +12,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:27.822Z",
+      "last_activity": "2026-11-14T03:00:53.382Z",
       "contributors": [
         "squad",
         "human",
@@ -30,7 +30,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:27.837Z",
+      "last_activity": "2026-11-14T03:00:53.385Z",
       "contributors": [
         "squad",
         "human",
@@ -48,12 +48,126 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:27.848Z",
+      "last_activity": "2026-11-14T03:00:53.387Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "asdd-p0",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.390Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "asdd-p1",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.394Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "asdd-p2",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.401Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "asdd-p3",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.405Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "asdd-p4",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.409Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "asdd-roadmap",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "lite",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.413Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "asdd-pipeline"
       ]
     },
     {
@@ -66,13 +180,32 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:27.945Z",
+      "last_activity": "2026-11-14T03:00:53.426Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite",
         "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "harness-green",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.428Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-pipeline",
+        "harness"
       ]
     },
     {
@@ -85,7 +218,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:27.955Z",
+      "last_activity": "2026-11-14T03:00:53.431Z",
       "contributors": [
         "squad",
         "human",
@@ -103,7 +236,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:27.998Z",
+      "last_activity": "2026-11-14T03:00:53.437Z",
       "contributors": [
         "squad",
         "human",
@@ -129,7 +262,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.056Z",
+      "last_activity": "2026-11-14T03:00:53.443Z",
       "contributors": [
         "squad",
         "human",
@@ -146,6 +279,25 @@
       ]
     },
     {
+      "slice_id": "kit-playbook",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.445Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-pipeline",
+        "harness"
+      ]
+    },
+    {
       "slice_id": "knowledge-nest",
       "phase": "implementation",
       "status": "in_progress",
@@ -155,7 +307,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.073Z",
+      "last_activity": "2026-11-14T03:00:53.446Z",
       "contributors": [
         "squad",
         "human",
@@ -173,7 +325,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.091Z",
+      "last_activity": "2026-11-14T03:00:53.447Z",
       "contributors": [
         "squad",
         "human",
@@ -191,12 +343,48 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.107Z",
+      "last_activity": "2026-11-14T03:00:53.448Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "review-quality",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.453Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "rule-coverage",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.459Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-pipeline"
       ]
     },
     {
@@ -209,7 +397,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.130Z",
+      "last_activity": "2026-11-14T03:00:53.463Z",
       "contributors": [
         "squad",
         "human",
@@ -228,7 +416,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.178Z",
+      "last_activity": "2026-11-14T03:00:53.468Z",
       "contributors": [
         "squad",
         "human",
@@ -246,12 +434,30 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.224Z",
+      "last_activity": "2026-11-14T03:00:53.474Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "spec-drift-adoption",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.480Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
         "asdd-pipeline"
       ]
     },
@@ -265,7 +471,43 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.255Z",
+      "last_activity": "2026-11-14T03:00:53.487Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "spec-drift-demand",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.491Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "spec-drift-depth",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.494Z",
       "contributors": [
         "squad",
         "human",
@@ -283,7 +525,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.287Z",
+      "last_activity": "2026-11-14T03:00:53.500Z",
       "contributors": [
         "squad",
         "human",
@@ -301,12 +543,31 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-12T19:57:28.308Z",
+      "last_activity": "2026-11-14T03:00:53.501Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite"
+      ]
+    },
+    {
+      "slice_id": "spec-drift-roadmap",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "lite",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-14T03:00:53.504Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "asdd-pipeline"
       ]
     }
   ]

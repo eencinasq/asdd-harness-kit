@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-adoption",
+  "concerns": [],
+  "session_id": "sess-spec-drift-adoption-008",
+  "timestamp": "2026-11-13T01:36:55.131Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: typecheck OK, lint no errors (2 warnings + 1 info pre-existing), test 179/179, build OK, test:e2e 109/109. baseline.spec: fingerprints survive moves/whitespace, not edits; multiplicity; resolved only for whole scans; malformed file = no baseline. baseline-view.spec: hint, default New filter, matching. baseline.e2e (Semgrep 1.183, CLI run as a process): no baseline -> null and dry run writes nothing; after baseline --write: 0 new / 2 existing / 0 resolved; moved line stays existing, new call new, removed resolved (1/1/1); limited scan resolved null; MCP tools never rewrite the file. Compiled bin: node bin/spec-drift.mjs baseline [--write] --repo <tmp> printed the dry run, then wrote .semgrep/baseline.json."
+}

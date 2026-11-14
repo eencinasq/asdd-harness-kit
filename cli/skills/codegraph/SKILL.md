@@ -1,9 +1,8 @@
 ---
 name: codegraph
 description: >-
-  Answers structural code questions from the codegraph index: code flows, callers, blast radius, affected tests. Use
-  when exploring code or checking impact, before grep or broad reads. Do NOT use for judging code against requirements —
-  use codebase-audit; or for searching specs (`asdd knowledge`).
+  Answers code-structure questions (flows, callers, impact). Use when exploring code. Do NOT use to judge code — use
+  codebase-audit.
 metadata:
   tier: leaf
 ---

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { type Answer, knowledgeQuery } from './harness-libs.ts';
+import { type Answer, computePipelineMetrics, knowledgeQuery } from './harness-libs.ts';
 
 export type { Answer } from './harness-libs.ts';
 
@@ -41,5 +41,17 @@ export class KnowledgeService {
 	/** Learning patterns, computed live from the sources of truth: needs no knowledge index. */
 	patterns(status?: string): Promise<Answer> {
 		return knowledgeQuery.patterns(this.options.root, status ? { status } : {});
+	}
+
+	/** Pipeline adoption metrics (same as `asdd status --json`). Read-only. */
+	pipelineStatus(): Answer {
+		try {
+			return { payload: computePipelineMetrics(this.options.root), failed: false };
+		} catch (e) {
+			return {
+				payload: { error: e instanceof Error ? e.message : String(e) },
+				failed: true,
+			};
+		}
 	}
 }

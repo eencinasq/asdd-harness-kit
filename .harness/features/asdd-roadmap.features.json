@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "asdd-roadmap",
+  "source_tasks": ".harness/specs/asdd-roadmap/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "ASDD + Harness roadmap document",
+      "user_visible_behavior": "The team reads the ASDD pipeline gaps and prioritized roadmap in docs/ASDD-ROADMAP.md.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 14"
+      ],
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 14` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "scope_paths": [
+        "docs/ASDD-ROADMAP.md"
+      ],
+      "evidence_hash": "dcf3c3bf62a1d72c170f893c66ecf0bee1a3bb8b99aea8f473be0d4f4bd2c915"
+    }
+  ]
+}

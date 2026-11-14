@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "asdd-p4",
+  "concerns": [],
+  "session_id": "sess-asdd-p4-020",
+  "timestamp": "2026-11-14T02:20:38.526Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_completed",
+  "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/spec-source-lib.test.mjs && test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e."
+}

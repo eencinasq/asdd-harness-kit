@@ -22,7 +22,7 @@ export default function validate(ctx) {
 
     const sessions = readSessions(sliceDir);
     const mode = deriveMode(sessions);
-    if (mode !== 'lite') continue;
+    if (mode !== 'lite' && mode !== 'hotfix') continue;
 
     const signals = deriveEscalationSignals(sessions);
     if (signals.length === 0) continue;
@@ -33,11 +33,11 @@ export default function validate(ctx) {
     const summary = signals.map((s) => s.type).join(', ');
     if (closing) {
       fail(
-        `lite slice "${sliceId}" cannot complete with open escalation signals (${summary}) — run: asdd slice escalate ${sliceId} --reasons "${summary}"`
+        `${mode} slice "${sliceId}" cannot complete with open escalation signals (${summary}) — run: asdd slice escalate ${sliceId} --reasons "${summary}"`
       );
     } else {
       for (const s of signals) {
-        warn(`lite slice "${sliceId}": escalation signal ${s.type} — ${s.evidence}`);
+        warn(`${mode} slice "${sliceId}": escalation signal ${s.type} — ${s.evidence}`);
       }
     }
   }

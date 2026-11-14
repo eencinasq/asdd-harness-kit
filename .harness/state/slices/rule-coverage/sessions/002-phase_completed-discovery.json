@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-002",
+  "timestamp": "2026-11-12T23:03:02.075Z",
+  "phase": "discovery",
+  "event_type": "phase_completed",
+  "evidence": "intent.md + capability.md from ROADMAP P1. Verified with Semgrep 1.183: semgrep --test --json reports only annotated rules (untested = absent), and semgrep scans .semgrep/ fixtures as code (must be excluded). Kit ADR convention: files in the ADR location (documentation-and-adrs), structure.md 'ADR index' binding."
+}

@@ -1,8 +1,8 @@
 {
 	"name": "spec-drift",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"private": true,
-	"description": "MCP App — Semgrep architecture/standards, project-agnostic GitHub PR review, and asdd-harness spec drift audit",
+	"description": "spec-drift MCP server \u2014 architecture and standards analysis on the repo rules (ADR coverage, baseline, trend), project-agnostic GitHub PR review, and asdd-harness spec drift audit",
 	"type": "module",
 	"engines": {
 		"node": ">=24.22.1"

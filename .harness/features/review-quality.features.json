@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "review-quality",
+  "source_tasks": ".harness/specs/review-quality/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Eval validation, breakdowns, baseline, harvest",
+      "user_visible_behavior": "Maintainers validate cases, compare scores with a baseline, and turn real reviews into private cases.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test"
+      ],
+      "evidence": "tools/spec-drift: typecheck OK; lint no errors (2 warnings + 1 info pre-existing); pnpm test 122/122. eval-score.spec: per-language/category breakdown, compareWithBaseline flags a 6-point precision drop and passes a 4-point one (and a 10-point recall drop), repeated noise counted. eval-cases.spec: validateCase passes a label on an added line with a known rule; reports a context-line label, unknown rule, file not in the diff, id/file mismatch, missing language; caseFromReview gives 2 defects (kept, edited) + 1 noise (removed) and copies no comment text. scripts/eval.mts: check, score --json/--baseline/--max-drop, harvest (default $PR_REVIEW_ROOT/eval-cases; refuses inside the repo without --allow-repo) — tried on a real review into a temp dir (1 clean case, check OK), then deleted.",
+      "scope_paths": [
+        "tools/spec-drift/src/pr-review/metrics/eval-score.ts",
+        "tools/spec-drift/src/pr-review/metrics/eval-score.spec.ts",
+        "tools/spec-drift/src/pr-review/metrics/eval-cases.ts",
+        "tools/spec-drift/src/pr-review/metrics/eval-cases.spec.ts",
+        "tools/spec-drift/scripts/eval.mts"
+      ],
+      "evidence_hash": "c47c59c80fedfc98c62bae381a9aedfc95b280ba349928579c00bee5459d6a3c"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Evaluation set",
+      "user_visible_behavior": "At least 30 validated cases across 6+ languages, a third clean.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test"
+      ],
+      "evidence": "eval/cases: 35 cases (32 new + 3 seeds given language/category), 9 languages (typescript, python, go, java, csharp, rust, php, yaml/GitHub Actions, terraform), 12 clean, 23 with one labelled defect each across security, correctness, error-handling, resources, concurrency, async, tests. Generated from before/after sources with labels by unique substring (no client code). pnpm eval check: 0 problems; eval-set.spec (every case validates and yields >= 1 review group; >= 30 cases, >= 6 languages, >= 1/3 clean) in pnpm test 158/158; typecheck OK; lint no errors.",
+      "scope_paths": [
+        "tools/spec-drift/eval/cases",
+        "tools/spec-drift/src/pr-review/metrics/eval-set.spec.ts"
+      ],
+      "evidence_hash": "5fdbeef2614d0f32dbf10e6d169bc5399010bb7d8960e5ed5f296e4efc386acd"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Review metrics in the learning loop",
+      "user_visible_behavior": "asdd learn folds review noise per rule into the shared weekly summaries.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test"
+      ],
+      "evidence": "npm test exit 0 (136/136). learning-lib.test 'review-quality REQ-005': a metrics file with 3 reviews of project shop, 1 of another project and a bad line → 3 ingested into 2026-W45-ana / 2026-W46-ana summaries; a second run and another author ingest 0; review:python.performance is a noise pattern, 3 occurrences, open; a kept-only rule is no signal; learningReport.review_quality = 3 reviews, drafted 7, kept 4, removed 3, acceptance 4/7, top rule python.performance, authors [ana]; null without reviews; a missing file ingests nothing. reviewMetricsFile follows PR_REVIEW_ROOT / XDG_STATE_HOME. learn.mjs ingests before compaction and reports it. QG-LEARN-01 lists removed review comments (cli/steering + kit copy). asdd kit vendor refreshed learning-lib.mjs in spec-drift, jev-gate, knowledge.",
+      "scope_paths": [
+        "cli/src/harness/learning-lib.mjs",
+        "cli/src/harness/learning-lib.test.mjs",
+        "cli/src/harness/learn.mjs",
+        "tools/spec-drift/src/harness/learning-lib.mjs",
+        "tools/jev-gate/src/harness/learning-lib.mjs",
+        "tools/knowledge/src/harness/learning-lib.mjs",
+        "cli/steering/quality-gates.md",
+        ".harness/steering/quality-gates.md"
+      ],
+      "evidence_hash": "647b36cf59083905bb74691857612491458e247622c0853557e54cac2676c3ac"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Review quality in the learning view",
+      "user_visible_behavior": "The learning view shows team review quality and noisy rules.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-005"
+      ],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "Re-verified after spec-drift-depth changed shared spec-drift files: typecheck OK, lint no errors (2 pre-existing warnings), test 214/214, build OK, test:e2e 132/132; ROADMAP.md has the P sections (grep #### P = 12).",
+      "scope_paths": [
+        "tools/spec-drift/src/audit/audit-insight.output.ts",
+        "tools/spec-drift/src/audit/audit.service.ts",
+        "tools/spec-drift/test/insight.e2e-spec.ts",
+        "tools/spec-drift/ui/audit-dashboard"
+      ],
+      "evidence_hash": "7299def5c2969638c3b000eea3d8f5350ce54c3bfc2295362ad021eb502bcbbd"
+    },
+    {
+      "id": "TASK-005",
+      "title": "Docs",
+      "user_visible_behavior": "The eval README, server README and roadmap describe the new workflow.",
+      "status": "passing",
+      "priority": 5,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005"
+      ],
+      "depends_on": [
+        "TASK-002",
+        "TASK-004"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm lint"
+      ],
+      "evidence": "Re-verified after the README / PLAYBOOK / ROADMAP update (P0-P4 state, P4.5 deferred to a later version): typecheck OK, lint no errors (2 pre-existing warnings), test 226/226, build OK, test:e2e 140/140; ROADMAP.md has its P sections (grep #### P = 12).",
+      "scope_paths": [
+        "tools/spec-drift/eval/README.md",
+        "tools/spec-drift/README.md",
+        "tools/spec-drift/docs/ROADMAP.md"
+      ],
+      "evidence_hash": "5979cf328f6a9aa9fc4d87f22d9b68625cd10ed738ec73bc6e6b921cd7e2aa26"
+    }
+  ]
+}

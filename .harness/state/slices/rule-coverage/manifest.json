@@ -1,0 +1,483 @@
+{
+  "schema_version": "3.0",
+  "slice_id": "rule-coverage",
+  "phase": "knowledge",
+  "status": "DONE",
+  "mode": "full",
+  "escalation_signals": [
+    {
+      "type": "E1-scope-spread",
+      "evidence": "scope touches 3 top-level modules: .harness, cli, tools"
+    }
+  ],
+  "escalation_required": false,
+  "escalated_from_lite": false,
+  "created_at": "2026-11-12T23:02:45.239Z",
+  "updated_at": "2026-11-14T03:00:53.459Z",
+  "paths": {
+    "specs": ".harness/specs/rule-coverage",
+    "tasks": ".harness/specs/rule-coverage/tasks.md",
+    "features": ".harness/features/rule-coverage.features.json"
+  },
+  "gates": {
+    "discovery": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T23:03:02.075Z",
+      "evidence": "intent.md + capability.md from ROADMAP P1. Verified with Semgrep 1.183: semgrep --test --json reports only annotated rules (untested = absent), and semgrep scans .semgrep/ fixtures as code (must be excluded). Kit ADR convention: files in the ADR location (documentation-and-adrs), structure.md 'ADR index' binding.",
+      "concerns": []
+    },
+    "spec": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T23:03:02.125Z",
+      "evidence": "requirements.md: REQ-001..005 MUST with AC-001..005. Spec confidence 0.86.",
+      "concerns": []
+    },
+    "validation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T23:03:02.178Z",
+      "evidence": "anti-patterns.md: one AP-4 (noisy) resolved in design; spec-validation-report.md PASSED, confidence 0.86; INFO VAL-001 (ADR files, not inline slice ADRs), VAL-002 (Semgrep-dependent criteria).",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T23:03:02.227Z",
+      "evidence": "design.md: ADR-001..006 (files not slice designs; numeric id match; Enforcement: manual exempt; noisy >= 50 hits or >= 20 files; optional testRules port method; coverage in every summary). Domain phase skipped. Confidence 0.85 (QG-DES-01).",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T23:03:02.279Z",
+      "evidence": "tasks.md: TASK-001..005; serial; 002<-001, 004<-002, 005<-003,004; overlap of 001/002 files noted (re-verify on DRIFT-02). Confidence 0.85 (QG-TPL-01).",
+      "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T23:36:40.324Z",
+      "evidence": "TASK-001..005 passing in dependency order; TASK-001 re-verified after TASK-002 changed its files (planned); TASK-002 scope extended (noted in tasks.md).",
+      "concerns": []
+    },
+    "qa": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T23:36:40.371Z",
+      "evidence": "spec-coverage-report.md PASSED: MUST 5/5, AC 5/5; Semgrep cases ran with Semgrep 1.183.",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-12T23:36:40.419Z",
+      "evidence": "Lessons: (1) Semgrep scans .semgrep/ test fixtures as code and does not apply --exclude to explicit targets — every scan must exclude AND filter named paths (found by trying it, not by reading docs); (2) semgrep --test only reports annotated rules, so 'no test' is absence, not a status; (3) ADR ids must match by number (ADR-10 = ADR-0010 = 0010-x.md); (4) a free-text binding cell ('none yet …') is not a path; (5) zsh does not word-split unquoted variables — shell probes need ${=var}.",
+      "concerns": []
+    }
+  },
+  "active_features": [],
+  "open_dissents": 0,
+  "source": null,
+  "session_log": [
+    {
+      "timestamp": "2026-11-12T23:02:45.186Z",
+      "agent": "human",
+      "human": "squad",
+      "event": "phase_started",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T23:03:02.075Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T23:03:02.125Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T23:03:02.178Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "validation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T23:03:02.227Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T23:03:02.279Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T23:03:02.334Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T23:23:29.850Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T23:23:29.959Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T23:29:48.690Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-12T23:29:48.763Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T23:29:48.833Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-12T23:29:48.905Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T23:31:32.616Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-12T23:31:32.683Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-12T23:35:26.769Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-12T23:35:26.846Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-12T23:35:53.399Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-12T23:36:40.324Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T23:36:40.371Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-12T23:36:40.419Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-13T20:17:11.626Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-13T20:17:11.628Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-13T20:17:11.638Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-13T20:17:11.644Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-13T20:17:11.657Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-13T20:17:11.660Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-13T20:17:11.666Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-13T20:17:11.668Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-14T01:12:21.477Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-14T01:12:21.480Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-14T01:12:21.482Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-14T01:12:21.485Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-14T01:12:21.487Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-14T01:12:21.489Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-14T01:35:39.139Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-14T01:35:39.141Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-14T01:35:39.144Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-14T01:35:39.147Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-14T01:35:39.149Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-14T01:35:39.151Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-004"
+    },
+    {
+      "timestamp": "2026-11-14T01:35:39.153Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-14T01:35:39.155Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-14T01:50:29.712Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-14T01:50:29.715Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-005"
+    },
+    {
+      "timestamp": "2026-11-14T02:55:16.169Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-14T02:55:16.172Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-14T02:55:16.176Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-14T02:55:16.179Z",
+      "agent": "asdd-pipeline",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    }
+  ],
+  "contributors": [
+    "squad",
+    "human",
+    "eencinas",
+    "asdd-pipeline"
+  ]
+}

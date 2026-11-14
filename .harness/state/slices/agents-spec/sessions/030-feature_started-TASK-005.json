@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "agents-spec",
+  "concerns": [],
+  "session_id": "sess-agents-spec-030",
+  "timestamp": "2026-11-14T02:20:38.443Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-005 (DRIFT-02; slice harness-green).",
+  "scope_paths": [
+    "cli/src/kit/agents-lint.mjs",
+    "cli/src/main.mjs",
+    "cli/test/agents-lint.test.mjs",
+    "package.json",
+    "cli/README.md",
+    "cli/versions.json"
+  ]
+}

@@ -49,7 +49,7 @@ export class CommandAbortedError extends Error {
  * Never let git / gh / ssh wait for input: there is no terminal behind an MCP server, so a prompt
  * (credentials, SSH passphrase, host key) would hang the tool call forever.
  */
-const nonInteractiveEnv = (): NodeJS.ProcessEnv => {
+export const nonInteractiveEnv = (): NodeJS.ProcessEnv => {
 	const env: NodeJS.ProcessEnv = {
 		...process.env,
 		GIT_TERMINAL_PROMPT: '0',
@@ -57,9 +57,12 @@ const nonInteractiveEnv = (): NodeJS.ProcessEnv => {
 		GH_PROMPT_DISABLED: '1',
 		GIT_SSH_COMMAND: process.env['GIT_SSH_COMMAND'] ?? 'ssh -o BatchMode=yes',
 	};
-	// A stale token in the GUI environment overrides gh's keyring and makes `gh pr view` return 401.
-	delete env.GITHUB_TOKEN;
-	delete env.GH_TOKEN;
+	// A stale token in the GUI environment overrides gh's keyring and makes `gh pr view` return 401. In CI there is no
+	// keyring: the token is how gh authenticates (the reviewer's token, spec-drift-demand REQ-004).
+	if (process.env['CI'] !== 'true') {
+		delete env.GITHUB_TOKEN;
+		delete env.GH_TOKEN;
+	}
 	return env;
 };
 

@@ -46,7 +46,10 @@ export const PatternsInputSchema = z.object({
 		.describe('Only patterns in this status (default: everything except watching)'),
 });
 
+export const PipelineStatusInputSchema = z.object({});
+
 export type SearchInput = z.infer<typeof SearchInputSchema>;
 export type TraceInput = z.infer<typeof TraceInputSchema>;
 export type SliceInput = z.infer<typeof SliceInputSchema>;
 export type PatternsInput = z.infer<typeof PatternsInputSchema>;
+export type PipelineStatusInput = z.infer<typeof PipelineStatusInputSchema>;

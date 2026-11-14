@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "review-quality",
+  "concerns": [],
+  "session_id": "sess-review-quality-009",
+  "timestamp": "2026-11-12T21:09:09.527Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/eval/cases",
+    "tools/spec-drift/src/pr-review/metrics/eval-set.spec.ts"
+  ],
+  "evidence": "Start TASK-002 (REQ-003)."
+}

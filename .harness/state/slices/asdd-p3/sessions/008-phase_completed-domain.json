@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p3",
+  "concerns": [],
+  "event_type": "phase_completed",
+  "phase": "domain",
+  "evidence": "Backfill capability.md + requirements.md; domain for escalated P3.",
+  "session_id": "sess-asdd-p3-008",
+  "timestamp": "2026-11-13T12:10:34.000Z"
+}

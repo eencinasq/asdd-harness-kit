@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-010",
+  "timestamp": "2026-11-14T01:25:58.923Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_completed",
+  "evidence": "typecheck OK, test 218/218 (fix-prompt.spec 2/2), build OK; full e2e 132/136, the 4 failures were this task's new prompt missing from the MCP contract list \u2014 updated test/mcp.e2e-spec.ts, re-ran mcp.e2e + fix-prompt.e2e: 18/18; ui.e2e 'Ask the agent to fix' sends the rule's 2 violations to the host. Lint error (noUnsafeOptionalChaining in the new e2e) fixed; biome clean on both files."
+}

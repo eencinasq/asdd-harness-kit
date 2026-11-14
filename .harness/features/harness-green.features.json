@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "harness-green",
+  "source_tasks": ".harness/specs/harness-green/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Green check: budget, copies, versions, re-verification",
+      "user_visible_behavior": "asdd check and npm test pass with the steering budget unchanged.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm test && node cli/bin/asdd.mjs kit guidance && cd tools/knowledge && pnpm test"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && node cli/bin/asdd.mjs kit guidance && cd tools/knowledge && pnpm test` exits 0.",
+      "scope_paths": [
+        "cli/skills/asdd-converge/SKILL.md",
+        "cli/skills/asdd-implement/SKILL.md",
+        "cli/skills/asdd-next/SKILL.md",
+        "cli/skills/asdd-status/SKILL.md",
+        "cli/skills/codegraph/SKILL.md",
+        "cli/skills/external-trackers/SKILL.md",
+        "cli/modules/http-api/skills/api-and-interface-design/SKILL.md",
+        ".harness/steering/skills.md",
+        "cli/versions.json",
+        "tools/knowledge/test/knowledge.e2e-spec.ts"
+      ],
+      "evidence_hash": "6c7bf2cf9aa01f96c5329127184bc48848a09da74ef1e46b673e16b3ef158b87"
+    }
+  ]
+}

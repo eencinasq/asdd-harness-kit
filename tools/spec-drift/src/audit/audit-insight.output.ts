@@ -80,8 +80,67 @@ export const LearningReportOutput = z.looseObject({
 		}),
 	),
 	commands_note: z.string(),
+	review_quality: z
+		.looseObject({
+			reviews: z.number(),
+			drafted: z.number(),
+			kept: z.number(),
+			edited: z.number(),
+			removed: z.number(),
+			acceptance: z.number().nullable().describe('(kept + edited) / drafted'),
+			by_rule: z.array(
+				z.looseObject({
+					rule: z.string(),
+					drafted: z.number(),
+					kept: z.number(),
+					edited: z.number(),
+					removed: z.number(),
+				}),
+			),
+		})
+		.nullable()
+		.optional()
+		.describe('Team PR review quality from the reviews asdd learn recorded (review-quality REQ-005); null when none'),
 	no_data: NoDataOutput.optional(),
 });
 
 export type AuditQueryInput = z.infer<typeof AuditQueryInputSchema>;
 export type LearningReportInput = z.infer<typeof LearningReportInputSchema>;
+
+export const TraceabilityInputSchema = z.object({
+	slice_id: z.string().optional().describe('Only the requirements of this slice'),
+	gaps_only: z
+		.boolean()
+		.default(false)
+		.describe('Only requirements with a gap: no-feature, no-test, or not-passing (totals still cover all)'),
+});
+
+export const TraceabilityOutput = z.looseObject({
+	matrix: z.array(
+		z.looseObject({
+			slice: z.string(),
+			req_id: z.string(),
+			title: z.string(),
+			features: z.array(z.looseObject({ id: z.string(), status: z.string() })),
+			files: z.array(z.string()).describe('Owned files (folders and globs expanded), at most 50'),
+			file_count: z.number(),
+			tests: z.array(z.string()).describe('Test files among the owned files'),
+			prs: z.array(z.number()).describe('PR numbers of commits that touched the owned files'),
+			gaps: z.array(z.enum(['no-feature', 'no-test', 'not-passing'])),
+		}),
+	),
+	totals: z
+		.looseObject({
+			requirements: z.number(),
+			with_feature: z.number(),
+			tested: z.number(),
+			passing: z.number(),
+			with_gaps: z.number(),
+		})
+		.nullable(),
+	markdown: z.string().optional().describe('The same matrix as a Markdown table, for an audit document'),
+	index_generated_at: z.string().nullable().optional(),
+	no_data: NoDataOutput.optional(),
+});
+
+export type TraceabilityInput = z.infer<typeof TraceabilityInputSchema>;

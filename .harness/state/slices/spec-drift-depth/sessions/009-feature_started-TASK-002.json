@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-depth",
+  "concerns": [],
+  "session_id": "sess-spec-drift-depth-009",
+  "timestamp": "2026-11-14T00:51:10.256Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/src/pr-review/risk",
+    "tools/spec-drift/src/pr-review/pr-review.service.ts",
+    "tools/spec-drift/src/pr-review/pr-review.types.ts",
+    "tools/spec-drift/src/pr-review/pr-review.schemas.ts",
+    "tools/spec-drift/src/pr-review/github/github.service.ts",
+    "tools/spec-drift/src/pr-review/prompt/review-prompt.ts",
+    "tools/spec-drift/src/pr-review/workspace/review-artifacts.repository.ts",
+    "tools/spec-drift/ui/pr-review",
+    "tools/spec-drift/test/pr-risk.e2e-spec.ts"
+  ],
+  "evidence": "Start TASK-002 (REQ-002)."
+}

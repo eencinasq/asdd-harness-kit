@@ -1,0 +1,15 @@
+{
+	"id": "cs-httpclient-per-call",
+	"description": "A new HttpClient per call exhausts sockets (TIME_WAIT); the injected client was the right one.",
+	"language": "csharp",
+	"category": "resources",
+	"diff": "diff --git a/src/Api/Services/RatesService.cs b/src/Api/Services/RatesService.cs\n--- a/src/Api/Services/RatesService.cs\n+++ b/src/Api/Services/RatesService.cs\n@@ -1,8 +1,8 @@\n public class RatesService\n {\n-    private readonly HttpClient _http;\n-\n-    public RatesService(HttpClient http) => _http = http;\n-\n-    public Task<string> Rates() => _http.GetStringAsync(\"/rates\");\n+    public async Task<string> Rates()\n+    {\n+        using var http = new HttpClient { BaseAddress = new Uri(\"https://rates.example\") };\n+        return await http.GetStringAsync(\"/rates\");\n+    }\n }\n",
+	"expected": [
+		{
+			"path": "src/Api/Services/RatesService.cs",
+			"startLine": 5,
+			"ruleId": "csharp.resource-lifetime-and-disposal",
+			"note": "HttpClient per call"
+		}
+	]
+}

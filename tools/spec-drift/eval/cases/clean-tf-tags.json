@@ -1,0 +1,8 @@
+{
+	"id": "clean-tf-tags",
+	"description": "Adds cost-allocation tags to a bucket.",
+	"language": "terraform",
+	"category": "clean",
+	"diff": "diff --git a/infra/assets.tf b/infra/assets.tf\n--- a/infra/assets.tf\n+++ b/infra/assets.tf\n@@ -1,3 +1,8 @@\n resource \"aws_s3_bucket\" \"assets\" {\n   bucket = \"acme-assets-${var.env}\"\n+\n+  tags = {\n+    team        = \"storefront\"\n+    environment = var.env\n+  }\n }\n",
+	"expected": []
+}

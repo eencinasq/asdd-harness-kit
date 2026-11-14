@@ -19,7 +19,16 @@
       }
     },
     "harness_version": { "type": "string", "minLength": 1 },
-    "mode": { "enum": ["full", "lite", "escalated"] },
+    "mode": { "enum": ["full", "lite", "hotfix", "escalated"] },
+    "stop": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": ["fail_closed", "advisory"],
+          "description": "Verify-on-Stop: fail_closed blocks the session on check FAIL; advisory runs check + learning but does not block."
+        }
+      }
+    },
     "bindings_complete": { "type": "boolean" },
     "paths": {
       "type": "object",
@@ -39,6 +48,15 @@
         "contract": { "enum": ["warn", "fail"], "description": "Severity of DRIFT-06 (every feature has scope_paths; passing features have evidence)." }
       }
     },
-    "capabilities": { "type": "object" }
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "spec_as_source": {
+          "type": "boolean",
+          "description": "Experimental: enable asdd spec-source inventory (not default SoT)."
+        }
+      },
+      "additionalProperties": true
+    }
   }
 }

@@ -5,8 +5,8 @@
     "name": "asdd-harness-kit",
     "source": "https://github.com/eencinasq/asdd-harness-kit",
     "ref": "main",
-    "version": "3.10.0",
-    "installed_at": "2026-11-12T19:44:01Z"
+    "version": "3.11.0",
+    "installed_at": "2026-11-14T02:30:01Z"
   },
   "harness_version": "2.0",
   "mode": "full",

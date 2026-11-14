@@ -1,0 +1,8 @@
+{
+	"id": "clean-rust-question-mark",
+	"description": "Replaces unwrap() with ? and a typed error; no panic on bad input.",
+	"language": "rust",
+	"category": "clean",
+	"diff": "diff --git a/src/config.rs b/src/config.rs\n--- a/src/config.rs\n+++ b/src/config.rs\n@@ -1,5 +1,8 @@\n use std::fs;\n \n-pub fn read_port(path: &str) -> u16 {\n-    fs::read_to_string(path).unwrap().trim().parse().unwrap()\n+use crate::error::ConfigError;\n+\n+pub fn read_port(path: &str) -> Result<u16, ConfigError> {\n+    let text = fs::read_to_string(path)?;\n+    Ok(text.trim().parse()?)\n }\n",
+	"expected": []
+}

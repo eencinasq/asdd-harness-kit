@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "review-quality",
+  "concerns": [],
+  "session_id": "sess-review-quality-014",
+  "timestamp": "2026-11-12T21:17:19.371Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: typecheck OK; lint no errors (2 warnings + 1 info pre-existing); pnpm test 159/159; pnpm build OK; test:e2e 102/102. insight.e2e 'review-quality REQ-005': a summary with one recorded review \u2192 learning_report returns review_quality (1 review, top rule python.performance), schema-valid, writes nothing. model.spec: learning view carries review_quality (null without). LearningReportOutput.review_quality (nullable); the learning no_data no longer hides recorded reviews; the dashboard shows 'PR review quality' (totals, per-rule kept/edited/removed). Reverted an unintended biome autofix of ci-templates.ts."
+}

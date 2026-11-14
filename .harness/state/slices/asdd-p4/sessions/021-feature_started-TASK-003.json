@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "asdd-p4",
+  "concerns": [],
+  "session_id": "sess-asdd-p4-021",
+  "timestamp": "2026-11-14T02:55:16.117Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-003 (DRIFT-02 after the 3.11.0 bump).",
+  "scope_paths": [
+    "cli/src/harness/spec-source-lib.mjs",
+    "cli/src/harness/spec-source-lib.test.mjs",
+    "cli/src/harness/spec-source.mjs",
+    "cli/docs/guides/spec-as-source.md",
+    "cli/src/harness/commands.mjs",
+    "cli/README.md",
+    "docs/ASDD-ROADMAP.md",
+    "package.json"
+  ]
+}

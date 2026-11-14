@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-008",
+  "timestamp": "2026-11-14T01:20:29.373Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/domain/fix-prompt.ts",
+    "tools/spec-drift/src/analysis/domain/fix-prompt.spec.ts",
+    "tools/spec-drift/src/analysis/analysis.prompts.ts",
+    "tools/spec-drift/ui/analysis-dashboard",
+    "tools/spec-drift/test/fix-prompt.e2e-spec.ts",
+    "tools/spec-drift/test/ui.e2e-spec.ts",
+    "tools/spec-drift/src/analysis/analysis.service.ts",
+    "tools/spec-drift/test/ui/host.ts"
+  ],
+  "evidence": "Start TASK-002 (REQ-002)."
+}

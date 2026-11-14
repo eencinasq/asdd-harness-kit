@@ -1,0 +1,15 @@
+{
+	"id": "py-swallowed-exception",
+	"description": "A failed charge is swallowed: the order is marked paid even when the gateway raised.",
+	"language": "python",
+	"category": "error-handling",
+	"diff": "diff --git a/app/billing.py b/app/billing.py\n--- a/app/billing.py\n+++ b/app/billing.py\n@@ -1,7 +1,14 @@\n+import logging\n+\n from app.gateway import charge\n+\n+log = logging.getLogger(__name__)\n \n \n def pay(order):\n-    charge(order.total, order.card)\n+    try:\n+        charge(order.total, order.card)\n+    except Exception:\n+        pass\n     order.status = \"paid\"\n     return order\n",
+	"expected": [
+		{
+			"path": "app/billing.py",
+			"startLine": 12,
+			"ruleId": "python.error-handling-and-exceptions",
+			"note": "exception swallowed"
+		}
+	]
+}

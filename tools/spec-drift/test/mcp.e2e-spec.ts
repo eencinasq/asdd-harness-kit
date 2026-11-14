@@ -48,9 +48,17 @@ const EXPECTED_UI: Record<string, { uri: string; appOnly?: boolean }> = {
 	audit_report: { uri: UI.audit },
 	audit_finding: { uri: UI.audit },
 	learning_report: { uri: UI.audit },
+	traceability_matrix: { uri: UI.audit },
 };
 const TEXT_ONLY = [
 	'list_rule_packs',
+	'adr_coverage',
+	'validate_rules',
+	'drift_trend',
+	'analysis_start',
+	'analysis_job',
+	'drift_origin',
+	'repos_overview',
 	'audit_query',
 	'pr_review_start',
 	'pr_review_next_group',
@@ -70,7 +78,7 @@ const textOf = (result: Awaited<ReturnType<Client['callTool']>>): string =>
 /** Contract every transport must satisfy. */
 const assertContract = async (client: Client): Promise<void> => {
 	const { tools } = await client.listTools();
-	assert.equal(tools.length, 32, 'tool count');
+	assert.equal(tools.length, 40, 'tool count');
 	for (const [name, ui] of Object.entries(EXPECTED_UI)) {
 		const meta = tools.find((t) => t.name === name)?._meta as Record<string, any> | undefined;
 		assert.equal(meta?.ui?.resourceUri, ui.uri, `${name} ui.resourceUri`);
@@ -96,11 +104,13 @@ const assertContract = async (client: Client): Promise<void> => {
 	const { prompts } = await client.listPrompts();
 	assert.deepEqual(prompts.map((p) => p.name).sort(), [
 		'architecture-review',
+		'fix-rule-violations',
 		'generate-architecture-rules',
 		'pr-review',
 		'review-pr',
 		'spec-alignment',
 		'spec-drift-report',
+		'write-adr-rule',
 	]);
 	const review = await client.getPrompt({ name: 'review-pr', arguments: { pr: '825', repoPath: '/repo' } });
 	const reviewContent = review.messages[0]?.content;
@@ -302,7 +312,7 @@ describe('MCP server (HTTP transport)', () => {
 	test('GET /health', async () => {
 		const res = await fetch(`${base}/health`);
 		assert.equal(res.status, 200);
-		assert.deepEqual(await res.json(), { status: 'ok', name: 'spec-drift', version: '1.0.0' });
+		assert.deepEqual(await res.json(), { status: 'ok', name: 'spec-drift', version: '1.1.0' });
 	});
 
 	const listTools = (headers: Record<string, string>) =>
@@ -408,7 +418,7 @@ describe('HTTP transport security', () => {
 			await client.connect(
 				new StreamableHTTPClientTransport(new URL(url), { requestInit: { headers: { 'x-api-key': key } } }),
 			);
-			assert.equal((await client.listTools()).tools.length, 32);
+			assert.equal((await client.listTools()).tools.length, 40);
 			await client.close();
 		} finally {
 			child.kill();

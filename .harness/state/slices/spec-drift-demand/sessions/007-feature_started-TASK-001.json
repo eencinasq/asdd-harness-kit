@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-007",
+  "timestamp": "2026-11-14T01:17:18.924Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/domain/drift-origin.ts",
+    "tools/spec-drift/src/analysis/domain/drift-origin.spec.ts",
+    "tools/spec-drift/src/analysis/analysis.service.ts",
+    "tools/spec-drift/src/analysis/analysis.tools.ts",
+    "tools/spec-drift/src/analysis/analysis.output.ts",
+    "tools/spec-drift/src/analysis/analysis.schemas.ts",
+    "tools/spec-drift/test/drift-origin.e2e-spec.ts",
+    "tools/spec-drift/test/mcp.e2e-spec.ts"
+  ],
+  "evidence": "Start TASK-001 (REQ-001)."
+}

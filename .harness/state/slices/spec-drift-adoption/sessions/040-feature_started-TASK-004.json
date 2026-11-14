@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-adoption",
+  "concerns": [],
+  "session_id": "sess-spec-drift-adoption-040",
+  "timestamp": "2026-11-14T02:55:16.206Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-004 (DRIFT-02 after the 3.11.0 bump).",
+  "scope_paths": [
+    "tools/spec-drift/src/cli",
+    "tools/spec-drift/README.md",
+    "tools/spec-drift/docs",
+    "tools/spec-drift/package.json",
+    "cli/mcp/README.md",
+    "tools/spec-drift/test/config.e2e-spec.ts",
+    "tools/spec-drift/src/pr-review/prompt/review-prompt.ts",
+    "tools/spec-drift/src/pr-review/engine/findings-format.ts",
+    "tools/spec-drift/src/pr-review/engine/types.ts",
+    "tools/spec-drift/bin/spec-drift.mjs"
+  ]
+}

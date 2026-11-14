@@ -1,0 +1,15 @@
+{
+	"id": "py-file-handle-leak",
+	"description": "Files opened in a loop are never closed (no `with`): handles leak on large imports.",
+	"language": "python",
+	"category": "resources",
+	"diff": "diff --git a/app/importer.py b/app/importer.py\n--- a/app/importer.py\n+++ b/app/importer.py\n@@ -1,6 +1,9 @@\n import csv\n \n \n-def rows(path):\n-    with open(path, newline=\"\") as f:\n-        return list(csv.DictReader(f))\n+def rows(paths):\n+    out = []\n+    for path in paths:\n+        f = open(path, newline=\"\")\n+        out.extend(csv.DictReader(f))\n+    return out\n",
+	"expected": [
+		{
+			"path": "app/importer.py",
+			"startLine": 7,
+			"ruleId": "python.resource-management",
+			"note": "file never closed"
+		}
+	]
+}

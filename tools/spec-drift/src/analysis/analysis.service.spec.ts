@@ -167,4 +167,32 @@ describe('AnalysisModule with a replacement engine', () => {
 		assert.equal(view.findingCount, 2);
 		assert.deepEqual(moduleRef.get(FakeCodeqlAnalyzer).runs.at(-1)?.paths, ['src/a.ts']);
 	});
+
+	test('rule-coverage REQ-003: the rules folder is excluded, and explicit paths under it are dropped', async () => {
+		const moduleRef = await compile();
+		const engine = moduleRef.get(FakeCodeqlAnalyzer);
+		await moduleRef.get(AnalysisService).scan({ mode: 'all', paths: ['src', 'codeql/architecture/layers.ts'] });
+		assert.ok(engine.runs.at(-1)?.exclude?.includes('codeql'), 'the rules folder is excluded');
+		assert.deepEqual(engine.runs.at(-1)?.paths, ['src']);
+		const runs = engine.runs.length;
+		const only = await moduleRef.get(AnalysisService).scan({ mode: 'all', paths: ['codeql/architecture/layers.ts'] });
+		assert.equal(engine.runs.length, runs, 'nothing to scan when only rule files were named');
+		assert.equal(only.findingCount, 0);
+		const pr = await moduleRef
+			.get(ArchitectureScanService)
+			.scan({ repoRoot: '/pr', project: 'demo', paths: ['src/a.ts', 'codeql/x.ts'] });
+		assert.equal(pr.status, 'scanned');
+		assert.deepEqual(engine.runs.at(-1)?.paths, ['src/a.ts']);
+		assert.ok(engine.runs.at(-1)?.exclude?.includes('codeql'));
+	});
+
+	test('rule-coverage REQ-004: an engine without rule tests is never ready', async () => {
+		const moduleRef = await compile();
+		const summary = await moduleRef.get(AnalysisService).scan({ mode: 'all' });
+		assert.equal(summary.ruleTests?.status, 'unavailable');
+		const report = await moduleRef.get(AnalysisService).validateRules();
+		assert.equal(report.ready, 0);
+		assert.ok(report.rules.every((r) => r.test === 'unavailable' && r.flags.includes('tests-unavailable')));
+		assert.match(report.tests.message ?? '', /CodeQL adapter has no rule tests/);
+	});
 });

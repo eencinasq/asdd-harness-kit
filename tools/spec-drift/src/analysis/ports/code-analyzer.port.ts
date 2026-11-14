@@ -1,4 +1,4 @@
-import type { EngineInfo, Finding, RuleMeta, RulePack } from '../analysis.types.ts';
+import type { EngineInfo, Finding, RuleMeta, RulePack, RuleTestReport } from '../analysis.types.ts';
 
 /**
  * Port between the analysis use cases (spec drift, PR architecture scan) and a static-analysis
@@ -27,6 +27,12 @@ export interface CodeAnalyzer {
 
 	/** Engine-specific steps for an agent asked to write a first rule set for a repo. */
 	authoringGuide(): readonly string[];
+
+	/**
+	 * Run the rules' own tests (rule-coverage REQ-004), e.g. `semgrep --test`. Optional: an engine without it reports
+	 * tests `unavailable`, never passing. Resolves `unavailable` when the tool cannot be started.
+	 */
+	testRules?(repoRoot: string, timeoutMs: number): Promise<RuleTestReport>;
 }
 
 export type RulesLocation = {

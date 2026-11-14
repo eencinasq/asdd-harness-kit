@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p2",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "scope_paths": [
+    "cli/scaffold/features/feature.schema.json",
+    ".harness/features/feature.schema.json",
+    "cli/src/harness/harness-status.mjs",
+    "cli/src/harness/check-invariants.mjs",
+    "cli/src/harness/hill-lib.mjs",
+    "cli/src/harness/hill-lib.test.mjs",
+    "docs/ASDD-ROADMAP.md",
+    "package.json"
+  ],
+  "session_id": "sess-asdd-p2-012",
+  "timestamp": "2026-11-13T03:06:11.000Z"
+}

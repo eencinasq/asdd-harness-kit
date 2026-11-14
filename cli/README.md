@@ -38,11 +38,38 @@ removes both (a project's own scripts in `.harness/scripts/` stay) and moves the
 
 ## Harness commands
 
-`asdd help` lists them all: `check`, `verify`, `gate`, `drift`, `check-config`, `skills-index`, `status`, `sync`,
-`repair`, `slice init|escalate`, `knowledge sync|search|trace|slice|status|patterns`, `learn`, `audit`, and `triage`. They run on the nearest folder up that has `.harness/`. Older installs had them as
+Which command to run when: [the playbook](../docs/PLAYBOOK.md).
+
+They run on the nearest folder up that has `.harness/`. `asdd help` lists every name. Older installs had them as
 `node .harness/scripts/<name>.mjs`, then as a copy in `.harness/cli/`; `asdd install` removes both, rewrites the kit
 hooks and the `project.json` commands, and keeps a project's own scripts in `.harness/scripts/`.
 `asdd repair` restores a consistent harness layout (dirs, sessions, specs, features) and then runs `sync`.
+
+Roadmap P0–P4 shipped these session-facing commands (see [`docs/ASDD-ROADMAP.md`](../docs/ASDD-ROADMAP.md)):
+
+| Command | Purpose |
+|---|---|
+| `asdd status [--metrics\|--json\|--html]` | Slices, escalation, hill; pipeline metrics; HTML dashboard |
+| `asdd init-flow` | 15-minute brownfield: install if needed, one lite slice, check |
+| `asdd converge [--slice] [--strict] [--json]` | Cheap REQ / test-mention / evidence sensor (also in `asdd check`) |
+| `asdd converge-eval` | Score `cli/eval/converge-ears/` fixtures |
+| `asdd slice init <id> [--hotfix\|--full]` | Presets: hotfix / lite (default) / full |
+| `asdd slice amend <id>` | Reopen DONE with `amendments/<stamp>.md` |
+| `asdd slice escalate <id> --reasons "…"` | Lite/hotfix → escalated |
+| `asdd waves [--slice] [--json]` | Parallelism hints from owners + deps + scopes |
+| `asdd portfolio [--json]` | Read-only multi-repo summary (`portfolio.json`) |
+| `asdd tracker-sync [--apply]` | Plan tracker sync from handoff + sessions; `--apply` = local receipt |
+| `asdd spec-source` | Opt-in MUST REQ inventory (`capabilities.spec_as_source`) |
+
+Also: `check`, `verify`, `gate`, `drift`, `check-config`, `skills-index`, `sync`, `repair`,
+`knowledge sync|search|trace|slice|status|patterns`, `learn`, `audit`, `triage`.
+
+Agent skills that wrap the CLI (do not invent SoT): `asdd-status`, `asdd-next`, `asdd-implement`, `asdd-converge`
+under `cli/skills/`. Guides: [`docs/guides/spec-kit-to-asdd.md`](docs/guides/spec-kit-to-asdd.md),
+[`docs/guides/spec-as-source.md`](docs/guides/spec-as-source.md).
+
+Stop hook mode: default fail-closed; set `stop.mode: "advisory"` in `.harness/config/project.json` or
+`HARNESS_STOP_MODE=advisory` so Verify-on-Stop still runs `check --live` but does not block the session.
 
 ```sh
 npx asdd-harness-kit install /path/to/repo --runtime=cursor,claude --modules=http-api

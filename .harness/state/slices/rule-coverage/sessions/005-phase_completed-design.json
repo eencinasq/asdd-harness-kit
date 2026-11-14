@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-005",
+  "timestamp": "2026-11-12T23:03:02.227Z",
+  "phase": "design",
+  "event_type": "phase_completed",
+  "evidence": "design.md: ADR-001..006 (files not slice designs; numeric id match; Enforcement: manual exempt; noisy >= 50 hits or >= 20 files; optional testRules port method; coverage in every summary). Domain phase skipped. Confidence 0.85 (QG-DES-01)."
+}

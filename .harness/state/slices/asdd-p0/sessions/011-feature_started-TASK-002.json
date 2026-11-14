@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-p0",
+  "concerns": [],
+  "event_type": "feature_started",
+  "phase": "qa",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/src/harness/pipeline-metrics.mjs",
+    "cli/src/harness/pipeline-metrics.test.mjs",
+    "cli/src/harness/harness-status.mjs",
+    "cli/src/harness/init-flow.mjs",
+    "cli/src/harness/init-flow.test.mjs",
+    "cli/src/harness/commands.mjs",
+    "docs/guides/spec-kit-to-asdd.md",
+    "docs/ASDD-ROADMAP.md",
+    "cli/README.md",
+    "package.json"
+  ],
+  "evidence": "Hold asdd-p0 mapped until commit (DRIFT-01).",
+  "session_id": "sess-asdd-p0-011",
+  "timestamp": "2026-11-13T02:38:56.000Z"
+}

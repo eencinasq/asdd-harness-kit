@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-040",
+  "timestamp": "2026-11-14T02:20:38.570Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_completed",
+  "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node cli/bin/asdd.mjs kit skills-lint --only api-and-interface-design,browser-testing-with-devtools,frontend-ui-engineering && node cli/bin/asdd.mjs kit guidance` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e."
+}

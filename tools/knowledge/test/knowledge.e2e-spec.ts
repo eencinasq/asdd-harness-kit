@@ -21,7 +21,14 @@ import { AppModule } from '../src/app.module.ts';
 import { KNOWLEDGE_OPTIONS, type KnowledgeOptions } from '../src/knowledge/knowledge.service.ts';
 
 const MAIN = path.resolve(import.meta.dirname, '../src/main.ts');
-const TOOLS = ['knowledge_patterns', 'knowledge_search', 'knowledge_slice', 'knowledge_status', 'knowledge_trace'];
+const TOOLS = [
+	'knowledge_patterns',
+	'knowledge_search',
+	'knowledge_slice',
+	'knowledge_status',
+	'knowledge_trace',
+	'pipeline_status',
+];
 const SLICE = 'test-slice';
 const EMBEDDINGS = ['KNOWLEDGE_EMBEDDINGS_URL', 'KNOWLEDGE_EMBEDDINGS_MODEL', 'KNOWLEDGE_EMBEDDINGS_KEY'];
 

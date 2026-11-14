@@ -1,0 +1,15 @@
+{
+	"id": "ts-react-state-mutation",
+	"description": "The handler mutates the state array in place and sets the same reference: React skips the re-render.",
+	"language": "typescript",
+	"category": "correctness",
+	"diff": "diff --git a/src/cart/CartList.tsx b/src/cart/CartList.tsx\n--- a/src/cart/CartList.tsx\n+++ b/src/cart/CartList.tsx\n@@ -2,5 +2,14 @@\n \n export function CartList({ initial }: { initial: string[] }) {\n \tconst [items, setItems] = useState(initial);\n-\treturn <ul>{items.map((i) => <li key={i}>{i}</li>)}</ul>;\n+\tconst add = (sku: string) => {\n+\t\titems.push(sku);\n+\t\tsetItems(items);\n+\t};\n+\treturn (\n+\t\t<div>\n+\t\t\t<ul>{items.map((i) => <li key={i}>{i}</li>)}</ul>\n+\t\t\t<button type=\"button\" onClick={() => add('gift')}>Add gift</button>\n+\t\t</div>\n+\t);\n }\n",
+	"expected": [
+		{
+			"path": "src/cart/CartList.tsx",
+			"startLine": 6,
+			"ruleId": "ts_js_tsx_jsx.react-best-practices",
+			"note": "state mutated in place"
+		}
+	]
+}

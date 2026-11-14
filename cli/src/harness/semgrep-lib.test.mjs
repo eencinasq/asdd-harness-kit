@@ -93,6 +93,29 @@ test('spec-drift-empty REQ-003: resolveSemgrepConfig selects the .semgrep/archit
   assert.equal(resolveSemgrepConfig(root, stub).path, '.semgrep.yml', 'a config file still wins');
 });
 
+test('rule-coverage REQ-003: the scan excludes .semgrep and drops rule test fixtures named as targets', () => {
+  const root = mkdtempSync(join(tmpdir(), 'semgrep-exclude-'));
+  mkdirSync(join(root, '.semgrep/architecture'), { recursive: true });
+  mkdirSync(join(root, 'src'), { recursive: true });
+  writeFileSync(join(root, '.semgrep/architecture/r.yml'), 'rules: []\n');
+  writeFileSync(join(root, '.semgrep/architecture/r.ts'), 'console.log(1);\n');
+  writeFileSync(join(root, 'src/a.ts'), 'console.log(2);\n');
+  let seen = null;
+  const spawn = (_bin, args) => {
+    seen = args;
+    return { status: 0, stdout: JSON.stringify({ results: [] }), stderr: '' };
+  };
+  const stub = sources.map((s) => (s.id === 'domain-layer.project' ? { ...s, text: '# Layers\n' } : s));
+  runSemgrepScan({ root, sources: stub, paths: ['src/a.ts', '.semgrep/architecture/r.ts'], spawn });
+  assert.deepEqual(seen.slice(seen.indexOf('--exclude'), seen.indexOf('--exclude') + 2), ['--exclude', '.semgrep']);
+  assert.ok(seen.includes('src/a.ts'));
+  assert.ok(!seen.includes('.semgrep/architecture/r.ts'), 'a fixture named as a target is dropped');
+  seen = null;
+  const only = runSemgrepScan({ root, sources: stub, paths: ['.semgrep/architecture/r.ts'], spawn });
+  assert.equal(seen, null, 'nothing to scan');
+  assert.equal(only.status, 'pass');
+});
+
 test('resolveSemgrepConfig honors the Semgrep rules binding', () => {
   const root = mkdtempSync(join(tmpdir(), 'semgrep-bound-'));
   mkdirSync(join(root, 'rules'), { recursive: true });

@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-depth",
+  "concerns": [],
+  "session_id": "sess-spec-drift-depth-013",
+  "timestamp": "2026-11-14T01:05:32.134Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/jobs",
+    "tools/spec-drift/src/analysis/analysis.tools.ts",
+    "tools/spec-drift/src/analysis/analysis.schemas.ts",
+    "tools/spec-drift/src/analysis/analysis.output.ts",
+    "tools/spec-drift/src/common/mcp/elicitation.ts",
+    "tools/spec-drift/src/pr-review/pr-review.tools.ts",
+    "tools/spec-drift/test/jobs.e2e-spec.ts",
+    "tools/spec-drift/test/elicitation.e2e-spec.ts",
+    "tools/spec-drift/README.md",
+    "tools/spec-drift/docs"
+  ],
+  "evidence": "Start TASK-004 (REQ-004)."
+}

@@ -1,5 +1,5 @@
 /**
- * Convert structured findings into Architecture MCP comments.md / report pieces.
+ * Convert structured findings into spec-drift comments.md / report pieces.
  */
 import { serializeCommentsMarkdown } from '../comments/comments-format.ts';
 import type { ReviewEvent } from '../pr-review.types.ts';

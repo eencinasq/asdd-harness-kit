@@ -87,12 +87,20 @@
 				<button type="button" role="tab" id="tab-drift" data-tab="drift" aria-controls="panel-drift">
 					Spec drift <span class="count" id="count-drift">0</span>
 				</button>
+				<button type="button" role="tab" id="tab-adrs" data-tab="adrs" aria-controls="panel-adrs">
+					ADRs <span class="count" id="count-adrs">0</span>
+				</button>
+				<button type="button" role="tab" id="tab-trend" data-tab="trend" aria-controls="panel-trend">Trend</button>
 			</div>
 
 			<section role="tabpanel" id="panel-findings" aria-labelledby="tab-findings" hidden>
 				<div class="toolbar" id="findings-toolbar">
 					<label class="sr-only" for="search">Filter findings</label>
 					<input id="search" class="input input-grow" type="search" placeholder="Filter by file, rule or message" />
+					<div class="segmented" role="group" aria-label="Baseline" id="baseline-filter" hidden>
+						<button type="button" data-value="new" aria-pressed="true">New</button>
+						<button type="button" data-value="all" aria-pressed="false">All</button>
+					</div>
 					<div class="segmented" role="group" aria-label="Severity" id="severity-filter"></div>
 					<div class="segmented" role="group" aria-label="Domain" id="domain-filter" hidden>
 						<button type="button" data-value="ALL" aria-pressed="true">All</button>
@@ -106,6 +114,8 @@
 			</section>
 
 			<section role="tabpanel" id="panel-drift" aria-labelledby="tab-drift" hidden></section>
+			<section role="tabpanel" id="panel-adrs" aria-labelledby="tab-adrs" hidden></section>
+			<section role="tabpanel" id="panel-trend" aria-labelledby="tab-trend" hidden></section>
 
 			<p id="status" class="status"></p>
 		</div>

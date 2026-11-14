@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "spec-drift-roadmap",
+  "concerns": [],
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "evidence": "tools/spec-drift/docs/ROADMAP.md added (moved from the reviewed draft): sections 1-7, gaps G1-G12, 12 priority items P0.1-P3.4 plus the P4 table, out of scope, success metrics; the verification command finds the P headings.",
+  "session_id": "sess-spec-drift-roadmap-006",
+  "timestamp": "2026-11-12T21:00:51.313Z"
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "rule-coverage",
+  "concerns": [],
+  "session_id": "sess-rule-coverage-008",
+  "timestamp": "2026-11-12T23:23:29.850Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: typecheck OK, lint no errors (2 warnings + 1 info pre-existing), test 166/166, build OK, test:e2e 105/105. adr-coverage.spec (7): discovery order binding > .adr-dir > conventional folders (free-text binding ignored), parsing of kit/MADR/adr-tools ADRs (id, title, status, Enforcement: manual), READMEs/templates skipped, numeric id matching, coverage ratio over active non-exempt ADRs, dangling (superseded, no file, no folder), prompt contents. rule-coverage.e2e (3): adr_coverage 1 of 2 enforceable (50%), uncovered ADR-0002 with prompt, dangling ADR-0009, schema-valid, nothing written; write-adr-rule prompt and unknown-ADR message; analyze_spec_drift summary carries adrCoverage. mcp.e2e contract: 33 tools (adr_coverage text-only), prompt write-adr-rule."
+}

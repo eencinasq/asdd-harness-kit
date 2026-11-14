@@ -1,0 +1,15 @@
+{
+	"id": "java-shared-hashmap",
+	"description": "A static HashMap is filled from request threads: concurrent puts can corrupt it.",
+	"language": "java",
+	"category": "concurrency",
+	"diff": "diff --git a/src/main/java/com/acme/pricing/PriceCache.java b/src/main/java/com/acme/pricing/PriceCache.java\n--- a/src/main/java/com/acme/pricing/PriceCache.java\n+++ b/src/main/java/com/acme/pricing/PriceCache.java\n@@ -1,6 +1,10 @@\n package com.acme.pricing;\n \n+import java.util.HashMap;\n+import java.util.Map;\n+\n public class PriceCache {\n+    private static final Map<String, Long> CACHE = new HashMap<>();\n     private final PriceClient client;\n \n     public PriceCache(PriceClient client) {\n@@ -8,6 +12,6 @@\n     }\n \n     public long price(String sku) {\n-        return client.fetch(sku);\n+        return CACHE.computeIfAbsent(sku, client::fetch);\n     }\n }\n",
+	"expected": [
+		{
+			"path": "src/main/java/com/acme/pricing/PriceCache.java",
+			"startLine": 7,
+			"ruleId": "java.thread-safety-issue-detection",
+			"note": "HashMap shared across request threads"
+		}
+	]
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-depth",
+  "concerns": [],
+  "session_id": "sess-spec-drift-depth-028",
+  "timestamp": "2026-11-14T02:55:16.256Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-001 (DRIFT-02 after the 3.11.0 bump).",
+  "scope_paths": [
+    "tools/spec-drift/src/audit/domain",
+    "tools/spec-drift/src/audit/audit.service.ts",
+    "tools/spec-drift/src/audit/audit-insight.tools.ts",
+    "tools/spec-drift/src/audit/audit.output.ts",
+    "tools/spec-drift/src/audit/audit.types.ts",
+    "tools/spec-drift/ui/audit-dashboard",
+    "tools/spec-drift/test/traceability.e2e-spec.ts",
+    "tools/spec-drift/src/audit/harness-libs.ts",
+    "tools/spec-drift/test/ui.e2e-spec.ts",
+    "tools/spec-drift/test/mcp.e2e-spec.ts"
+  ]
+}

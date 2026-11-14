@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-002",
+  "timestamp": "2026-11-14T01:17:18.671Z",
+  "phase": "discovery",
+  "event_type": "phase_completed",
+  "evidence": "intent/capability from ROADMAP P4 without P4.5. Facts: CodeQL CLI not installed here; anthropics/claude-code-action@v1 inputs prompt, anthropic_api_key, claude_args (--mcp-config, --allowedTools); a pending review belongs to its token's owner."
+}

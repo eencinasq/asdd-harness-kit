@@ -1,0 +1,18 @@
+{
+  "id": "ears-01-missing-shall",
+  "clean": false,
+  "slice_id": "demo",
+  "requirements": [
+    { "id": "REQ-001", "must": true, "text": "The system stores evidence somehow." }
+  ],
+  "features": [
+    {
+      "id": "TASK-001",
+      "status": "in_progress",
+      "req_ids": ["REQ-001"],
+      "evidence": ""
+    }
+  ],
+  "test_mentions": ["REQ-001"],
+  "expected_codes": ["EARS-01"]
+}

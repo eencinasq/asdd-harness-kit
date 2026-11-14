@@ -1,0 +1,15 @@
+{
+	"id": "go-defer-in-loop",
+	"description": "defer inside the loop closes every file only when the function returns: all files stay open at once.",
+	"language": "go",
+	"category": "resources",
+	"diff": "diff --git a/internal/report/merge.go b/internal/report/merge.go\n--- a/internal/report/merge.go\n+++ b/internal/report/merge.go\n@@ -1,11 +1,20 @@\n package report\n \n-import \"os\"\n+import (\n+\t\"io\"\n+\t\"os\"\n+)\n \n-func Size(path string) (int64, error) {\n-\tinfo, err := os.Stat(path)\n-\tif err != nil {\n-\t\treturn 0, err\n+func Merge(dst io.Writer, paths []string) error {\n+\tfor _, p := range paths {\n+\t\tf, err := os.Open(p)\n+\t\tif err != nil {\n+\t\t\treturn err\n+\t\t}\n+\t\tdefer f.Close()\n+\t\tif _, err := io.Copy(dst, f); err != nil {\n+\t\t\treturn err\n+\t\t}\n \t}\n-\treturn info.Size(), nil\n+\treturn nil\n }\n",
+	"expected": [
+		{
+			"path": "internal/report/merge.go",
+			"startLine": 14,
+			"ruleId": "go.timers-tickers-and-resource-lifecycle",
+			"note": "defer in loop"
+		}
+	]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "review-quality",
+  "concerns": [],
+  "session_id": "sess-review-quality-008",
+  "timestamp": "2026-11-12T21:09:09.470Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: typecheck OK; lint no errors (2 warnings + 1 info pre-existing); pnpm test 122/122. eval-score.spec: per-language/category breakdown, compareWithBaseline flags a 6-point precision drop and passes a 4-point one (and a 10-point recall drop), repeated noise counted. eval-cases.spec: validateCase passes a label on an added line with a known rule; reports a context-line label, unknown rule, file not in the diff, id/file mismatch, missing language; caseFromReview gives 2 defects (kept, edited) + 1 noise (removed) and copies no comment text. scripts/eval.mts: check, score --json/--baseline/--max-drop, harvest (default $PR_REVIEW_ROOT/eval-cases; refuses inside the repo without --allow-repo) \u2014 tried on a real review into a temp dir (1 clean case, check OK), then deleted."
+}

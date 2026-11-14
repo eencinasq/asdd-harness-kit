@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-depth",
+  "concerns": [],
+  "session_id": "sess-spec-drift-depth-011",
+  "timestamp": "2026-11-14T00:58:06.652Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/src/analysis/engines",
+    "tools/spec-drift/src/analysis/domain/pack-selection.ts",
+    "tools/spec-drift/src/analysis/analysis.module.ts",
+    "cli/templates/bindings/domain-layer.project.md",
+    "tools/spec-drift/test/dependencies.e2e-spec.ts"
+  ],
+  "evidence": "Start TASK-003 (REQ-003)."
+}

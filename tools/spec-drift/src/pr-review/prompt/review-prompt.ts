@@ -5,6 +5,7 @@ import type { PrMetadata, ResolvedPaths, ReviewUnitsView } from '../pr-review.ty
 import { INLINE_WORD_LIMIT, SUMMARY_WORD_LIMIT } from '../pr-review.types.ts';
 import type { RequirementsState } from '../requirements/requirements.types.ts';
 import { requirementsPromptSection } from '../requirements/requirements-report.ts';
+import { type PrRisk, riskPromptSection } from '../risk/file-risk.ts';
 
 /**
  * Calibration examples (precision over recall). Short on purpose: they show the bar, not a style.
@@ -34,6 +35,8 @@ export const buildReviewPrompt = (options: {
 	readonly units?: ReviewUnitsView;
 	readonly architecture?: ArchitectureReviewView;
 	readonly requirements?: RequirementsState;
+	/** Changed files ranked by risk (spec-drift-depth REQ-002). */
+	readonly risk?: PrRisk;
 	readonly existingComments?: readonly ExistingComment[];
 	/** Re-review section (what changed since the last review, previous comments). */
 	readonly reReview?: string;
@@ -44,7 +47,7 @@ export const buildReviewPrompt = (options: {
 	const parallel = (options.units?.groups.length ?? 0) > 2;
 
 	return [
-		'# PR Review (Architecture MCP)',
+		'# PR Review (spec-drift)',
 		'',
 		'This reviewer is **project- and language-agnostic**: assume no framework or org standard that the diff, the surrounding code or the attached rules do not show.',
 		'Write findings in the language the PR / repo predominantly uses.',
@@ -61,6 +64,8 @@ export const buildReviewPrompt = (options: {
 		`Do **not** read files from the local checkout (${paths.repoRoot}): it may be on another branch and show code that is not in this PR.`,
 		'',
 		unitsSummary,
+		'',
+		options.risk ? riskPromptSection(options.risk) : '',
 		'',
 		architecture ? architecturePromptSection(architecture) : '',
 		'',

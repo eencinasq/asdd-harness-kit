@@ -1,4 +1,4 @@
-import type { Finding, RuleMeta } from '../../analysis.types.ts';
+import type { Finding, RuleMeta, RuleTestReport } from '../../analysis.types.ts';
 import { adrOf, toSeverity } from './semgrep-rules.ts';
 
 /** Subset of `semgrep --json` output this adapter reads. */
@@ -78,3 +78,28 @@ export const semgrepErrors = (raw: RawSemgrepJson | undefined): string =>
 			return `${typeof type === 'string' ? type : 'Error'}${where}: ${message}`.trim();
 		})
 		.join('\n');
+
+/** `semgrep --test --json` output → per-rule pass/fail and the rule files with errors (rule-coverage REQ-004). */
+export const parseTestOutput = (stdout: string): Omit<RuleTestReport, 'status' | 'message'> | undefined => {
+	let raw: unknown;
+	try {
+		raw = JSON.parse(stdout);
+	} catch {
+		return undefined;
+	}
+	if (!raw || typeof raw !== 'object') return undefined;
+	const json = raw as {
+		results?: Record<string, { checks?: Record<string, { passed?: boolean }> }>;
+		config_with_errors?: unknown[];
+	};
+	const byRule: Record<string, 'passed' | 'failed'> = {};
+	for (const file of Object.values(json.results ?? {})) {
+		for (const [id, check] of Object.entries(file.checks ?? {})) byRule[id] = check.passed ? 'passed' : 'failed';
+	}
+	const invalidFiles = (json.config_with_errors ?? []).map((e) =>
+		typeof e === 'string'
+			? e
+			: String((e as { file?: string; path?: string }).file ?? (e as { path?: string }).path ?? e),
+	);
+	return { byRule, invalidFiles };
+};

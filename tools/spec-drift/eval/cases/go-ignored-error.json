@@ -1,0 +1,15 @@
+{
+	"id": "go-ignored-error",
+	"description": "The Unmarshal error is discarded: a malformed config silently yields zero values (port 0).",
+	"language": "go",
+	"category": "error-handling",
+	"diff": "diff --git a/internal/config/load.go b/internal/config/load.go\n--- a/internal/config/load.go\n+++ b/internal/config/load.go\n@@ -15,5 +15,9 @@\n \tif err != nil {\n \t\treturn c, err\n \t}\n-\treturn c, json.Unmarshal(data, &c)\n+\t_ = json.Unmarshal(data, &c)\n+\tif c.Port == 0 {\n+\t\tc.Port = 8080\n+\t}\n+\treturn c, nil\n }\n",
+	"expected": [
+		{
+			"path": "internal/config/load.go",
+			"startLine": 18,
+			"ruleId": "go.errors-panics-and-api-contracts",
+			"note": "error ignored"
+		}
+	]
+}

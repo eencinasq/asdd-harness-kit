@@ -47,14 +47,15 @@ function featureSchemaKeys(root) {
   }
 }
 
-// Lite-first: a lite slice is serial by design (one in_progress feature).
+// Lite-first / hotfix: serial by design (one in_progress feature).
 // Mode is derived from the slice's sessions; slices without v3 sessions
 // (legacy v2) are unaffected.
-function isLiteSlice(root, sliceId) {
+function isSerialSlice(root, sliceId) {
   if (typeof sliceId !== 'string' || !sliceId.trim()) return false;
   const sessions = readSessions(join(root, '.harness/state/slices', sliceId));
   if (sessions.length === 0) return false;
-  return deriveMode(sessions) === 'lite';
+  const mode = deriveMode(sessions);
+  return mode === 'lite' || mode === 'hotfix';
 }
 
 export function validateFeatureDocument(data, rel, fail, root, warn = fail) {
@@ -120,8 +121,8 @@ export function validateFeatureExecution(data, rel, sliceId, fail, readJson, roo
 
   if (active.length <= 1) return;
 
-  if (isLiteSlice(root, sliceId)) {
-    fail(`${rel}: lite slice "${sliceId}" allows at most one in_progress feature (found ${active.length}) — complete one first, or escalate: asdd slice escalate ${sliceId} --reasons "<triggers>"`);
+  if (isSerialSlice(root, sliceId)) {
+    fail(`${rel}: serial slice "${sliceId}" (lite/hotfix) allows at most one in_progress feature (found ${active.length}) — complete one first, or escalate: asdd slice escalate ${sliceId} --reasons "<triggers>"`);
   }
 
   const owners = new Set();

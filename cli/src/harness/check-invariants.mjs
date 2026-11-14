@@ -76,6 +76,28 @@ validatePhaseChain(ctx);
 validateSpecDrift(ctx);
 validateLearning(ctx);
 
+// P1.3: converge FAILs for passing features (short path before session close)
+try {
+  const { runConverge } = await import('./converge-lib.mjs');
+  const converge = runConverge({ root });
+  for (const f of converge.fails) fail(`${f.code} ${f.message}`);
+  for (const f of converge.warns) warn(`${f.code} ${f.message}`);
+} catch {
+  // converge is best-effort if the module cannot load
+}
+
+// P2.3: uphill features still open late in the cycle
+try {
+  const { lateUphillFindings } = await import('./hill-lib.mjs');
+  for (const u of lateUphillFindings(root)) {
+    warn(
+      `HILL-01 feature ${u.feature_id} on slice "${u.slice_id}" is still uphill in phase ${u.phase} — resolve unknowns or set hill: downhill`,
+    );
+  }
+} catch {
+  // hill is best-effort
+}
+
 if (warnings.length) {
   for (const w of warnings) console.warn(`WARN  ${w}`);
 }

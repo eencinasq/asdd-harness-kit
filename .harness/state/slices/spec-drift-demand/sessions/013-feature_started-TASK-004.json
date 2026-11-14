@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-013",
+  "timestamp": "2026-11-14T01:35:13.100Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "tools/spec-drift/src/cli",
+    "tools/spec-drift/bin/spec-drift.mjs",
+    "tools/spec-drift/src/common/process/process-runner.service.ts",
+    "tools/spec-drift/test/ci-review.e2e-spec.ts",
+    "tools/spec-drift/src/cli/ci-review.ts",
+    "tools/spec-drift/src/cli/ci-review.spec.ts"
+  ],
+  "evidence": "Start TASK-004 (REQ-004)."
+}

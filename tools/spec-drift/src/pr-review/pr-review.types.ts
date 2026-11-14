@@ -2,6 +2,7 @@ import type { ArchitectureReviewView } from './architecture/architecture.types.t
 import type { ReviewProfile } from './engine/profile.ts';
 import type { ExcludeReason, LineSpan, ReviewFinding } from './engine/types.ts';
 import type { RequirementsState } from './requirements/requirements.types.ts';
+import type { PrRisk } from './risk/file-risk.ts';
 
 export const REVIEW_EVENTS = ['APPROVE', 'REQUEST_CHANGES', 'COMMENT'] as const;
 export type ReviewEvent = (typeof REVIEW_EVENTS)[number];
@@ -42,6 +43,8 @@ export type ResolvedPaths = {
 	readonly progress: string;
 	readonly architecture: string;
 	readonly requirements: string;
+	/** PR risk ranking (spec-drift-depth REQ-002). */
+	readonly risk: string;
 	readonly existingComments: string;
 	readonly state: string;
 	readonly rotated: string;
@@ -181,6 +184,8 @@ export type PrReviewView = {
 	readonly architecture?: ArchitectureReviewView;
 	/** Ticket criteria and their verification (when the review has a ticket). */
 	readonly requirements?: RequirementsState;
+	/** Changed files ranked by risk: where to read first (spec-drift-depth REQ-002). */
+	readonly risk?: PrRisk;
 	/** Ticket references found in the PR when no ticket was given (e.g. MLC-123, #45). */
 	readonly ticketRefs?: readonly { readonly source: string; readonly ref: string; readonly foundIn: string }[];
 	/** Current group the agent should review (from pr_review_next_group). */

@@ -131,8 +131,8 @@ export default function validate(ctx) {
             if (sliceManifest.slice_id !== slice.slice_id) {
               fail(`slice "${slice.slice_id}" manifest slice_id mismatch: ${sliceManifest.slice_id}`);
             }
-            if (sliceManifest.mode && !['full', 'lite', 'escalated'].includes(sliceManifest.mode)) {
-              fail(`slice "${slice.slice_id}" has invalid mode "${sliceManifest.mode}" (expected full, lite, or escalated)`);
+            if (sliceManifest.mode && !['full', 'lite', 'hotfix', 'escalated'].includes(sliceManifest.mode)) {
+              fail(`slice "${slice.slice_id}" has invalid mode "${sliceManifest.mode}" (expected full, lite, hotfix, or escalated)`);
             }
 
             // Phase/status consistency with global manifest

@@ -154,6 +154,99 @@ describe('dashboards in a real MCP Apps host', { skip }, () => {
 		await page.close();
 	});
 
+	test('spec-drift-demand REQ-002: Ask the agent to fix sends every violation of the rule to the host', async () => {
+		const { page, view } = await openView('analysis-dashboard.html');
+		await deliver(page, await client.callTool({ name: 'analyze_spec_drift', arguments: {} }));
+		await view.waitForFunction(() => document.getElementById('kpi-findings')?.textContent?.trim() === '4');
+		await view.click('#tab-drift');
+		await view.click('#panel-drift button[data-rule="mmlc.std.no-explicit-any"]');
+		await page.waitForFunction(() => window.sentMessages.length === 1);
+		const [message] = (await page.evaluate(() => window.sentMessages)) as Array<{ content: Array<{ text: string }> }>;
+		const text = message?.content[0]?.text ?? '';
+		assert.match(text, /^Fix the 2 violations of rule `mmlc\.std\.no-explicit-any`/);
+		assert.match(text, /wait for their confirmation before editing/);
+		assert.match(text, /analyze_spec_drift` with `\{ "paths": /);
+		await page.close();
+	});
+
+	test('spec-drift-adoption REQ-002: the Trend tab charts the snapshots with a verdict, a crosshair and a table', async () => {
+		const { page, view } = await openView('analysis-dashboard.html');
+		const result = await client.callTool({ name: 'analyze_spec_drift', arguments: {} });
+		const at = (d: string) => `2026-${d}T09:00:00.000Z`;
+		const trend = {
+			points: [
+				{ at: at('10-01'), label: '.semgrep/history/2026-10-01.json', total: 24, new: null },
+				{ at: at('10-15'), label: '.semgrep/history/2026-10-15.json', total: 19, new: null },
+				{ at: at('10-29'), label: '.semgrep/history/2026-10-29.json', total: 21, new: null },
+				{ at: at('11-12'), label: '.semgrep/history/2026-11-12.json', total: 12, new: null },
+			],
+			measure: 'total',
+			direction: 'better',
+			change: -0.5,
+		};
+		await deliver(page, { ...result, structuredContent: { ...(result.structuredContent as object), trend } });
+		await view.waitForFunction(() => document.getElementById('kpi-findings')?.textContent?.trim() === '4');
+		await view.click('#tab-trend');
+		assert.match((await view.textContent('#panel-trend')) ?? '', /Going down — better: 24 → 12 \(-50%\)/);
+		assert.equal(await view.locator('#panel-trend .trend-dot').count(), 4);
+		assert.equal(await view.locator('#panel-trend tbody tr').count(), 4, 'the table view has every point');
+		const box = await view.locator('#panel-trend svg').boundingBox();
+		assert.ok(box);
+		await page.mouse.move(box.x + box.width * 0.07, box.y + box.height / 2);
+		await view.waitForFunction(() => !document.querySelector<HTMLElement>('#panel-trend .trend-tooltip')?.hidden);
+		assert.match((await view.textContent('#panel-trend .trend-tooltip')) ?? '', /^24\s*2026-10-01/);
+		const shots = process.env['SPEC_DRIFT_UI_SHOTS'];
+		if (shots) {
+			await view.locator('#panel-trend').screenshot({ path: path.join(shots, 'trend-light.png') });
+			await page.emulateMedia({ colorScheme: 'dark' });
+			await view.locator('#panel-trend').screenshot({ path: path.join(shots, 'trend-dark.png') });
+		}
+		await page.close();
+	});
+
+	test('spec-drift-depth REQ-001: the audit dashboard shows the traceability matrix with gaps and a Markdown copy', async () => {
+		const { page, view } = await openView('audit-dashboard.html');
+		const row = (req: string, gaps: string[], extra: object = {}) => ({
+			slice: 'auth',
+			req_id: req,
+			title: `Title ${req}`,
+			features: [{ id: 'TASK-001', status: 'passing' }],
+			files: ['src/a.ts'],
+			file_count: 1,
+			tests: [],
+			prs: [],
+			gaps,
+			...extra,
+		});
+		const structured = {
+			matrix: [
+				row('REQ-001', [], { tests: ['src/a.spec.ts'], prs: [12, 15] }),
+				row('REQ-002', ['no-test', 'not-passing'], { features: [{ id: 'TASK-002', status: 'in_progress' }] }),
+			],
+			totals: { requirements: 2, with_feature: 2, tested: 1, passing: 1, with_gaps: 1 },
+			markdown: '| Slice | Requirement |\n',
+			note: 'Writes nothing.',
+		};
+		await deliver(page, {
+			content: [{ type: 'text', text: JSON.stringify(structured) }],
+			structuredContent: structured,
+		});
+		await view.waitForFunction(() => document.getElementById('title')?.textContent === 'Traceability');
+		const text = (await view.textContent('#content')) ?? '';
+		assert.match(text, /2 requirements/);
+		assert.match(text, /1 with gaps/);
+		assert.match(text, /#12, #15/);
+		assert.match(text, /no test/);
+		assert.match(text, /not passing/);
+		assert.equal(await view.locator('#content tbody tr').count(), 2);
+		assert.equal(
+			await view.getAttribute('[data-action="copy"]', 'data-text'),
+			'| Slice | Requirement |\n',
+			'the Markdown table is ready to copy',
+		);
+		await page.close();
+	});
+
 	test('PR Review dashboard: render, edit-safe publish, and the human submits the review', async () => {
 		const args = { pr: PR_NUMBER, repoPath: sandbox.repo };
 		await client.callTool({ name: 'pr_review_start', arguments: args });
@@ -192,6 +285,12 @@ describe('dashboards in a real MCP Apps host', { skip }, () => {
 		assert.equal((await view.textContent('#kpi-pr'))?.trim(), String(PR_NUMBER));
 		await view.click('#tab-coverage');
 		assert.match((await view.textContent('#panel-coverage')) ?? '', /Verify findings[\s\S]*✓ Confirmed/);
+		// spec-drift-depth REQ-002: changed files ranked by risk, before the groups (churn only in this repo).
+		assert.match(
+			(await view.textContent('#read-first')) ?? '',
+			/Read first · \d+ files? ranked by risk[\s\S]*src\/app\.ts[\s\S]*commit in 90 days/,
+		);
+		assert.match((await view.textContent('#read-first')) ?? '', /Not available here: requirements, audit/);
 		await view.click('#tab-comments');
 		assert.ok((await view.locator('#inline-list > [data-path]').count()) >= 1, 'inline comments rendered');
 		assert.equal(await view.isEnabled('#publish'), true);

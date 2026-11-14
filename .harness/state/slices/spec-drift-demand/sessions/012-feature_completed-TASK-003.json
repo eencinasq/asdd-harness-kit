@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-demand",
+  "concerns": [],
+  "session_id": "sess-spec-drift-demand-012",
+  "timestamp": "2026-11-14T01:35:13.028Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_completed",
+  "evidence": "typecheck OK, lint no errors (2 pre-existing warnings; the new noTemplateCurlyInString on the intentional GitHub expression in ci-review.ts is annotated), test 226/226, build OK, test:e2e 140/140. review-cost.spec 2/2; pr-review.e2e 29/29 asserts cost (minutes, byTool start=1, submit_findings>=2, chars, estTokens = chars/4) and the medians line in pr_review_metrics."
+}

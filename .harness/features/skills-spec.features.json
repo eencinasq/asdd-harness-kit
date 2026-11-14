@@ -48,13 +48,13 @@
         "node cli/bin/asdd.mjs kit skills-lint --only shape-up,product-delivery,external-trackers",
         "node cli/bin/asdd.mjs kit guidance"
       ],
-      "evidence": "shape-up: runbook grammar (flow picker, run flow, write pitch, review with quoted evidence + counter-case, convert/record bet), coaching detail moved to new references/flows.md; 15199 -> 7588 bytes (packaged cap 15 KB); scope_map mode only when the pitch leaves the repo; pitch-template gains pitch_id/betting_state lines. product-delivery: sole owner of the scope map in a harness repo (docs/pitches/<pitch-id>/scope-map.yaml, its own contracts schema; no link into shape-up), preconditions = entry gate, steps 1-6 with assertions, redirects to shape-up/external-trackers. external-trackers: sole reader/writer of trackers, writes docs/pitches/<pitch-id>/handoff.yaml (never intent.md), session source block, sync only when enabled; handoff -> product-delivery. kit skills-lint --only shape-up,product-delivery,external-trackers: PASS (3 of 15); kit guidance: PASS.",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node cli/bin/asdd.mjs kit skills-lint --only shape-up,product-delivery,external-trackers && node cli/bin/asdd.mjs kit guidance` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
       "scope_paths": [
         "cli/skills/shape-up",
         "cli/skills/product-delivery",
         "cli/skills/external-trackers"
       ],
-      "evidence_hash": "869a74e9fef5ad47ef3cb8a93e8fff46a1984471cbb21bf798c9f1d6f40209f5"
+      "evidence_hash": "f11b3821dbf7a5ce472cc55bbeabb63e2a3e9c29b84d6c3a7050014459999667"
     },
     {
       "id": "TASK-003",
@@ -75,7 +75,7 @@
         "node cli/bin/asdd.mjs kit skills-lint --only test-driven-development,documentation-and-adrs,codegraph,codebase-audit,create-mcp-app",
         "node cli/bin/asdd.mjs kit guidance"
       ],
-      "evidence": "test-driven-development: trigger narrowed (code whose behavior a test can pin; Do NOT use for live-browser checks, UI craft, API contract design, config/docs) ; runbook RED/GREEN/REFACTOR/evidence with assertions; tutorial (cycle examples, Prove-It, pyramid, sizes, good tests, anti-patterns, rationalizations, red flags) moved to new references/testing-practices.md; 16741 -> 5153 bytes. documentation-and-adrs: single ADR authority (default template incl. drivers, strongest argument against, Steering consulted), inline/API/README/changelog/agent docs to new references/writing-docs.md (with the worked ADR example); 12879 -> 5496 bytes. codegraph: cites the AGENTS.md codegraph-first rule instead of restating it; preconditions, read-only boundary. codebase-audit: grammar with preconditions and findings schema step. create-mcp-app: /tmp/mcp-ext-apps replaced by $MCP_APPS_REF (S-011 x6 fixed); SDK detail to new references/sdk-reference.md; 10461 -> 5995 bytes. kit skills-lint --only <5 skills>: PASS (5 of 15); kit guidance: PASS.",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node cli/bin/asdd.mjs kit skills-lint --only test-driven-development,documentation-and-adrs,codegraph,codebase-audit,create-mcp-app && node cli/bin/asdd.mjs kit guidance` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
       "scope_paths": [
         "cli/skills/test-driven-development",
         "cli/skills/documentation-and-adrs",
@@ -83,7 +83,7 @@
         "cli/skills/codebase-audit",
         "cli/skills/create-mcp-app"
       ],
-      "evidence_hash": "4835b9e4f1466ce1fd8af60a380f8751f737107ed2634f5678f7727363d038d2"
+      "evidence_hash": "5a7a27b5f521815f414cbb3ee24592af230e691c6d7e840a67cb2064bad5ca09"
     },
     {
       "id": "TASK-004",
@@ -103,12 +103,12 @@
         "node cli/bin/asdd.mjs kit skills-lint --only api-and-interface-design,browser-testing-with-devtools,frontend-ui-engineering",
         "node cli/bin/asdd.mjs kit guidance"
       ],
-      "evidence": "api-and-interface-design (http-api), frontend-ui-engineering and browser-testing-with-devtools (web-ui) to the grammar; descriptions exclude each other and the core siblings by name (test-driven-development, documentation-and-adrs), so the TDD / browser / frontend 'fix a bug' collision and the API / docs overlap are bilateral now. Tutorials moved to new references: design-principles.md (api), ui-craft.md (frontend), devtools-workflows.md (browser; MCP setup and the five workflows); security boundaries kept in the browser skill. Machine checks in the gates: contract check, a11y lint 0 violations, console 0 errors via the MCP tool. kit skills-lint (all): PASS — 15 skills, 7 rule files; kit guidance: PASS.",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node cli/bin/asdd.mjs kit skills-lint --only api-and-interface-design,browser-testing-with-devtools,frontend-ui-engineering && node cli/bin/asdd.mjs kit guidance` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
       "scope_paths": [
         "cli/modules/http-api/skills",
         "cli/modules/web-ui/skills"
       ],
-      "evidence_hash": "0ad7848f6f943e8c459dc1cfaa6e5b43b9a6f6d603206643b7267055c3a4a511"
+      "evidence_hash": "fd6e2662210dc3ebc1d2be725654b7e6360b3618e58d70fecbbcb22fda06d8dc"
     },
     {
       "id": "TASK-005",
@@ -131,7 +131,7 @@
         "node cli/bin/asdd.mjs kit skills-lint",
         "node cli/bin/asdd.mjs kit guidance"
       ],
-      "evidence": "cli/steering/skills.md: 'Markers and escalation' defines PENDING_DEFINITION, ASSUMPTION — CONFIRMATION REQUIRED, PROPOSED — VALIDATION REQUIRED, DERIVED once (skills cite it) and the HALT + Context -> Options -> Recommendation -> Decision Needed format; sensors named (asdd check, asdd kit skills-lint); disclosure header compacted. README.md, security-rules.md, controls.md: Prohibitions sections with a HALT directive and their sensor (R-006/R-007/R-009). asdd-design-agent.md section 11 cites the documentation-and-adrs ADR format instead of its own schema (single authority). Skill descriptions tightened (all 15 now 256-351 chars) so the regenerated index fits the budget without raising it: always-loaded 31604 bytes in the kit, 31917 in the install.sh project with the http-api module (budget 31962). kit self + --check OK; kit guidance PASS; kit skills-lint PASS (15 skills, 7 rule files). | Re-verified after agents-spec rewrote asdd-design-agent.md to the agent grammar (ADR section still cites documentation-and-adrs): npm test 131/131 (kit skills-lint PASS 17 skills; kit agents-lint PASS 14 agents); skills-lint test 'skills-spec REQ-002 AC-002' passes; kit guidance PASS (31604 bytes).",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
       "scope_paths": [
         "cli/steering/skills.md",
         "cli/steering/controls.md",
@@ -139,7 +139,7 @@
         "cli/steering/security-rules.md",
         "cli/agents/asdd-design-agent.md"
       ],
-      "evidence_hash": "cb9c38b5f7c9fa34d30891fd306d79ae0a419bc0a9aaa856a5a9d42f91feab02"
+      "evidence_hash": "b6485058c19d707279c65eac4e892138bd578dcdf9d8d95bd77a099ab90af1ec"
     },
     {
       "id": "TASK-006",
@@ -166,7 +166,7 @@
         "node --test cli/test/skills-lint.test.mjs",
         "npm test"
       ],
-      "evidence": "asdd kit skills-lint (cli/src/kit/skills-lint.mjs, registered in main.mjs and HELP; documented in cli/README.md): decidable S-* rules as errors (S-001/002/003/005/006/008/009/011/013/016/017/018/020) with the fleet promotions (S-014 -> SL-101, S-015 -> SL-303, S-021 -> SL-302, S-022 -> SL-103), S-004 as a warning; fleet SL-103 (orchestrator deps / leaf has none), SL-105 (identical 5-line blocks), SL-301 (handoff cycles; redirects excluded), SL-302 (dangling names; a core skill may name only core skills); R-004 (24 KB) and R-005 (no frontmatter in the root AGENTS.md) on always-loaded rules; --only to narrow; kit or project mode. It caught a real defect while this slice ran (description wrapped at a hyphen: 'domain-language- extraction'). cli/test/skills-lint.test.mjs 10/10; npm test runs kit skills-lint and the tests: 119/119 pass. install.sh: product-delivery asserted to own the scope-map schema with no link into shape-up (replaces the old conversions.md assertion). cli/versions.json regenerated (7 new reference files). | Reopened after the escalation for AC-002/AC-003 (VAL-002): two shipped-content tests ('skills-spec REQ-002 AC-002' routes and owners: TDD boundary, browser names TDD, product-delivery own schema and no shape-up link, shape-up scope_map only outside, external-trackers sole tracker reader/writer and never writes intent.md, design agent cites documentation-and-adrs; 'skills-spec REQ-003 AC-003': four markers + HALT/Decision Needed in skills.md, Prohibitions + HALT in README/controls/security-rules, codegraph cites AGENTS.md). skills-lint tests 12/12; npm test 121/121; kit skills-lint PASS (15 skills, 7 rule files). | Re-verified after agents-spec added agents-lint to main.mjs, package.json, cli/README.md and projection assertions to install.sh: npm test 131/131 (kit skills-lint PASS 17 skills; kit agents-lint PASS 14 agents); install.sh OK. | Re-verified after the version bump 3.9.0 -> 3.10.0 (package.json, package-lock.json, cli/versions.json via asdd kit versions bump): npm test 131/131 (incl. install.sh version checks, kit skills-lint, kit agents-lint). | Re-verified after the README update for 3.10 (README.md: rendered runtime agents, tiers/envelopes, kit lints, upgrade note; cli/README.md layout and install phases; cli/modules/README.md; cli/runtimes READMEs): npm test 131/131.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance && node --test cli/test/skills-lint.test.mjs && npm test` exits 0.",
       "scope_paths": [
         "cli/src/kit/skills-lint.mjs",
         "cli/src/main.mjs",
@@ -175,7 +175,7 @@
         "cli/test/install.sh",
         "cli/README.md"
       ],
-      "evidence_hash": "e9b3bff5be41cac17a30ee6871aeddfdb8f8fed86b4490ce551572afb6e61086"
+      "evidence_hash": "45ba79b48c6e0a1ef7692a42fd87c0f65fd3c24055aec1f6e982867cdc66cb2e"
     }
   ]
 }

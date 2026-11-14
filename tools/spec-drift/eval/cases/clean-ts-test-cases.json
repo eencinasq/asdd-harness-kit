@@ -1,0 +1,8 @@
+{
+	"id": "clean-ts-test-cases",
+	"description": "Adds table-driven tests with real assertions for an existing function.",
+	"language": "typescript",
+	"category": "clean",
+	"diff": "diff --git a/src/cart/total.spec.ts b/src/cart/total.spec.ts\n--- a/src/cart/total.spec.ts\n+++ b/src/cart/total.spec.ts\n@@ -4,3 +4,10 @@\n test('empty cart', () => {\n \texpect(total([])).toBe(0);\n });\n+\n+test.each([\n+\t[[{ price: 10, qty: 1 }], 10],\n+\t[[{ price: 10, qty: 2 }, { price: 5, qty: 1 }], 25],\n+])('total(%j) is %i', (lines, expected) => {\n+\texpect(total(lines)).toBe(expected);\n+});\n",
+	"expected": []
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-adoption",
+  "concerns": [],
+  "session_id": "sess-spec-drift-adoption-019",
+  "timestamp": "2026-11-13T20:17:11.898Z",
+  "phase": "knowledge",
+  "event_type": "phase_completed",
+  "evidence": "Lessons: (1) look at the chart, not only its tests: the screenshot showed a tooltip over the title and oversized axis text that no assertion caught; (2) config generation beats config docs: the e2e starts the server from the printed config, so 'no path edited' is tested; (3) toolsets must be read when modules are defined, so each value needs its own process in tests; (4) another work stream changed cli/src/harness meanwhile \u2014 classify reopened features by cause before re-verifying."
+}

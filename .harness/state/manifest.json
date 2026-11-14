@@ -130,6 +130,118 @@
       "mode": "full",
       "manifest": ".harness/state/slices/spec-drift-empty/manifest.json",
       "features": ".harness/features/spec-drift-empty.features.json"
+    },
+    {
+      "slice_id": "spec-drift-roadmap",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/spec-drift-roadmap/manifest.json",
+      "features": ".harness/features/spec-drift-roadmap.features.json"
+    },
+    {
+      "slice_id": "review-quality",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/review-quality/manifest.json",
+      "features": ".harness/features/review-quality.features.json"
+    },
+    {
+      "slice_id": "rule-coverage",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/rule-coverage/manifest.json",
+      "features": ".harness/features/rule-coverage.features.json"
+    },
+    {
+      "slice_id": "spec-drift-adoption",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-adoption/manifest.json",
+      "features": ".harness/features/spec-drift-adoption.features.json"
+    },
+    {
+      "slice_id": "asdd-roadmap",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/asdd-roadmap/manifest.json",
+      "features": ".harness/features/asdd-roadmap.features.json"
+    },
+    {
+      "slice_id": "asdd-p0",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/asdd-p0/manifest.json",
+      "features": ".harness/features/asdd-p0.features.json"
+    },
+    {
+      "slice_id": "asdd-p1",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/asdd-p1/manifest.json",
+      "features": ".harness/features/asdd-p1.features.json"
+    },
+    {
+      "slice_id": "asdd-p2",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/asdd-p2/manifest.json",
+      "features": ".harness/features/asdd-p2.features.json"
+    },
+    {
+      "slice_id": "asdd-p3",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/asdd-p3/manifest.json",
+      "features": ".harness/features/asdd-p3.features.json"
+    },
+    {
+      "slice_id": "asdd-p4",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/asdd-p4/manifest.json",
+      "features": ".harness/features/asdd-p4.features.json"
+    },
+    {
+      "slice_id": "spec-drift-depth",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-depth/manifest.json",
+      "features": ".harness/features/spec-drift-depth.features.json"
+    },
+    {
+      "slice_id": "spec-drift-demand",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-demand/manifest.json",
+      "features": ".harness/features/spec-drift-demand.features.json"
+    },
+    {
+      "slice_id": "harness-green",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/harness-green/manifest.json",
+      "features": ".harness/features/harness-green.features.json"
+    },
+    {
+      "slice_id": "kit-playbook",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/kit-playbook/manifest.json",
+      "features": ".harness/features/kit-playbook.features.json"
     }
   ]
 }

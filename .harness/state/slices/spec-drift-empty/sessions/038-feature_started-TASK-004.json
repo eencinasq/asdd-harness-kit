@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-empty",
+  "concerns": [],
+  "session_id": "sess-spec-drift-empty-038",
+  "timestamp": "2026-11-14T01:12:21.553Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-004 (DRIFT-02 after spec-drift-depth).",
+  "scope_paths": [
+    "tools/spec-drift/README.md"
+  ]
+}

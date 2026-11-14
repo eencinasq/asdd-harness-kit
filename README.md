@@ -4,7 +4,9 @@ A portable process layer for **Agent Specification-Driven Development (ASDD)** a
 
 It gives AI agents a governed pipeline — from shaping an idea through implementation, QA, and knowledge capture — with feature trackers, file-scope enforcement, verification evidence, spec-drift sensors, and traceability. You bring your own stack (Python, Go, Rails, Next.js, Nest, …). The kit brings the process.
 
-**Contents:** [What this is](#what-this-is) · [Install](#install) · [How a session works](#how-a-session-works) · [Delivery pipeline](#delivery-pipeline) · [Jev MCP](#jev-mcp-server-not-installable) · [Spec drift and codebase audit](#spec-drift-and-codebase-audit) · [Self-improving harness](#self-improving-harness) · [Principles](#principles) · [What's inside](#whats-inside) · [Requirements](#requirements) · [Documentation](#documentation) · [Developing the kit](#developing-the-kit)
+**Contents:** [What this is](#what-this-is) · [Playbook](docs/PLAYBOOK.md) · [Install](#install) · [How a session works](#how-a-session-works) · [Delivery pipeline](#delivery-pipeline) · [Jev MCP](#jev-mcp-server-not-installable) · [Spec drift and codebase audit](#spec-drift-and-codebase-audit) · [Self-improving harness](#self-improving-harness) · [Principles](#principles) · [What's inside](#whats-inside) · [Requirements](#requirements) · [Documentation](#documentation) · [Developing the kit](#developing-the-kit)
+
+**Roadmap:** gaps and shipped work (P0–P4) live in [`docs/ASDD-ROADMAP.md`](docs/ASDD-ROADMAP.md).
 
 ---
 
@@ -33,7 +35,7 @@ It gives AI agents a governed pipeline — from shaping an idea through implemen
 
 Full ASDD phases: `Discovery → Spec → Validation → Domain → Design → Task Planning → Implementation → QA → Knowledge`
 
-**Slices are Lite-first.** Every slice starts in `lite` mode (`Spec → Design → Tasks → Implementation → QA-Lite`). `full` is opt-in (`asdd slice init --full`) for work known upfront to be cross-cutting or architectural. Growth in a lite slice is detected from session evidence and **blocks completion until the slice is escalated** ([escalation](#lite-first-and-escalation)).
+**Slices are Lite-first.** Every slice starts in `lite` mode (`Spec → Design → Tasks → Implementation → QA-Lite`). Use `asdd slice init --hotfix` for a ≤1-file bug fix (starts at implementation with one stub feature). `full` is opt-in (`asdd slice init --full`) for work known upfront to be cross-cutting or architectural. Growth in a lite/hotfix slice is detected from session evidence and **blocks completion until the slice is escalated** ([escalation](#lite-first-and-escalation)). Reopen a `DONE` slice with `asdd slice amend <id>` (no new pitch).
 
 ---
 
@@ -193,11 +195,19 @@ The knowledge index (spec/session/feature graph + searchable chunks) regenerates
 The kit has **one version**: `package.json`. Every artifact the installer copies carries that version in `cli/versions.json` (installed as `.harness/config/versions.json`), and the target records what it received in `.harness/config/installed-versions.json`. Re-running the installer refreshes every kit-owned file whose version changed, so a release reaches every file — nothing stays stale because one file was not bumped.
 
 ```bash
-node cli/bin/asdd.mjs kit versions bump 3.10.0  # set package.json + lock, restamp every artifact
+node cli/bin/asdd.mjs kit versions bump 3.11.0  # set package.json + lock, restamp every artifact
 node cli/bin/asdd.mjs kit versions              # restamp at the current version (npm run versions)
 ```
 
 Then re-run the installer in dependent projects. `npm test` fails when an artifact's version differs from the project version, or when the installer refreshes a file that has no version entry.
+
+**Upgrading to 3.11.** Re-run `asdd install .`: every kit file is refreshed. New in the session flow: `asdd init-flow`
+(brownfield path), `asdd slice init --hotfix`, `asdd slice amend`, `asdd converge`, `asdd waves`, `asdd portfolio`,
+`asdd tracker-sync`, `asdd status --metrics|--html`, and the agent skills `asdd-status`, `asdd-next`,
+`asdd-implement`, `asdd-converge`. The [playbook](docs/PLAYBOOK.md) says when to use each. The MCP servers in a kit
+checkout are `spec-drift` 1.1.0 (40 tools: baseline and trend, ADR coverage, dependency-graph rules, CodeQL, PR risk,
+traceability, CI review — [its playbook](tools/spec-drift/docs/PLAYBOOK.md)) and `knowledge` 1.1.0 (`pipeline_status`);
+rebuild them with `pnpm install && pnpm build` in their folders.
 
 **Upgrading to 3.10.** Re-running `asdd install .` replaces the agent links under `.claude/agents/`, `.cursor/agents/`, and `.opencode/agents/` with rendered files (see [Agents and their tool envelopes](#agents-and-their-tool-envelopes)); edit `.agents/agents/`, never the rendered copies. The QA agent no longer generates tests or peer-reviews specs, and the `spec-peer-review.md` template is gone.
 
@@ -213,9 +223,10 @@ $EDITOR .harness/steering/{product,structure,tech,domain-layer.project,quality-g
 asdd check-config
 asdd check
 
-# 3. First slice (lite by default; --full for cross-cutting work), then write its spec
+# 3. First slice (lite by default; --hotfix for a one-file fix; --full for cross-cutting), then write its spec
 asdd slice init my-first-slice
-asdd status
+# Or brownfield happy path: asdd init-flow
+asdd status --metrics
 ```
 
 The clone carries the kit's own slices, features, and bindings; replace them with yours.
@@ -230,6 +241,8 @@ The clone carries the kit's own slices, features, and bindings; replace them wit
 
 ## How a session works
 
+For what to do in each situation — a small change, a shaped bet, a hotfix, a red check, a pull request — see the [playbook](docs/PLAYBOOK.md).
+
 Read [`AGENTS.md`](AGENTS.md) every session. The loop:
 
 1. **Read** `.harness/state/registry.json` (squad state) and the target slice's `manifest.json` (mode, phase, escalation signals).
@@ -241,27 +254,35 @@ Read [`AGENTS.md`](AGENTS.md) every session. The loop:
 7. **Record evidence** — no feature is `passing` without its verification result and `evidence`; `asdd sync` records its `evidence_hash`.
 8. **Escalate when evidence demands it** — open signals on a lite slice block `DONE` until `asdd slice escalate` acknowledges them.
 
-On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecution` (fail-closed) and `asdd verify` on `stop`. On **Claude Code**, `.claude/settings.json` wires the same scripts to `PreToolUse` (Bash) and `Stop`. Both stop gates run `asdd check --live`, and a failure comes back as the next prompt. Other runtimes are advisory and rely on CI:
+On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecution` (fail-closed) and `asdd verify` on `stop`. On **Claude Code**, `.claude/settings.json` wires the same scripts to `PreToolUse` (Bash) and `Stop`. Both stop gates run `asdd check --live`, and a failure comes back as the next prompt — unless the project sets `stop.mode: "advisory"` (or `HARNESS_STOP_MODE=advisory`), in which case the check still runs and learning signals are recorded, but the session is not blocked. Other runtimes are advisory and rely on CI:
 
 | Runtime | Command gate (pattern) | Verify-on-stop |
 |---------|------------------------|----------------|
-| Cursor | `beforeShellExecution` hook (fail-closed) | `stop` hook (fail-closed) |
-| Claude Code | `PreToolUse`/`Bash` hook | `Stop` hook (loop-safe) |
+| Cursor | `beforeShellExecution` hook (fail-closed) | `stop` hook (fail-closed by default; advisory when configured) |
+| Claude Code | `PreToolUse`/`Bash` hook | `Stop` hook (loop-safe; advisory when configured) |
 | OpenCode, Kimi, Junie, Devin, Kiro | Advisory — run `asdd gate` before dangerous commands, or expose the `check_command_safety` MCP tool | Run `asdd check --live` before marking `passing`; a failing run is recorded as a learning signal |
 
 | Command | Purpose |
 |---|---|
-| `asdd status` | Active slices, modes, features in progress, escalation signals |
-| `asdd slice init <id> [--full]` | Scaffold a slice (lite by default) |
-| `asdd slice escalate <id> --reasons "<triggers>"` | Lite → escalated |
+| `asdd status [--metrics\|--json\|--html]` | Active slices, escalation, hill (uphill); pipeline metrics; HTML dashboard |
+| `asdd init-flow` | 15-minute brownfield path: install (if needed), one lite slice, minimal feature, `asdd check` |
+| `asdd slice init <id> [--hotfix\|--full]` | Scaffold a slice (`lite` default; `hotfix` = one stub feature at implementation) |
+| `asdd slice amend <id>` | Reopen a `DONE` slice with an amendments note |
+| `asdd slice escalate <id> --reasons "<triggers>"` | Lite/hotfix → escalated |
+| `asdd converge [--strict] [--json]` | Cheap REQ / test-mention / evidence gate before `passing` |
+| `asdd converge-eval` | Score EARS/converge fixtures under `cli/eval/converge-ears/` |
+| `asdd waves [--slice <id>]` | Parallelism hints from owners, deps, and scopes |
+| `asdd portfolio` | Read-only multi-repo summary (`.harness/config/portfolio.json`) |
+| `asdd tracker-sync [--apply]` | Plan bi-directional tracker sync from handoff + sessions (local receipt with `--apply`) |
+| `asdd spec-source` | Experimental MUST REQ inventory (requires `capabilities.spec_as_source`) |
 | `asdd sync [--slice <id>]` | Regenerate manifests, registry, and the knowledge index from session logs |
-| `asdd check [--live]` | Harness invariants, including spec drift (`--live` is used by Verify-on-Stop) |
+| `asdd check [--live]` | Harness invariants, including spec drift and converge (`--live` is used by Verify-on-Stop) |
 | `asdd drift [--json]` | The drift checks on their own |
 | `asdd audit` | Whole-codebase audit report |
 | `asdd knowledge sync [--embed]` | Rebuild the knowledge index |
 | `asdd learn [--all \| --signatures \| --export \| --propose <LP-id>]` | Learning patterns; signatures in use; lessons for the kit; scaffold a steering proposal |
 
-All commands are `asdd <command>`: with a devDependency, `npx asdd <command>` (or a global `asdd`, which hands off to it). `asdd help` lists them.
+Agent slash skills (call the CLI, do not invent SoT): `asdd-status`, `asdd-next`, `asdd-implement`, `asdd-converge`. All commands are `asdd <command>`: with a devDependency, `npx asdd <command>` (or a global `asdd`, which hands off to it). `asdd help` lists them.
 
 ### Guides, then sensors
 
@@ -278,8 +299,8 @@ A guide steers the agent before it edits. A sensor checks the result and, on fai
 | Dangerous bash | `asdd gate` pattern allow/deny — hook-wired on Cursor and Claude Code, both fail-closed; advisory elsewhere | `asdd gate` (`command-gate.mjs`) |
 | In-progress diff vs spec | Deterministic scope mapping (`session-loop.md` + `features.mjs`) | `.harness/steering/session-loop.md` |
 | Lite slice governance | Serial rule (one `in_progress`, FAIL) + escalation signals block `DONE` while open (`validators/lite-escalation.mjs`, `asdd sync`) | `.harness/steering/asdd-lite.md` |
-| Before `passing` or session end | `asdd check` must exit 0. WARN does not block. FAIL does | `session-loop.md` |
-| Session end gate | Cursor stop hook and Claude Code Stop hook run `asdd verify` → `asdd check --live`; a failing check is returned as the next prompt (Cursor `loop_limit` 3; Claude respects `stop_hook_active`). Abort and error statuses do not continue the loop | `.cursor/hooks.json`, `.claude/settings.json` |
+| Before `passing` or session end | `asdd check` / `asdd converge` must be clean. WARN does not block. FAIL does (unless Stop is `advisory`) | `session-loop.md`, `asdd converge` |
+| Session end gate | Cursor stop hook and Claude Code Stop hook run `asdd verify` → `asdd check --live`; a failing check is returned as the next prompt (Cursor `loop_limit` 3; Claude respects `stop_hook_active`) unless `stop.mode=advisory`. Abort and error statuses do not continue the loop | `.cursor/hooks.json`, `.claude/settings.json`, `project.json` `stop` |
 | Before `passing` (engineers) and PR review (Tech Lead) | Spec drift `DRIFT-01`…`07` runs inside the invariants; agents run `asdd drift` on demand, and `audit_diff` on the `spec-drift` MCP server gives the same findings in chat, in `author` or `review` mode | `.harness/steering/spec-drift.md` |
 | Pull request | `.github/workflows/harness-invariants.yml` runs unit tests, installer smoke, lifecycle e2e with negative cases, config/skills checks, and `asdd sync` + `asdd check` (with the PR branch and body for `DRIFT-07`) | CI |
 | On a schedule | `asdd audit` (drift over all slices, unowned code, audit commands, hotspots) and the `codebase-audit` skill; the Tech Lead triages | `.harness/audits/` |
@@ -392,21 +413,21 @@ Discovery keeps the scope exactly as the intent defines it. An intent with more 
 
 #### Lite-first and escalation
 
-Lite slices use four artifacts (`spec.md`, `design.md`, `tasks.md`, the features file). Mode is derived from session events, never hand-edited ([`asdd-lite.md`](.harness/steering/asdd-lite.md)). Growth is detected, not judged:
+Lite slices use four artifacts (`spec.md`, `design.md`, `tasks.md`, the features file). **Hotfix** slices skip Discovery theatre (one stub feature at implementation). Mode is derived from session events, never hand-edited ([`asdd-lite.md`](.harness/steering/asdd-lite.md)). Growth is detected, not judged:
 
 | Trigger | Evidence | Effect |
 |---|---|---|
 | E1 scope spread | Scope spans ≥ 2 top-level modules | Signal; blocks `DONE` |
-| E2 serial violation | > 1 `in_progress` feature | FAIL invariants (lite is serial) |
+| E2 serial violation | > 1 `in_progress` feature | FAIL invariants (lite/hotfix are serial) |
 | E3 domain growth | > 1 new domain term on checkpoints | Signal; blocks `DONE` |
 | E4 dissent | Any dissent session | Signal; blocks `DONE` |
 | E5 implementation blockage | `phase_blocked` during implementation | Signal; blocks `DONE` |
 
-Open signals are WARNs; completing `qa`/`knowledge` with signals open is a FAIL. Resolve with `asdd slice escalate <id> --reasons "E1-scope-spread,…"`, backfill `capability.md` and `requirements.md` from `spec.md`, and continue at Validation on the full path. Choose `full` upfront for new capabilities, cross-cutting or architectural work, or multiple domains.
+Open signals are WARNs; completing `qa`/`knowledge` with signals open is a FAIL. Resolve with `asdd slice escalate <id> --reasons "E1-scope-spread,…"`, backfill `capability.md` and `requirements.md` from `spec.md`, and continue at Validation on the full path. Choose `full` upfront for new capabilities, cross-cutting or architectural work, or multiple domains. After `DONE`, use `asdd slice amend <id>` to evolve the capability without a new Shape Up pitch.
 
 #### Progress and cycle closure
 
-Harness statuses say whether a feature started or passed. Shape Up adds a hill chart per scope — uphill while unknowns remain, downhill once the approach is settled — that never replaces feature status or evidence. At any point the team should know which scopes are still uphill, which must-haves are done, and what can be cut.
+Harness statuses say whether a feature started or passed. Features may set optional `hill: uphill|downhill`; `asdd status` lists uphill work and `asdd check` WARNs (`HILL-01`) when uphill remains in qa/knowledge. That never replaces feature status or evidence. At any point the team should know which scopes are still uphill, which must-haves are done, and what can be cut.
 
 At the end of the cycle: ship the verified must-have scopes, cut unfinished nice-to-haves (scope hammering), or let the circuit breaker stop the bet. Never extend a cycle silently. Unfinished work is not carried over; if it still matters it is shaped and pitched again. The Knowledge phase records the outcome, decisions, cut scope, and reusable learning; cooldown covers fixes the team chooses, exploration, and shaping the next pitches.
 
@@ -528,8 +549,22 @@ The audit tools are a feature module of the `spec-drift` MCP server ([`tools/spe
 | `verify_spec_compliance` | Per slice: the core `ears` adapter (`DRIFT-03`/`04`) plus module adapters such as `openapi` from `http-api` |
 | `generate_ci_gate` | CI config text (GitHub or GitLab) that runs `asdd check`; it writes no files and carries no threshold |
 | `audit_report` / `audit_finding` | Latest audit, filtered; one finding with its REQ → feature → file trace |
+| `audit_query` / `learning_report` | Findings filtered and grouped on the server; the learning loop with the `asdd` command a human runs next |
+| `traceability_matrix` | Requirement → features → owned files → tests → PRs from the knowledge index, with gaps (`no-feature`, `no-test`, `not-passing`) and a Markdown table |
 
-Resources: `spec://manifest`, `spec://rules/architecture`, `spec://drift/latest-report`, and `ui://spec-drift/audit-dashboard.html`. Prompts are thin pointers to skills and steering: `architecture-review`, `spec-alignment` (per-REQ `satisfied` / `violated` / `unclear`), and `pr-review` (draft comments ordered 🔴 FAIL, 🟡 WARN, 🔵 advisory — never posted by the server).
+Beyond the audit, the same server analyzes the code with the repository's rules and reviews pull requests. The full
+list (40 tools, toolsets, configuration) is in [its README](tools/spec-drift/README.md):
+
+- **Analysis:** Semgrep rules from `.semgrep/` (or CodeQL queries with `SPEC_DRIFT_ENGINE=codeql`), plus dependency-graph
+  rules (`dep-layer`, `dep-cycle`) from a `Dependency layers` table in `domain-layer.project.md`; ADR coverage, rule
+  tests, a baseline of accepted findings and a trend (`spec-drift baseline`, `spec-drift record`), the origin of a finding
+  (`drift_origin`), a request to the agent to fix a rule's violations, background scans, and an overview of several
+  repositories (`repos_overview`).
+- **PR review:** a pending GitHub review (a person submits it), the changed files ranked by risk, the ticket's criteria,
+  cost and quality metrics per review, and a CI workflow (`spec-drift ci-review`) that drafts the review under a
+  reviewer's token.
+
+Resources: `spec://manifest`, `spec://rules/architecture`, `spec://drift/latest-report`, and `ui://spec-drift/audit-dashboard.html`. Prompts are thin pointers to skills and steering: `architecture-review`, `spec-alignment` (per-REQ `satisfied` / `violated` / `unclear`), and `pr-review` (draft comments ordered 🔴 FAIL, 🟡 WARN, 🔵 advisory — never posted by the server); the analysis adds `generate-architecture-rules`, `write-adr-rule`, `fix-rule-violations`, and `spec-drift-report`.
 
 **Dashboard.** On hosts that render MCP Apps, the tools show a single-file HTML view built from `tools/spec-drift/ui/audit-dashboard/`; others get the same JSON. Actions only post messages to the conversation: *Trace* (both modes), *Send to agent as task* (author), *Draft comment* and *Dismiss…* (review). Results for the view stay under 8 KB (Cursor stops mounting the view above about 13 KB); larger results are always paged with `page_token` and `offset`, and architecture source texts load on demand (`include_text`, `source`). Cursor renders widgets only from servers registered globally with `HARNESS_ROOT` ([`.agents/mcp/README.md`](.agents/mcp/README.md)).
 
@@ -548,7 +583,7 @@ Resources: `spec://manifest`, `spec://rules/architecture`, `spec://drift/latest-
 4. The Tech Lead posts the review with their own tooling; the server has no GitHub token.
 5. The engineer fixes it in a normal session.
 
-Engineers work in separate slices, or in one slice with disjoint `scope_paths`. A check that is dismissed repeatedly is producing false positives — tune or remove it. Make the Tech Lead code owner of the gate files, bindings, `controls.md`, and hook config so an agent cannot loosen them without review (example: `.harness/examples/CODEOWNERS.harness.example`).
+Engineers work in separate slices, or in one slice with disjoint `scope_paths`. A check that is dismissed repeatedly is producing false positives — tune or remove it. Make the Tech Lead code owner of the gate files, bindings, `controls.md`, and hook config so an agent cannot loosen them without review (example: `.github/CODEOWNERS.harness.example`).
 
 ---
 
@@ -660,7 +695,7 @@ Each agent declares a tier and what it may do in its frontmatter (`metadata.tier
 
 Claude Code has no per-path write rule, so an auditor there keeps `Write` and `Bash`; its negative mutation check and `DRIFT-01` cover the rest. Details: [`cli/agents/_runtime-template.md`](cli/agents/_runtime-template.md).
 
-**Skills** (`.agents/skills/`) — Shape Up, Product Delivery, External Trackers, Capability Discovery, Domain-Language Extraction, Test-Driven Development, Documentation & ADRs, Anti-Pattern Detection, Codebase Audit, Codegraph, Business Model Canvas, and Create MCP App. Agents see names and descriptions ([`skills.md`](.harness/steering/skills.md)) and read a skill's body only when the task starts. Every skill is a runbook: trigger and negative boundary, an input/output contract, steps with an action, target, and assertion, a verification gate, an escalation gate, and its handoffs; general advice lives in its `references/`.
+**Skills** (`.agents/skills/`) — ASDD session skills (`asdd-status`, `asdd-next`, `asdd-implement`, `asdd-converge`), Shape Up, Product Delivery, External Trackers, Capability Discovery, Domain-Language Extraction, Test-Driven Development, Documentation & ADRs, Anti-Pattern Detection, Codebase Audit, Codegraph, Business Model Canvas, and Create MCP App. Agents see names and descriptions ([`skills.md`](.harness/steering/skills.md)) and read a skill's body only when the task starts. Every skill is a runbook: trigger and negative boundary, an input/output contract, steps with an action, target, and assertion, a verification gate, an escalation gate, and its handoffs; general advice lives in its `references/`.
 
 **Steering** (`.harness/steering/`)
 
@@ -670,7 +705,7 @@ Claude Code has no per-path write rule, so an auditor there keeps `Write` and `B
 | `domain-layer.md` / `.project.md` | Domain boundaries and ubiquitous language |
 | `quality-gates.md` / `.project.md` | EARS gates; test commands, drift and audit bindings |
 | `session-loop.md`, `manifest.md` | Session open/close, file scope, evidence; the phase machine |
-| `asdd-lite.md` | Lite mode and escalation |
+| `asdd-lite.md` | Lite / hotfix / full presets, amend, and escalation |
 | `spec-drift.md`, `knowledge.md` | Drift sensors, knowledge index (code intelligence: the `codegraph` skill) |
 | `controls.md` | Which guide or sensor wins on a conflict |
 | `security-rules.md`, `skills.md` | Security rules, skills index  |
@@ -706,7 +741,12 @@ Claude Code has no per-path write rule, so an auditor there keeps `Write` and `B
 | Document | Covers |
 |---|---|
 | [`AGENTS.md`](AGENTS.md) | Operational map — read every session |
+| [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) | Day-to-day use: what to do when (adopt, lite slice, shaped bet, hotfix, escalate, red check, PR gate, health check, learning loop) |
+| [`tools/spec-drift/docs/PLAYBOOK.md`](tools/spec-drift/docs/PLAYBOOK.md) | Day-to-day use of the spec-drift server: PR review, architecture rules, drift, traceability |
+| [`docs/ASDD-ROADMAP.md`](docs/ASDD-ROADMAP.md) | Gaps vs market, P0–P4 status, deferred items for kit v2 |
 | [`cli/README.md`](cli/README.md) | The `asdd` CLI: commands, install ownership and safety, layout |
+| [`cli/docs/guides/spec-kit-to-asdd.md`](cli/docs/guides/spec-kit-to-asdd.md) | Spec Kit → ASDD map (P0.2) |
+| [`cli/docs/guides/spec-as-source.md`](cli/docs/guides/spec-as-source.md) | Experimental spec-as-source pilot (P4.4; not default SoT) |
 | [`cli/runtimes/README.md`](cli/runtimes/README.md) | Per-runtime wiring |
 | [`.harness/steering/README.md`](.harness/steering/README.md) | Steering files and how agents load them |
 | [`tools/knowledge`](tools/knowledge/README.md), [`tools/spec-drift`](tools/spec-drift/README.md), [`tools/jev-gate`](tools/jev-gate/README.md) | The MCP servers |

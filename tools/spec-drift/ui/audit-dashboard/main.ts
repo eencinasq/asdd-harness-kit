@@ -43,6 +43,7 @@ const TITLES: Record<Kind, string> = {
 	finding: 'Finding',
 	ci: 'CI gate',
 	learning: 'Learning loop',
+	traceability: 'Traceability',
 };
 
 type TraceState =
@@ -118,6 +119,79 @@ const commandBlock = (command: string): string =>
 	`<div class="command"><code>${escapeHtml(command)}</code><button type="button" class="btn btn-sm" data-action="copy" data-text="${escapeHtml(command)}">Copy</button></div>`;
 
 /** The learning loop, read-only: patterns, proposals, what each proposal lacks, and the next command (REQ-002). */
+/** Team PR review quality (review-quality REQ-005): how many drafted comments humans kept, edited, or removed. */
+const renderReviewQuality = (q: Payload | null | undefined): string => {
+	if (!q) return '';
+	const pct = (part: number, whole: number) => (whole ? `${Math.round((100 * part) / whole)}%` : '—');
+	const acceptance = q['acceptance'] === null ? '—' : `${Math.round(100 * q['acceptance'])}%`;
+	const rules = (q['by_rule'] as Payload[]).length
+		? table(
+				['Checklist rule', 'Drafted', 'Kept', 'Edited', 'Removed'],
+				(q['by_rule'] as Payload[]).map((r) => [
+					mono(r['rule']),
+					escapeHtml(String(r['drafted'])),
+					escapeHtml(pct(r['kept'], r['drafted'])),
+					escapeHtml(pct(r['edited'], r['drafted'])),
+					r['removed'] ? badge(pct(r['removed'], r['drafted']), 'tone-warning') : escapeHtml('0%'),
+				]),
+			)
+		: '';
+	return `<h2>PR review quality</h2><p>${escapeHtml(`${q['reviews']} published review(s): ${q['drafted']} drafted comment(s), ${acceptance} kept or edited, ${q['removed']} removed.`)}</p>${rules}`;
+};
+
+const GAP_LABEL: Record<string, string> = {
+	'no-feature': 'no feature',
+	'no-test': 'no test',
+	'not-passing': 'not passing',
+};
+
+/** Requirement → features → tests → PRs, with gaps (spec-drift-depth REQ-001). */
+const renderTraceability = (vm: ViewModel): string => {
+	const t = vm.traceability;
+	if (!t) return '';
+	const n = (k: string): number => Number(t.totals[k] ?? 0);
+	const counts = [
+		badge(`${n('requirements')} requirements`),
+		badge(`${n('with_feature')} with a feature`),
+		badge(`${n('tested')} tested`, n('tested') === n('requirements') ? 'tone-success' : ''),
+		badge(`${n('passing')} passing`, n('passing') === n('requirements') ? 'tone-success' : ''),
+		badge(`${n('with_gaps')} with gaps`, n('with_gaps') ? 'tone-warning' : 'tone-success'),
+	].join(' ');
+	const list = (items: string[], max = 3): string =>
+		items.length
+			? `${items
+					.slice(0, max)
+					.map((i) => mono(i))
+					.join('<br>')}${items.length > max ? `<br><span class="subtle">+${items.length - max} more</span>` : ''}`
+			: '<span class="subtle">—</span>';
+	const rows = t.rows.length
+		? table(
+				['Requirement', 'Features', 'Tests', 'PRs', 'Gaps'],
+				t.rows.map((r) => [
+					`${mono(`${r['slice']} · ${r['req_id']}`)}<br>${escapeHtml(String(r['title']))}`,
+					(r['features'] as Payload[]).length
+						? (r['features'] as Payload[])
+								.map((f) =>
+									badge(`${f['id']} ${f['status']}`, f['status'] === 'passing' ? 'tone-success' : 'tone-warning'),
+								)
+								.join(' ')
+						: '<span class="subtle">—</span>',
+					list(r['tests'] as string[]),
+					(r['prs'] as number[]).length
+						? escapeHtml((r['prs'] as number[]).map((p) => `#${p}`).join(', '))
+						: '<span class="subtle">—</span>',
+					(r['gaps'] as string[]).length
+						? (r['gaps'] as string[]).map((g) => badge(GAP_LABEL[g] ?? g, 'tone-warning')).join(' ')
+						: badge('none', 'tone-success'),
+				]),
+			)
+		: emptyState('No rows', 'No requirement matches.', 'success');
+	const copy = t.markdown
+		? `<button type="button" class="btn btn-sm" data-action="copy" data-text="${escapeHtml(t.markdown)}">Copy as Markdown</button>`
+		: '';
+	return `<section class="stack" aria-label="Traceability"><div class="toolbar"><p>${counts}</p>${copy}</div>${rows}${t.note ? `<p class="subtle">${escapeHtml(t.note)}</p>` : ''}</section>`;
+};
+
 const renderLearning = (vm: ViewModel): string => {
 	const l = vm.learning;
 	if (!l) return '';
@@ -156,7 +230,7 @@ const renderLearning = (vm: ViewModel): string => {
 				]),
 			)
 		: '<p class="subtle">No steering proposals.</p>';
-	return `<section class="stack" aria-label="Learning loop"><div>${counts}</div>${l.note ? `<div class="callout">${escapeHtml(l.note)}</div>` : ''}<h2>Patterns</h2>${patterns}<h2>Steering proposals</h2>${proposals}</section>`;
+	return `<section class="stack" aria-label="Learning loop"><div>${counts}</div>${l.note ? `<div class="callout">${escapeHtml(l.note)}</div>` : ''}${renderReviewQuality(l.reviews)}<h2>Patterns</h2>${patterns}<h2>Steering proposals</h2>${proposals}</section>`;
 };
 
 const textBlock = (key: string, label: string): string => {
@@ -456,7 +530,7 @@ const setHeader = (vm: ViewModel | null): void => {
 	modeLabel.textContent =
 		vm?.kind === 'ci'
 			? `CI gate · ${vm.ci?.provider ?? ''}`
-			: vm?.kind === 'learning'
+			: vm?.kind === 'learning' || vm?.kind === 'traceability'
 				? 'Read-only'
 				: mode === 'review'
 					? 'Tech Lead review'
@@ -491,6 +565,10 @@ const render = (): void => {
 	}
 	if (vm.kind === 'learning') {
 		content.innerHTML = renderLearning(vm);
+		return;
+	}
+	if (vm.kind === 'traceability') {
+		content.innerHTML = renderTraceability(vm);
 		return;
 	}
 	if (vm.kind === 'finding') {

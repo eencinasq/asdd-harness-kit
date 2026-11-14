@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-adoption",
+  "concerns": [],
+  "session_id": "sess-spec-drift-adoption-002",
+  "timestamp": "2026-11-13T01:30:11.018Z",
+  "phase": "discovery",
+  "event_type": "phase_completed",
+  "evidence": "intent.md + capability.md from ROADMAP P2; Tech Lead chose 'guide only' for distribution (no package publishing). Facts: server bundle keeps node_modules external and needs Node >= 24; kit package has no dependencies and needs Node >= 22."
+}

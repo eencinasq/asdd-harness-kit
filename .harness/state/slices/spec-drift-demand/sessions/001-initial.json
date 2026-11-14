@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-spec-drift-demand-001",
+  "timestamp": "2026-11-14T01:16:15.897Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "spec-drift-demand",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "full",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

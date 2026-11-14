@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "harness-green",
+  "concerns": [],
+  "session_id": "sess-harness-green-011",
+  "timestamp": "2026-11-14T02:55:16.158Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-001 (DRIFT-02 after the 3.11.0 bump).",
+  "scope_paths": [
+    "cli/skills/asdd-converge/SKILL.md",
+    "cli/skills/asdd-implement/SKILL.md",
+    "cli/skills/asdd-next/SKILL.md",
+    "cli/skills/asdd-status/SKILL.md",
+    "cli/skills/codegraph/SKILL.md",
+    "cli/skills/external-trackers/SKILL.md",
+    "cli/modules/http-api/skills/api-and-interface-design/SKILL.md",
+    ".harness/steering/skills.md",
+    "cli/versions.json",
+    "tools/knowledge/test/knowledge.e2e-spec.ts"
+  ]
+}

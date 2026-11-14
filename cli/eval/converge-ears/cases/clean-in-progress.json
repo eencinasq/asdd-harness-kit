@@ -1,0 +1,19 @@
+{
+  "id": "clean-in-progress",
+  "clean": true,
+  "slice_id": "demo",
+  "requirements": [
+    { "id": "REQ-001", "must": true, "text": "The harness SHALL list open slices." },
+    { "id": "REQ-002", "must": true, "text": "The CLI SHALL exit non-zero on FAIL." }
+  ],
+  "features": [
+    {
+      "id": "TASK-001",
+      "status": "in_progress",
+      "req_ids": ["REQ-001", "REQ-002"],
+      "evidence": ""
+    }
+  ],
+  "test_mentions": ["REQ-001 and REQ-002 covered"],
+  "expected_codes": []
+}

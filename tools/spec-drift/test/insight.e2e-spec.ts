@@ -151,3 +151,29 @@ test('spec-drift-apps REQ-004: audit_query filters and groups the latest report 
 	assert.match(noDiff.structured['no_data']['reason'], /No audit_diff has run/);
 	assert.equal(snapshot(root), before, 'no file changed');
 });
+
+test('review-quality REQ-005: learning_report shows the reviews asdd learn recorded, and writes nothing', async () => {
+	write(root, '.harness/state/learning/summaries/2026-W45-ana.json', {
+		schema_version: '1.0',
+		author: 'ana',
+		week: '2026-W45',
+		signatures: {},
+		reviews: {
+			'7@1': {
+				at: '2026-11-03T10:00:00Z',
+				pr: 7,
+				revision: 1,
+				comments: { drafted: 3, kept: 1, edited: 1, removed: 1, added: 0 },
+				by_rule: { 'python.performance': { drafted: 2, kept: 0, edited: 1, removed: 1 } },
+			},
+		},
+	});
+	const before = snapshot(root);
+	const { isError, structured } = await call('learning_report');
+	assert.equal(isError, false);
+	assert.ok(LearningReportOutput.safeParse(structured).success);
+	assert.equal(structured['review_quality']['reviews'], 1);
+	assert.equal(structured['review_quality']['by_rule'][0]['rule'], 'python.performance');
+	assert.equal(snapshot(root), before, 'no file changed');
+	rmSync(path.join(root, '.harness/state/learning'), { recursive: true, force: true });
+});

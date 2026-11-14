@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "review-quality",
+  "concerns": [],
+  "session_id": "sess-review-quality-020",
+  "timestamp": "2026-11-12T23:36:40.192Z",
+  "phase": "implementation",
+  "event_type": "feature_started",
+  "feature_id": "TASK-005",
+  "evidence": "Re-verify TASK-005 (DRIFT-02).",
+  "scope_paths": [
+    "tools/spec-drift/eval/README.md",
+    "tools/spec-drift/README.md",
+    "tools/spec-drift/docs/ROADMAP.md"
+  ]
+}

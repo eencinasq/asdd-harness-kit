@@ -136,6 +136,32 @@ export class GithubService {
 		return code === 0 ? stdout : undefined;
 	}
 
+	/** File names directly in `dir` at `sha` (undefined when the folder does not exist there). Never touches the checkout. */
+	async listDirAt(repoRoot: string, sha: string, dir: string): Promise<string[] | undefined> {
+		const { code, stdout } = await this.process.run('git', ['ls-tree', '--name-only', sha, '--', `${dir}/`], {
+			cwd: repoRoot,
+		});
+		const names = stdout
+			.split('\n')
+			.filter(Boolean)
+			.map((p) => p.slice(dir.length + 1));
+		return code === 0 && names.length ? names : undefined;
+	}
+
+	/**
+	 * Commits per file in the history of `sha` since `since` (spec-drift-depth REQ-002); undefined when git cannot read
+	 * it. Only the given files are counted.
+	 */
+	async churn(repoRoot: string, sha: string, since: string, files: readonly string[]): Promise<string | undefined> {
+		if (!files.length) return '';
+		const { code, stdout } = await this.process.run(
+			'git',
+			['log', sha, `--since=${since}`, '--format=', '--name-only', '--', ...files],
+			{ cwd: repoRoot },
+		);
+		return code === 0 ? stdout : undefined;
+	}
+
 	/** `git grep` at `sha`: `path:line:text` lines (the `sha:` prefix removed). */
 	async grepAt(
 		repoRoot: string,

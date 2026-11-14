@@ -1,8 +1,9 @@
-# Architecture MCP — Playbook
+# spec-drift — Playbook
 
-How to use the Architecture MCP day to day: **what** it is for, **when** to reach for it, **where** to set
+How to use spec-drift (formerly "Architecture MCP") day to day: **what** it is for, **when** to reach for it, **where** to set
 it up, and step-by-step plays for each situation. For tool details and configuration, see the
-[README](../README.md).
+[README](../README.md). For the ASDD + Harness process itself (slices, sessions, checks), see the
+[kit playbook](../../../docs/PLAYBOOK.md).
 
 ---
 
@@ -15,6 +16,12 @@ it up, and step-by-step plays for each situation. For tool details and configura
 | **Architecture scan** | (automatic in every PR review)           | The repo's own `.semgrep/` rules run on the PR's files                                |
 | **Spec drift**        | "Which architecture rules are drifting?" | A dashboard of rule violations across the repo, grouped by ADR                        |
 | **Review quality**    | "How useful have the reviews been?"      | How many drafted comments humans kept, edited or removed, and the noisiest rules      |
+| **Read first**        | (automatic in every PR review)           | The changed files ranked by risk (churn, requirement links, findings)                 |
+| **Drift origin**      | "Where did this finding come from?"      | The commit, author and PR that introduced the line                                    |
+| **Guided fix**        | "Fix the violations of rule X"           | The agent's plan per file, your confirmation, the fix, and a rescan                   |
+| **Traceability**      | "Show the traceability matrix"           | Requirement → feature → file → test → PR, with gaps, ready to paste in an audit       |
+| **Several repos**     | "How are our repos doing?"               | Per repository: findings, trend, audit level, spec compliance                         |
+| **Review in CI**      | (a workflow in the reviewed repo)        | A pending review drafted on every ready PR, for you to submit                         |
 
 What it is **not**:
 
@@ -38,6 +45,10 @@ What it is **not**:
 | A repo has no architecture rules yet                                            | Tech lead | [Bootstrap rules](#play-e--bootstrap-architecture-rules)             |
 | Before a release, after a refactor, or every sprint                             | Tech lead | [Spec drift check](#play-f--spec-drift-check)                        |
 | Monthly, or when people complain about noisy comments                           | Tech lead | [Tune the reviewer](#play-g--tune-the-reviewer-with-metrics)         |
+| An audit or a client asks how requirements are covered                          | Tech lead | [Traceability matrix](#play-h--traceability-matrix)                  |
+| A rule keeps drifting and you want it fixed                                     | Tech lead | [Origin and fix](#play-i--find-the-origin-and-fix-a-rule)            |
+| You want a draft review on every PR without asking                              | Tech lead | [Review in CI](#play-j--review-in-ci)                                |
+| You look after several repositories                                             | Tech lead | [Several repos](#play-k--several-repositories)                       |
 
 **Skip it** for trivial PRs (typos, version bumps, generated files, lockfile-only changes): most of their
 files are filtered out anyway, so you'd pay for little. **Split it** when a PR is very large (dozens of
@@ -92,6 +103,7 @@ tool, possibly pointing at different repos.
 | Architecture / standards rules | `<repo>/.semgrep/<set>/<pack>.yml`                                                                                 | **Yes** — they are the spec                                              |
 | Review artifacts               | `<repo>/.pr-review/pr-<N>/` if that folder exists or is gitignored, else `~/.local/state/pr-review/<repo>/pr-<N>/` | No — add `.pr-review/` to `.gitignore` if you want them next to the code |
 | Review metrics                 | `~/.local/state/pr-review/metrics.jsonl`                                                                           | No                                                                       |
+| Baseline and history           | `<repo>/.semgrep/baseline.json`, `<repo>/.semgrep/history/<date>.json`                                             | **Yes** — written by `spec-drift baseline --write` / `record`            |
 | The review itself              | GitHub, as a **pending** review until you submit it                                                                | —                                                                        |
 
 ### One-time checklist
@@ -115,7 +127,7 @@ tool, possibly pointing at different repos.
    /review-pr pr: 828
    ```
 
-   or in plain words: _"Review PR 828 with the Architecture MCP."_ Add a focus if you have one:
+   or in plain words: _"Review PR 828 with spec-drift."_ Add a focus if you have one:
    `/review-pr pr: 828 focus: "notifications API"`.
 2. **Let the loop run.** The agent calls `pr_review_start`, then for each group `pr_review_next_group` →
    `pr_review_submit_findings`, then verifies its findings. There is no UI during the loop; you'll see the
@@ -224,7 +236,38 @@ addedLinesOnly: false # true: comment only on lines the PR added
 Then **check the change offline** before trusting it: `pnpm eval prepare`, run the reviewer on the
 cases, `pnpm eval score results.json` ([eval/README.md](../eval/README.md)). Precision should not drop
 when you chase recall. Add a case whenever a real defect slipped through or a comment was pure noise.
-A rising "kept" rate on real reviews is the signal the reviewer is getting better.
+A rising "kept" rate on real reviews is the signal the reviewer is getting better. The same report gives the median
+minutes, tool calls, and tool output (an estimate in tokens) per review: what a review costs.
+
+### Play H — Traceability matrix
+
+_"Show the traceability matrix"_ (or only one slice, or only the gaps). `traceability_matrix` reads the kit's knowledge
+index — run `asdd knowledge sync` first when specs changed — and lists each requirement with its features, the files
+they own, the tests among them, and the PRs that touched them. Gaps: no feature, no test, not passing. **Copy as
+Markdown** in the dashboard puts the table in an audit document.
+
+### Play I — Find the origin and fix a rule
+
+On a finding: _"Where did src/domain/order.ts line 12 come from?"_ — `drift_origin` answers with the commit that last
+changed the line and the one that first added it, each with author, date and PR. To clean up a rule, press **Ask the
+agent to fix** on it in the Drift tab (or `/fix-rule-violations rule_id: …`): the agent lists its plan per file and
+waits for your confirmation, fixes the cause (it never silences the rule), and rescans what it changed. Freeze what you
+accept with a baseline (`spec-drift baseline --write`) and record a snapshot each sprint (`spec-drift record`) to follow
+the trend.
+
+### Play J — Review in CI
+
+`node bin/spec-drift.mjs ci-review --kit-ref <commit>` prints a GitHub Actions workflow; commit it as
+`.github/workflows/spec-drift-review.yml` in the reviewed repository with two secrets, `ANTHROPIC_API_KEY` and
+`SPEC_DRIFT_REVIEWER_TOKEN` (a fine-grained token of the person who submits reviews). On every ready PR it drafts a
+**pending** review that belongs to that person: open the PR, read it, edit or drop comments, and submit. Drafts and fork
+PRs are skipped.
+
+### Play K — Several repositories
+
+Set `SPEC_DRIFT_REPOS` to the repositories' paths in the client config and ask _"How are our repos doing?"_.
+`repos_overview` reads each one's latest snapshot and audit report (no scan): findings, new ones, the trend, the audit
+level and spec compliance. A repository without data says which command to run there.
 
 ---
 
@@ -263,7 +306,13 @@ A rising "kept" rate on real reviews is the signal the reviewer is getting bette
 | Remove local artifacts     | "Clean up the review of PR 828"              |
 | Check spec drift           | `/spec-drift-report`                         |
 | See which rule packs exist | "List the rule packs"                        |
-| Review quality             | "Show the PR review metrics"                 |
+| Review quality and cost    | "Show the PR review metrics"                 |
+| Traceability               | "Show the traceability matrix"               |
+| Where a finding came from  | "Where did `<file>` line `<n>` come from?"   |
+| Fix a rule's violations    | `/fix-rule-violations rule_id: <id>`         |
+| A long scan                | "Start the analysis in the background"       |
+| Several repositories       | "How are our repos doing?"                   |
+| Review in CI               | `spec-drift ci-review --kit-ref <commit>`    |
 
 In Claude Code, the slash commands are `/mcp__spec-drift__review-pr` and
 `/mcp__spec-drift__spec-drift-report`.

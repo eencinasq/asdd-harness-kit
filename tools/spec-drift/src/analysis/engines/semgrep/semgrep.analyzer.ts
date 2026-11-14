@@ -4,7 +4,7 @@ import path from 'node:path';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { ProcessRunner } from '../../../common/process/process-runner.service.ts';
-import type { EngineInfo, RuleMeta, RulePack } from '../../analysis.types.ts';
+import type { EngineInfo, RuleMeta, RulePack, RuleTestReport } from '../../analysis.types.ts';
 import { ruleFilesOf } from '../../domain/pack-selection.ts';
 import type {
 	AnalyzerRunRequest,
@@ -12,7 +12,7 @@ import type {
 	CodeAnalyzer,
 	RulesLocation,
 } from '../../ports/code-analyzer.port.ts';
-import { parseFindings, parseSemgrepJson, semgrepErrors } from './semgrep-output.ts';
+import { parseFindings, parseSemgrepJson, parseTestOutput, semgrepErrors } from './semgrep-output.ts';
 import { IGNORED_SETS, isRuleFile, packIdFromFile, parseRuleCatalog } from './semgrep-rules.ts';
 
 const RULES_DIR = '.semgrep';
@@ -124,8 +124,36 @@ export class SemgrepAnalyzer implements CodeAnalyzer {
 			'Write Semgrep YAML: `rules:` entries with `id`, `languages`, `severity` (ERROR / WARNING / INFO), `message`, and `pattern` / `patterns` / `mode: taint`.',
 			'Put ADR links in `metadata.adr` and a `metadata.category`, so the dashboard can group drift by decision.',
 			'Use `paths.include` / `paths.exclude` that match this repo (do not hardcode another monorepo’s layout).',
-			'Check the rules with `semgrep --validate --config .semgrep` before finishing.',
+			`For every rule file, add a test file next to it with the same name and the target language's extension (\`${RULES_DIR}/architecture/boundaries.yml\` → \`boundaries.ts\`): above a line the rule must flag, a comment \`ruleid: <rule id>\`; above a similar line it must not flag, \`ok: <rule id>\` (in the language's comment syntax: \`// ruleid: …\`, \`# ruleid: …\`).`,
+			`Run \`semgrep --validate --config ${RULES_DIR}\` and \`semgrep --test ${RULES_DIR}\` until both pass; the test files are never scanned as code.`,
 		];
+	}
+
+	/** `semgrep --test` over the rules folder (rule-coverage REQ-004): which annotated rules pass. */
+	async testRules(repoRoot: string, timeoutMs: number): Promise<RuleTestReport> {
+		const rulesDir = path.join(repoRoot, RULES_DIR);
+		if (!(await fs.stat(rulesDir).catch(() => null))?.isDirectory()) {
+			return { status: 'ok', byRule: {}, invalidFiles: [] };
+		}
+		try {
+			const { stdout, stderr } = await this.process.run('semgrep', ['--test', '--json', RULES_DIR], {
+				cwd: repoRoot,
+				timeoutMs,
+			});
+			const parsed = parseTestOutput(stdout);
+			if (!parsed) {
+				return {
+					status: 'failed',
+					byRule: {},
+					invalidFiles: [],
+					message: stderr.trim().slice(-500) || 'no test output',
+				};
+			}
+			return { status: 'ok', ...parsed };
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			return { status: 'unavailable', byRule: {}, invalidFiles: [], message };
+		}
 	}
 
 	/** Keep the repo's `.semgrepignore` when scanning files copied elsewhere. */

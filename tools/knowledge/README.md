@@ -11,13 +11,14 @@ JSONL), vendored into `src/harness/` and bundled, so the server never drifts fro
 
 ## Tools
 
-| Tool                 | Purpose                                                                                            |
-| -------------------- | -------------------------------------------------------------------------------------------------- |
-| `knowledge_search`   | `query`, `k` (1-25), `slice_id`: semantic search when the index has vectors, else lexical          |
-| `knowledge_trace`    | Breadth-first walk from a node id (`req:<slice>:REQ-001`, `feature:…`, `file:…`), `depth` 1-4      |
-| `knowledge_slice`    | One slice: spec docs, requirements, acceptance criteria, features, session count, log entries      |
-| `knowledge_status`   | Backend (`sqlite` / `jsonl`), counts, `generated_at`, search mode, and `warnings` when degraded    |
-| `knowledge_patterns` | Learning patterns (LP-\*), proposals, failure signatures; computed live, needs no index (`status`) |
+| Tool                 | Purpose                                                                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `knowledge_search`   | `query`, `k` (1-25), `slice_id`: semantic search when the index has vectors, else lexical                                                                     |
+| `knowledge_trace`    | Breadth-first walk from a node id (`req:<slice>:REQ-001`, `feature:…`, `file:…`), `depth` 1-4                                                                 |
+| `knowledge_slice`    | One slice: spec docs, requirements, acceptance criteria, features, session count, log entries                                                                 |
+| `knowledge_status`   | Backend (`sqlite` / `jsonl`), counts, `generated_at`, search mode, and `warnings` when degraded                                                               |
+| `knowledge_patterns` | Learning patterns (LP-\*), proposals, failure signatures; computed live, needs no index (`status`)                                                            |
+| `pipeline_status`    | ASDD pipeline adoption metrics (same object as `asdd status --json`): lite share, escalation rate, phase medians, stop-FAIL counts, open patterns. Read-only. |
 
 Degradations are reported, never hidden: a stale `knowledge.db` (JSONL served), an index with vectors but no embeddings
 endpoint, or a failed query embedding (lexical fallback) all appear in `warnings` and on stderr. Without an index, the

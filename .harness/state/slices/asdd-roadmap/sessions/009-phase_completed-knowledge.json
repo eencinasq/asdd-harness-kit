@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "concerns": [],
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Knowledge note: roadmap lives at docs/ASDD-ROADMAP.md for future P0 slices.",
+  "session_id": "sess-asdd-roadmap-009",
+  "timestamp": "2026-11-13T02:25:42.000Z"
+}

@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "asdd-p2",
+  "source_tasks": ".harness/specs/asdd-p2/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Hotfix / lite / full presets",
+      "user_visible_behavior": "asdd slice init --hotfix scaffolds a hotfix-mode slice at implementation with one stub feature; lite and --full unchanged.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/init-slice.test.mjs"
+      ],
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/init-slice.test.mjs` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "scope_paths": [
+        "cli/src/harness/init-slice.mjs",
+        "cli/src/harness/init-slice.test.mjs",
+        "cli/src/harness/sync-state.mjs",
+        "cli/src/harness/validators",
+        "cli/src/harness/commands.mjs",
+        "cli/steering/asdd-lite.md"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "e240f7436d0b518b65f824f246b51b187fb67aedcbcb7c40e94779bd92b2cd53"
+    },
+    {
+      "id": "TASK-002",
+      "title": "slice amend for post-DONE evolution",
+      "user_visible_behavior": "asdd slice amend <id> reopens a DONE slice to in_progress with an amendments note.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/src/harness/amend-slice.test.mjs"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/amend-slice.test.mjs` exits 0.",
+      "scope_paths": [
+        "cli/src/harness/amend-slice.mjs",
+        "cli/src/harness/amend-slice.test.mjs",
+        "cli/src/harness/sync-state.mjs",
+        "cli/src/harness/commands.mjs",
+        "cli/README.md"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "0306539933c49c79b321f255f2016915d494a8777fb016e0c15754cad1b07f20"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Hill chart sensor",
+      "user_visible_behavior": "Features may set hill uphill|downhill; asdd status lists uphill work; check WARNs when uphill remains in qa/knowledge.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "node --test cli/src/harness/hill-lib.test.mjs"
+      ],
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/hill-lib.test.mjs` exits 0.",
+      "scope_paths": [
+        "cli/scaffold/features/feature.schema.json",
+        ".harness/features/feature.schema.json",
+        "cli/src/harness/harness-status.mjs",
+        "cli/src/harness/check-invariants.mjs",
+        "cli/src/harness/hill-lib.mjs",
+        "cli/src/harness/hill-lib.test.mjs",
+        "docs/ASDD-ROADMAP.md",
+        "package.json"
+      ],
+      "hill": "downhill",
+      "evidence_hash": "b2338d466c1e5f6533cf14f6cc3a47c279a484fff30ebdda9d1963c9461e5598"
+    }
+  ]
+}

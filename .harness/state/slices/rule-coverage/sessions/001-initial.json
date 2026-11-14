@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-rule-coverage-001",
+  "timestamp": "2026-11-12T23:02:45.186Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "rule-coverage",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "full",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

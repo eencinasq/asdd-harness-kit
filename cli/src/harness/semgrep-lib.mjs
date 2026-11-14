@@ -21,6 +21,13 @@ import { readBinding } from './drift-lib.mjs';
  */
 const CONFIG_CANDIDATES = ['.semgrep.yml', '.semgrep.yaml', 'semgrep.yml', '.semgrep/architecture.yml', '.semgrep/architecture'];
 
+/** The rules folder: its rule test fixtures are not code. */
+const RULES_FOLDER = '.semgrep';
+const isRulesFolderPath = (p) => {
+  const clean = String(p).replace(/^\.\//, '');
+  return clean === RULES_FOLDER || clean.startsWith(`${RULES_FOLDER}/`);
+};
+
 /** A rule file, or a folder with at least one YAML file in it. */
 function holdsRules(abs) {
   if (!existsSync(abs)) return false;
@@ -448,7 +455,11 @@ export function runSemgrepScan({ root, sources, paths = [], bin = 'semgrep', spa
     configPath = join(tmpDir, '.semgrep.yml');
     writeFileSync(configPath, config.yaml);
   }
-  const targets = (paths.length ? paths : ['.']).filter((p) => p === '.' || existsSync(join(root, p)));
+  // Rule test fixtures live in .semgrep/ and violate the rules on purpose: never code. Semgrep does not apply
+  // --exclude to explicit targets, so they are dropped here too (spec-drift rule-coverage REQ-003).
+  const targets = (paths.length ? paths : ['.']).filter(
+    (p) => p === '.' || (!isRulesFolderPath(p) && existsSync(join(root, p))),
+  );
   if (!targets.length) {
     if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
     return { status: 'pass', source: config.source, path: config.path, yaml: config.yaml, findings: [], message: 'No existing paths to scan.' };
@@ -457,6 +468,7 @@ export function runSemgrepScan({ root, sources, paths = [], bin = 'semgrep', spa
     const r = spawn(bin, [
       'scan', '--json', '--quiet', '--metrics=off', '--disable-version-check',
       '--config', configPath,
+      '--exclude', RULES_FOLDER,
       ...targets,
     ], { cwd: root, encoding: 'utf8', timeout: 120000, maxBuffer: 16 * 1024 * 1024 });
     if (r.error?.code === 'ENOENT') {

@@ -2,6 +2,9 @@ import os from 'node:os';
 import path from 'node:path';
 import * as z from 'zod';
 
+import { parseEngine } from './engine.ts';
+import { parseToolsets } from './toolsets.ts';
+
 const LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '::1', '[::1]']);
 export const isLoopbackHost = (host: string): boolean => LOOPBACK_HOSTS.has(host);
 
@@ -30,6 +33,31 @@ export const EnvSchema = z
 		MCP_API_KEY: z.string().min(16, 'MCP_API_KEY must be at least 16 characters').optional(),
 		/** Extra browser origins allowed to call /mcp (comma-separated hostnames). Localhost is always allowed. */
 		MCP_ALLOWED_ORIGINS: commaList,
+		/** Toolsets to load (comma-separated: analysis, review, audit); all when unset. */
+		SPEC_DRIFT_TOOLSETS: z
+			.string()
+			.optional()
+			.superRefine((value, ctx) => {
+				try {
+					parseToolsets(value);
+				} catch (error) {
+					ctx.addIssue({ code: 'custom', message: (error as Error).message });
+				}
+			}),
+
+		/** Repositories for repos_overview (comma-separated paths); the analyzed repo when unset. */
+		SPEC_DRIFT_REPOS: commaList,
+		/** Analysis engine: semgrep (default) or codeql. */
+		SPEC_DRIFT_ENGINE: z
+			.string()
+			.optional()
+			.superRefine((value, ctx) => {
+				try {
+					parseEngine(value);
+				} catch (error) {
+					ctx.addIssue({ code: 'custom', message: (error as Error).message });
+				}
+			}),
 
 		/** Repo whose rule packs (e.g. `.semgrep/`) the analysis dashboard tools run. Alias: SEMGREP_REPO_ROOT. */
 		ANALYSIS_REPO_ROOT: z

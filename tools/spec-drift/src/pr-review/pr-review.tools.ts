@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Resource, ResourceTemplate, Tool } from '@nestjs/mcp';
+import { type McpContext, Resource, ResourceTemplate, Tool } from '@nestjs/mcp';
 
+import { answerOf, ask, canElicit } from '../common/mcp/elicitation.ts';
 import { appToolMeta, RESOURCE_MIME_TYPE, readAppHtml } from '../common/mcp/mcp-app.util.ts';
 import { presentReview } from './pr-review.presenter.ts';
 import {
@@ -38,6 +39,14 @@ import {
 	VerifyFindingsSchema,
 } from './pr-review.schemas.ts';
 import { PrReviewService } from './pr-review.service.ts';
+import {
+	PUBLISH_QUESTION,
+	publishQuestion,
+	TICKET_QUESTION,
+	type TicketAnswer,
+	ticketFromAnswer,
+	ticketQuestion,
+} from './requirements/ticket-question.ts';
 
 export const PR_REVIEW_UI_URI = 'ui://spec-drift/pr-review.html';
 const PR_REVIEW_UI_FILE = 'pr-review.html';
@@ -56,6 +65,20 @@ const dashboardOnlyMeta = appToolMeta(PR_REVIEW_UI_URI, ['app']);
 export class PrReviewTools {
 	constructor(@Inject(PrReviewService) private readonly review: PrReviewService) {}
 
+	/** Records the call and the text it returned, for the review's cost (spec-drift-demand REQ-003). */
+	private async logged<T extends { content: readonly { text: string }[] }>(
+		tool: string,
+		args: { readonly pr: number; readonly repoPath?: string },
+		result: T,
+	): Promise<T> {
+		await this.review.recordCall(
+			args,
+			tool,
+			result.content.reduce((n, c) => n + c.text.length, 0),
+		);
+		return result;
+	}
+
 	// ── Agent loop: text + structuredContent only, no UI ───────────────────────
 
 	@Tool({
@@ -66,8 +89,23 @@ export class PrReviewTools {
 			'Start a review of a GitHub PR: fetch its diff, split it into review groups and return the review prompt. Optionally pass the ticket it implements (Jira / Linear: its text; GitHub issue: its ref; or pasted text) to verify its acceptance criteria after the groups. No UI: then loop pr_review_next_group → pr_review_submit_findings.',
 		inputSchema: StartSchema,
 	})
-	async start(args: StartInput) {
-		return presentReview(await this.review.start(args));
+	async start(args: StartInput, ctx?: McpContext) {
+		// spec-drift-depth REQ-004: a client that can be asked gets a ticket question instead of a free-text hint.
+		if (!args.ticket && canElicit(ctx)) {
+			const answer = answerOf<TicketAnswer>(ctx, TICKET_QUESTION);
+			if (answer.kind === 'none') {
+				const question = await this.review.ticketSuggestion(args);
+				if (question.ask) {
+					const { message, schema } = ticketQuestion(args.pr, question.suggestion);
+					return ask(TICKET_QUESTION, message, schema);
+				}
+			} else if (answer.kind === 'accepted') {
+				const ticket = ticketFromAnswer(answer.content);
+				if (ticket)
+					return this.logged('pr_review_start', args, presentReview(await this.review.start({ ...args, ticket })));
+			}
+		}
+		return this.logged('pr_review_start', args, presentReview(await this.review.start(args)));
 	}
 
 	@Tool({
@@ -79,7 +117,11 @@ export class PrReviewTools {
 		inputSchema: NextGroupSchema,
 	})
 	async nextGroup(args: NextGroupInput) {
-		return presentReview(await this.review.nextGroup(args), { withRules: true, loop: true });
+		return this.logged(
+			'pr_review_next_group',
+			args,
+			presentReview(await this.review.nextGroup(args), { withRules: true, loop: true }),
+		);
 	}
 
 	@Tool({
@@ -91,7 +133,11 @@ export class PrReviewTools {
 		inputSchema: SubmitFindingsSchema,
 	})
 	async submitFindings(args: SubmitFindingsInput) {
-		return presentReview(await this.review.submitFindings(args), { loop: true });
+		return this.logged(
+			'pr_review_submit_findings',
+			args,
+			presentReview(await this.review.submitFindings(args), { loop: true }),
+		);
 	}
 
 	@Tool({
@@ -103,7 +149,9 @@ export class PrReviewTools {
 		inputSchema: ReadFileSchema,
 	})
 	async readFile(args: ReadFileInput) {
-		return { content: [{ type: 'text' as const, text: await this.review.readFile(args) }] };
+		return this.logged('pr_review_read_file', args, {
+			content: [{ type: 'text' as const, text: await this.review.readFile(args) }],
+		});
 	}
 
 	@Tool({
@@ -115,7 +163,9 @@ export class PrReviewTools {
 		inputSchema: SearchSchema,
 	})
 	async search(args: SearchInput) {
-		return { content: [{ type: 'text' as const, text: await this.review.search(args) }] };
+		return this.logged('pr_review_search', args, {
+			content: [{ type: 'text' as const, text: await this.review.search(args) }],
+		});
 	}
 
 	@Tool({
@@ -127,7 +177,11 @@ export class PrReviewTools {
 		inputSchema: VerifyFindingsSchema,
 	})
 	async verifyFindings(args: VerifyFindingsInput) {
-		return presentReview(await this.review.verifyFindings(args), { loop: true });
+		return this.logged(
+			'pr_review_verify_findings',
+			args,
+			presentReview(await this.review.verifyFindings(args), { loop: true }),
+		);
 	}
 
 	@Tool({
@@ -151,7 +205,7 @@ export class PrReviewTools {
 		inputSchema: SetTicketSchema,
 	})
 	async setTicket(args: SetTicketInput) {
-		return presentReview(await this.review.setTicket(args));
+		return this.logged('pr_review_set_ticket', args, presentReview(await this.review.setTicket(args)));
 	}
 
 	@Tool({
@@ -163,7 +217,11 @@ export class PrReviewTools {
 		inputSchema: SubmitRequirementsSchema,
 	})
 	async submitRequirements(args: SubmitRequirementsInput) {
-		return presentReview(await this.review.submitRequirements(args), { loop: true });
+		return this.logged(
+			'pr_review_submit_requirements',
+			args,
+			presentReview(await this.review.submitRequirements(args), { loop: true }),
+		);
 	}
 
 	@Tool({
@@ -203,7 +261,7 @@ export class PrReviewTools {
 		_meta: dashboardMeta,
 	})
 	async status(args: PrInput) {
-		return presentReview(await this.review.status(args));
+		return this.logged('pr_review_status', args, presentReview(await this.review.status(args)));
 	}
 
 	@Tool({
@@ -241,7 +299,27 @@ export class PrReviewTools {
 		inputSchema: PublishSchema,
 		_meta: dashboardMeta,
 	})
-	async publish(args: PublishInput) {
+	async publish(args: PublishInput, ctx?: McpContext) {
+		// spec-drift-depth REQ-004: the user confirms the pending review when the client can be asked.
+		if (canElicit(ctx)) {
+			const answer = answerOf<{ confirm?: unknown }>(ctx, PUBLISH_QUESTION);
+			if (answer.kind === 'none') {
+				const comments = await this.review.draftCommentCount(args);
+				if (comments !== null) {
+					const { message, schema } = publishQuestion(args.pr, comments);
+					return ask(PUBLISH_QUESTION, message, schema);
+				}
+			} else if (answer.kind === 'declined' || answer.content.confirm !== true) {
+				return {
+					content: [
+						{
+							type: 'text' as const,
+							text: `Not published: the user declined creating the pending review on PR #${args.pr}. The draft is unchanged; do not publish again unless the user asks.`,
+						},
+					],
+				};
+			}
+		}
 		return presentReview(await this.review.publish(args));
 	}
 

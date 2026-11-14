@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "review-quality",
+  "concerns": [],
+  "session_id": "sess-review-quality-019",
+  "timestamp": "2026-11-12T21:19:50.624Z",
+  "phase": "knowledge",
+  "event_type": "phase_completed",
+  "evidence": "Lessons: (1) real data showed 6/6 drafted comments kept \u2014 precision looks perfect while recall is unknown, which is why the labelled set matters; (2) review noise reaches the team through the existing committed weekly summaries, keeping the MCP server read-only; (3) harvested diffs are client code \u2014 the default output is outside the repo; (4) biome --write on a folder touches unrelated files (ci-templates.ts again) \u2014 format named files only; (5) a docs slice without lint in its verification let a format error through (spec-drift-roadmap fixed)."
+}

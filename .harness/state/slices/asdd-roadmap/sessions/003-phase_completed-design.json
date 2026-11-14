@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-lite",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "concerns": [],
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "design.md: single mapped file docs/ASDD-ROADMAP.md; no domain terms; no ADRs.",
+  "session_id": "sess-asdd-roadmap-003",
+  "timestamp": "2026-11-13T02:25:42.000Z"
+}

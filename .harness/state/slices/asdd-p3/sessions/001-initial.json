@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-p3-001",
+  "timestamp": "2026-11-13T12:03:05.329Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "asdd-p3",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "lite",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

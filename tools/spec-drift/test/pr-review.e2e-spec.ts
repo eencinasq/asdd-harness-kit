@@ -367,6 +367,13 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 		assert.deepEqual(metrics.verification, { confirmed: 1, plausible: 0, rejected: 0 });
 		const summary = textOf(await client.callTool({ name: 'pr_review_metrics', arguments: {} }));
 		assert.match(summary, /over 1 published review[\s\S]*Inline comments: 1 drafted · kept 0% · edited 100%/);
+		// spec-drift-demand REQ-003: the review's time and calls since the last pr_review_start.
+		assert.equal(typeof metrics.cost.minutes, 'number');
+		assert.ok(metrics.cost.byTool.pr_review_start === 1, JSON.stringify(metrics.cost.byTool));
+		assert.ok(metrics.cost.byTool.pr_review_submit_findings >= 2);
+		assert.ok(metrics.cost.calls >= 4 && metrics.cost.chars > 1000);
+		assert.equal(metrics.cost.estTokens, Math.round(metrics.cost.chars / 4));
+		assert.match(summary, /Cost \(median of 1 review\(s\)\): [\d.]+ min · \d+ tool calls · ~\d+ tokens of tool output/);
 	});
 
 	test('the model can only create pending reviews, even when forcing', async () => {

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "spec-drift-adoption",
+  "concerns": [],
+  "session_id": "sess-spec-drift-adoption-016",
+  "timestamp": "2026-11-13T20:16:25.100Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_completed",
+  "evidence": "tools/spec-drift: typecheck OK, lint no errors (2 warnings + 1 info pre-existing; the Cursor ${workspaceFolder} literal is a named constant with a biome-ignore reason), test 190/190, build OK, test:e2e 117/117. client-config.spec: Cursor/Claude Desktop JSON with resolved launcher, PATH dirs, project roots (${workspaceFolder} without --project), toolsets; Claude Code 'claude mcp add' line with quoting; tool dirs from PATH. config.e2e: the printed Claude Desktop config started the server as pasted from another working directory with only its env, toolset applied. Compiled bin config resolves the same launcher. README: one name, 'Install in 5 minutes', Toolsets, Baseline and trend, config variable; PLAYBOOK and PR review prompt heading renamed; package.json description; cli/mcp/README points to the config command."
+}

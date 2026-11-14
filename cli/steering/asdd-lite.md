@@ -8,16 +8,32 @@ tags:
 
 Lite is the **default entry mode for every slice**. The full 9-phase pipeline is
 opt-in (`asdd slice init --full`) for work known upfront to be cross-cutting or
-architectural. Growth in a lite slice is not a judgment call: the harness
-detects escalation evidence from sessions and blocks the slice from completing
-until it is acknowledged.
+architectural. For a ≤1-file bugfix, use `asdd slice init <id> --hotfix`
+(starts at implementation with one stub feature; no Discovery theatre). Growth
+in a lite/hotfix slice is not a judgment call: the harness detects escalation
+evidence from sessions and blocks the slice from completing until it is
+acknowledged.
 
 ## When to use
 
-Lite is the default. Choose **full only upfront** when the work is provably a
-new user-facing capability spanning modules, cross-cutting, or architectural.
-Rule of thumb for what keeps a slice lite: single module scope, ≤1 new domain
-concept, serial work (one `in_progress` feature).
+| Preset | Command | When |
+|--------|---------|------|
+| **hotfix** | `asdd slice init <id> --hotfix` | Bug ≤ ~1 file; feature + evidence only |
+| **lite** | `asdd slice init <id>` (default) | Bounded feature; current lite path |
+| **full** | `asdd slice init <id> --full` | Cross-cutting / architectural upfront |
+
+Rule of thumb for what keeps a slice lite/hotfix: single module scope, ≤1 new
+domain concept, serial work (one `in_progress` feature).
+
+### Post-DONE amend
+
+When a closed capability needs a small delta (no new Shape Up pitch):
+
+```bash
+asdd slice amend <slice-id> --note "why" [--by <owner>]
+```
+
+This resumes `in_progress` and writes `.harness/specs/<id>/amendments/<stamp>.md`.
 
 ## Escalation triggers (machine-enforced)
 

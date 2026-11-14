@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "skills-spec",
+  "concerns": [],
+  "session_id": "sess-skills-spec-035",
+  "timestamp": "2026-11-14T02:20:38.558Z",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-002 (DRIFT-02; slice harness-green).",
+  "scope_paths": [
+    "cli/skills/shape-up",
+    "cli/skills/product-delivery",
+    "cli/skills/external-trackers"
+  ]
+}

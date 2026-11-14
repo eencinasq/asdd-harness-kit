@@ -1,0 +1,8 @@
+{
+	"id": "clean-java-early-return",
+	"description": "Flattens nested ifs into guard clauses with the same results.",
+	"language": "java",
+	"category": "clean",
+	"diff": "diff --git a/src/main/java/com/acme/ship/Shipping.java b/src/main/java/com/acme/ship/Shipping.java\n--- a/src/main/java/com/acme/ship/Shipping.java\n+++ b/src/main/java/com/acme/ship/Shipping.java\n@@ -2,13 +2,12 @@\n \n public final class Shipping {\n     public static int cost(Order order) {\n-        if (order != null) {\n-            if (order.total() >= 100) {\n-                return 0;\n-            } else {\n-                return 7;\n-            }\n+        if (order == null) {\n+            return 0;\n         }\n-        return 0;\n+        if (order.total() >= 100) {\n+            return 0;\n+        }\n+        return 7;\n     }\n }\n",
+	"expected": []
+}

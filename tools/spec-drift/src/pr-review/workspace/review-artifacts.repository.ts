@@ -10,6 +10,7 @@ import type { ExistingComment } from '../context/review-context.ts';
 import type { ReviewProgress } from '../coverage/coverage.ts';
 import type { ResolvedPaths, ReviewUnitsView } from '../pr-review.types.ts';
 import type { RequirementsState } from '../requirements/requirements.types.ts';
+import type { PrRisk } from '../risk/file-risk.ts';
 
 const writeJson = writeJsonAtomic;
 
@@ -65,6 +66,14 @@ export class ReviewArtifactsRepository {
 
 	saveRequirements(paths: ResolvedPaths, requirements: RequirementsState): Promise<void> {
 		return writeJson(paths.requirements, requirements);
+	}
+
+	loadRisk(paths: ResolvedPaths): Promise<PrRisk | undefined> {
+		return this.readJson<PrRisk>(paths.risk);
+	}
+
+	saveRisk(paths: ResolvedPaths, risk: PrRisk): Promise<void> {
+		return writeJson(paths.risk, risk);
 	}
 
 	async loadExistingComments(paths: ResolvedPaths): Promise<ExistingComment[]> {

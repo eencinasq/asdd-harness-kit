@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-pipeline",
+  "human": "eencinas",
+  "slice_id": "asdd-p4",
+  "concerns": [],
+  "session_id": "sess-asdd-p4-017",
+  "timestamp": "2026-11-14T02:20:38.519Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "evidence": "Re-verify TASK-001 (DRIFT-02; slice harness-green).",
+  "scope_paths": [
+    "cli/src/harness/tracker-sync-lib.mjs",
+    "cli/src/harness/tracker-sync-lib.test.mjs",
+    "cli/src/harness/tracker-sync.mjs",
+    "cli/skills/external-trackers/SKILL.md",
+    "cli/src/harness/commands.mjs"
+  ]
+}

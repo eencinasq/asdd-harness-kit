@@ -1,0 +1,18 @@
+{
+  "id": "clean-passing",
+  "clean": true,
+  "slice_id": "demo",
+  "requirements": [
+    { "id": "REQ-001", "must": true, "text": "The system SHALL persist feature evidence." }
+  ],
+  "features": [
+    {
+      "id": "TASK-001",
+      "status": "passing",
+      "req_ids": ["REQ-001"],
+      "evidence": "tests passed"
+    }
+  ],
+  "test_mentions": ["// covers REQ-001"],
+  "expected_codes": []
+}
