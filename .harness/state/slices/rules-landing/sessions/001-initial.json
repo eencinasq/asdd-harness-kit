@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-rules-landing-001",
+  "timestamp": "2026-11-11T05:14:24.964Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "rules-landing",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "lite",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

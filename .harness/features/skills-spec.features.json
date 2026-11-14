@@ -48,13 +48,13 @@
         "node cli/bin/asdd.mjs kit skills-lint --only shape-up,product-delivery,external-trackers",
         "node cli/bin/asdd.mjs kit guidance"
       ],
-      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node cli/bin/asdd.mjs kit skills-lint --only shape-up,product-delivery,external-trackers && node cli/bin/asdd.mjs kit guidance` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node cli/bin/asdd.mjs kit skills-lint --only shape-up,product-delivery,external-trackers && node cli/bin/asdd.mjs kit guidance` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/skills/shape-up",
         "cli/skills/product-delivery",
         "cli/skills/external-trackers"
       ],
-      "evidence_hash": "f11b3821dbf7a5ce472cc55bbeabb63e2a3e9c29b84d6c3a7050014459999667"
+      "evidence_hash": "b61e88eb25e139f1b4e5cc2be51fb365a96e70807fdbc5fde6a3ece2ff8f5586"
     },
     {
       "id": "TASK-003",
@@ -131,7 +131,7 @@
         "node cli/bin/asdd.mjs kit skills-lint",
         "node cli/bin/asdd.mjs kit guidance"
       ],
-      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/steering/skills.md",
         "cli/steering/controls.md",
@@ -139,7 +139,7 @@
         "cli/steering/security-rules.md",
         "cli/agents/asdd-design-agent.md"
       ],
-      "evidence_hash": "b6485058c19d707279c65eac4e892138bd578dcdf9d8d95bd77a099ab90af1ec"
+      "evidence_hash": "1bb997d8f3d76d45beb0ddf379306fb4e759d75b54aebfa455ddbe9f7434dece"
     },
     {
       "id": "TASK-006",
@@ -166,7 +166,7 @@
         "node --test cli/test/skills-lint.test.mjs",
         "npm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance && node --test cli/test/skills-lint.test.mjs && npm test` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance && node --test cli/test/skills-lint.test.mjs && npm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/kit/skills-lint.mjs",
         "cli/src/main.mjs",
@@ -175,7 +175,7 @@
         "cli/test/install.sh",
         "cli/README.md"
       ],
-      "evidence_hash": "45ba79b48c6e0a1ef7692a42fd87c0f65fd3c24055aec1f6e982867cdc66cb2e"
+      "evidence_hash": "e1f8344287c768f51c4b2d89cd71c930a179ffbb7bfaa05937417346c911a11c"
     }
   ]
 }

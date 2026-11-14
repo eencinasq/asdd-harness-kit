@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-14T03:28:31.030Z",
+  "generated_at": "2026-11-14T04:44:22.877Z",
   "threshold": 3,
   "summary": {
-    "patterns": 18,
-    "open": 0,
+    "patterns": 21,
+    "open": 1,
     "in_flight": 3,
     "verified": 0,
     "unsigned_failures": 0
@@ -19,7 +19,7 @@
       "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-26T22:46:55Z",
-      "last_seen": "2026-11-14T03:28:30.000Z",
+      "last_seen": "2026-12-04T00:00:00.000Z",
       "sources": [
         "escalation"
       ],
@@ -133,6 +133,27 @@
       ]
     },
     {
+      "id": "LP-f374bf6d",
+      "signature": "sensor:DRIFT-02",
+      "kind": "escape",
+      "occurrences": 3,
+      "threshold": 3,
+      "status": "open",
+      "reopened": false,
+      "first_seen": "2026-10-28T01:34:26.022Z",
+      "last_seen": "2026-11-13T02:25:45.463Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [],
+      "examples": [
+        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-001 changed after evidence_commit 67f5a59; set it back to in_progress and rerun verification"
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-e9c4ddb0",
       "signature": "blocked:phase:qa",
       "kind": "escape",
@@ -220,26 +241,6 @@
       "examples": [
         "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)",
         "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by agents-use-scripts, asdd-cli, cli-harness, jev-gate-nest, knowledge-nest, mcp-standalone, modules-top-level, spec-drift-merge, spec-drift-adoption (intent/design/tasks/spec or scope_paths)"
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-f374bf6d",
-      "signature": "sensor:DRIFT-02",
-      "kind": "escape",
-      "occurrences": 2,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-10-28T01:34:26.022Z",
-      "last_seen": "2026-11-13T02:25:45.463Z",
-      "sources": [
-        "sensor"
-      ],
-      "slices": [],
-      "examples": [
-        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification",
-        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
       ],
       "proposals": []
     },
@@ -427,6 +428,63 @@
       ],
       "examples": [
         "Seeding the kit's domain model in docs/architecture/ during Domain leaked it into installed projects, and `npm test` still passed: `! grep …` lines in scripts/test-install-into.sh (2) and scripts/test-lifecycle.sh (1) never fail under `set -e`."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-1d3df87a",
+      "signature": "sensor:<path>: missing portable slot(s): enforcement (kit_steering_rule profile)",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-11T04:52:58.875Z",
+      "last_seen": "2026-11-11T04:52:58.875Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [],
+      "examples": [
+        ".harness/steering/session-loop.md: missing portable slot(s): enforcement (kit_steering_rule profile)"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-7aa239e5",
+      "signature": "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 5,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-11T04:44:07.820Z",
+      "last_seen": "2026-11-11T04:44:07.820Z",
+      "sources": [
+        "warn"
+      ],
+      "slices": [],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-34328f57",
+      "signature": "warn:asdd-steering.mdc mandates reads for auto files bypassing tags: structure.md, pr",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 5,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-11T04:44:07.820Z",
+      "last_seen": "2026-11-11T04:44:07.820Z",
+      "sources": [
+        "warn"
+      ],
+      "slices": [],
+      "examples": [
+        "asdd-steering.mdc mandates reads for auto files bypassing tags: structure.md, product.md, codegraph.md (recorded G-6 — Phase-2 generated projections)"
       ],
       "proposals": []
     },

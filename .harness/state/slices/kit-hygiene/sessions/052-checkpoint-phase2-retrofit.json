@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-052",
+  "timestamp": "2026-12-04T00:00:00.000Z",
+  "agent": "devin",
+  "human": "ougarte",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "Phase-2 fleet retrofit landed per harness.stearing/v1: AR-5 resolved (quality-gates.project -> implementation/qa/task_planning/refactor; Domain Placement gate applies impl/qa/refactor; Tech Debt gate at task_planning boundary), starvation retags (quality-gates +discovery/spec/design, domain-layer pair +design..refactor), G-1 pseudo-always retags, G-8 codegraph-agents merged into codegraph.md, G-14 quality-gates split into core + phases/exec/learn parts",
+    "G-9 slot retrofit: numbered invariants (CTL/MAN/SEC/KNO/SPD/SPT/DOM/LITE/CG/JEV/SKL ids) and NEGATIVE_SPACE/ENFORCEMENT/ESCALATION slots added across 14 portable/module files; bindings left slot-optional per profile; G-15 codegraph runbook extracted to codegraph-setup skill; session-loop declared protocol variant",
+    "Infra tail: D-5 effectively-always sensor tier + active-turn measurement in check-guidance.mjs; D-12 generate-runtime-steering.mjs regenerates mdc always-list + phase rows from registry (G-6 bypass warn resolved); check-steering-profile linter (validators/steering-profile.mjs) enforces slot grammar per class (kit fail / project warn); D-9 _template-profile.md contract-doc owns steering-proposal grammar",
+    "Budget: recorded decision 34000->36500 per G-9 (slot retrofit added ~3KB normative text to always files; D-5 sensor tier now live as required precondition); binding stubs retagged to contract coverage and given the budget slot; knowledge.md honestly tagged +validation making it pseudo-always per KNO-02",
+    "DRIFT-02 reopened ~9 features across kit-hygiene — standard post-commit evidence cycle, resolves on commit + re-verification"
+  ],
+  "event_type": "checkpoint",
+  "evidence": "npm test 151/151 (incl. D-12 projection staleness test); check-invariants --live: only 2 recorded pseudo-always warns (quality-gates.md, knowledge.md — D-4b posture), G-6 warn resolved; check-guidance PASS always-loaded 35953 <= 36500, effectively-always 9567, active-turn 45520; install smoke PASS invariants consumer-side; collision guard halt+rehome verified; skill linters PASS 17 bundles"
+}

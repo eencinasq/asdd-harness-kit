@@ -5,7 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 import { checkAsserts, checkBudget, checkCutoffs, checkStale, alwaysLoadedBytes } from '../src/kit/guidance.mjs';
+import { jitEntries, render } from '../src/kit/generate-runtime-steering.mjs';
 
 const KIT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -118,3 +120,8 @@ test('asserts: a kit test script with a bash syntax error fails (bash can exit 0
   write('cli/test/broken.sh', "#!/usr/bin/env bash\nset -euo pipefail\nnode -e 'it's broken'\n");
   assert.match(checkAsserts(root).join('\n'), /cli\/test\/broken\.sh: bash syntax error/);
 }));
+
+test('D-12: committed asdd-steering.mdc equals the registry-derived projection', () => {
+  const committed = readFileSync(join(KIT_ROOT, 'cli/runtimes/cursor/asdd-steering.mdc'), 'utf8');
+  assert.equal(render(jitEntries(KIT_ROOT)), committed, 'run node cli/src/kit/generate-runtime-steering.mjs');
+});

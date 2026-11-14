@@ -3,6 +3,7 @@ inclusion: auto
 tags:
   - design
   - ui
+classification: binding
 ---
 
 # Design system — asdd-harness-kit

@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-049",
+  "timestamp": "2026-11-10T21:45:00.000Z",
+  "agent": "devin",
+  "human": "ougarte",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "G-6 profile linter landed: check-skill-profile.mjs + skill-profile-waivers.json (15 grandfathered bundles incl. consumer-side flat module paths) + validators/skills.mjs wrap + installer/test wiring",
+    "Linter enforces conform-on-touch consumer-side: non-waived consumer-authored bundles must pass (my-local-skill fixture proven renamed to local-notes after S-002 affix rejection)",
+    "DRIFT-02 reopened by install-into.sh / test-install-into.sh / validators edits — same documented cycle, resolves post-commit"
+  ],
+  "event_type": "checkpoint",
+  "evidence": "npm test 142/142 (12 new linter tests); fleet lint: 1 linted (capability-authoring PASS) + 15 waived; consumer install runs linter via validators/skills.mjs; versions.json 146 artifacts."
+}

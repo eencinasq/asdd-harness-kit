@@ -21,7 +21,7 @@
         "grep -q 'lite-fit\\|lite_fit\\|self-contained\\|self_contained' cli/skills/product-delivery/references/asdd-harness-handoff.md",
         "node cli/bin/asdd.mjs kit skills-lint --only product-delivery"
       ],
-      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "evidence": "egm-shaping P0–P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/skills/product-delivery/SKILL.md",
         "cli/skills/product-delivery/contracts/scope-map.schema.yaml",
@@ -31,7 +31,7 @@
         ".harness/steering/templates/intent.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "a0fcbdf3dbb744627b4fbe74bdfa1fdaa8e1ec52726cb3670ea229e916285c31"
+      "evidence_hash": "4bc7f4d71bace768472b560fddadc410eebd370782b42a1819a3f230209da569"
     },
     {
       "id": "TASK-002",
@@ -53,14 +53,14 @@
         "grep -q 'appetite\\|lite-fit\\|demoable\\|critique' cli/skills/product-delivery/references/scope-split-review.md",
         "node cli/bin/asdd.mjs kit skills-lint --only product-delivery"
       ],
-      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "evidence": "egm-shaping P0–P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/skills/product-delivery/SKILL.md",
         "cli/skills/product-delivery/references/scope-split-review.md",
         "cli/skills/product-delivery/examples/end-to-end-example.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "96a65d5cbe6f5fecc84830b5cedb41f969c3eb1dd2fb851750f4bafba7aaf507"
+      "evidence_hash": "ee8fbb95d6e00a8df97cf60d2e015cddfcbc0d0cd3028415bed3ce4fe80a54c8"
     },
     {
       "id": "TASK-003",
@@ -82,7 +82,7 @@
         "grep -q 'concepts_brief\\|readiness' cli/skills/shape-up/references/flows.md",
         "node cli/bin/asdd.mjs kit skills-lint --only shape-up"
       ],
-      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "evidence": "egm-shaping P0–P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/skills/shape-up/SKILL.md",
         "cli/skills/shape-up/references/flows.md",
@@ -90,7 +90,7 @@
         "cli/skills/shape-up/references/pitch-template.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "6b328a3d15cb00074329747ed7f4fe3245e64bfbadd945f3292b6901b5017190"
+      "evidence_hash": "6bc874ce4906488e11fbfda30dff97228ed7c74266796bbbed9ee3b6904cb297"
     },
     {
       "id": "TASK-004",
@@ -110,13 +110,13 @@
         "grep -qi 'critique-first\\|no-glazing\\|no glazing' cli/skills/product-delivery/SKILL.md",
         "node cli/bin/asdd.mjs kit skills-lint --only shape-up,product-delivery"
       ],
-      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "evidence": "egm-shaping P0–P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/skills/shape-up/SKILL.md",
         "cli/skills/product-delivery/SKILL.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "adf2a04306f812b84cb5f723feceb1fe494bc67082c09cf7d3d731f395f891a7"
+      "evidence_hash": "1c5e05ff4aeb6c4cd9072fd6046d317979fa5965f480cbf37119ec9223e4fd27"
     },
     {
       "id": "TASK-005",
@@ -138,7 +138,7 @@
         "grep -qE 'intent fitness|scope-split|Goldfish' docs/PLAYBOOK.md",
         "node cli/bin/asdd.mjs kit skills-lint --only shape-up,product-delivery"
       ],
-      "evidence": "egm-shaping P0\u2013P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills.",
+      "evidence": "egm-shaping P0–P4: skills-lint shape-up,product-delivery PASS; verification greps for intent_fit, scope-split-review, concepts_brief, critique-first, brownfield-bootstrap, PLAYBOOK all OK; kit self mirrored skills. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/skills/shape-up/references/brownfield-bootstrap.md",
         "docs/PLAYBOOK.md",
@@ -146,7 +146,7 @@
         "docs/ASDD-ROADMAP.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "289975428b457680d63d741cee64680c1f03575e18e154cab0124e80f6f1155c"
+      "evidence_hash": "a3ff8fda1c2e52bef309192343d5c0079f136fcbb83ce03d616bba2b83f76919"
     }
   ]
 }

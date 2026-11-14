@@ -250,6 +250,22 @@
       "mode": "full",
       "manifest": ".harness/state/slices/egm-shaping/manifest.json",
       "features": ".harness/features/egm-shaping.features.json"
+    },
+    {
+      "slice_id": "rules-landing",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/rules-landing/manifest.json",
+      "features": ".harness/features/rules-landing.features.json"
+    },
+    {
+      "slice_id": "telemetry-contract",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/telemetry-contract/manifest.json",
+      "features": ".harness/features/telemetry-contract.features.json"
     }
   ]
 }

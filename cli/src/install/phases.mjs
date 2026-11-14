@@ -5,11 +5,13 @@ import { basename, dirname, join } from 'node:path';
 
 import { CliError, KIT_REF, KIT_REMOTE, TEMPLATES } from '../paths.mjs';
 import { c, info, log, warn } from '../ui.mjs';
-import { filesUnder, isSymlink } from './context.mjs';
+import { filesUnder, isSymlink, previousManaged } from './context.mjs';
 
 const STEERING = [
-  'domain-layer.md', 'quality-gates.md', 'manifest.md', 'session-loop.md', 'asdd-lite.md', 'knowledge.md',
+  'domain-layer.md', 'quality-gates.md', 'quality-gates.phases.md', 'quality-gates.exec.md',
+  'quality-gates.learn.md', 'manifest.md', 'session-loop.md', 'asdd-lite.md', 'knowledge.md',
   'skills.md', 'security-rules.md', 'controls.md', 'spec-drift.md', 'README.md',
+  '_steering-profile.md', '_template-profile.md',
 ];
 
 /** Where the shipped steering lives in the kit: the CLI. The kit's own .harness/steering holds only its bindings (and links). */
@@ -22,6 +24,8 @@ export const HARNESS_FILES = [
   ['.harness/features/feature.schema.json', 'cli/scaffold/features/feature.schema.json'],
   ['.harness/config/versions.json', 'cli/versions.json'],
   ['.harness/config/models.json', 'cli/scaffold/config/models.json'],
+  ['.harness/config/skill-profile-waivers.json', 'cli/scaffold/config/skill-profile-waivers.json'],
+  ['.harness/config/steering.registry.json', 'cli/scaffold/config/steering.registry.json'],
 ];
 /** READMEs of the project's own folders: written once, then the project's. */
 const FOLDER_READMES = ['specs', 'features', 'state/slices', 'state/archive'];
@@ -38,6 +42,7 @@ export const SELF_COPIES = [
   // What .agents/ and the root get: agents, skills, the MCP config and launchers, and the agent map.
   ['.agents/agents', 'cli/agents'],
   ['.agents/skills', 'cli/skills'],
+  ['.agents/rules', 'cli/rules'],
   ['.agents/mcp/bin', 'cli/mcp/bin'],
   ['.agents/mcp/sync-runtime-mcp.cjs', 'cli/mcp/sync-runtime-mcp.cjs'],
   ['.agents/mcp/README.md', 'cli/mcp/README.md'],
@@ -393,6 +398,8 @@ export function installAgentsCore(ctx) {
   const { kit, target } = ctx;
   ctx.copyTree(join(kit, 'cli/agents'), join(target, '.agents/agents'), 'refresh');
   ctx.copyTree(join(kit, 'cli/skills'), join(target, '.agents/skills'), 'refresh');
+  // .agents/rules/ — modular policy root (rules proposal D-7); absent until the kit ships rules
+  if (existsSync(join(kit, 'cli/rules'))) ctx.copyTree(join(kit, 'cli/rules'), join(target, '.agents/rules'), 'refresh');
   ctx.copyTree(join(kit, 'cli/mcp/bin'), join(target, '.agents/mcp/bin'), 'refresh');
   ctx.copyFile(join(kit, 'cli/mcp/sync-runtime-mcp.cjs'), join(target, '.agents/mcp/sync-runtime-mcp.cjs'), 'refresh');
   ctx.copyFile(join(kit, 'cli/mcp/README.md'), join(target, '.agents/mcp/README.md'), 'refresh');
@@ -462,10 +469,27 @@ const RETIRED_KIT_PATHS = [
 const LEGACY_INSTALLER = 'scripts/install-into.sh';
 const LEGACY_INSTALLER_MARK = 'Install / upgrade asdd-harness-kit into an existing project.';
 
+/**
+ * A retired path is removed only when the previous install's managed_files proves the kit wrote it: the path itself is
+ * managed, or (for a directory) every file under it is. A consumer's file at a retired path is never deleted — it is
+ * warned and left for manual reconciliation (the kit never silently deletes unmanaged files).
+ */
+function provablyKitOwned(ctx, rel) {
+  const managed = previousManaged(ctx.installedVersionsFile);
+  if (managed === null) return false;
+  if (managed.has(rel)) return true;
+  const p = join(ctx.target, rel);
+  if (!statSync(p).isDirectory()) return managed.has(rel);
+  const files = filesUnder(p);
+  return files.length > 0 && files.every((f) => managed.has(`${rel}/${f}`));
+}
+
 export function removeRetiredKitFiles(ctx) {
   for (const rel of RETIRED_KIT_PATHS) {
     const path = join(ctx.target, rel);
-    if (existsSync(path)) ctx.remove(path, 'retired kit file');
+    if (!existsSync(path)) continue;
+    if (provablyKitOwned(ctx, rel)) ctx.remove(path, 'retired kit file');
+    else warn(`${rel} exists but is not kit-managed — the kit retired this path; reconcile or remove it manually`);
   }
   const legacy = join(ctx.target, LEGACY_INSTALLER);
   // Recorded as managed, so deleting a committed copy is not slice drift (DRIFT-01).

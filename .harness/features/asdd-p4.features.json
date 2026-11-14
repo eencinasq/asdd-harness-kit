@@ -72,7 +72,7 @@
         "node --test cli/src/harness/spec-source-lib.test.mjs",
         "test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/spec-source-lib.test.mjs && test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/spec-source-lib.test.mjs && test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/spec-source-lib.mjs",
         "cli/src/harness/spec-source-lib.test.mjs",
@@ -84,7 +84,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "bfeabca97fa6afebc416c0dff7db5411d6171450f15ba5c4cc5cb6529a2b9d86"
+      "evidence_hash": "7b0dd63b54f9fcdaa62f3e918c4de35854a725df4febc3e1aabb383c1ce8849e"
     }
   ]
 }

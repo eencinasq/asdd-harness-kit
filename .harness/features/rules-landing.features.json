@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "rules-landing",
+  "source_tasks": ".harness/specs/rules-landing/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Land L-1+L-2: modular-policy root + installer wiring + version stamping + guard parity tests",
+      "user_visible_behavior": "Consumers installing the kit receive .agents/rules/_rule-profile.md (version-stamped, refresh-managed); a consumer-authored same-name rule file halts the install instead of being clobbered; a missing kit rules dir never hard-fails the install; unique-name consumer rules survive.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "devin",
+      "req_ids": [
+        "D-7",
+        "D-10"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --check cli/src/install/rule-collisions.mjs && node --check cli/src/kit/versions.mjs",
+        "node cli/bin/asdd.mjs kit versions  # .agents/rules/_rule-profile.md stamped @3.10.0",
+        "bash cli/test/install.sh  # \"== rule collision guard ==\" OK + all prior blocks"
+      ],
+      "evidence": "Re-verified post-rebase (CLI era): bash cli/test/install.sh exit 0 incl. \"== rule collision guard ==\" block; node --check rule-collisions.mjs + versions.mjs OK; versions.json regenerated (122 artifacts). Recorded commands updated from retired scripts/* to cli/* equivalents. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-stamped after vendoring proposals to docs/knowledge-base/steering-proposals/external/ (verifications green: npm test 195/195, install.sh, kit versions).",
+      "scope_paths": [
+        "cli/rules/_rule-profile.md",
+        ".agents/rules/_rule-profile.md",
+        "cli/src/install/rule-collisions.mjs",
+        "cli/src/install/phases.mjs",
+        "cli/src/install/index.mjs",
+        "cli/src/kit/versions.mjs",
+        "cli/test/install.sh",
+        "cli/versions.json"
+      ],
+      "evidence_hash": "6e773708f80bf71d781dc44538c0ea33665f806e528a363b98b48a81409ac17d"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Land L-3: AGENTS.md ## Modular rules routing section",
+      "user_visible_behavior": "Every kit-supported runtime sees the .agents/rules/ discovery contract via the always-on root rule: reference-based Read, contract-doc note, dispatch-path interim (AR-7), routing entries deferred until real rules land (IC-2).",
+      "status": "passing",
+      "priority": 2,
+      "owner": "devin",
+      "req_ids": [
+        "D-8",
+        "IC-2",
+        "AR-7-interim"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "grep -n '## Modular rules' AGENTS.md  # section present, links .agents/rules/_rule-profile.md"
+      ],
+      "evidence": "AGENTS.md +9 lines between System of record and Working rules; names the canonical root, _-prefix contract-doc convention, interim dispatch-path clause, and deferred routing entries.",
+      "scope_paths": [
+        "AGENTS.md",
+        "cli/AGENTS.md"
+      ],
+      "evidence_hash": "a490f884491aa69bc659d132af52f540d5dab3086b93545dbe125ec98d4020e6"
+    }
+  ]
+}

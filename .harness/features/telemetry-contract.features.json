@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "telemetry-contract",
+  "source_tasks": ".harness/specs/telemetry-contract/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Land Phase-1 span contract: telemetry.schema.json + README.md at .harness/state/telemetry/",
+      "user_visible_behavior": "The kit carries the ratified telemetry span grammar (urn:asdd-harness-kit:schemas:telemetry:1.0) as a committed contract artifact with a README one-pager and a schema-validated conformance exemplar — zero code wiring, no emitters, nothing to gitignore until Phase 2.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "devin",
+      "req_ids": [
+        "D-1",
+        "D-2"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node -e 'JSON.parse(require(\"fs\").readFileSync(\".harness/state/telemetry/telemetry.schema.json\",\"utf8\"))'",
+        "exemplar validation: README 4-line mock vs landed schema — required keys, enums, id patterns, closed top level, ≤4KB lines, reserved-attr discipline, trace-model consistency (env-child / synthesized phase own-trace / detection self-trace)"
+      ],
+      "evidence": "Programmatic validation against the LANDED schema file — all 4 exemplar spans pass schema checks and trace-model checks; schema is valid JSON Schema draft-07. | Re-stamped after vendoring proposals to docs/knowledge-base/steering-proposals/external/ (verifications green: npm test 195/195, install.sh, kit versions).",
+      "scope_paths": [
+        ".harness/state/telemetry/telemetry.schema.json",
+        ".harness/state/telemetry/README.md"
+      ],
+      "evidence_hash": "7f9f3ef9157c8cd9a984ac239da6ce46d40c738cdcaf5a5beefef3669b7751ee"
+    }
+  ]
+}

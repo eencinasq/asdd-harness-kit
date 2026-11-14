@@ -1,5 +1,6 @@
 ---
 inclusion: always
+classification: portable
 ---
 
 # Security Rules
@@ -13,30 +14,32 @@ inclusion: always
 - **Confidential** — PII, tokens, message content; encrypt + audit
 - **Restricted** — keys/secrets; strong encryption + strict access
 
-## Authentication & Authorization
+## Invariants
 
-- Prefer short-lived tokens; rotate API keys
-- Use secure session cookie flags when applicable (HttpOnly, Secure, SameSite)
-- Enforce least privilege / RBAC for admin operations
+- **SEC-01.** Prefer short-lived tokens; rotate API keys.
+- **SEC-02.** Use secure session cookie flags when applicable (HttpOnly, Secure, SameSite).
+- **SEC-03.** Enforce least privilege / RBAC for admin operations.
+- **SEC-04.** Never commit secrets; use env / secret managers.
+- **SEC-05.** Do not log tokens, passwords, or raw PII.
+- **SEC-06.** Rotate on suspicion of compromise.
+- **SEC-07.** TLS in transit for non-local traffic.
+- **SEC-08.** Encrypt confidential/restricted data at rest when the product requires it.
+- **SEC-09.** Validate and sanitize untrusted input at trust boundaries.
 
-## Secrets
+## Negative space
 
-- Never commit secrets; use env / secret managers
-- Do not log tokens, passwords, or raw PII
-- Rotate on suspicion of compromise
+No threat-model tailoring (projects tune in this file or `security-rules.project.md`), no secrets-manager runbooks (procedures live in skills), no vuln-scanning rules (`audit-codebase.mjs`, `semgrep`, CI own detection).
 
-## Transport & storage
+## Enforcement
 
-- TLS in transit for non-local traffic
-- Encrypt confidential/restricted data at rest when the product requires it
-- Validate and sanitize untrusted input at trust boundaries
+Reviewer-enforced on slices touching auth, tokens, PII, encryption, payments, or public APIs; `asdd gate` blocks credential-exposing shell patterns; secret checks run in CI. HTTP/GraphQL contract work also loads skill `api-and-interface-design` when installed.
+
+## Escalation
+
+Threat-model/data-class dispute → Tech Lead `dissent` session; a new class or rule → steering proposal, not a mid-slice inline edit.
 
 ## Prohibitions and halt
 
 Never commit, log, or paste into a prompt or tracker a secret, token, password, or raw PII; never weaken auth, TLS, or
 input validation to pass a test or gate. When a change needs a secret you lack or would cross these rules: HALT and
 escalate to the Tech Lead. Sensors: `asdd audit` Semgrep rules and the project's secret scanning.
-
-## When to load
-
-Any slice touching auth, tokens, PII, encryption, payments, or public APIs must read this file. HTTP/GraphQL contract work also loads skill `api-and-interface-design` when that module is installed.

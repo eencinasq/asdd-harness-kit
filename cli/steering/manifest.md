@@ -1,5 +1,6 @@
 ---
 inclusion: always
+classification: portable
 ---
 
 # State Manifest — schema v3.0 (multi-slice, session-based)
@@ -43,7 +44,6 @@ Each session is a single JSON file written once, never modified.
   "session_id": "sess-auth-v2-003",
   "timestamp": "2026-10-02T14:30:22Z",
   "agent": "asdd-implementation",
-  "human": "bob",
   "slice_id": "auth-v2",
   "event_type": "feature_started",
   "phase": "implementation",
@@ -58,24 +58,30 @@ Each session is a single JSON file written once, never modified.
 
 **Event types:** `phase_started`, `phase_completed`, `phase_blocked`, `feature_started`, `feature_completed`, `feature_blocked`, `dissent`, `override`, `checkpoint`.
 
-## Rules
+## Rules (invariants)
 
-1. **Resolve the slice** from the registry or user prompt, then work under `paths.specs`.
-2. **No locks.** Concurrent work is allowed when features have unique owners and disjoint `scope_paths` (see [session-loop.md](./session-loop.md)).
-3. **Write a session file** at the end of every significant action (phase complete, feature start, dissent, override).
-4. **Run `sync-state`** after writing sessions: `asdd sync --slice <id>`.
-5. **Advance phase** only when the gate for that phase is PASS per [quality-gates.md](./quality-gates.md).
-6. **On DONE:** write a `phase_completed` session for `knowledge`, then `sync-state`. The generated manifest will show `status: DONE`.
-7. **PARKED / ABANDONED:** write a `checkpoint` session with `"status": "PARKED"` or `"ABANDONED"` and a `note`. It holds until a later checkpoint sets `"status": "in_progress"` (resume).
-8. **Handoffs:** when picking up another human's work, set `handoff_from` and `handoff_note` in your session file.
-9. **Never** edit a generated manifest or registry directly. Always append sessions and regenerate.
+- **MAN-01.** **Resolve the slice** from the registry or user prompt, then work under `paths.specs`.
+- **MAN-02.** **No locks.** Concurrent work is allowed when features have unique owners and disjoint `scope_paths` (see [session-loop.md](./session-loop.md)).
+- **MAN-03.** **Write a session file** at the end of every significant action (phase complete, feature start, dissent, override).
+- **MAN-04.** **Run `sync-state`** after writing sessions: `asdd sync --slice <id>`.
+- **MAN-05.** **Advance phase** only when the gate for that phase is PASS per [quality-gates.md](./quality-gates.md).
+- **MAN-06.** **On DONE:** write a `phase_completed` session for `knowledge`, then `sync-state`. The generated manifest will show `status: DONE`.
+- **MAN-07.** **PARKED / ABANDONED:** write a `checkpoint` session with `"status": "PARKED"` or `"ABANDONED"` and a `note`. It holds until a later checkpoint sets `"status": "in_progress"` (resume).
+- **MAN-08.** **Handoffs:** when picking up another human's work, set `handoff_from` and `handoff_note` in your session file.
+- **MAN-09.** **Never** edit a generated manifest or registry directly. Always append sessions and regenerate.
+
+## Negative space
+
+A session file is a log record, not a state update (MAN-09 forbids retroactive edits); `.features.json` is not `tasks.md` (features are the session projection; `tasks.md` stays SoT for waves/deps); no field here is hand-writable — the only inputs are session events.
+
+## Enforcement
+
+`asdd sync` derives manifest/registry/PROGRESS; `asdd check` validates schema, gate chain (`QG-DEC-09`), feature shape, and `DRIFT-*`.
+
+## Escalation
+
+Malformed/conflicting session → fix the format, re-run `sync-state`; gate-chain violation → Tech Lead `override` session; derived state contradicting sessions → `dissent` + steering proposal on the deriver, never a hand-edit.
 
 ## Parent / subagent INIT
 
-1. Read generated `registry.json` for the squad state.
-2. If every slice is `DONE` or `PARKED`/`ABANDONED`: **stop** — ask for new intent or unpark.
-3. Read the generated per-slice manifest for the target slice.
-4. Read features from `paths.features` when present.
-5. Read required steering files for the phase (JIT loading per [_runtime-template.md](../../.agents/agents/_runtime-template.md)).
-6. During Implementation, use scoped same-slice concurrency contract.
-7. On phase complete: **write a session file**, then run `sync-state`.
+INIT order lives in `AGENTS.md`; subagents follow the same order. On phase complete: **write a session file**, then run `sync-state` (MAN-03/04).

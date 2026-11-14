@@ -24,6 +24,16 @@ Options:
   --skip-bindings         Do not create binding stubs
   --skip-docs             Skip AGENTS.md / docs copy
   --skip-deps             No effect (kept for scripts): the harness installs no npm packages
+  --rehome-colliding-skills
+                          Recovery UX for skill collisions: move consumer-authored
+                          skill dirs that collide with kit names to
+                          .agents/skills.local/<name>/ (preserved, not scanned),
+                          then proceed. Never overwrites consumer files.
+  --rehome-colliding-steering
+                          Recovery UX for steering collisions: move consumer-authored
+                          steering files that collide with kit names to
+                          .harness/steering.local/ (preserved, not scanned),
+                          then proceed. Never overwrites consumer files.
   --dry-run               Print actions only
   --pr                    In a git repository: install on a new branch from origin's default branch,
                           commit, push, and open a pull request with gh (the working tree must be clean)
@@ -49,6 +59,8 @@ const FLAGS = {
   '--skip-bindings': 'skipBindings',
   '--skip-docs': 'skipDocs',
   '--skip-deps': 'skipDeps',
+  '--rehome-colliding-skills': 'rehomeColliding',
+  '--rehome-colliding-steering': 'rehomeSteering',
   '--pr': 'pr',
   '--json': 'json',
 };

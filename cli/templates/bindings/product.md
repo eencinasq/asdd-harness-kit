@@ -2,6 +2,7 @@
 inclusion: auto
 tags:
   - discovery
+classification: binding
 ---
 
 # Product overview (stub)

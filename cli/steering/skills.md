@@ -1,14 +1,24 @@
 ---
 inclusion: always
+classification: hybrid-index
 ---
 
 # ASDD skills index (kit)
 
-Name and description of each folder under `.agents/skills/`; choose a skill here.
+Initial catalog for folders under `.agents/skills/`. Each folder exposes only its name and description here. The skill body stays in `SKILL.md` until the matching task starts.
 
-- When you start the task a description matches, `Read` `.agents/skills/<name>/SKILL.md` and follow it. Before that,
-  do not `Read` the `SKILL.md`, its `references/`, or its `agents/`.
-- Never copy a skill body here. After adding or editing a skill, run `asdd skills-index --write`.
+## Disclosure (invariants)
+
+- **SKL-01.** Read this file to choose a skill. This is the initial index.
+- **SKL-02.** When you start the task that matches a description, `Read` `.agents/skills/<name>/SKILL.md` and follow that file.
+- **SKL-03.** Until that task starts, do not `Read` that `SKILL.md` or its `references/`.
+- **SKL-04.** Do not copy a skill body into this index. After adding or editing a skill folder, regenerate the catalog with `asdd skills-index --write`.
+- **SKL-05.** Authoring a skill? Follow `.agents/skills/capability-authoring/SKILL.md` (profile: `references/skill-profile.md`).
+- **SKL-06.** A skill that is not yet copied into `.agents/skills/` is not part of this index.
+
+## Enforcement
+
+`asdd skills-index` FAILs on index↔folder drift (SKL-04); `check-skill-profile` / `check-skill-fleet` lint bundles. SKL-02/SKL-03 are reviewer-enforced disclosure economy.
 
 ## Markers and escalation
 
@@ -30,6 +40,7 @@ not escalation. Sensors: `asdd check` (index), `asdd kit skills-lint` (skill gra
 | `asdd-next` | Picks the next ready feature. Use when choosing what to build. Do NOT use to code — use asdd-implement. |
 | `asdd-status` | Reports slice and pipeline health. Use when asking what is in progress. Do NOT use to edit — use asdd-next. |
 | `business-model-canvas` | Turns a Business Model Canvas or Lean Canvas into proposed capabilities and personas traced to their blocks. Use when a Discovery intent supplies a BMC or Lean Canvas. Do NOT use for free-text vocabulary — use domain-language-extraction; or for existing code — use capability-discovery. |
+| `capability-authoring` | Authors and verifies .agents/skills/<name>/ skill bundles from a capability specification. Use when creating or auditing a skill bundle. Do NOT use for agent profiles, AGENTS.md, _prompt.md, or fleet-wide linting. |
 | `capability-discovery` | Discovers the capabilities an existing codebase implements as draft capability files. Use when onboarding a repository that has code but no specs. Do NOT use for a business canvas — use business-model-canvas; or for judging code against requirements — use codebase-audit. |
 | `codebase-audit` | Judges the code in the audit's churn hotspots against its requirements with file and line evidence. Use when running a scheduled audit or after `asdd audit` reports hotspots. Do NOT use for judging requirement text — use anti-pattern-detection; or for exploring code — use codegraph. |
 | `codegraph` | Answers code-structure questions (flows, callers, impact). Use when exploring code. Do NOT use to judge code — use codebase-audit. |

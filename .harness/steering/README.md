@@ -1,10 +1,13 @@
 ---
 inclusion: always
+classification: index
 ---
 
 # Harness steering (kit)
 
 **SoT** for line-base rules. Agents **Read** files here directly.
+
+Profile: [`_steering-profile.md`](./_steering-profile.md) — the `kit_steering_rule` grammar, tag vocabulary, and budget rules every file here conforms to.
 
 Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-harness-kit#adopter-checklist) · Modules: maintained in [asdd-harness-kit](https://github.com/eencinasq/asdd-harness-kit)
 
@@ -22,7 +25,7 @@ Portability: [README → Adopter checklist](https://github.com/eencinasq/asdd-ha
 | File | Contents |
 |------|----------|
 | `domain-layer.md` | Domain placement contract |
-| `quality-gates.md` | Phase gates, phase chain, coverage / readiness (Lite skips the numeric gates) |
+| `quality-gates.md` + `quality-gates.phases.md` / `quality-gates.exec.md` / `quality-gates.learn.md` | Phase gates, phase chain, coverage / readiness (Lite skips the numeric gates) |
 | `manifest.md` | Manifest schema v3 (generated from sessions) |
 | `session-loop.md` | Features + evidence (no v2 locks) |
 | `controls.md` | Guides, sensors, precedence |

@@ -1,7 +1,14 @@
 ---
 inclusion: auto
 tags:
+  - discovery
   - domain
+  - design
+  - task_planning
+  - implementation
+  - qa
+  - refactor
+classification: binding
 ---
 
 # Domain layer — project binding (stub)

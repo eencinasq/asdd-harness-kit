@@ -25,6 +25,7 @@
 | modules-top-level | escalated | implementation | in_progress | 0 |
 | review-quality | full | knowledge | DONE | 0 |
 | rule-coverage | full | knowledge | DONE | 0 |
+| rules-landing | lite | knowledge | DONE | 0 |
 | sensor-fixes | escalated | knowledge | DONE | 0 |
 | skills-bloom | lite | knowledge | DONE | 0 |
 | skills-spec | escalated | knowledge | DONE | 0 |
@@ -35,3 +36,4 @@
 | spec-drift-empty | full | knowledge | DONE | 0 |
 | spec-drift-merge | escalated | implementation | in_progress | 0 |
 | spec-drift-roadmap | lite | knowledge | DONE | 0 |
+| telemetry-contract | lite | knowledge | DONE | 0 |

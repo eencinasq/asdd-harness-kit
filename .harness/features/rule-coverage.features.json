@@ -82,7 +82,7 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "npm test exit 0 (137/137); semgrep-lib.test 10/10 incl. 'rule-coverage REQ-003': scan args carry --exclude .semgrep, a fixture named as a target is dropped, only-fixture paths scan nothing. Real Semgrep 1.183 via runSemgrepScan on a temp repo (.semgrep/architecture rule + annotated fixture + src/a.ts): findings only src/a.ts, with and without explicit paths. Steering spec-drift.md: .semgrep/ is never code; validate_rules and adr_coverage named. asdd kit vendor and kit self refreshed the copies.",
+      "evidence": "npm test exit 0 (137/137); semgrep-lib.test 10/10 incl. 'rule-coverage REQ-003': scan args carry --exclude .semgrep, a fixture named as a target is dropped, only-fixture paths scan nothing. Real Semgrep 1.183 via runSemgrepScan on a temp repo (.semgrep/architecture rule + annotated fixture + src/a.ts): findings only src/a.ts, with and without explicit paths. Steering spec-drift.md: .semgrep/ is never code; validate_rules and adr_coverage named. asdd kit vendor and kit self refreshed the copies. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/semgrep-lib.mjs",
         "cli/src/harness/semgrep-lib.test.mjs",
@@ -90,7 +90,7 @@
         "cli/steering/spec-drift.md",
         ".harness/steering/spec-drift.md"
       ],
-      "evidence_hash": "e62d51d425c1ff816bddbe496e59393c9584d72cee119e47e9bbc706e899957e"
+      "evidence_hash": "b14951c6e150903fb387a6aef0c379fabf088905829c48b70c30963caed6b893"
     },
     {
       "id": "TASK-004",

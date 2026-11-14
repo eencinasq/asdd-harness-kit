@@ -47,7 +47,7 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "Reopened for the fleet fixes found while writing the sensor: refactor's handoff to QA removed (it closed a qa -> refactor -> qa handoff cycle, AL-301; the caller re-runs QA after a refactor PR); spike researcher's anti-hedging rule made explicit (A-018); scope path of the deleted spec-peer-review.md template now cli/steering/templates (DRIFT-05). kit agents-lint PASS (14 agents); agents-lint tests 10/10; npm test 131/131. | Re-verified with no content change: the hash moved when the deletion of cli/steering/templates/spec-peer-review.md was committed (c35127e): a directory scope lists files with git ls-files --cached, so before the commit the deleted file entered the hash as <missing> and after it does not (harness sensor noise, reported). asdd kit agents-lint PASS (14 agents); npm test 132/132.",
+      "evidence": "Reopened for the fleet fixes found while writing the sensor: refactor's handoff to QA removed (it closed a qa -> refactor -> qa handoff cycle, AL-301; the caller re-runs QA after a refactor PR); spike researcher's anti-hedging rule made explicit (A-018); scope path of the deleted spec-peer-review.md template now cli/steering/templates (DRIFT-05). kit agents-lint PASS (14 agents); agents-lint tests 10/10; npm test 131/131. | Re-verified with no content change: the hash moved when the deletion of cli/steering/templates/spec-peer-review.md was committed (c35127e): a directory scope lists files with git ls-files --cached, so before the commit the deleted file entered the hash as <missing> and after it does not (harness sensor noise, reported). asdd kit agents-lint PASS (14 agents); npm test 132/132. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/agents/asdd-implementation-agent.md",
         "cli/agents/asdd-qa-agent.md",
@@ -60,7 +60,7 @@
         "cli/steering/templates",
         "cli/scaffold/config/models.json"
       ],
-      "evidence_hash": "cff287920444088e3160c74d68657102b1accfe670f62cdc7d8ebe16579082eb"
+      "evidence_hash": "c93a0e8a29948329de231c96ede950979bac27b3e75c66fe07c0760bd8180283"
     },
     {
       "id": "TASK-003",
@@ -105,14 +105,14 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "New cli/src/install/agent-frontmatter.mjs parses the canonical agent frontmatter and renders per runtime: Claude Code (tools allowlist Read/Grep/Glob/Bash/Write/Edit, Agent only for the orchestrator; disallowedTools when mcp_tools is true so MCP tools stay; maxTurns), Cursor (readonly: true when write_tools is false), OpenCode (ordered permissions: edit deny * + allow write_paths, subagent deny * for non-orchestrators; steps). context.writeGenerated writes kit-owned generated files (replaces legacy links, keeps a project-edited copy unless --force, recorded in managed_files/kit_files so uninstall removes it). runtimes.mjs renders for cursor/claude/opencode; junie/devin/kiro/kimi keep links. Manual run: install into a temp repo (claude,cursor,opencode,junie, all modules): 42 RENDER, reinstall 0 RENDER/56 KEEP, asdd check exit 0, uninstall removed the rendered dirs. install.sh: new assertions (validation tools without Edit/Agent, implementation with Agent, e2e disallowedTools: Agent, maxTurns; OpenCode qa permissions; Cursor readonly only on the researcher) — bash cli/test/install.sh: OK asdd install smoke test (after kit versions registered the new files).",
+      "evidence": "New cli/src/install/agent-frontmatter.mjs parses the canonical agent frontmatter and renders per runtime: Claude Code (tools allowlist Read/Grep/Glob/Bash/Write/Edit, Agent only for the orchestrator; disallowedTools when mcp_tools is true so MCP tools stay; maxTurns), Cursor (readonly: true when write_tools is false), OpenCode (ordered permissions: edit deny * + allow write_paths, subagent deny * for non-orchestrators; steps). context.writeGenerated writes kit-owned generated files (replaces legacy links, keeps a project-edited copy unless --force, recorded in managed_files/kit_files so uninstall removes it). runtimes.mjs renders for cursor/claude/opencode; junie/devin/kiro/kimi keep links. Manual run: install into a temp repo (claude,cursor,opencode,junie, all modules): 42 RENDER, reinstall 0 RENDER/56 KEEP, asdd check exit 0, uninstall removed the rendered dirs. install.sh: new assertions (validation tools without Edit/Agent, implementation with Agent, e2e disallowedTools: Agent, maxTurns; OpenCode qa permissions; Cursor readonly only on the researcher) — bash cli/test/install.sh: OK asdd install smoke test (after kit versions registered the new files). | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/install/agent-frontmatter.mjs",
         "cli/src/install/runtimes.mjs",
         "cli/src/install/context.mjs",
         "cli/test/install.sh"
       ],
-      "evidence_hash": "c0a258df6b8b0bec7d1e404f8424027f93c343f15cfb98fcc5bfae13e8007300"
+      "evidence_hash": "a89c3636a8b645b09746075c8706f8cae890dc805202666174e0da339db2fae5"
     },
     {
       "id": "TASK-005",
@@ -136,7 +136,7 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit agents-lint && npm test` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit agents-lint && npm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/kit/agents-lint.mjs",
         "cli/src/main.mjs",
@@ -145,7 +145,7 @@
         "cli/README.md",
         "cli/versions.json"
       ],
-      "evidence_hash": "af6ee89cba138ca3d390c4a0787b3f88106a2614548890926b0c08ffec08fffc"
+      "evidence_hash": "9cef5f9e31fc2867cbeb48ba8ac1b0d16243ff67f84eca28d91c8cf46187ec83"
     }
   ]
 }

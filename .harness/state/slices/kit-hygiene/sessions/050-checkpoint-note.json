@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-kit-hygiene-050",
+  "timestamp": "2026-11-10T23:10:00.000Z",
+  "agent": "devin",
+  "human": "ougarte",
+  "slice_id": "kit-hygiene",
+  "concerns": [
+    "G-4 shape-up split landed: Flows 2-6 extracted to references/flows.md; trackers/commands/mistakes to references/shaping-guidance.md; pointer headings keep extracted sections reachable from Entry Point routing",
+    "Verbatim extraction verified: all 8 moved bodies present verbatim in destinations; kept sections (philosophy, gate mode, entry point, mode check, Flow 1) byte-identical to HEAD",
+    "Result 335 lines / 14205 bytes — S-008 PASS under caps; 8 grandfathered findings remain waived; versions.json 148 artifacts",
+    "DRIFT-02 reopened kit-hygiene TASK-003 and jev-module TASK-004 — standard cycle, resolves post-commit"
+  ],
+  "event_type": "checkpoint",
+  "evidence": "npm test 142/142; lintBundle(.agents/skills/shape-up) S-008=none; check-skills-index PASS; node section-diff: all moved bodies verbatim, kept bodies unchanged; versions.json 148 artifacts @ 3.8.1"
+}

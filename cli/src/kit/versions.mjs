@@ -85,6 +85,11 @@ function collectArtifacts() {
     record(relative(root, path));
   }
 
+  // Modular rules (cli/rules → .agents/rules on install)
+  for (const path of walk(join(root, 'cli/rules'))) {
+    record(relative(root, path));
+  }
+
   // MCP launchers + README (projects get an empty mcp.json seed; tools/* servers stay in the kit)
   for (const path of walk(join(root, 'cli/mcp'))) {
     record(relative(root, path));
