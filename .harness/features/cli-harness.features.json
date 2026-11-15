@@ -306,6 +306,7 @@
         "cli/src/install/context.mjs",
         "cli/src/install/index.mjs",
         "cli/src/install/modules.mjs",
+        "cli/src/install/options.mjs",
         "cli/src/uninstall.mjs",
         "cli/src/doctor.mjs",
         "cli/src/kit/versions.mjs",

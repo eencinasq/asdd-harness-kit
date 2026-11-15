@@ -108,10 +108,10 @@ async function preflightChecks(o, ask) {
 function installHarnessIgnores(ctx) {
   const harness = join(ctx.target, '.harness');
   const hpkg = join(harness, 'package.json');
-  // Recorded as managed, so deleting committed copies is not slice drift (DRIFT-01).
-  for (const rel of ['package.json', 'package-lock.json']) ctx.recordManaged(join(harness, rel));
   if (readJson(hpkg)?.name === 'asdd-harness-deps') {
     for (const rel of ['node_modules', 'package-lock.json', 'package.json']) {
+      // Recorded as managed, so deleting committed copies is not slice drift (DRIFT-01).
+      ctx.recordManaged(join(harness, rel));
       if (existsSync(join(harness, rel))) ctx.remove(join(harness, rel), 'the harness needs no npm packages');
     }
     removeGitignoreLine(ctx, '.harness/node_modules');
@@ -242,9 +242,9 @@ function printSummary(ctx, previous) {
   const { created, updated, kept, skipped } = ctx.stats;
   log(`  ${created} created, ${updated} updated, ${kept} unchanged, ${skipped} skipped`);
   if (skipped) {
-    warn(`${skipped} kit file(s) changed in this project were left as they are:`);
+    warn(`${skipped} file(s) at kit paths were left as they are (edited here, or not recorded as kit-installed):`);
     for (const rel of ctx.skipped) log(`       ${rel}`);
-    log('     Keep your change, or take the kit version with: asdd install <dir> --force');
+    log('     They stay yours: keep them, or take the kit version with: asdd install <dir> --force');
   }
   log('');
   log(c.bold('Installed:'));

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "devin",
+  "human": "ougarte",
+  "slice_id": "cli-harness",
+  "concerns": [],
+  "session_id": "sess-cli-harness-108",
+  "timestamp": "2026-11-15T00:00:00.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-011",
+  "event_type": "checkpoint",
+  "evidence": "Kit/project artifact ownership enforced end to end. copyAction refreshes a refresh file only while still provably the kit's copy (recorded sha256 unchanged); an edited or unproven file at a kit path is SKIPped and reported (--force restores). writeGenerated applies the same rule to rendered runtime files. linkAgentFile replaces a real file only when the kit recorded it. Unproven deletes now require managed_files proof or a content signature: retireProjectCli, removeModuleSources (.agents/modules, scripts/enable-module.sh), retireJev, retired kit paths, removeLegacyScripts, the bash installer — a path is recordManaged only when actually removed, never to launder a customer's file into ownership. Module mounts no longer run ctx.forced(). asdd doctor reports project-edited kit files and unmanaged files inside kit-owned dirs (skipped on the kit repo itself). Ownership contract documented in INSTALL_HELP, README.md, cli/README.md. Verified: npm run build; node --test cli/test/install-lifecycle.test.mjs (13 pass); bash cli/test/install.sh; npm test (226 pass). Pre-existing: 25 DRIFT-02 failures on a clean tree (stale evidence_hash in other slices' passing features) and the known tools/spec-drift coverage.ts defect noted in TASK-011."
+}

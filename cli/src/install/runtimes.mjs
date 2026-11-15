@@ -62,12 +62,27 @@ function realAgentsDir(ctx, runtimeDir) {
   return dir;
 }
 
+/**
+ * One agent file as a link into a runtime dir. A real file already there is replaced only when the kit can prove it
+ * wrote it (a recorded render/copy, or --force); a symlink is always safe to retarget — it holds no content.
+ */
+function linkAgentFile(ctx, source, path) {
+  const rel = ctx.rel(path);
+  if (existsSync(path) && !isSymlink(path) && ctx.kitHashes[rel] === undefined && !ctx.force) {
+    ctx.stats.skipped += 1;
+    ctx.skipped.push(rel);
+    warn(`${rel} is not recorded as kit-installed — kept (--force replaces it with a link)`);
+    return;
+  }
+  ctx.link(source, path);
+  ctx.recordManaged(path);
+  log(`${c.blue('LINK')}  ${path}`);
+}
+
 function linkAgentFiles(ctx, runtimeDir) {
   const dir = realAgentsDir(ctx, runtimeDir);
   for (const base of agentFiles(ctx)) {
-    ctx.link(`../../.agents/agents/${base}`, join(dir, base));
-    ctx.recordManaged(join(dir, base));
-    log(`${c.blue('LINK')}  ${join(dir, base)}`);
+    linkAgentFile(ctx, `../../.agents/agents/${base}`, join(dir, base));
   }
 }
 
@@ -81,8 +96,7 @@ function renderAgentFiles(ctx, runtimeDir, runtime) {
     const source = `.agents/agents/${base}`;
     const parsed = parseAgent(readFileSync(join(ctx.target, source), 'utf8'));
     if (!parsed) {
-      ctx.link(`../../${source}`, join(dir, base));
-      ctx.recordManaged(join(dir, base));
+      linkAgentFile(ctx, `../../${source}`, join(dir, base));
       warn(`${source}: no frontmatter; linked instead of rendered`);
       continue;
     }

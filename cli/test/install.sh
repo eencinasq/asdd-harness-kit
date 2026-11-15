@@ -59,7 +59,7 @@ mkdir -p "$TMP/existing-app/scripts" && echo '// old kit copy' >"$TMP/existing-a
 # Prior install tracked those scrum-era files as kit-managed (the collision guard reads this manifest)
 mkdir -p "$TMP/existing-app/.harness/config"
 cat >"$TMP/existing-app/.harness/config/installed-versions.json" <<'EOF'
-{"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/skills/product-delivery/agents/sprint-planning.md",".agents/skills/user-story-decomposition/SKILL.md",".agents/skills/open-code-review/SKILL.md","scripts/migrate-v2-v3.mjs",".agents/mcp/spec-drift-auditor.mjs",".agents/mcp/knowledge-server.mjs",".agents/mcp/ui/drift-dashboard.html",".agents/mcp/bin/codegraph-mcp.cjs",".harness/steering/codegraph.md"]}
+{"kit_version":"3.0.0","artifacts":{},"managed_files":[".agents/skills/product-delivery/agents/sprint-planning.md",".agents/skills/user-story-decomposition/SKILL.md",".agents/skills/open-code-review/SKILL.md","scripts/migrate-v2-v3.mjs",".agents/mcp/spec-drift-auditor.mjs",".agents/mcp/knowledge-server.mjs",".agents/mcp/ui/drift-dashboard.html",".agents/mcp/bin/codegraph-mcp.cjs",".harness/steering/codegraph.md",".harness/scripts/check-invariants.mjs",".harness/scripts/validators/features.mjs",".harness/scripts/jev-command-gate.mjs",".harness/scripts/knowledge-store-kuzu.mjs",".harness/scripts/drift-lib.mjs",".harness/cli/bin/asdd.mjs",".agents/modules/loader/enable.md","scripts/enable-module.sh"]}
 EOF
 # Consumer-authored skill at a NON-colliding name — must survive the whole install
 # (conforming: the profile linter also gates non-waived consumer bundles)
@@ -87,12 +87,21 @@ Context: failure. Options: listed. Recommendation: pick. Decision Needed: human.
 ## Handoff & Convergence
 None (terminal).
 EOF
-# A pre-CLI install kept the harness in .harness/scripts/: the kit's files go, a project's own script stays
+# A pre-CLI install kept the harness in .harness/scripts/: the kit's files go, a project's own script stays.
+# The kit's copies go only because the prior install's manifest proves them (managed_files below).
 mkdir -p "$TMP/existing-app/.harness/scripts/validators"
 echo '// old kit copy' >"$TMP/existing-app/.harness/scripts/check-invariants.mjs"
 echo '// old kit copy' >"$TMP/existing-app/.harness/scripts/validators/features.mjs"
 echo '// old kit copy' >"$TMP/existing-app/.harness/scripts/jev-command-gate.mjs"
+echo '// old kit copy' >"$TMP/existing-app/.harness/scripts/knowledge-store-kuzu.mjs"
+echo '// old kit copy' >"$TMP/existing-app/.harness/scripts/drift-lib.mjs"
 echo '// ours' >"$TMP/existing-app/.harness/scripts/team-report.mjs"
+# Older kits copied the CLI into .harness/cli/ (provably the kit's: every file managed below), and ran a
+# retired module loader (.agents/modules, scripts/enable-module.sh — both managed below)
+mkdir -p "$TMP/existing-app/.harness/cli/bin" "$TMP/existing-app/.agents/modules/loader" "$TMP/existing-app/scripts"
+echo '// old kit copy' >"$TMP/existing-app/.harness/cli/bin/asdd.mjs"
+echo 'x' >"$TMP/existing-app/.agents/modules/loader/enable.md"
+echo '#!/bin/sh' >"$TMP/existing-app/scripts/enable-module.sh"
 # Older kits installed sqlite-vec into .harness/: it goes on upgrade
 mkdir -p "$TMP/existing-app/.harness/node_modules/sqlite-vec"
 printf '{"name":"asdd-harness-deps","private":true,"dependencies":{"sqlite-vec":"0.1.10-alpha.4"}}\n' >"$TMP/existing-app/.harness/package.json"
@@ -687,12 +696,12 @@ mkdir -p "$MTMP/legacy-app/.harness/cli/bin" "$MTMP/legacy-app/.cursor"
 printf '// old kit copy\n' >"$MTMP/legacy-app/.harness/cli/bin/asdd.mjs"
 printf '%s\n' '{"version":1,"hooks":{"beforeShellExecution":[{"command":"node .harness/cli/bin/asdd.mjs gate","timeout":30,"failClosed":true}],"stop":[{"command":"node .harness/cli/bin/asdd.mjs verify"}]}}' >"$MTMP/legacy-app/.cursor/hooks.json"
 printf 'old\n' >"$MTMP/legacy-app/.agents/mcp/jev-gate-server.mjs"
-# The retired file is provably kit-managed (an old kit recorded it) — the provenance-gated retire then removes it
+# The retired files are provably kit-managed (an old kit recorded them) — the provenance-gated retires then remove them
 node -e '
   const fs = require("fs");
   const p = process.argv[1];
   const d = JSON.parse(fs.readFileSync(p, "utf8"));
-  d.managed_files = [...new Set([...(d.managed_files ?? []), ".agents/mcp/jev-gate-server.mjs", ".harness/steering/jev.md"])];
+  d.managed_files = [...new Set([...(d.managed_files ?? []), ".agents/mcp/jev-gate-server.mjs", ".harness/steering/jev.md", ".harness/scripts/jev-client.mjs", ".harness/scripts/jev-gates.mjs"])];
   fs.writeFileSync(p, JSON.stringify(d, null, 2) + "\n");
 ' "$MTMP/legacy-app/.harness/config/installed-versions.json"
 node -e '

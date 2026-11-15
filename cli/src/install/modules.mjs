@@ -2,8 +2,9 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { c, log } from '../ui.mjs';
+import { c, log, warn } from '../ui.mjs';
 import { list, MODULES } from './options.mjs';
+import { provablyKitOwned } from './phases.mjs';
 import { mountMap, readManifest, retiredPaths, validateModules } from './registry.mjs';
 
 const projectFile = (ctx) => join(ctx.target, '.harness/config/project.json');
@@ -26,9 +27,15 @@ const RETIRED_JEV_FILES = retiredPaths(KIT_ROOT, 'jev_files');
 
 export function retireJev(ctx) {
   for (const rel of RETIRED_JEV_FILES) {
+    const path = join(ctx.target, rel);
+    if (!existsSync(path)) continue;
+    if (!provablyKitOwned(ctx, rel)) {
+      warn(`${path} is not recorded as kit-installed — kept for manual reconciliation`);
+      continue;
+    }
     // Recorded as managed, so deleting a committed copy is not slice drift (DRIFT-01).
-    ctx.recordManaged(join(ctx.target, rel));
-    if (existsSync(join(ctx.target, rel))) ctx.remove(join(ctx.target, rel), 'Jev is not part of the harness');
+    ctx.recordManaged(path);
+    ctx.remove(path, 'Jev is not part of the harness');
   }
   if (ctx.dryRun || !existsSync(projectFile(ctx))) return;
   const dropped = ctx.patchJson(projectFile(ctx), (d) => {
@@ -46,7 +53,7 @@ export function enableModules(ctx) {
   validateModules(ctx.kit, mods);
   for (const m of mods) {
     log(`${c.bold('MODULE')} ${m}`);
-    ctx.forced(() => enableOne(ctx, m));
+    enableOne(ctx, m);
   }
   // Record enabled modules in project.json
   if (!ctx.dryRun && existsSync(projectFile(ctx))) {

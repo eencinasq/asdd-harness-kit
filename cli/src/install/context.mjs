@@ -120,14 +120,14 @@ export class InstallContext {
    */
   copyFile(src, dest, policy = 'create') {
     if (!existsSync(src)) throw new CliError(`missing kit file: ${src}`);
-    if (policy === 'refresh') {
+    const rel = this.rel(dest);
+    if (policy === 'refresh') this.kitFiles.add(rel);
+    const action = this.copyAction(src, dest, rel, policy);
+    if (policy === 'refresh' && (action !== 'skip' || this.kitHashes[rel] !== undefined)) {
       this.recordManaged(dest);
       // Test hook: list refreshed kit sources (each needs a versions.json entry)
       if (process.env.HARNESS_TRACE_REFRESH) appendFileSync(process.env.HARNESS_TRACE_REFRESH, `${relative(this.kit, src)}\n`);
     }
-    const rel = this.rel(dest);
-    if (policy === 'refresh') this.kitFiles.add(rel);
-    const action = this.copyAction(src, dest, rel, policy);
     if (action === 'keep') {
       this.stats.kept += 1;
       log(`${c.dim('KEEP')}  ${dest}`);
@@ -136,7 +136,8 @@ export class InstallContext {
     if (action === 'skip') {
       this.stats.skipped += 1;
       this.skipped.push(rel);
-      log(`${c.yellow('SKIP')}  ${dest} (changed in this project since the kit installed it; --force overwrites)`);
+      const why = this.kitHashes[rel] ? 'changed in this project since the kit installed it' : 'not recorded as kit-installed';
+      log(`${c.yellow('SKIP')}  ${dest} (${why}; --force restores the kit version)`);
       return;
     }
     this.stats[action === 'create' ? 'created' : 'updated'] += 1;
@@ -149,8 +150,9 @@ export class InstallContext {
   }
 
   /**
-   * create: the file is missing. update: kit-owned, and --force or its version changed, unless the project edited it
-   * since the kit wrote it (skip; --force still overwrites). keep: everything else, and content already identical.
+   * create: the file is missing. update: kit-owned and still the kit's copy, with --force or a version change.
+   * keep: identical content, or kit-owned and unchanged with no version change. skip: everything else — a file the
+   * project edited since the kit wrote it, or one the kit cannot prove it wrote (unproven; --force restores either).
    */
   copyAction(src, dest, rel, policy) {
     if (!existsSync(dest)) return 'create';
@@ -158,10 +160,12 @@ export class InstallContext {
     const current = fileHash(dest);
     if (current !== null && current === fileHash(src)) return 'keep';
     if (this.force) return 'update';
-    if (!this.needsUpdate(src)) return 'keep';
     const recorded = this.kitHashes[rel];
-    if (recorded && current !== recorded && !REGENERATED.has(rel)) return 'skip';
-    return 'update';
+    // Refreshed only while still provably the kit's copy: hash unchanged since the kit wrote it (skills.md is
+    // regenerated after copying, so its hash never matches — it is always the kit's). Anything else stays.
+    const own = recorded !== undefined && (current === recorded || REGENERATED.has(rel));
+    if (!own) return 'skip';
+    return this.needsUpdate(src) ? 'update' : 'keep';
   }
 
   /**
@@ -170,24 +174,30 @@ export class InstallContext {
    */
   writeGenerated(dest, content) {
     const rel = this.rel(dest);
-    this.recordManaged(dest);
-    this.kitFiles.add(rel);
+    const own = () => {
+      this.recordManaged(dest);
+      this.kitFiles.add(rel);
+    };
     const linked = isSymlink(dest);
     if (!linked && existsSync(dest)) {
       const current = readFileSync(dest, 'utf8');
       if (current === content) {
+        own();
         this.stats.kept += 1;
         log(`${c.dim('KEEP')}  ${dest}`);
         return;
       }
-      const recorded = this.kitHashes[rel];
-      if (recorded && fileHash(dest) !== recorded && !this.force) {
+      // A file the kit cannot prove it rendered is the project's own: keep it (--force still restores the kit version).
+      const unchanged = this.kitHashes[rel] !== undefined && fileHash(dest) === this.kitHashes[rel];
+      if (!unchanged && !this.force) {
         this.stats.skipped += 1;
         this.skipped.push(rel);
-        log(`${c.yellow('SKIP')}  ${dest} (changed in this project since the kit rendered it; --force overwrites)`);
+        const why = this.kitHashes[rel] ? 'changed in this project since the kit rendered it' : 'not recorded as kit-rendered';
+        log(`${c.yellow('SKIP')}  ${dest} (${why}; --force restores the kit version)`);
         return;
       }
     }
+    own();
     this.stats[existsSync(dest) || linked ? 'updated' : 'created'] += 1;
     log(`${c.blue('RENDER')} ${dest}`);
     if (this.dryRun) return;

@@ -96,14 +96,19 @@ export const installerBin = (ctx) => join(ctx.kit, KIT_BIN);
 
 /**
  * Projects get no copy of the CLI. An install by an older kit left one in .harness/cli/ (and before that the harness
- * in .harness/scripts/): both go, so the project runs the asdd package it installs.
+ * in .harness/scripts/): both go, so the project runs the asdd package it installs. The dir goes only when it is
+ * provably the kit's copy (managed files, or the bin/asdd.mjs signature) — a project's own .harness/cli/ is kept.
  */
 export function retireProjectCli(ctx) {
   const dest = join(ctx.target, LEGACY_PROJECT_CLI);
-  // Recorded as managed, so deleting the committed copy is not slice drift (DRIFT-01).
-  ctx.recordManaged(join(dest, 'bin/asdd.mjs'));
   if (existsSync(dest) || isSymlink(dest)) {
-    ctx.remove(dest, ctx.self ? 'the kit runs cli/ directly' : 'asdd is a Node package now: npm i -D asdd-harness-kit (or -g)');
+    if (provablyKitOwned(ctx, LEGACY_PROJECT_CLI) || existsSync(join(dest, 'bin/asdd.mjs'))) {
+      // Recorded as managed, so deleting the committed copy is not slice drift (DRIFT-01).
+      ctx.recordManaged(join(dest, 'bin/asdd.mjs'));
+      ctx.remove(dest, ctx.self ? 'the kit runs cli/ directly' : 'asdd is a Node package now: npm i -D asdd-harness-kit (or -g)');
+    } else {
+      warn(`${dest} is not recorded as the kit's CLI copy — kept for manual reconciliation`);
+    }
   }
   if (!ctx.self) removeLegacyScripts(ctx);
 }
@@ -143,13 +148,18 @@ function removeLegacyScripts(ctx) {
     'jev-client.mjs',
     'jev-gates.mjs',
   ]);
-  // Recorded as managed, so deleting a committed copy is not slice drift (DRIFT-01).
-  for (const rel of kitNames) ctx.recordManaged(join(legacy, rel));
-  if (!existsSync(legacy)) return;
+  if (!existsSync(legacy) || !statSync(legacy).isDirectory()) return;
+  const managed = previousManaged(ctx.installedVersionsFile);
   const own = [];
   for (const rel of filesUnder(legacy)) {
-    if (kitNames.has(rel) || isTest(rel)) ctx.remove(join(legacy, rel), 'the harness runs from the asdd package now');
-    else own.push(rel);
+    const proven = managed?.has(`.harness/scripts/${rel}`) === true;
+    if ((kitNames.has(rel) || isTest(rel)) && proven) {
+      // Recorded as managed, so deleting a committed copy is not slice drift (DRIFT-01).
+      ctx.recordManaged(join(legacy, rel));
+      ctx.remove(join(legacy, rel), 'the harness runs from the asdd package now');
+    } else {
+      own.push(rel);
+    }
   }
   if (ctx.dryRun) return;
   if (!own.length) {
@@ -447,7 +457,7 @@ const LEGACY_INSTALLER_MARK = 'Install / upgrade asdd-harness-kit into an existi
  * managed, or (for a directory) every file under it is. A consumer's file at a retired path is never deleted — it is
  * warned and left for manual reconciliation (the kit never silently deletes unmanaged files).
  */
-function provablyKitOwned(ctx, rel) {
+export function provablyKitOwned(ctx, rel) {
   const managed = previousManaged(ctx.installedVersionsFile);
   if (managed === null) return false;
   if (managed.has(rel)) return true;
@@ -501,18 +511,30 @@ export function removeRetiredKitFiles(ctx) {
     else warn(`${rel} exists but is not kit-managed — the kit retired this path; reconcile or remove it manually`);
   }
   const legacy = join(ctx.target, LEGACY_INSTALLER);
-  // Recorded as managed, so deleting a committed copy is not slice drift (DRIFT-01).
-  ctx.recordManaged(legacy);
   if (existsSync(legacy) && readFileSync(legacy, 'utf8').includes(LEGACY_INSTALLER_MARK)) {
+    // Recorded as managed, so deleting a committed copy is not slice drift (DRIFT-01).
+    ctx.recordManaged(legacy);
     ctx.remove(legacy, 'replaced by the asdd CLI: npx asdd-harness-kit install');
   }
 }
 
 export function removeModuleSources(ctx) {
-  const legacy = join(ctx.target, '.agents/modules');
-  if (existsSync(legacy)) ctx.remove(legacy, 'modules remain in asdd-harness-kit');
-  const enable = join(ctx.target, 'scripts/enable-module.sh');
-  if (existsSync(enable)) ctx.remove(enable, 'use the kit installer to enable modules');
+  const legacy = '.agents/modules';
+  const path = join(ctx.target, legacy);
+  if (existsSync(path)) {
+    if (statSync(path).isDirectory() && filesUnder(path).length && !provablyKitOwned(ctx, legacy)) {
+      warn(`${path} contains files the kit did not install — kept for manual reconciliation`);
+    } else if (statSync(path).isDirectory() || provablyKitOwned(ctx, legacy)) {
+      ctx.remove(path, 'modules remain in asdd-harness-kit');
+    } else {
+      warn(`${path} is not recorded as kit-installed — kept for manual reconciliation`);
+    }
+  }
+  const enable = 'scripts/enable-module.sh';
+  if (existsSync(join(ctx.target, enable))) {
+    if (provablyKitOwned(ctx, enable)) ctx.remove(join(ctx.target, enable), 'use the kit installer to enable modules');
+    else warn(`${join(ctx.target, enable)} is not recorded as kit-installed — kept for manual reconciliation`);
+  }
 }
 
 export function refreshSkillsIndex(ctx) {

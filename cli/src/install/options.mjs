@@ -51,9 +51,14 @@ Options:
   --json                  Print one JSON object on stdout (the result, or the error) instead of progress lines
   -h, --help              Show help
 
-Safe defaults: never overwrites existing bindings, PROGRESS, slice state, specs,
-or mcp.json. Kit-owned files are refreshed when their version changes, except a
-file this project changed since the kit wrote it (SKIP; --force overwrites).
+Ownership contract: the kit only ever refreshes or deletes kit artifacts — the
+paths installed-versions.json records (managed_files, kit_files). A file the kit
+cannot prove it wrote is never overwritten or removed: existing kit-path files
+without a recorded hash are SKIPped, unproven retired paths are kept with a
+warning, and skill/steering/rule collisions halt (rehome with --rehome-*).
+Project artifacts — bindings, PROGRESS, slice state, specs, mcp.json — are
+seeded once and never touched again. Kit files refresh on version change; one
+the project changed since the kit wrote it is skipped (--force restores it).
 An older kit than the one installed is refused (--force downgrades).
 Bindings still kept unless --force-bindings. Undo with: asdd uninstall <dir>.
 `;
