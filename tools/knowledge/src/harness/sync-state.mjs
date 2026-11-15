@@ -18,7 +18,7 @@
  * telemetry-lib.mjs (ADR-001). A telemetry failure never changes stdout, stderr, the exit code, or a generated file.
  * Only the CLI block emits: the exported functions (used by the MCP servers) never do.
  */
-import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -365,8 +365,9 @@ function generateRegistry(sliceManifests) {
       phase: m.phase,
       status: m.status,
       mode: m.mode,
-      active_features: m.active_features.length,
-      escalation_signals: m.escalation_signals.length,
+      // Legacy/foreign manifests may lack the v3 derived arrays — never crash the whole sync on one.
+      active_features: (m.active_features ?? []).length,
+      escalation_signals: (m.escalation_signals ?? []).length,
       escalation_required: m.escalation_required,
       escalated_from_lite: m.escalated_from_lite,
       open_dissents: m.open_dissents,
@@ -392,12 +393,54 @@ function writeProgress(registry) {
   writeFileSync(join(root, '.harness/PROGRESS.md'), text);
 }
 
+/**
+ * AR-3 collision resolution (K-6): when two session files share a sequence
+ * number, the earliest timestamp keeps the number; later ones are renamed to
+ * the next free sequences. Deterministic and content-preserving — the rename
+ * is recorded in the sync output so the coordinator sees it.
+ */
+function resolveSessionCollisions(sliceId, sliceDir) {
+  const sessionsDir = join(sliceDir, 'sessions');
+  if (!existsSync(sessionsDir)) return;
+  const files = readdirSync(sessionsDir).filter((n) => /^\d{3}-.+\.json$/.test(n));
+  const bySeq = new Map();
+  for (const f of files) {
+    const seq = f.slice(0, 3);
+    const list = bySeq.get(seq) ?? [];
+    list.push(f);
+    bySeq.set(seq, list);
+  }
+  const timestampOf = (f) => {
+    try {
+      const data = JSON.parse(readFileSync(join(sessionsDir, f), 'utf8'));
+      return Date.parse(data.timestamp) || 0;
+    } catch {
+      return 0;
+    }
+  };
+  const used = new Set([...bySeq.keys()].map(Number));
+  let next = Math.max(0, ...used) + 1;
+  for (const [, group] of bySeq) {
+    if (group.length < 2) continue;
+    group.sort((a, b) => timestampOf(a) - timestampOf(b) || a.localeCompare(b));
+    for (const loser of group.slice(1)) {
+      while (used.has(next)) next += 1;
+      const target = `${String(next).padStart(3, '0')}-${loser.slice(4)}`;
+      renameSync(join(sessionsDir, loser), join(sessionsDir, target));
+      console.log(`SYNC  ${sliceId} renamed ${loser} → ${target} (AR-3 collision)`);
+      used.add(next);
+      next += 1;
+    }
+  }
+}
+
 function syncSlice(sliceId) {
   const sliceDir = join(slicesDir, sliceId);
   if (!existsSync(sliceDir)) {
     console.error(`FAIL  slice directory not found: ${sliceDir}`);
     return null;
   }
+  resolveSessionCollisions(sliceId, sliceDir);
   const sessions = readSessions(sliceDir);
   const manifest = generateSliceManifest(sliceId, sessions);
   writeJson(join(sliceDir, 'manifest.json'), manifest);

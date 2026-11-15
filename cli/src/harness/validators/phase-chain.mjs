@@ -67,6 +67,7 @@ export default function validate(ctx) {
   for (const entry of registry.slices) {
     const sliceId = typeof entry === 'string' ? entry : entry?.slice_id;
     if (typeof sliceId !== 'string' || !sliceId.trim()) continue;
+    if (ctx.slice && sliceId !== ctx.slice) continue;
     const sliceDir = join(root, '.harness/state/slices', sliceId);
     if (!existsSync(join(sliceDir, 'sessions'))) continue; // legacy v2 slices
 

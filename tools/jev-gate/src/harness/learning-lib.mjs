@@ -564,8 +564,11 @@ export function proposalFindings(root, proposal, patternIds) {
   const name = where.split('/').pop();
   if (!proposal.id) return [`${where}: missing frontmatter (id, pattern, status, control, change, success)`];
   if (!/^SP-\d{3,}$/.test(proposal.id) || !name.startsWith(proposal.id)) out.push(`${where}: id "${proposal.id}" must be SP-NNN and match the file name`);
+  // `pattern: none` marks an advisory proposal — proactive steering change not
+  // derived from a computed signal (sub-threshold observations). The Tech Lead
+  // still decides it; it just isn't linked to an LP-*.
   if (!proposal.pattern) out.push(`${where}: missing pattern`);
-  else if (!patternIds.has(proposal.pattern)) out.push(`${where}: pattern ${proposal.pattern} matches no learning signal (run learn.mjs --all)`);
+  else if (proposal.pattern !== 'none' && !patternIds.has(proposal.pattern)) out.push(`${where}: pattern ${proposal.pattern} matches no learning signal (run learn.mjs --all)`);
   if (!PROPOSAL_STATUSES.includes(proposal.status)) out.push(`${where}: status must be one of ${PROPOSAL_STATUSES.join(', ')} (got "${proposal.status ?? ''}")`);
   if (!CHANGE_TYPES.includes(proposal.change)) out.push(`${where}: change must be one of ${CHANGE_TYPES.join(', ')} (got "${proposal.change ?? ''}")`);
   const control = String(proposal.control ?? '').split('#')[0].trim();

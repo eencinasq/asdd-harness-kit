@@ -222,6 +222,28 @@ export function mappedPaths(root, slice) {
   return [...out];
 }
 
+/**
+ * Directory prefixes a slice declares — its surface for slice-attribution
+ * (DRIFT-01 under forSlice). A glob's surface is its static prefix; a file-like
+ * entry contributes its parent directory (covers stray same-dir edits); a
+ * dir-like entry contributes itself.
+ */
+export function surfaceDirs(mapped) {
+  const out = new Set();
+  for (const p of mapped) {
+    if (/[*?]/.test(p)) {
+      const prefix = p.split('/').slice(0, p.split('/').findIndex((s) => /[*?]/.test(s))).join('/');
+      if (prefix) out.add(prefix);
+    } else if (/\.[A-Za-z0-9]+$/.test(p)) {
+      const dir = p.slice(0, p.lastIndexOf('/'));
+      if (dir) out.add(dir);
+    } else {
+      out.add(p);
+    }
+  }
+  return [...out];
+}
+
 // --------------------------------------------------------- requirements
 
 export function parseRequirements(root, sliceId) {
@@ -313,6 +335,9 @@ export function linkedSlices(prBranch, prBody, known) {
  * @param {string} [opts.base]          base ref (default: binding → origin/HEAD → main …)
  * @param {string} [opts.target]        target ref (default HEAD + working tree)
  * @param {string[]} [opts.sliceIds]    restrict DRIFT-01/03/04 to these slices (any phase)
+ * @param {string} [opts.forSlice]      slice-attribution mode (asdd check --slice): DRIFT-01 reports only
+ *                                      unmapped files inside the slice's declared surface; 02/05/06 filter
+ *                                      to the slice; 03/04 scope to it
  * @param {string} [opts.prBranch]      enables DRIFT-07
  * @param {string} [opts.prBody]        enables DRIFT-07
  * @param {boolean} [opts.includeContract=true]  report DRIFT-06 (check-invariants reports it itself)
@@ -334,6 +359,12 @@ export function runDrift(opts) {
   const editSlices = requested ?? slices.filter((s) =>
     s.status === 'in_progress' &&
     (EDIT_PHASES.includes(s.phase) || s.features.some((f) => f.status === 'in_progress')));
+
+  // K-1: slice-attribution mode. DRIFT-01 reports only unmapped files inside the
+  // named slice's declared surface (stray edits in its neighborhoods); DRIFT-02/05/06
+  // are filtered to findings whose slice_id matches; DRIFT-03/04 scope to it.
+  const forSlice = typeof opts.forSlice === 'string' ? opts.forSlice : null;
+  const forSliceObj = forSlice ? slices.find((s) => s.slice_id === forSlice) : null;
   const passing = slices.flatMap((s) => s.features.filter((f) => f.status === 'passing').map((f) => ({ s, f })));
 
   const target = opts.target || 'HEAD';
@@ -350,17 +381,29 @@ export function runDrift(opts) {
 
   // DRIFT-01 — changed product files must be mapped by an editing slice.
   // A test file that names a REQ of an editing slice is mapped by that REQ.
+  // K-2: DONE/PARKED slices keep covering their own declarations — a slice going
+  // DONE must not orphan its uncommitted diff; post-verification edits are still
+  // caught per-feature by DRIFT-02. ABANDONED slices stay uncovered on purpose.
   if (gitAvailable && editSlices.length) {
-    const mapped = editSlices.flatMap((s) => mappedPaths(root, s));
+    const coverageSlices = [...editSlices];
+    for (const s of slices) {
+      if ((s.status === 'DONE' || s.status === 'PARKED') && !coverageSlices.includes(s)) coverageSlices.push(s);
+    }
+    const mapped = coverageSlices.flatMap((s) => mappedPaths(root, s));
     const isTest = testFileMatcher(root);
     const reqIds = [...new Set(editSlices.flatMap((s) => parseRequirements(root, s.slice_id).map((r) => r.id)))];
-    const unmapped = changedProduct.filter((f) =>
+    let unmapped = changedProduct.filter((f) =>
       !mapped.some((m) => matchesPath(f, m)) &&
       !(isTest(f) && mentionedRequirementIds(root, [f], reqIds).size > 0));
+    if (forSliceObj) {
+      const surface = surfaceDirs(mappedPaths(root, forSliceObj));
+      unmapped = unmapped.filter((f) => surface.some((dir) => f === dir || f.startsWith(`${dir}/`)));
+    }
     for (const f of unmapped) {
       findings.push(finding('DRIFT-01', 'fail', {
         paths: [f],
         node: `file:${f}`,
+        slice_id: forSlice ?? null,
         message: `${f} changed but is not mapped by ${editSlices.map((s) => s.slice_id).join(', ')} (intent/design/tasks/spec or scope_paths)`,
       }));
     }
@@ -370,6 +413,7 @@ export function runDrift(opts) {
   // DRIFT-05 — passing features whose scope paths do not exist
   const listFiles = fileLister(root, gitAvailable);
   for (const { s, f } of passing) {
+    if (forSlice && s.slice_id !== forSlice) continue;
     const scopes = (Array.isArray(f.scope_paths) ? f.scope_paths : []).map(normalizeScopePath).filter(Boolean);
     const node = `feature:${s.slice_id}:${f.id}`;
     for (const p of scopes) {
@@ -394,7 +438,9 @@ export function runDrift(opts) {
   }
 
   // DRIFT-03 / DRIFT-04 — requirement coverage and test mentions
-  const reqSlices = requested ?? slices.filter((s) => s.status === 'in_progress');
+  const reqSlices = forSliceObj
+    ? [forSliceObj]
+    : (requested ?? slices.filter((s) => s.status === 'in_progress'));
   let mustTotal = 0;
   let mustCovered = 0;
   let tests = null;
@@ -431,6 +477,7 @@ export function runDrift(opts) {
   if (includeContract) {
     const severity = contractSeverity(root);
     for (const s of slices) {
+      if (forSlice && s.slice_id !== forSlice) continue;
       for (const f of s.features) {
         for (const message of contractFindings(f)) {
           findings.push(finding('DRIFT-06', severity, {

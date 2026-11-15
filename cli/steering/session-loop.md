@@ -76,7 +76,9 @@ At the end of every significant action, write one session file (format and event
 
 The coordinator alone writes `.features.json`, session files, and updates shared state via `sync-state`. Workers edit only their owned task scope and report changed files, verification commands/results, blockers, and relevant requirement coverage. The coordinator reconciles results and marks a task `passing` only after evidence review. Shared-state changes happen at wave barriers. For supervised DAG orchestration across agents, use the `orchestration` skill if installed.
 
-ASDD-Lite remains single-worker and serial (machine-enforced: a lite slice with more than one `in_progress` feature fails invariants). Lite slices are the default; growth evidence forces escalation — see [asdd-lite.md](./asdd-lite.md).
+Lite slices are the default; growth evidence forces escalation — see [asdd-lite.md](./asdd-lite.md).
+
+A dispatch cap stops waiting, it does not kill the worker — on `TIMEOUT`, verify the worker's residue and re-dispatch only the gap; late writes can race verification, so freeze evidence (file hashes) before judging it.
 
 ## Gold-plating (negative space)
 
@@ -91,7 +93,7 @@ Scope control is deterministic: this file's mapping plus `features.mjs`.
 Before the session ends, and before a feature is marked `passing`, the agent shall run:
 
 ```bash
-asdd check --live
+asdd check --live --slice <slice-id>
 ```
 
 Exit 0 is required. WARN lines do not block. Any FAIL blocks completion. The agent shall fix every FAIL and shall not mark the feature `passing` while the command exits non-zero. Live mode does not require `JEV_API_KEY` (Jev is not a harness gate).

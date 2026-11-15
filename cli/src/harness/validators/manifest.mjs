@@ -111,6 +111,7 @@ export default function validate(ctx) {
         fail('registry slices entry missing slice_id');
         continue;
       }
+      if (ctx.slice && slice.slice_id !== ctx.slice) continue;
       if (slice.status && !['DONE', 'in_progress', 'PARKED', 'ABANDONED'].includes(slice.status)) {
         fail(`slice "${slice.slice_id}" has invalid status "${slice.status}" (expected DONE, in_progress, PARKED, or ABANDONED)`);
       }
@@ -272,6 +273,7 @@ export default function validate(ctx) {
 
   // Orphan slice detection + AR-2: expected-generated files absent while their state inputs exist.
   for (const sliceName of sliceDirNames) {
+    if (ctx.slice && sliceName !== ctx.slice) continue;
     const sliceManifestPath = join(slicesDir, sliceName, 'manifest.json');
     const sliceSessionsDir = join(slicesDir, sliceName, 'sessions');
     const hasV2 = existsSync(sliceManifestPath);

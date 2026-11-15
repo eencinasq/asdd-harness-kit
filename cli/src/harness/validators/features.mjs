@@ -180,6 +180,7 @@ export default function validate(ctx) {
     const rel = `.harness/features/${name}`;
     const data = readJson(rel);
     if (!data) continue;
+    if (ctx.slice && data.slice_id !== ctx.slice) continue;
     validateFeatureDocument(data, rel, fail, root, warn);
     const list = Array.isArray(data.features) ? data.features : [];
     const sliceId = data.slice_id;
