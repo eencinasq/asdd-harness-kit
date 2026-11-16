@@ -72,7 +72,7 @@
         "node --test cli/src/harness/spec-source-lib.test.mjs",
         "test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/spec-source-lib.test.mjs && test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/spec-source-lib.test.mjs && test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-verified 2026-11-16 after asdd-roadmap amend (P5, G15–G22 in docs/ASDD-ROADMAP.md): all verification commands exit 0.",
       "scope_paths": [
         "cli/src/harness/spec-source-lib.mjs",
         "cli/src/harness/spec-source-lib.test.mjs",
@@ -84,7 +84,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "7b0dd63b54f9fcdaa62f3e918c4de35854a725df4febc3e1aabb383c1ce8849e"
+      "evidence_hash": "fe658738725cabc068816ffd84d663fa48c30cd6ed44d66690e1fbc75fc5b14a"
     }
   ]
 }

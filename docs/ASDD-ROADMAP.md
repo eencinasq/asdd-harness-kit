@@ -14,6 +14,7 @@
 | **P3** | `asdd-p3` | `waves`, `portfolio`, `converge-eval` | P3.3 Windows hooks, P3.4 import Spec Kit/OpenSpec |
 | **P4** | `asdd-p4` | `tracker-sync`, Stop `advisory`, `spec-source` opt-in | P4.2 presets Cencosud |
 | **Shaping** | `egm-shaping` | Intent fitness, Goldfish scope-split, concepts_brief, critique-first, brownfield pack | — |
+| **P5** | `telemetry-emitters`, `skill-eval`, `learn-eval-gate`, `cost-metrics`, `asdd-ui`, `ui-gate-decisions`, `ui-insights` | — (abierto, nov 2026) | P5.8–P5.10 según demanda |
 
 Slices `asdd-p0`…`asdd-p4` están en `DONE` (escalated donde el scope cruzó módulos). El detalle por ítem está en §4.
 `egm-shaping` porta conceptos EGM (Elephant/Goldfish) a `shape-up` / `product-delivery` para intents lite-fit; SoT de build sigue en `.harness/`.
@@ -84,6 +85,14 @@ Nivel SDD ([Böckeler / Thoughtworks](https://martinfowler.com/articles/explorin
 | **G12** | Medición del pipeline | No priorizar proceso | **Hecho** (P0.1 `status --metrics`) |
 | **G13** | Slash/MCP surface débil vs Spec Drift | Claude usa Spec Drift | **Mitigado** (P1.1 skills + P1.2 `pipeline_status`) |
 | **G14** | Slice DONE → evolve sin re-pitch | Mantenimiento a medias | **Hecho** (P2.2 `slice amend`) |
+| **G15** | No se sabe qué steering/skills se cargan de verdad (instalado vs. usado) | Guías muertas o ignoradas sin señal | **Abierto** (P5.1 `telemetry-emitters`) |
+| **G16** | Skills y agentes sin eval de comportamiento antes/después | Un cambio de guía puede regresar sin que nada lo detecte; el learning loop solo verifica a posteriori | **Abierto** (P5.2 `skill-eval`, P5.3 `learn-eval-gate`) |
+| **G17** | Sin costo/tokens por slice, modelo o runtime | No se puede comparar configuraciones ni justificar el proceso | **Abierto** (P5.4 `cost-metrics`) |
+| **G18** | UI dispersa y atada a hosts MCP (límite ~13 KB en Cursor) | TL/PM fuera del IDE no ven el ciclo completo | **Abierto** (P5.5 `asdd-ui`) |
+| **G19** | Gates humanos (`decided_by`) solo desde IDE/CLI | Fricción para quien decide; gates retrasados | **Abierto** (P5.6 `ui-gate-decisions`) |
+| **G20** | Skills/steering sin versión propia ni distribución entre repos | No hay packs de organización ni inventario de versiones | **Según demanda** (P5.8) |
+| **G21** | Skills/agentes de terceros sin escaneo de seguridad | Prompt injection, comandos peligrosos, exfiltración | **Según demanda** (P5.9) |
+| **G22** | Sin gobierno de organización (steering central, audit log agregado) | Cada repo diverge; sin trazabilidad multi-repo de overrides | **Según demanda** (P5.10) |
 
 ## 4. Roadmap priorizado
 
@@ -165,6 +174,25 @@ Escala: **Valor** (alto / medio / bajo) · **Esfuerzo** S (≤ 2 días) / M (≤
 | P4.3 | Stop advisory-only | **hecho** — `stop.mode` / `HARNESS_STOP_MODE=advisory` |
 | P4.4 | Spec-as-source experimental | **hecho** — `asdd spec-source` opt-in (**not** default SoT) |
 
+### P5 — Medir y superficie humana
+
+Origen: análisis del 2026-11-16 frente a Eminzo AI Factory (UI de escritorio sobre un orquestador) y Tessl (gestión del ciclo de vida de skills). Conclusión: el kit no necesita orquestar ni alojar loops; le falta **medir** sus guías y **mostrar** el estado a quien decide los gates.
+
+| ID | Slice | Propuesta | Cubre | Modo | Depende de | Estado |
+|----|-------|-----------|-------|------|------------|--------|
+| P5.1 | `telemetry-emitters` | Fase 2 de `telemetry-contract`: emisores fail-open, spans de activación de steering/skills, `asdd profile` (guardrails AR-1…AR-10) | G15 | full | `telemetry-contract` | **abierto** |
+| P5.2 | `skill-eval` | `asdd skill-eval`: fixtures por skill, comparación contra baseline, regresiones | G16 | lite | — | **abierto** |
+| P5.3 | `learn-eval-gate` | Propuestas `SP-*` que cambian guías requieren eval adjunta (`QG-LEARN-*`) | G16 | lite | P5.2 | **abierto** |
+| P5.4 | `cost-metrics` | Tokens y costo por slice, fase, modelo y runtime en `status --metrics` | G17 | lite | P5.1 | **abierto** |
+| P5.5 | `asdd-ui` | `asdd ui`: servidor local Node sin dependencias, solo lectura, agrega pipeline + spec-drift + learning + knowledge | G18 | lite | — | **abierto** |
+| P5.6 | `ui-gate-decisions` | Única escritura de la UI: decidir gates vía comando `asdd` (`decided_by` + nota) | G19 | lite | P5.5 | **abierto** |
+| P5.7 | `ui-insights` | Paneles de activación, evals y costo | G15–G17 | lite | P5.1, P5.2, P5.4, P5.5 | **abierto** |
+| P5.8 | — | Packs versionados de skills/steering + `asdd fleet` (inventario multi-repo) | G20 | full | — | **según demanda** |
+| P5.9 | — | Escaneo de seguridad de skills/agentes de terceros | G21 | lite | (P5.8 opcional) | **según demanda** |
+| P5.10 | — | Steering de organización no sobrescribible + audit log agregado | G22 | full | P5.8 | **según demanda** |
+
+Olas: **A** (medir) P5.1–P5.4 · **B** (superficie humana) P5.5–P5.7 · **C** (distribuir) P5.8–P5.10, sin slice hasta que haya demanda de compartir skills entre repos u organizaciones.
+
 ## 5. Resumen
 
 | Prioridad | Hecho ahora | Queda para 2ª versión |
@@ -174,6 +202,7 @@ Escala: **Valor** (alto / medio / bajo) · **Esfuerzo** S (≤ 2 días) / M (≤
 | **P2** | Hotfix / amend / hill | — |
 | **P3** | Waves, portfolio, converge-eval | Windows hooks, import Spec Kit/OpenSpec |
 | **P4** | Tracker-sync, advisory Stop, spec-source pilot | Presets Cencosud |
+| **P5** | — (abierto: telemetría, evals, costo, `asdd ui`) | Packs, escaneo de skills, gobierno de organización (según demanda) |
 
 ## 6. Fuera de alcance (decisiones vigentes)
 
@@ -182,6 +211,8 @@ Escala: **Valor** (alto / medio / bajo) · **Esfuerzo** S (≤ 2 días) / M (≤
 - Gates Shape Up / Product Delivery siguen siendo **humanos** (`decided_by`); Jev es opinión, no pipeline.
 - No convertirse en SaaS ni en IDE propietario (no competir con Kiro como producto).
 - No abrazar Tessl *spec-as-source* como default (código sigue siendo editable; el piloto es opt-in).
+- No orquestar ni ejecutar agentes (modelo Eminzo) ni alojar loops con créditos (modelo Tessl); los loops programados viven en CI.
+- App de escritorio (Tauri) aparcada: solo si aparecen usuarios fuera del IDE o necesidad multi-repo con notificaciones nativas, empaquetando `asdd ui`.
 
 ## 7. Cómo medir el éxito
 

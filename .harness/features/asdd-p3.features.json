@@ -71,7 +71,7 @@
         "node --test cli/src/harness/converge-eval-lib.test.mjs",
         "node cli/bin/asdd.mjs converge-eval"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/converge-eval-lib.test.mjs && node cli/bin/asdd.mjs converge-eval` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/converge-eval-lib.test.mjs && node cli/bin/asdd.mjs converge-eval` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-verified 2026-11-16 after asdd-roadmap amend (P5, G15–G22 in docs/ASDD-ROADMAP.md): all verification commands exit 0.",
       "scope_paths": [
         "cli/src/harness/converge-eval-lib.mjs",
         "cli/src/harness/converge-eval-lib.test.mjs",
@@ -82,7 +82,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "031ac13ce3d76b06dd9cd6657ee5daa80c424ebb530f95a9e733ed3c615ff1f9"
+      "evidence_hash": "de487985b21a61c24b05dfdea6bfb5bc17786c948f1d072d03ffdfb0e57027d0"
     }
   ]
 }
