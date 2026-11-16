@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "guidance-proposal-skip",
+  "source_tasks": ".harness/specs/guidance-proposal-skip/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Guidance scan skips proposal records",
+      "user_visible_behavior": "asdd kit guidance exits 0: historical profiling/rules proposals are not scanned for stale terms.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit guidance",
+        "node --test cli/test/guidance.test.mjs"
+      ],
+      "evidence": "GREEN 2026-11-16: `asdd kit guidance` exit 0 (PASS stale, cutoffs, budget, asserts); `node --test cli/test/guidance.test.mjs` 10/10; `npm test` 195/195.",
+      "scope_paths": [
+        "cli/src/kit/guidance.mjs"
+      ],
+      "evidence_hash": "d325eb7b7c00567d68eafd2663f828d25fb497cf3a537052df004abe7a5bf786"
+    }
+  ]
+}

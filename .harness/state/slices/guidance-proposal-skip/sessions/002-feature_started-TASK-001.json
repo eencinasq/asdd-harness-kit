@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-guidance-proposal-skip-002",
+  "timestamp": "2026-11-16T23:27:25.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "guidance-proposal-skip",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": ["cli/src/kit/guidance.mjs"],
+  "evidence": "RED: asdd kit guidance exit 1 — FAIL stale docs/knowledge-base/profiling-proposals/v2.md:88 (also FAILs on clean HEAD).",
+  "concerns": []
+}

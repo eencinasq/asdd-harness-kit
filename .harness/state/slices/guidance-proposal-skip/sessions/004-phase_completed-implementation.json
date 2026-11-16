@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "guidance-proposal-skip",
+  "concerns": [],
+  "timestamp": "2026-11-16T23:28:13.000Z",
+  "session_id": "sess-guidance-proposal-skip-004",
+  "event_type": "phase_completed",
+  "phase": "implementation",
+  "evidence": "SKIP_PREFIXES gains profiling-proposals/ and rules-proposals/."
+}
