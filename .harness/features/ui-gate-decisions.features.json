@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "ui-gate-decisions",
+  "source_tasks": ".harness/specs/ui-gate-decisions/tasks.md",
+  "features": []
+}
