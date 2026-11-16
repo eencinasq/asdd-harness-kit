@@ -200,7 +200,8 @@ for kit_slice in "$ROOT"/.harness/specs/*/ "$ROOT"/.harness/state/archive/*/; do
   test ! -e "$TMP/existing-app/.harness/state/slices/$name"
   test ! -e "$TMP/existing-app/.harness/features/$name.features.json"
 done
-(cd "$ROOT" && npm pack --dry-run --json 2>/dev/null) | node -e '
+# --ignore-scripts: prepack (npm run build) prints to stdout, which would land before the JSON
+(cd "$ROOT" && npm pack --dry-run --json --ignore-scripts 2>/dev/null) | node -e '
   const files = JSON.parse(require("fs").readFileSync(0, "utf8"))[0].files.map((f) => f.path);
   const kitOnly = /^docs\/(architecture\/domain-model|agent-failure-log|dissent-log)\.md$|^\.harness\/(specs|state\/slices|state\/archive|state\/learning)\/.+\/|^\.harness\/state\/archive\/.+\.json$|^\.harness\/features\/.+\.features\.json$|^\.harness\/state\/registry\.json$|^\.harness\/config\/project\.json$|^\.harness\/audits\/.+\.json$|^docs\/knowledge-base\/steering-proposals\/|^\.harness\/steering\/(product|structure|tech|design-system|domain-layer\.project|quality-gates\.project)\.md$/;
   const leaked = files.filter((f) => kitOnly.test(f));
