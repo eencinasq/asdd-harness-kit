@@ -166,7 +166,7 @@
         "node --test cli/test/skills-lint.test.mjs",
         "npm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance && node --test cli/test/skills-lint.test.mjs && npm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance && node --test cli/test/skills-lint.test.mjs && npm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-verified 2026-11-16 after hotfixes npm-pack-json (cli/test/install.sh) and guidance-proposal-skip: every verification command exits 0 (npm test 195/195; install.sh OK; skills/agents lint PASS; kit guidance PASS; tools/knowledge and tools/jev-gate tests PASS on Node 24.22.3).",
       "scope_paths": [
         "cli/src/kit/skills-lint.mjs",
         "cli/src/main.mjs",
@@ -175,7 +175,7 @@
         "cli/test/install.sh",
         "cli/README.md"
       ],
-      "evidence_hash": "e1f8344287c768f51c4b2d89cd71c930a179ffbb7bfaa05937417346c911a11c"
+      "evidence_hash": "1fa8a32cf98e6dc5d859ebad13485c12d5e3d1186aa8bfc9416c0d870f118504"
     }
   ]
 }
