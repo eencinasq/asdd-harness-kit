@@ -23,11 +23,13 @@ classification: binding
 
 ## Key features
 
-- Installer: the `asdd` CLI (`npx asdd-harness-kit install`) with runtimes and opt-in modules.
-- Steering contracts and quality gates (`.harness/steering/`).
-- Agents and skills (`.agents/agents/`, `.agents/skills/`).
-- Harness scripts: state sync, invariants, spec drift, audit, knowledge, learning loop (`cli/src/harness/`).
-- MCP servers: `knowledge`, `spec-drift`, `jev-gate` (`.agents/mcp/`).
+- Installer: the `asdd` CLI (`npx asdd-harness-kit install`) with runtime adapters (Cursor, Claude Code, OpenCode, Kimi, Junie, Devin, Kiro) and opt-in modules (`bruno`, `playwright-e2e`, `web-ui`, `http-api`).
+- Steering contracts and quality gates (`.harness/steering/`); modular rules (`.agents/rules/`).
+- Agents and skills (`.agents/agents/`, `.agents/skills/`), including the `/asdd-*` session skills.
+- Slice sizes: lite-first slices, `--hotfix`, `--full`, evidence-based escalation (E1–E5), and post-DONE `slice amend`.
+- Harness commands (`cli/src/harness/`): state sync, invariants, Verify-on-Stop and the command gate, spec drift, converge, audit, knowledge, the learning loop (`asdd learn`), pipeline metrics and HTML status, waves, portfolio, tracker sync.
+- MCP servers: `knowledge`, `spec-drift` (with MCP App dashboards), and the kit-only `jev-gate` (`tools/`, configured in `.agents/mcp/`).
+- Roadmap and gaps: `docs/ASDD-ROADMAP.md`; how-to plays: `docs/PLAYBOOK.md`.
 
 ## Actors / personas
 
@@ -44,3 +46,5 @@ classification: binding
 2. Kit development artifacts never reach a project: not through the installer, and not through the npm package.
 3. Every artifact the installer refreshes carries the single kit version (`package.json`) in `.harness/config/versions.json`.
 4. `npm test` passes before any change is released.
+5. The `asdd` CLI has no runtime dependencies; the harness never installs npm packages into a project.
+6. The kit governs agents; it does not run them (no orchestrator, no hosted loops) — `docs/ASDD-ROADMAP.md` §6.

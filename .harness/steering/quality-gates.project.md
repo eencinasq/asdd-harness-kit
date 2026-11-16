@@ -10,7 +10,7 @@ classification: binding
 
 # Quality gates — project binding (asdd-harness-kit)
 
-> **Project binding for the kit itself.** Never shipped: projects get the stub from `scripts/templates/bindings/quality-gates.project.md`.
+> **Project binding for the kit itself.** Never shipped: projects get the stub from `cli/templates/bindings/quality-gates.project.md`.
 
 Concrete commands, paths, and findings for [quality-gates.md](quality-gates.md). Fill every `…` slot before Discovery. A stub value does not satisfy a gate.
 
@@ -53,9 +53,9 @@ Read by `drift-lib.mjs`, `asdd audit`, and the `spec-drift` MCP server. A slot l
 - Test file globs: `…` (default: `**/*.test.*`, `**/*.spec.*`, `**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/test-*.sh`)
 - Always-loaded steering budget: `36500` bytes (kit-only: `inclusion: always` steering plus `AGENTS.md`; checked by `asdd kit guidance`; lower it when the steering shrinks, never raise it without a decision. **Recorded decisions:** `32600`→`34000` per `docs/knowledge-base/steering-proposals/v1.md` `D-5`; `34000`→`36500` per that proposal's `G-9` slot retrofit — the profile's required NEGATIVE_SPACE/ENFORCEMENT/ESCALATION slots added ~3 KB of normative text to the always files, and the `D-5` effectively-always sensor tier (pseudo-always files + active-turn bytes) is now live in `cli/src/kit/guidance.mjs` (`asdd kit guidance`). Downward levers still open: the `D-14` `security-rules.md` inclusion decision and any sensor-gated `auto`→`always` reclassification, each of which requires its own recorded re-decision)
 - Drift base branch: `main` (default: `origin/HEAD`, then `main`, then `master`)
-- Audit commands: `…` (one `name=command` per backtick, for example `deps=npm audit --omit=dev`; unfilled → `unconfigured`)
-- Contract command: `…` (`http-api` module `openapi` adapter; non-zero exit = contract drift)
-- OpenAPI spec: `…` (JSON file compared against endpoints cited by requirements when no Contract command is set)
+- Audit commands: `deps=npm audit --omit=dev` (one `name=command` per backtick; unfilled → `unconfigured`)
+- Contract command: `…` (not applicable: the kit exposes no HTTP API and does not enable the `http-api` module)
+- OpenAPI spec: `…` (not applicable: no HTTP API)
 
 ## Related project paths
 

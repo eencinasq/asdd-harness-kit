@@ -15,10 +15,14 @@ classification: binding
 ```
 .
 ├── .agents/             # COPIES of cli/agents, cli/skills, cli/mcp (asdd kit self); edit the sources in cli/
+│   └── rules/           # modular-policy root (_rule-profile.md = the grammar; active rules land here)
+├── .cursor/ .claude/ .devin/ .mcp.json CLAUDE.md   # runtime wiring written by asdd install (rendered agents, skill links, hooks, MCP config)
 ├── .harness/            # the harness as installed in the kit (never shipped; edit sources in cli/). No .harness/cli: the kit runs node cli/bin/asdd.mjs
 │   ├── steering/        # COPIES of cli/steering + this kit's own bindings (product, structure, tech, *.project, design-system)
 │   ├── config/          # COPIES of cli/scaffold/config + cli/versions.json; project.json (the kit's own)
 │   ├── specs/ features/ state/ audits/ knowledge/ PROGRESS.md   # this kit's own slices
+│   ├── state/learning/  # learning loop: signals/ (gitignored), summaries/, patterns.json
+│   └── state/telemetry/ # span contract (telemetry.schema.json); emitters land with slice telemetry-emitters
 ├── cli/                 # the asdd CLI (npx asdd-harness-kit)
 │   ├── src/harness/     # harness commands + libs: check, verify, gate, sync, knowledge, drift, audit, learn (compiled to cli/dist for the npm package; *.test.mjs kit-only)
 │   ├── src/install/ kit/            # install, uninstall, kit versions|build|vendor|guidance (kit package only)
@@ -30,12 +34,14 @@ classification: binding
 │   ├── templates/       # PROGRESS.md, manifest.json, bindings/ and docs/ stubs copied into projects
 │   ├── modules/         # opt-in modules: bruno, playwright-e2e, web-ui, http-api (copied when enabled)
 │   ├── runtimes/        # per-runtime recipes (the installer wires them; cursor/asdd-steering.mdc is copied)
+│   ├── eval/            # evaluation fixtures (converge-ears/ for asdd converge-eval)
 │   └── test/            # kit tests: install.sh, lifecycle.sh, full-flow.sh, *.test.mjs (kit-only)
 ├── tools/spec-drift/    # spec-drift MCP server: audit tools + dashboard, analysis, PR review (source shipped; build in place)
 ├── tools/jev-gate/      # jev-gate MCP server, NestJS: System One gates for chat only (not part of the harness; kit-only)
 ├── tools/knowledge/     # knowledge MCP server, NestJS: index search/trace/slice + learning patterns (source shipped; build in place)
 │                        # tools/*/src/harness/ = GENERATED copies of cli/src/harness libs (asdd kit vendor); servers never load the project's harness
-├── docs/                # seeded logs and knowledge-base README (seeded); architecture notes
+├── docs/                # seeded logs and knowledge-base README (seeded); architecture notes; ASDD-ROADMAP.md and PLAYBOOK.md
+├── .github/workflows/   # harness-invariants.yml (CI: tests, install smoke, vendor/self checks); harness-audit.yml.example (shipped example)
 ├── AGENTS.md            # COPY of cli/AGENTS.md (asdd kit self)
 └── README.md            # kit documentation (kit-only)
 ```
