@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-14T04:44:22.877Z",
+  "generated_at": "2026-11-16T23:28:23.087Z",
   "threshold": 3,
   "summary": {
-    "patterns": 21,
+    "patterns": 22,
     "open": 1,
     "in_flight": 3,
     "verified": 0,
@@ -245,6 +245,46 @@
       "proposals": []
     },
     {
+      "id": "LP-7aa239e5",
+      "signature": "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi",
+      "kind": "noise",
+      "occurrences": 2,
+      "threshold": 5,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-11T04:44:07.820Z",
+      "last_seen": "2026-11-16T23:24:54.312Z",
+      "sources": [
+        "warn"
+      ],
+      "slices": [],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-b028f255",
+      "signature": "warn:QG-DEC-09",
+      "kind": "noise",
+      "occurrences": 2,
+      "threshold": 5,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-13T02:25:45.463Z",
+      "last_seen": "2026-11-16T23:24:54.312Z",
+      "sources": [
+        "warn"
+      ],
+      "slices": [
+        "sensor-fixes"
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-f880c576",
       "signature": "blocked:feature:.harness/scripts",
       "kind": "escape",
@@ -451,21 +491,21 @@
       "proposals": []
     },
     {
-      "id": "LP-7aa239e5",
-      "signature": "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi",
+      "id": "LP-5684db39",
+      "signature": "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali",
       "kind": "noise",
       "occurrences": 1,
       "threshold": 5,
       "status": "watching",
       "reopened": false,
-      "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-11T04:44:07.820Z",
+      "first_seen": "2026-11-16T22:08:19.015Z",
+      "last_seen": "2026-11-16T23:24:54.312Z",
       "sources": [
         "warn"
       ],
       "slices": [],
       "examples": [
-        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+        ".harness/steering/quality-gates.project.md: coverage keys not reachable via tags (starvation, Phase-2 backlog): validation"
       ],
       "proposals": []
     },
@@ -485,27 +525,6 @@
       "slices": [],
       "examples": [
         "asdd-steering.mdc mandates reads for auto files bypassing tags: structure.md, product.md, codegraph.md (recorded G-6 — Phase-2 generated projections)"
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-b028f255",
-      "signature": "warn:QG-DEC-09",
-      "kind": "noise",
-      "occurrences": 1,
-      "threshold": 5,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-13T02:25:45.463Z",
-      "sources": [
-        "warn"
-      ],
-      "slices": [
-        "sensor-fixes"
-      ],
-      "examples": [
-        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
       ],
       "proposals": []
     }

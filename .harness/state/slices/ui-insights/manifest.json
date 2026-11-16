@@ -1,0 +1,35 @@
+{
+  "schema_version": "3.0",
+  "slice_id": "ui-insights",
+  "phase": "discovery",
+  "status": "in_progress",
+  "mode": "lite",
+  "escalation_signals": [],
+  "escalation_required": false,
+  "escalated_from_lite": false,
+  "created_at": "2026-11-16T21:55:18.522Z",
+  "updated_at": "2026-11-16T23:28:23.043Z",
+  "paths": {
+    "specs": ".harness/specs/ui-insights",
+    "tasks": ".harness/specs/ui-insights/tasks.md",
+    "features": ".harness/features/ui-insights.features.json"
+  },
+  "gates": {},
+  "active_features": [],
+  "open_dissents": 0,
+  "source": null,
+  "session_log": [
+    {
+      "timestamp": "2026-11-16T21:55:18.496Z",
+      "agent": "human",
+      "human": "squad",
+      "event": "phase_started",
+      "phase": "discovery",
+      "feature_id": null
+    }
+  ],
+  "contributors": [
+    "squad",
+    "human"
+  ]
+}

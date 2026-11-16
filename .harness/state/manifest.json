@@ -266,6 +266,78 @@
       "mode": "lite",
       "manifest": ".harness/state/slices/telemetry-contract/manifest.json",
       "features": ".harness/features/telemetry-contract.features.json"
+    },
+    {
+      "slice_id": "telemetry-emitters",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/telemetry-emitters/manifest.json",
+      "features": ".harness/features/telemetry-emitters.features.json"
+    },
+    {
+      "slice_id": "skill-eval",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/skill-eval/manifest.json",
+      "features": ".harness/features/skill-eval.features.json"
+    },
+    {
+      "slice_id": "learn-eval-gate",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/learn-eval-gate/manifest.json",
+      "features": ".harness/features/learn-eval-gate.features.json"
+    },
+    {
+      "slice_id": "cost-metrics",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/cost-metrics/manifest.json",
+      "features": ".harness/features/cost-metrics.features.json"
+    },
+    {
+      "slice_id": "asdd-ui",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/asdd-ui/manifest.json",
+      "features": ".harness/features/asdd-ui.features.json"
+    },
+    {
+      "slice_id": "ui-gate-decisions",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/ui-gate-decisions/manifest.json",
+      "features": ".harness/features/ui-gate-decisions.features.json"
+    },
+    {
+      "slice_id": "ui-insights",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/ui-insights/manifest.json",
+      "features": ".harness/features/ui-insights.features.json"
+    },
+    {
+      "slice_id": "npm-pack-json",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/npm-pack-json/manifest.json",
+      "features": ".harness/features/npm-pack-json.features.json"
+    },
+    {
+      "slice_id": "guidance-proposal-skip",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/guidance-proposal-skip/manifest.json",
+      "features": ".harness/features/guidance-proposal-skip.features.json"
     }
   ]
 }
