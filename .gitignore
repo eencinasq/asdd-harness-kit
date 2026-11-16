@@ -8,7 +8,7 @@ node_modules/
 .vscode/
 dist/
 build/
-coverage/
+/coverage/
 .next/
 .codegraph/
 .harness/knowledge/
