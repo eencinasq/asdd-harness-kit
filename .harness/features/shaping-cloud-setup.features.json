@@ -2,5 +2,58 @@
   "schema_version": "1.0",
   "slice_id": "shaping-cloud-setup",
   "source_tasks": ".harness/specs/shaping-cloud-setup/tasks.md",
-  "features": []
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Cloud setup script with plan/check modes",
+      "user_visible_behavior": "bash cli/runtimes/claude/cloud-setup.sh prepares a Claude Code cloud environment (asdd CLI, MCP servers when present, codegraph index, knowledge index); --plan lists the steps and --check reports prerequisites without changing anything.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude-p65",
+      "req_ids": [
+        "REQ-001",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "bash -n cli/runtimes/claude/cloud-setup.sh",
+        "node --test cli/test/cloud-setup.test.mjs"
+      ],
+      "evidence": "GREEN 2026-11-17: bash -n OK; cloud-setup.test.mjs 5/5 (--plan order + writes nothing; --check Node 22 without pnpm in a kit tree exits 1 naming pnpm and Node >= 24.22.1; Node 24 + pnpm + codegraph exits 0; project without tools/ skips MCP servers); bad argument exits 2. Registered in package.json test.",
+      "scope_paths": [
+        "cli/runtimes/claude/cloud-setup.sh",
+        "cli/test/cloud-setup.test.mjs",
+        "package.json"
+      ],
+      "evidence_hash": "5946ba26da2cdfb819c150e9b3cad0ac89f1973133797d0f7ac2c0804f6a8f87"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Plays O and P, runtime README, README flow",
+      "user_visible_behavior": "A PO/PM and an engineer each find their play (shaping to the tracker; intake from the tracker) and the README links the flow.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude-p65",
+      "req_ids": [
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "grep -q 'Play O' docs/PLAYBOOK.md && grep -q 'Play P' docs/PLAYBOOK.md && grep -q 'asdd intake' docs/PLAYBOOK.md && grep -q 'asdd-shaping-agent' docs/PLAYBOOK.md",
+        "grep -q 'cloud-setup.sh' cli/runtimes/claude/README.md && grep -q 'play-o' README.md && grep -q 'play-p' README.md && grep -q 'play-o' cli/README.md",
+        "node cli/bin/asdd.mjs kit guidance"
+      ],
+      "evidence": "2026-11-17: verification 3/3 exit 0 — PLAYBOOK Plays O and P (+ §2 and §6 rows, Bash-write gap noted); runtime README cloud section (script paths, steps, --plan/--check, env vars); README.md and cli/README.md flow paragraph linking both plays; kit guidance PASS.",
+      "scope_paths": [
+        "docs/PLAYBOOK.md",
+        "cli/runtimes/claude/README.md",
+        "README.md",
+        "cli/README.md"
+      ],
+      "evidence_hash": "3312079dfda2bba696bac4d8660bfb500bc93b861f577dc3f7a139e054366351"
+    }
+  ]
 }

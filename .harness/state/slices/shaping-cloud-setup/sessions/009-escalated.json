@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-shaping-cloud-setup-009",
+  "timestamp": "2026-11-17T12:34:46.660Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "shaping-cloud-setup",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "The script ships under cli/, its test registers in package.json, and the plays and flow land in docs/ and README.md by design; no code outside the runtime folder and no domain change.",
+  "concerns": []
+}

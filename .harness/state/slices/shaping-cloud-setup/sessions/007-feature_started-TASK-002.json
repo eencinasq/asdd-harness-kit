@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-p65",
+  "human": "eencinas",
+  "slice_id": "shaping-cloud-setup",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:33:27.000Z",
+  "session_id": "sess-shaping-cloud-setup-007",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "docs/PLAYBOOK.md",
+    "cli/runtimes/claude/README.md",
+    "README.md",
+    "cli/README.md"
+  ],
+  "evidence": "RED: TASK-002 verification fails — docs/PLAYBOOK.md has no Play O / Play P, README has no play-o/play-p links, runtime README does not mention cloud-setup.sh."
+}

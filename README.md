@@ -327,6 +327,8 @@ Session close:
 4. The `PROGRESS.md` row matches the per-slice manifest.
 5. Lite slices closing with open escalation signals are rejected — escalate first (`asdd slice escalate`).
 
+**PO → tracker → engineer.** A PO/PM shapes with the read-only `asdd-shaping-agent`, grounded in the code, specs, and past slices, and writes the pitch, the bet, and one Intent item per scope to the tracker named in `project.json` ([Play O](docs/PLAYBOOK.md#play-o--po-or-pm-shapes-into-the-tracker)). An engineer imports an Intent with `asdd intake`, which re-checks its grounding and creates the slice, then works it locally with any agent ([Play P](docs/PLAYBOOK.md#play-p--an-engineer-picks-up-an-intent)).
+
 ### Local UI (`asdd ui`)
 
 `asdd ui [--port <n>]` serves a local page on `http://127.0.0.1:7474/` (Node built-ins only, bound to loopback) for people who do not live in the IDE. Its views read the files the CLI already writes, and refresh when `.harness/state/` changes:
