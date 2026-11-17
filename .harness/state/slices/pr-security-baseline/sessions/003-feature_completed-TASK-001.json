@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-prsec",
+  "human": "eencinas",
+  "slice_id": "pr-security-baseline",
+  "concerns": [],
+  "timestamp": "2026-11-17T21:44:26.000Z",
+  "session_id": "sess-pr-security-baseline-003",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "tools/spec-drift/src/pr-review/architecture/architecture-scan.service.ts",
+    "tools/spec-drift/src/pr-review/architecture/architecture.types.ts",
+    "tools/spec-drift/src/pr-review/architecture/architecture-report.ts",
+    "tools/spec-drift/src/pr-review/architecture/architecture-scan.spec.ts",
+    "tools/spec-drift/src/pr-review/pr-review.views.ts",
+    "tools/spec-drift/test/pr-review.e2e-spec.ts",
+    "tools/spec-drift/README.md",
+    "tools/spec-drift/test/fixtures/sandbox.ts"
+  ],
+  "evidence": "GREEN 2026-11-17 (85fb2bc): architecture-scan.spec.ts 6/6 (runs on snapshot when no security set; also with no rules folder; skipped with a repo security set, on CodeQL, with no scannable files; failure is a note; labeled hints, prompt and report); e2e 142/142 incl. 'pr-security-baseline REQ-001' (exec + req.query in a PR → security.js.command-injection at src/api/run.js:2 in the group hint and the report); spec-drift typecheck, lint, unit 256/256, build OK."
+}
