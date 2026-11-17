@@ -92,6 +92,14 @@
       "features": ".harness/features/asdd-ui.features.json"
     },
     {
+      "slice_id": "claude-hook-cwd",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/claude-hook-cwd/manifest.json",
+      "features": ".harness/features/claude-hook-cwd.features.json"
+    },
+    {
       "slice_id": "cli-harness",
       "phase": "discovery",
       "status": "in_progress",

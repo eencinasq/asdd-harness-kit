@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T21:55:20.059Z",
+  "generated_at": "2026-11-17T22:08:44.487Z",
   "threshold": 3,
   "summary": {
     "patterns": 45,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 44,
+      "occurrences": 45,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -33,6 +33,7 @@
         "asdd-p3",
         "asdd-p4",
         "asdd-ui",
+        "claude-hook-cwd",
         "cli-harness",
         "cost-metrics",
         "docs-p5-wave1",
@@ -267,7 +268,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 358
+          "quiet_sessions": 366
         }
       ]
     },

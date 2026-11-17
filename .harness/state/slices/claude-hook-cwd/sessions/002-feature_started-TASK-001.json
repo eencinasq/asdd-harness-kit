@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-claude-hook-cwd-002",
+  "timestamp": "2026-11-17T22:00:30.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "claude-hook-cwd",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/install/phases.mjs",
+    "cli/src/install/runtimes.mjs",
+    "cli/test/install.sh",
+    ".claude/settings.json"
+  ],
+  "evidence": "RED: Stop hook from tools/spec-drift → Cannot find module …/tools/spec-drift/cli/bin/asdd.mjs; install.sh: claude gate hook does not start at the project root.",
+  "concerns": []
+}

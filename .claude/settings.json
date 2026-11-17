@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node cli/bin/asdd.mjs gate"
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" || exit 2; node cli/bin/asdd.mjs gate"
           }
         ]
       }
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node cli/bin/asdd.mjs verify"
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" || exit 2; node cli/bin/asdd.mjs verify"
           }
         ]
       }
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node cli/bin/asdd.mjs observe claude >/dev/null 2>&1; exit 0",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" || exit 0; node cli/bin/asdd.mjs observe claude >/dev/null 2>&1; exit 0",
             "timeout": 10
           }
         ]
