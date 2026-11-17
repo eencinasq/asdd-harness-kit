@@ -12,7 +12,7 @@
 | Built-in pack | `tools/spec-drift/src/security/semgrep/**`, `tools/spec-drift/src/security/builtin-pack.ts` | Starter Semgrep rules (+ tests) used by `analyze_security` when the repo has no `.semgrep/security/` |
 | Service + tools | `tools/spec-drift/src/security/security.{service,tools,schemas,output,module}.ts` | Runs under `$XDG_STATE_HOME/spec-drift/security/<project>/run-<N>/`; tools `security_audit_start`, `security_audit_checklist`, `security_audit_submit_findings`, `security_audit_status` |
 | Analysis mode | `tools/spec-drift/src/analysis/{analysis.types,analysis.schemas,analysis.tools,analysis.service}.ts`, `src/analysis/domain/pack-selection.ts` | `ScanMode` `security`, `analyze_security` tool |
-| PR review hooks | `tools/spec-drift/src/pr-review/{pr-review.views,pr-review.service}.ts` | Append `<security>` to next-group instruction; filter security findings without evidence |
+| PR review hooks | `tools/spec-drift/src/pr-review/{pr-review.views,pr-review.service}.ts`, `tools/spec-drift/test/pr-review.e2e-spec.ts` | Append `<security>` to next-group instruction; filter security findings without evidence |
 | Toolset | `tools/spec-drift/src/config/toolsets.ts`, `src/app.module.ts` | `security` toolset; server instructions |
 | Security view | `tools/spec-drift/ui/security-dashboard.html`, `ui/security-dashboard/**` | MCP App: verdict/severity counts, ledger, findings list (paged) |
 | PR view marker | `tools/spec-drift/ui/pr-review/main.ts` | Security badge on findings |
