@@ -6,6 +6,7 @@
 |-------|------|-------|--------|-----------------|
 | agents-spec | full | knowledge | DONE | 0 |
 | agents-use-scripts | escalated | implementation | ABANDONED | 0 |
+| amend-close | hotfix | knowledge | DONE | 0 |
 | asdd-cli | escalated | implementation | ABANDONED | 0 |
 | asdd-p0 | escalated | knowledge | DONE | 0 |
 | asdd-p1 | escalated | knowledge | DONE | 0 |
