@@ -466,6 +466,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/amend-close/manifest.json",
       "features": ".harness/features/amend-close.features.json"
+    },
+    {
+      "slice_id": "pr-review-group-brief",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/pr-review-group-brief/manifest.json",
+      "features": ".harness/features/pr-review-group-brief.features.json"
     }
   ]
 }
