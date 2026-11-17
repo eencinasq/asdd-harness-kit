@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "pr-review-group-brief",
+  "source_tasks": ".harness/specs/pr-review-group-brief/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Restore the PR review group instruction",
+      "user_visible_behavior": "Each review group tells the agent to read the PR version and lists commentable lines as ranges.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm test && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm test:e2e"
+      ],
+      "evidence": "GREEN 2026-11-17 (7400982): spec-drift typecheck + lint OK, unit 249/249, build OK, e2e 141/141 (was 140/141 since 78d1fb9).",
+      "scope_paths": [
+        "tools/spec-drift/src/pr-review/coverage/coverage.ts"
+      ],
+      "evidence_hash": "eb25e4a63e8f5d5a714162191db76322071b003f99926ca3901faa88e0bdf6cd"
+    }
+  ]
+}
