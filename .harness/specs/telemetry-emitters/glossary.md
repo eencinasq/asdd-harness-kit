@@ -59,3 +59,14 @@ None block discovery. Left to Design or the Domain phase:
 - Name of the explicit env var for attribution (Q-3).
 - Whether "Runtime hook host" becomes a domain-model actor or stays a qualifier of Hook config.
 - Whether "Activation record" enters `domain-model.md` as its own entity or as a sub-type of Span.
+
+## Domain phase rulings
+
+**Author:** asdd-domain-agent · **Model/Tool:** claude-opus-5-5 · 2026-11-16. The terms are in
+`docs/architecture/domain-model.md` → "Telemetry". The entries above are kept unchanged as the discovery record.
+
+- **Activation record**: a sub-type of Span (`kind:"tool"`, `writer:"runtime-hook"`), not a separate entity. source: DOM-003; REQ-013…REQ-017
+- **Runtime hook host**: a domain-model actor, not a qualifier of Hook config (the Hook config is the file; the host is the process that runs it). source: DOM-006; REQ-007, REQ-013…REQ-018
+- **Trace**: a value object (derived display grouping, no lifecycle), not an entity. source: DOM-002; REQ-005; AR-10
+- **Explicit attribution env var name**: stays with Design (OI-1); the contract is TEL-6. source: REQ-017
+- **Added value objects**: Tail, Telemetry state, Telemetry location / Stream, Activation state, Command label; **Guidance load observed** recorded as a telemetry event outside the nine session events. source: DOM-007; REQ-006, REQ-007, REQ-021
