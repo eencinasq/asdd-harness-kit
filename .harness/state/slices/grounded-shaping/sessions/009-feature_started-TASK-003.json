@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-grounded-shaping-009",
+  "timestamp": "2026-11-17T12:12:54.000Z",
+  "agent": "claude-p63",
+  "human": "eencinas",
+  "slice_id": "grounded-shaping",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "RED: skill-eval shape-up 1/2 and product-delivery 1/2 — po-mode-pitch and po-mode-intents fail: no PO mode section, no tracker-output reference, shape-up still says it never writes tracker items, no Intent body example.",
+  "concerns": [],
+  "feature_id": "TASK-003",
+  "scope_paths": [
+    "cli/skills/shape-up/SKILL.md",
+    "cli/skills/product-delivery/SKILL.md",
+    "cli/skills/product-delivery/references/po-mode-tracker-output.md",
+    "cli/eval/skills/shape-up/po-mode-pitch.json",
+    "cli/eval/skills/product-delivery/po-mode-intents.json"
+  ]
+}

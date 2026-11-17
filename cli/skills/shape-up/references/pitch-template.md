@@ -18,7 +18,8 @@ Every pitch needs all five components to be ready for betting:
 5. **No-Gos** - What we're explicitly NOT doing
 
 Vague ideas: write a [`concepts-brief-template.md`](./concepts-brief-template.md) and pass its
-readiness gate before filling this template. Optional brownfield context:
+readiness gate before filling this template. Mandatory grounding (Reuse / Extend / New, reference slices):
+`.agents/skills/product-delivery/references/grounding.md`. Optional brownfield context:
 [`brownfield-bootstrap.md`](./brownfield-bootstrap.md).
 
 ---
@@ -39,6 +40,18 @@ Use a story or scenario. Show the friction.]
 ## Appetite
 
 [State the time budget: Small Batch (1-2 weeks) or Big Batch (6 weeks)]
+
+Reference slices (DONE, similar shape):
+- [slice-id]: [n] features
+[or: Reference slices: none — what was searched]
+
+## Grounding
+
+| Kind | What | Evidence |
+|---|---|---|
+| [Reuse / Extend / New] | [component, capability, or gap] | [REQ:<slice>/REQ-NNN, slice:<id>, path:<repo-path>; none only on New] |
+
+[Built in shape-up Step 3 — see grounding.md. Every Reuse and Extend row cites evidence that exists today.]
 
 ## Solution
 

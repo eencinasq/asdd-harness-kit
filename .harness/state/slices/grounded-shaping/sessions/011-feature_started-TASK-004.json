@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-grounded-shaping-011",
+  "timestamp": "2026-11-17T12:13:58.000Z",
+  "agent": "claude-p63",
+  "human": "eencinas",
+  "slice_id": "grounded-shaping",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "Start TASK-004: kit self --check reports the shape-up and product-delivery copies as stale (RED for shipping).",
+  "concerns": [],
+  "feature_id": "TASK-004",
+  "scope_paths": [
+    ".agents/skills/shape-up",
+    ".agents/skills/product-delivery",
+    "cli/versions.json",
+    ".harness/config/versions.json",
+    ".harness/config/installed-versions.json"
+  ]
+}

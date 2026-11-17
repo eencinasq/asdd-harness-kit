@@ -6,7 +6,7 @@ Write findings to `docs/pitches/<pitch-id>/scope-split-review.md`. Do not invent
 
 ## When to run
 
-After the scope map exists and Step 4 map checks have a draft answer; **before** writing `intent.md` or running `asdd slice init`.
+After the scope map exists and Step 5 map checks have a draft answer; **before** writing `intent.md` or running `asdd slice init`.
 
 ## Fresh-context protocol
 

@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-grounded-shaping-008",
+  "timestamp": "2026-11-17T12:12:30.000Z",
+  "agent": "claude-p63",
+  "human": "eencinas",
+  "slice_id": "grounded-shaping",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "evidence": "GREEN: skill-eval --skill product-delivery 1/1 (scope-grounding: knowledge slice exit 0; skill has Step 3 Ground the scopes, Reuse / Extend / New, merge or cut, grounding reference); intent fitness gains a 'grounded' check and intent.md a ## Grounding table (asdd-harness-handoff.md). kit skills-lint --only product-delivery PASS.",
+  "concerns": [],
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/skills/product-delivery/SKILL.md",
+    "cli/eval/skills/product-delivery/scope-grounding.json"
+  ]
+}

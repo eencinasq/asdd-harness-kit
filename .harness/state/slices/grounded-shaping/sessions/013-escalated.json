@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-grounded-shaping-013",
+  "timestamp": "2026-11-17T12:16:00.380Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "grounded-shaping",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Skill sources in cli/, their installed copies in .agents/, and the kit records in .harness/config move together by construction (asdd kit self); no new domain terms, no dissent.",
+  "concerns": []
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-grounded-shaping-018",
+  "timestamp": "2026-11-17T12:16:18.000Z",
+  "agent": "claude-p63",
+  "human": "eencinas",
+  "slice_id": "grounded-shaping",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lessons: skill_contains is a literal substring, so a contract phrase must not wrap across lines; product-delivery must not link into shape-up/references (skills-spec REQ-002), so shared skill references live in product-delivery.",
+  "concerns": []
+}

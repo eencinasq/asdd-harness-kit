@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-grounded-shaping-015",
+  "timestamp": "2026-11-17T12:16:11.000Z",
+  "agent": "claude-p63",
+  "human": "eencinas",
+  "slice_id": "grounded-shaping",
+  "event_type": "phase_completed",
+  "phase": "domain",
+  "evidence": "No new domain terms (Grounding, Reuse / Extend / New, Intent item come from tracker-binding).",
+  "concerns": []
+}

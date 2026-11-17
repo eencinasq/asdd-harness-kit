@@ -184,7 +184,7 @@ Checking:
 | Rabbit Holes | Technical risks flagged with mitigation | "Should be straightforward" |
 | No-Gos | Explicit exclusions listed | Nothing marked as out of scope |
 
-The verdict table, the counter-case, and the human decision are Step 4 of the skill (`SKILL.md`).
+The verdict table, the counter-case, and the human decision are Step 5 of the skill (`SKILL.md`).
 
 ## Flow 3: Quick Pitch
 

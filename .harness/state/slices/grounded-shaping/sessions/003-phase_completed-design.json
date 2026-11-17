@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-p63",
+  "human": "eencinas",
+  "slice_id": "grounded-shaping",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:10:19.000Z",
+  "session_id": "sess-grounded-shaping-003",
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "design.md: shared grounding reference in shape-up; evidence grammar reused from intent-format.md; PO-mode trigger; no domain terms; no ADRs."
+}

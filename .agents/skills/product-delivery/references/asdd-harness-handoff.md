@@ -32,6 +32,7 @@ A kept scope is **fit** for ASDD only when all hold. Record them under `intent_f
 | **Lite-fit** — expected as one `lite` (or later hotfix) slice unless an explicit `--full` or re-split is recorded | `lite_fit` | Re-split, reshape, or set `lite_fit: false` with `decided_by` + notes for `--full` |
 | Must-haves are EARS-ready (one trigger, one observable response, no ambiguous term) with human confirm | `ears_ready` | Rewrite MH; do not invent |
 | Intent is **self-contained** (another agent understands it without the pitch chat) | `self_contained` | Enrich intent; do not rely on chat |
+| Scope is **grounded**: its Reuse / Extend / New table cites evidence that exists today, and it duplicates no existing capability | `grounded` | Ground it (SKILL Step 3), or merge or cut it |
 
 `intent_fit.status` is `fit`, `unfit`, or `pending`. **Unfit scopes must not run `asdd slice init`.** Re-split, reshape, or return `RE-SHAPING_REQUIRED`. Discovery must not re-shape an unfit intent — send it back to product-delivery.
 
@@ -46,6 +47,8 @@ For each **fit** kept scope:
    - Problem and desired outcome narrowed to this scope.
    - Appetite: the bet's appetite (shared by all scopes).
    - Must-have outcomes as EARS-style statements (`MH-01`, …). Check each against the EARS criteria and record who confirmed it (`decided_by`).
+   - `## Grounding`: the scope's Reuse / Extend / New table from `scope-grounding.md` (grammar:
+     [`grounding.md`](./grounding.md)).
    - Optional `## Intent fitness` mirroring the map's `intent_fit`.
    - Nice-to-haves (~), no-gos, rabbit holes, actors, depends on, open questions.
 4. **Record the slice ID** on the scope in the scope map.
