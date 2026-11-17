@@ -482,6 +482,22 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/full-flow-fixture/manifest.json",
       "features": ".harness/features/full-flow-fixture.features.json"
+    },
+    {
+      "slice_id": "skill-eval-portable",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/skill-eval-portable/manifest.json",
+      "features": ".harness/features/skill-eval-portable.features.json"
+    },
+    {
+      "slice_id": "security-recon-untracked",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/security-recon-untracked/manifest.json",
+      "features": ".harness/features/security-recon-untracked.features.json"
     }
   ]
 }

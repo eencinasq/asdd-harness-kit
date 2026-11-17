@@ -42,11 +42,13 @@
 | review-quality | full | knowledge | DONE | 0 |
 | rule-coverage | full | knowledge | DONE | 0 |
 | rules-landing | lite | knowledge | DONE | 0 |
+| security-recon-untracked | hotfix | implementation | in_progress | 0 |
 | security-review | full | knowledge | DONE | 0 |
 | sensor-fixes | escalated | knowledge | DONE | 0 |
 | shaping-agent | escalated | knowledge | DONE | 0 |
 | shaping-cloud-setup | escalated | knowledge | DONE | 0 |
 | skill-eval | escalated | knowledge | DONE | 0 |
+| skill-eval-portable | lite | discovery | in_progress | 0 |
 | skills-bloom | lite | knowledge | DONE | 0 |
 | skills-spec | escalated | knowledge | DONE | 0 |
 | spec-drift-adoption | full | knowledge | DONE | 0 |
