@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-skill-eval-012",
+  "timestamp": "2026-11-17T01:24:00.000Z",
+  "agent": "asdd-lite-agent",
+  "slice_id": "skill-eval",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "mode": "lite",
+  "evidence": "Knowledge note: reusable pattern = deterministic fixture eval (probes + assertions + git-show baseline) now available for learn-eval-gate (P5.3) and ui-insights. Steering proposal SP-004 filed for open pattern LP-06528643 (QG-LEARN-04). No domain-model terms added.",
+  "concerns": []
+}

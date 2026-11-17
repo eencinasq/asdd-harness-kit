@@ -1,20 +1,70 @@
 {
   "schema_version": "3.0",
   "slice_id": "skill-eval",
-  "phase": "discovery",
-  "status": "in_progress",
-  "mode": "lite",
-  "escalation_signals": [],
+  "phase": "knowledge",
+  "status": "DONE",
+  "mode": "escalated",
+  "escalation_signals": [
+    {
+      "type": "E1-scope-spread",
+      "evidence": "scope touches 2 top-level modules: cli, package.json"
+    }
+  ],
   "escalation_required": false,
-  "escalated_from_lite": false,
+  "escalated_from_lite": true,
   "created_at": "2026-11-16T21:55:17.287Z",
-  "updated_at": "2026-11-16T23:28:23.033Z",
+  "updated_at": "2026-11-17T01:04:17.794Z",
   "paths": {
     "specs": ".harness/specs/skill-eval",
     "tasks": ".harness/specs/skill-eval/tasks.md",
     "features": ".harness/features/skill-eval.features.json"
   },
-  "gates": {},
+  "gates": {
+    "spec": {
+      "status": "PASS",
+      "by": "asdd-lite-agent",
+      "at": "2026-11-17T00:26:19.000Z",
+      "evidence": "spec.md final (human-authored): intent + REQ-001..004 + Mapped line; lite self-review passed, no anti-pattern gate in lite",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "asdd-lite-agent",
+      "at": "2026-11-17T00:26:19.000Z",
+      "evidence": "design.md: skill-eval-lib + CLI + fixtures under cli/eval/skills; deterministic probes+assertions; baseline via git show; no model adapter needed",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "asdd-lite-agent",
+      "at": "2026-11-17T00:26:19.000Z",
+      "evidence": "tasks.md + skill-eval.features.json: TASK-001..003, serial, owner=devin, scope_paths set",
+      "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "asdd-lite-agent",
+      "at": "2026-11-17T01:20:00.000Z",
+      "evidence": "TASK-001..003 passing with evidence: skill-eval-lib.mjs + skill-eval.mjs + commands.mjs + package.json + 4 fixtures (asdd-status x2, asdd-next, codegraph) + README row. `node cli/bin/asdd.mjs skill-eval --json` → 4/4 pass; `--baseline 1b1fbae` all unchanged. TDD: RED sessions 005/007 recorded before GREEN.",
+      "concerns": []
+    },
+    "qa": {
+      "status": "WARN",
+      "by": "asdd-lite-agent",
+      "at": "2026-11-17T01:22:00.000Z",
+      "evidence": "QA-light: `npm test` exit 0 (build, vendor --check, self --check, install.sh, lifecycle.sh, skills-lint, agents-lint, 207 unit tests incl. skill-eval-lib.test.mjs 12/12). `node cli/bin/asdd.mjs skill-eval --json` 4/4; `--baseline` delta verified. No spec-coverage-report needed (<10% uncovered; lite).",
+      "concerns": [
+        "Plain `asdd check` FAILs DRIFT-01 on 7 files changed by the shared P5 base branch vs main (not this slice's work); verified green with HARNESS_DRIFT_BASE=chore/p5-roadmap-runtimes-bindings. Escalated to human; pending decision."
+      ]
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "asdd-lite-agent",
+      "at": "2026-11-17T01:24:00.000Z",
+      "evidence": "Knowledge note: reusable pattern = deterministic fixture eval (probes + assertions + git-show baseline) now available for learn-eval-gate (P5.3) and ui-insights. Steering proposal SP-004 filed for open pattern LP-06528643 (QG-LEARN-04). No domain-model terms added.",
+      "concerns": []
+    }
+  },
   "active_features": [],
   "open_dissents": 0,
   "source": null,
@@ -26,10 +76,104 @@
       "event": "phase_started",
       "phase": "discovery",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T00:26:19.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T00:26:19.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T00:26:19.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T00:45:00.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T00:52:00.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T00:58:00.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-17T01:02:00.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-17T01:10:00.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-17T01:20:00.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:22:00.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:24:00.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:35:00.000Z",
+      "agent": "asdd-lite-agent",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-17T00:38:49.466Z",
+      "agent": "devin",
+      "human": "devin",
+      "event": "checkpoint",
+      "phase": null,
+      "feature_id": null
     }
   ],
   "contributors": [
     "squad",
-    "human"
+    "human",
+    "asdd-lite-agent",
+    "devin"
   ]
 }

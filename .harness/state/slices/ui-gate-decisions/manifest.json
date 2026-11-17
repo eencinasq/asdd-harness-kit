@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:18.272Z",
-  "updated_at": "2026-11-16T23:28:23.043Z",
+  "updated_at": "2026-11-17T01:04:17.844Z",
   "paths": {
     "specs": ".harness/specs/ui-gate-decisions",
     "tasks": ".harness/specs/ui-gate-decisions/tasks.md",

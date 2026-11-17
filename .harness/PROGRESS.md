@@ -13,9 +13,10 @@
 | asdd-p3 | escalated | knowledge | DONE | 0 |
 | asdd-p4 | escalated | knowledge | DONE | 0 |
 | asdd-roadmap | lite | knowledge | DONE | 0 |
-| asdd-ui | lite | discovery | in_progress | 0 |
+| asdd-ui | escalated | knowledge | DONE | 0 |
 | cli-harness | escalated | implementation | ABANDONED | 0 |
 | cost-metrics | lite | discovery | in_progress | 0 |
+| drift02-open-slices | hotfix | knowledge | DONE | 0 |
 | egm-shaping | full | knowledge | DONE | 0 |
 | guidance-proposal-skip | hotfix | knowledge | DONE | 0 |
 | harness-green | escalated | knowledge | DONE | 0 |
@@ -24,7 +25,7 @@
 | kit-hygiene | full | knowledge | DONE | 0 |
 | kit-playbook | escalated | knowledge | DONE | 0 |
 | knowledge-nest | escalated | implementation | ABANDONED | 0 |
-| learn-eval-gate | lite | discovery | in_progress | 0 |
+| learn-eval-gate | lite | knowledge | DONE | 0 |
 | mcp-standalone | escalated | implementation | ABANDONED | 0 |
 | modules-top-level | escalated | implementation | ABANDONED | 0 |
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
@@ -32,7 +33,7 @@
 | rule-coverage | full | knowledge | DONE | 0 |
 | rules-landing | lite | knowledge | DONE | 0 |
 | sensor-fixes | escalated | knowledge | DONE | 0 |
-| skill-eval | lite | discovery | in_progress | 0 |
+| skill-eval | escalated | knowledge | DONE | 0 |
 | skills-bloom | lite | knowledge | DONE | 0 |
 | skills-spec | escalated | knowledge | DONE | 0 |
 | spec-drift-adoption | full | knowledge | DONE | 0 |
@@ -44,5 +45,6 @@
 | spec-drift-roadmap | lite | knowledge | DONE | 0 |
 | telemetry-contract | lite | knowledge | DONE | 0 |
 | telemetry-emitters | full | discovery | in_progress | 0 |
+| ui-assets-dist | hotfix | knowledge | DONE | 0 |
 | ui-gate-decisions | lite | discovery | in_progress | 0 |
 | ui-insights | lite | discovery | in_progress | 0 |

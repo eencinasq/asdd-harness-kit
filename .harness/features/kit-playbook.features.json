@@ -17,14 +17,14 @@
       "verification": [
         "test -f docs/PLAYBOOK.md && test $(grep -c '^### Play ' docs/PLAYBOOK.md) -ge 12 && grep -q 'docs/PLAYBOOK.md' README.md && grep -q 'docs/PLAYBOOK.md' cli/README.md && grep -q 'kit playbook' tools/spec-drift/docs/PLAYBOOK.md"
       ],
-      "evidence": "docs/PLAYBOOK.md: 6 sections like the spec-drift playbook, 12 plays (adopt, lite, shaped bet, hotfix, escalate, red check, amend, parallel, PR gate, health check, learning loop, portfolio), quick reference with commands from asdd help; linked from README (contents, session flow, documentation table, upgrade note), cli/README, and the spec-drift playbook. Verification command exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "docs/PLAYBOOK.md",
         "tools/spec-drift/docs/PLAYBOOK.md",
         "README.md",
         "cli/README.md"
       ],
-      "evidence_hash": "4a6d308bd3d26bc48691a382acc96b8b2cd9edf4fc88c876bd5054da6299510d"
+      "evidence_hash": "dd827e59a3460940e99ab58f2e33324aa24b34e6b73476b43d1fd19d12654f4e"
     },
     {
       "id": "TASK-002",

@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-11-16T23:28:23.043Z",
+  "generated_at": "2026-11-17T01:04:17.844Z",
   "slices": [
     {
       "slice_id": "agents-spec",
@@ -12,7 +12,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.015Z",
+      "last_activity": "2026-11-17T01:04:17.703Z",
       "contributors": [
         "squad",
         "human",
@@ -30,7 +30,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.016Z",
+      "last_activity": "2026-11-17T01:04:17.706Z",
       "contributors": [
         "squad",
         "human",
@@ -49,7 +49,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.017Z",
+      "last_activity": "2026-11-17T01:04:17.708Z",
       "contributors": [
         "squad",
         "human",
@@ -68,7 +68,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.018Z",
+      "last_activity": "2026-11-17T01:04:17.716Z",
       "contributors": [
         "squad",
         "human",
@@ -87,7 +87,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.018Z",
+      "last_activity": "2026-11-17T01:04:17.720Z",
       "contributors": [
         "squad",
         "human",
@@ -106,7 +106,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.019Z",
+      "last_activity": "2026-11-17T01:04:17.723Z",
       "contributors": [
         "squad",
         "human",
@@ -125,7 +125,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.020Z",
+      "last_activity": "2026-11-17T01:04:17.729Z",
       "contributors": [
         "squad",
         "human",
@@ -144,7 +144,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.020Z",
+      "last_activity": "2026-11-17T01:04:17.730Z",
       "contributors": [
         "squad",
         "human",
@@ -163,7 +163,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.021Z",
+      "last_activity": "2026-11-17T01:04:17.734Z",
       "contributors": [
         "squad",
         "human",
@@ -175,18 +175,20 @@
     },
     {
       "slice_id": "asdd-ui",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
       "active_features": 0,
-      "escalation_signals": 0,
+      "escalation_signals": 1,
       "escalation_required": false,
-      "escalated_from_lite": false,
+      "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.021Z",
+      "last_activity": "2026-11-17T01:04:17.738Z",
       "contributors": [
         "squad",
-        "human"
+        "human",
+        "eencinas",
+        "cursor"
       ]
     },
     {
@@ -199,7 +201,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.024Z",
+      "last_activity": "2026-11-17T01:04:17.754Z",
       "contributors": [
         "squad",
         "human",
@@ -219,10 +221,28 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.024Z",
+      "last_activity": "2026-11-17T01:04:17.755Z",
       "contributors": [
         "squad",
         "human"
+      ]
+    },
+    {
+      "slice_id": "drift02-open-slices",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T01:04:17.756Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
       ]
     },
     {
@@ -235,7 +255,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.025Z",
+      "last_activity": "2026-11-17T01:04:17.757Z",
       "contributors": [
         "squad",
         "human",
@@ -254,7 +274,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.025Z",
+      "last_activity": "2026-11-17T01:04:17.758Z",
       "contributors": [
         "squad",
         "human",
@@ -272,7 +292,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.025Z",
+      "last_activity": "2026-11-17T01:04:17.759Z",
       "contributors": [
         "squad",
         "human",
@@ -291,7 +311,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.026Z",
+      "last_activity": "2026-11-17T01:04:17.760Z",
       "contributors": [
         "squad",
         "human",
@@ -310,7 +330,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.027Z",
+      "last_activity": "2026-11-17T01:04:17.766Z",
       "contributors": [
         "squad",
         "human",
@@ -336,7 +356,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.028Z",
+      "last_activity": "2026-11-17T01:04:17.774Z",
       "contributors": [
         "squad",
         "human",
@@ -364,7 +384,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.028Z",
+      "last_activity": "2026-11-17T01:04:17.776Z",
       "contributors": [
         "squad",
         "human",
@@ -383,7 +403,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.029Z",
+      "last_activity": "2026-11-17T01:04:17.777Z",
       "contributors": [
         "squad",
         "human",
@@ -394,18 +414,19 @@
     },
     {
       "slice_id": "learn-eval-gate",
-      "phase": "discovery",
-      "status": "in_progress",
+      "phase": "knowledge",
+      "status": "DONE",
       "mode": "lite",
       "active_features": 0,
       "escalation_signals": 0,
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.029Z",
+      "last_activity": "2026-11-17T01:04:17.779Z",
       "contributors": [
         "squad",
-        "human"
+        "human",
+        "devin"
       ]
     },
     {
@@ -418,7 +439,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.029Z",
+      "last_activity": "2026-11-17T01:04:17.781Z",
       "contributors": [
         "squad",
         "human",
@@ -437,7 +458,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.029Z",
+      "last_activity": "2026-11-17T01:04:17.782Z",
       "contributors": [
         "squad",
         "human",
@@ -456,7 +477,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.030Z",
+      "last_activity": "2026-11-17T01:04:17.783Z",
       "contributors": [
         "squad",
         "human",
@@ -474,7 +495,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.031Z",
+      "last_activity": "2026-11-17T01:04:17.786Z",
       "contributors": [
         "squad",
         "human",
@@ -492,7 +513,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.032Z",
+      "last_activity": "2026-11-17T01:04:17.789Z",
       "contributors": [
         "squad",
         "human",
@@ -510,7 +531,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.032Z",
+      "last_activity": "2026-11-17T01:04:17.789Z",
       "contributors": [
         "squad",
         "human",
@@ -528,7 +549,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.033Z",
+      "last_activity": "2026-11-17T01:04:17.792Z",
       "contributors": [
         "squad",
         "human",
@@ -539,18 +560,20 @@
     },
     {
       "slice_id": "skill-eval",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
       "active_features": 0,
-      "escalation_signals": 0,
+      "escalation_signals": 1,
       "escalation_required": false,
-      "escalated_from_lite": false,
+      "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.033Z",
+      "last_activity": "2026-11-17T01:04:17.794Z",
       "contributors": [
         "squad",
-        "human"
+        "human",
+        "asdd-lite-agent",
+        "devin"
       ]
     },
     {
@@ -563,7 +586,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.034Z",
+      "last_activity": "2026-11-17T01:04:17.800Z",
       "contributors": [
         "squad",
         "human",
@@ -581,7 +604,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.036Z",
+      "last_activity": "2026-11-17T01:04:17.807Z",
       "contributors": [
         "squad",
         "human",
@@ -600,7 +623,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.037Z",
+      "last_activity": "2026-11-17T01:04:17.810Z",
       "contributors": [
         "squad",
         "human",
@@ -618,7 +641,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.038Z",
+      "last_activity": "2026-11-17T01:04:17.815Z",
       "contributors": [
         "squad",
         "human",
@@ -636,7 +659,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.039Z",
+      "last_activity": "2026-11-17T01:04:17.823Z",
       "contributors": [
         "squad",
         "human",
@@ -654,7 +677,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.040Z",
+      "last_activity": "2026-11-17T01:04:17.828Z",
       "contributors": [
         "squad",
         "human",
@@ -672,7 +695,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.041Z",
+      "last_activity": "2026-11-17T01:04:17.836Z",
       "contributors": [
         "squad",
         "human",
@@ -690,7 +713,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.042Z",
+      "last_activity": "2026-11-17T01:04:17.838Z",
       "contributors": [
         "squad",
         "human",
@@ -709,7 +732,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.042Z",
+      "last_activity": "2026-11-17T01:04:17.841Z",
       "contributors": [
         "squad",
         "human",
@@ -728,7 +751,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.042Z",
+      "last_activity": "2026-11-17T01:04:17.842Z",
       "contributors": [
         "squad",
         "human",
@@ -746,10 +769,28 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.042Z",
+      "last_activity": "2026-11-17T01:04:17.842Z",
       "contributors": [
         "squad",
         "human"
+      ]
+    },
+    {
+      "slice_id": "ui-assets-dist",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T01:04:17.843Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
       ]
     },
     {
@@ -762,7 +803,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.043Z",
+      "last_activity": "2026-11-17T01:04:17.844Z",
       "contributors": [
         "squad",
         "human"
@@ -778,7 +819,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-16T23:28:23.043Z",
+      "last_activity": "2026-11-17T01:04:17.844Z",
       "contributors": [
         "squad",
         "human"

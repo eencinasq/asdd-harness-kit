@@ -338,6 +338,22 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/guidance-proposal-skip/manifest.json",
       "features": ".harness/features/guidance-proposal-skip.features.json"
+    },
+    {
+      "slice_id": "drift02-open-slices",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/drift02-open-slices/manifest.json",
+      "features": ".harness/features/drift02-open-slices.features.json"
+    },
+    {
+      "slice_id": "ui-assets-dist",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/ui-assets-dist/manifest.json",
+      "features": ".harness/features/ui-assets-dist.features.json"
     }
   ]
 }

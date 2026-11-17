@@ -1,0 +1,163 @@
+{
+  "schema_version": "1.0",
+  "author": "eencinas-devin",
+  "week": "2026-W47",
+  "signatures": {
+    "sensor:DRIFT-01:.harness/steering": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": "skill-eval",
+          "last_at": "2026-11-17T00:28:58.181Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 .harness/steering/domain-layer.project.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:cli": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": "skill-eval",
+          "last_at": "2026-11-17T00:28:58.181Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 cli/src/kit/guidance.mjs changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:docs": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": "skill-eval",
+          "last_at": "2026-11-17T00:43:32.908Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-004.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by learn-eval-gate (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T00:51:54.028Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ]
+    },
+    "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T00:51:54.028Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/quality-gates.project.md: coverage keys not reachable via tags (starvation, Phase-2 backlog): validation"
+      ]
+    },
+    "warn:QG-DEC-09": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-17T00:51:54.028Z"
+        }
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ]
+    },
+    "sensor:QG-LEARN-04": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:42.887Z",
+          "slice_id": "jev-module",
+          "last_at": "2026-11-17T00:27:09.117Z"
+        }
+      ],
+      "examples": [
+        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-06528643 (sensor:DRIFT-01:docs) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+      ]
+    },
+    "sensor:lite slice \"*\" cannot complete with open escalation signals (EN-scope-spread) — ": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:36:35.163Z",
+          "slice_id": "skill-eval",
+          "last_at": "2026-11-17T00:38:05.276Z"
+        }
+      ],
+      "examples": [
+        "lite slice \"skill-eval\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate skill-eval --reasons \"E1-scope-spread\""
+      ]
+    },
+    "sensor:DRIFT-02": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:36:35.163Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T00:49:14.754Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-02 passing feature TASK-008 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-009 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
+      ]
+    },
+    "sensor:<path>: feature TASK-N missing user_visible_behavior": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:43:32.908Z",
+          "slice_id": "learn-eval-gate"
+        }
+      ],
+      "examples": [
+        ".harness/features/learn-eval-gate.features.json: feature TASK-001 missing user_visible_behavior"
+      ]
+    },
+    "sensor:<path>: feature TASK-N priority must be a positive integer": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:43:32.908Z",
+          "slice_id": "learn-eval-gate"
+        }
+      ],
+      "examples": [
+        ".harness/features/learn-eval-gate.features.json: feature TASK-001 priority must be a positive integer"
+      ]
+    },
+    "sensor:DRIFT-01:tools": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:49:14.754Z",
+          "slice_id": "learn-eval-gate"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 tools/jev-gate/src/harness/learning-lib.mjs changed but is not mapped by learn-eval-gate (intent/design/tasks/spec or scope_paths)"
+      ]
+    }
+  }
+}

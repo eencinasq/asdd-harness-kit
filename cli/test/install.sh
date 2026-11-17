@@ -225,6 +225,10 @@ grep -qx 'tools: Read, Grep, Glob, Bash, Write, Edit, Agent' "$PKG_DIR/app/.clau
 grep -qx 'disallowedTools: Agent' "$PKG_DIR/app/.claude/agents/asdd-e2e-tester.md"
 grep -qx 'maxTurns: 40' "$PKG_DIR/app/.claude/agents/asdd-validation-agent.md"
 test ! -e "$PKG_DIR/app/.harness/cli"
+# ui-assets-dist REQ-003: the package ships the asdd ui static assets in cli/dist (the package has no cli/src)
+for f in index.html app.js styles.css; do
+  test -f "$(find "$PKG_DIR/prefix" -path '*/asdd-harness-kit/cli/dist/harness/ui' -type d | head -1)/$f" || { echo "package misses cli/dist/harness/ui/$f" >&2; exit 1; }
+done
 echo '{"command":"git status"}' | (cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" sh -c "$EXPECT_GATE") | grep -q '"permission": *"allow"'
 (cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" asdd check >/dev/null)
 # kit-owned (refresh) files are recorded so spec drift exempts them; project-owned seeds are not

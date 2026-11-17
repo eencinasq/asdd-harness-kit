@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-learn-eval-gate-013",
+  "timestamp": "2026-11-16T20:51:33.426",
+  "agent": "devin",
+  "human": "squad",
+  "slice_id": "learn-eval-gate",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "mode": "lite",
+  "evidence": "QA-light: npm test exit 0 (210 tests, incl. kit self --check + kit vendor --check); asdd check --live exit 0; asdd skill-eval --json 4/4 fixtures pass. Learnings: DRIFT-02 keeps reopening DONE-slice features on shared-file edits \u2014 covered by proposed SP-005; DRIFT-01 ignores DONE-slice mappings on stacked branches (documented as carry-over in tasks.md).",
+  "concerns": []
+}

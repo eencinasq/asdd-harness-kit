@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-drift02-open-slices-002",
+  "timestamp": "2026-11-17T00:48:42.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "drift02-open-slices",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/drift-lib.mjs",
+    "cli/src/harness/drift-lib.test.mjs",
+    "cli/steering/spec-drift.md"
+  ],
+  "evidence": "RED: new test 'drift02-open-slices REQ-001 REQ-002' fails — 'DONE slice holds historical evidence' (DRIFT-02 fired for a DONE slice).",
+  "concerns": []
+}

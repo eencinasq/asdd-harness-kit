@@ -21,6 +21,7 @@ import {
   patternId,
   reviewMetricsFile,
   writeSensorSignal,
+  proposalEvalFinding,
 } from './learning-lib.mjs';
 import validateLearning, { appliedCommitFinding, proposalFindings } from './validators/learning.mjs';
 
@@ -378,4 +379,86 @@ test('review-quality REQ-005: review metrics are ingested once per review, for t
 test('review-quality REQ-005: a missing metrics file ingests nothing and never throws', withFixture((root) => {
   assert.equal(ingestReviewMetrics(root, { file: join(root, 'nope.jsonl'), project: 'shop' }).ingested, 0);
   assert.ok(!existsSync(join(root, '.harness/state/learning/summaries')));
+}));
+
+test('REQ-LEARN-10: accepted/applied guide proposals need a passing skill-eval result', withFixture((root) => {
+  write(root, 'AGENTS.md', '# map');
+  const evalOk = 'eval: asdd skill-eval --skill asdd-status --json => eval-results/SP-001.json';
+  const p = (fields) => ({ file: 'docs/knowledge-base/steering-proposals/SP-001.md', pattern: 'LP-x', control: 'AGENTS.md', change: 'add-guide', success: 'ok', decided_by: 'tl', ...fields });
+
+  // Exempt: other change kinds keep today's behavior (REQ-004).
+  for (const change of ['loosen-sensor', 'tighten-sensor', 'add-sensor', 'remove-sensor', 'product-code']) {
+    assert.equal(proposalEvalFinding(root, p({ status: 'accepted', change })), null, `${change} exempt`);
+  }
+  // Exempt: proposed and rejected statuses owe no eval.
+  assert.equal(proposalEvalFinding(root, p({ status: 'proposed' })), null);
+  assert.equal(proposalEvalFinding(root, p({ status: 'rejected' })), null);
+
+  // Missing eval field on an accepted guide proposal → finding.
+  const missing = proposalEvalFinding(root, p({ status: 'accepted' }));
+  assert.match(missing, /eval/);
+
+  // Unresolvable result reference → finding (no eval result).
+  const badRef = proposalEvalFinding(root, p({ status: 'accepted', eval: 'asdd skill-eval --json => eval-results/nope.json' }));
+  assert.match(badRef, /eval/);
+
+  // Result file present but not JSON → finding.
+  write(root, 'eval-results/bad.json', 'not json');
+  assert.match(proposalEvalFinding(root, p({ status: 'accepted', eval: `asdd skill-eval --json => eval-results/bad.json` })), /eval/);
+
+  // Regression / failed result → finding (REQ-003).
+  write(root, 'eval-results/regressed.json', JSON.stringify({ ok: false, failed: 1, regressed: ['asdd-status/status-json'], skills: [] }));
+  assert.match(proposalEvalFinding(root, p({ status: 'accepted', eval: `asdd skill-eval --json => eval-results/regressed.json` })), /regress|fail|ok/i);
+
+  // Passing result → no finding, for both accepted and applied.
+  write(root, 'eval-results/ok.json', JSON.stringify({ ok: true, failed: 0, regressed: [], skills: [{ name: 'asdd-status', total: 2, passed: 2, failed: 0 }] }));
+  assert.equal(proposalEvalFinding(root, p({ status: 'accepted', eval: evalOk.replace('SP-001', 'ok') })), null);
+  assert.equal(proposalEvalFinding(root, p({ status: 'applied', eval: evalOk.replace('SP-001', 'ok'), applied_commit: 'HEAD' })), null);
+}));
+
+test('REQ-LEARN-10: eval result-ref resolves through git show <ref>:<path>', withFixture((root) => {
+  const git = (...args) => spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+  git('init', '-q', '-b', 'main');
+  write(root, 'AGENTS.md', '# map');
+  write(root, 'eval-results/ok.json', JSON.stringify({ ok: true, failed: 0, regressed: [] }));
+  git('add', '-A');
+  git('-c', 'user.email=t@example.com', '-c', 'user.name=t', 'commit', '-q', '-m', 'base');
+  const ref = git('rev-parse', 'HEAD').stdout.trim();
+  // Result only exists at the ref, not in the worktree.
+  rmSync(join(root, 'eval-results'), { recursive: true, force: true });
+  const fields = { status: 'applied', change: 'tighten-guide', control: 'AGENTS.md', pattern: 'LP-x', id: 'SP-001', success: 'ok', decided_by: 'tl', applied_commit: ref, eval: `asdd skill-eval --json => ${ref}:eval-results/ok.json` };
+  assert.equal(proposalEvalFinding(root, { file: 'docs/knowledge-base/steering-proposals/SP-001.md', ...fields }), null);
+  const bad = proposalEvalFinding(root, { file: 'docs/knowledge-base/steering-proposals/SP-001.md', ...fields, eval: `asdd skill-eval --json => deadbeef:eval-results/ok.json` });
+  assert.match(bad, /eval/);
+}));
+
+test('QG-LEARN-10: asdd check FAILs an accepted guide proposal without a passing eval result', withFixture((root) => {
+  write(root, 'AGENTS.md', '# map');
+  // A real pattern so proposalFindings stays quiet; the eval gate is what fails.
+  for (const iso of ['2026-01-01T00:00:00Z', '2026-01-01T02:00:00Z', '2026-01-01T04:00:00Z']) {
+    writeSensorSignal(root, ['FAIL  DRIFT-01 src/a.ts changed'], { now: new Date(iso) });
+  }
+  const [p] = derivePatterns(root).patterns;
+  const base = { id: 'SP-001', pattern: p.id, status: 'accepted', control: 'AGENTS.md', change: 'add-guide', success: 'ok', decided_by: 'tl' };
+
+  proposal(root, 'SP-001', base);
+  let { errors } = run(root);
+  assert.ok(errors.some((m) => m.startsWith('QG-LEARN-10')), `expected QG-LEARN-10 FAIL, got: ${errors.join(' | ')}`);
+
+  // A passing eval result clears it.
+  write(root, 'eval-results/ok.json', JSON.stringify({ ok: true, failed: 0, regressed: [] }));
+  proposal(root, 'SP-001', { ...base, eval: 'asdd skill-eval --skill asdd-status --json => eval-results/ok.json' });
+  ({ errors } = run(root));
+  assert.ok(!errors.some((m) => m.startsWith('QG-LEARN-10')), `unexpected QG-LEARN-10: ${errors.join(' | ')}`);
+
+  // A regressed result FAILs again (REQ-003).
+  write(root, 'eval-results/bad.json', JSON.stringify({ ok: false, failed: 0, regressed: ['asdd-status/x'] }));
+  proposal(root, 'SP-001', { ...base, eval: 'asdd skill-eval --json => eval-results/bad.json' });
+  ({ errors } = run(root));
+  assert.ok(errors.some((m) => m.startsWith('QG-LEARN-10') && /regress/.test(m)), `expected regression FAIL: ${errors.join(' | ')}`);
+
+  // A non-guide change kind stays exempt end-to-end (REQ-004).
+  proposal(root, 'SP-001', { ...base, change: 'loosen-sensor' });
+  ({ errors } = run(root));
+  assert.ok(!errors.some((m) => m.startsWith('QG-LEARN-10')), `loosen-sensor must not need eval: ${errors.join(' | ')}`);
 }));

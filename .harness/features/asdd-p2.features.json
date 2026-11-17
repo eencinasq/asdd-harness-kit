@@ -18,7 +18,7 @@
       "verification": [
         "node --test cli/src/harness/init-slice.test.mjs"
       ],
-      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/init-slice.test.mjs` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "re-verified 2026-11-16T20:48:49 (DRIFT-02): node --test cli/src/harness/init-slice.test.mjs exit 0",
       "scope_paths": [
         "cli/src/harness/init-slice.mjs",
         "cli/src/harness/init-slice.test.mjs",
@@ -28,7 +28,7 @@
         "cli/steering/asdd-lite.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "06574b5842ab55acce2380215ad3faafda66b3a24ca4ade816ec2f3bd622ba1e"
+      "evidence_hash": "7168ddefc1faa44a5d4429ea0084bc417a03893b23668b268699e6966c6c712a"
     },
     {
       "id": "TASK-002",
@@ -46,7 +46,7 @@
       "verification": [
         "node --test cli/src/harness/amend-slice.test.mjs"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/amend-slice.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "cli/src/harness/amend-slice.mjs",
         "cli/src/harness/amend-slice.test.mjs",
@@ -55,7 +55,7 @@
         "cli/README.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "a1d8fd1f3e4ee4f6eec07b57529d123331f6f46c19efcc49112b569acc6cc182"
+      "evidence_hash": "10c3534172058c5b570578f84e9e36cdffc289bf49f0bbb8d35f6d7fda06d72e"
     },
     {
       "id": "TASK-003",
@@ -73,7 +73,7 @@
       "verification": [
         "node --test cli/src/harness/hill-lib.test.mjs"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/hill-lib.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-verified 2026-11-16 after asdd-roadmap amend (P5, G15–G22 in docs/ASDD-ROADMAP.md): all verification commands exit 0.",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "cli/scaffold/features/feature.schema.json",
         ".harness/features/feature.schema.json",
@@ -85,7 +85,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "a05122a5ee47bfb080162388d9138a1a897cfd2186363ebc6ea94903027c5cb1"
+      "evidence_hash": "8032439894d739f5d066e4d8701c08b15dd4ffe4eeb8d3a82d21e0ef1230062b"
     }
   ]
 }

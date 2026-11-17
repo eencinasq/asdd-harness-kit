@@ -17,7 +17,7 @@
       "verification": [
         "node --test cli/src/harness/tracker-sync-lib.test.mjs"
       ],
-      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/tracker-sync-lib.test.mjs` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "cli/src/harness/tracker-sync-lib.mjs",
         "cli/src/harness/tracker-sync-lib.test.mjs",
@@ -26,7 +26,7 @@
         "cli/src/harness/commands.mjs"
       ],
       "hill": "downhill",
-      "evidence_hash": "b0d9e34cbaa5aa202a22d26f5635dd6a8a807ef17445032ff251f889b8c6cd51"
+      "evidence_hash": "4d4783988d0cc580cc19c0a763e91c4be5f6067d5370afc75031154c87f127aa"
     },
     {
       "id": "TASK-002",
@@ -72,7 +72,7 @@
         "node --test cli/src/harness/spec-source-lib.test.mjs",
         "test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/spec-source-lib.test.mjs && test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-verified 2026-11-16 after asdd-roadmap amend (P5, G15–G22 in docs/ASDD-ROADMAP.md): all verification commands exit 0.",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "cli/src/harness/spec-source-lib.mjs",
         "cli/src/harness/spec-source-lib.test.mjs",
@@ -84,7 +84,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "fe658738725cabc068816ffd84d663fa48c30cd6ed44d66690e1fbc75fc5b14a"
+      "evidence_hash": "eb64847aec31bca1b35063fa3365dc967c43f8e221fe8e8dfd85a03eb9e806d5"
     }
   ]
 }

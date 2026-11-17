@@ -265,12 +265,14 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 | Command | Purpose |
 |---|---|
 | `asdd status [--metrics\|--json\|--html]` | Active slices, escalation, hill (uphill); pipeline metrics; HTML dashboard |
+| `asdd ui [--port <n>]` | Read-only local harness UI on 127.0.0.1 (slices, pipeline, drift, learning, knowledge) |
 | `asdd init-flow` | 15-minute brownfield path: install (if needed), one lite slice, minimal feature, `asdd check` |
 | `asdd slice init <id> [--hotfix\|--full]` | Scaffold a slice (`lite` default; `hotfix` = one stub feature at implementation) |
 | `asdd slice amend <id>` | Reopen a `DONE` slice with an amendments note |
 | `asdd slice escalate <id> --reasons "<triggers>"` | Lite/hotfix → escalated |
 | `asdd converge [--strict] [--json]` | Cheap REQ / test-mention / evidence gate before `passing` |
 | `asdd converge-eval` | Score EARS/converge fixtures under `cli/eval/converge-ears/` |
+| `asdd skill-eval [--skill <name>] [--baseline <ref>]` | Score skill fixtures under `cli/eval/skills/`; `--baseline` diffs against a git ref and fails on regressions |
 | `asdd waves [--slice <id>]` | Parallelism hints from owners, deps, and scopes |
 | `asdd portfolio` | Read-only multi-repo summary (`.harness/config/portfolio.json`) |
 | `asdd tracker-sync [--apply]` | Plan bi-directional tracker sync from handoff + sessions (local receipt with `--apply`) |

@@ -30,7 +30,7 @@ Checks `DRIFT-00`…`DRIFT-07` and their gates `QG-DRIFT-01`…`05` are defined 
 
 - **SPD-01.** Before marking a feature `passing`: run `asdd drift`. Fix every `fail`. (In chat, the MCP tool `audit_diff`, mode `author`, gives the same answer.)
 - **SPD-02.** A `DRIFT-01` (unmapped file) means one of two things: the change is out of scope (revert it), or the slice is missing the file (map it in `intent.md`, `design.md`, `tasks.md`, `spec.md`, or the feature's `scope_paths`). Never map a file only to silence the check.
-- **SPD-03.** After the verification passes, set `passing` with `evidence` and run `asdd sync`: it records the feature's `evidence_hash` ([session-loop.md](./session-loop.md)). No commit is needed. Later edits to owned files reopen the feature (`DRIFT-02`).
+- **SPD-03.** After the verification passes, set `passing` with `evidence` and run `asdd sync`: it records the feature's `evidence_hash` ([session-loop.md](./session-loop.md)). No commit is needed. Later edits to owned files reopen the feature (`DRIFT-02`) while its slice is `in_progress`; features of `DONE`, `PARKED`, and `ABANDONED` slices keep their historical evidence until `asdd slice amend` reopens the slice.
 - **SPD-04.** At `qa`, `asdd drift --slice <id> --requirements` shows which MUST requirements lack a feature or a test that names the REQ ID (DRIFT-03/04). In chat, `verify_spec_compliance` adds the project's contract adapters.
 - **SPD-05.** Branch as `slice/<slice-id>/<topic>` or put `Slice: <slice-id>` in the PR body (`DRIFT-07`).
 

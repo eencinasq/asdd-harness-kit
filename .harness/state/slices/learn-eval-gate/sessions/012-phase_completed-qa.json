@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-learn-eval-gate-012",
+  "timestamp": "2026-11-16T20:50:51.285",
+  "agent": "devin",
+  "human": "squad",
+  "slice_id": "learn-eval-gate",
+  "event_type": "phase_completed",
+  "phase": "qa",
+  "mode": "lite",
+  "evidence": "QA-light pending final npm test + check --live",
+  "concerns": []
+}

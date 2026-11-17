@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-skill-eval-007",
+  "timestamp": "2026-11-17T00:58:00.000Z",
+  "agent": "asdd-lite-agent",
+  "slice_id": "skill-eval",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/src/harness/skill-eval.mjs",
+    "cli/src/harness/skill-eval-lib.mjs",
+    "cli/src/harness/skill-eval-lib.test.mjs",
+    "cli/src/harness/commands.mjs",
+    "package.json"
+  ],
+  "evidence": "RED: `node cli/bin/asdd.mjs skill-eval --json` → 'unknown command: skill-eval' (exit 2). CLI entry and commands.mjs registration missing.",
+  "concerns": []
+}
