@@ -36,7 +36,7 @@
         {
           "at": "2026-11-17T12:00:15.013Z",
           "slice_id": null,
-          "last_at": "2026-11-17T12:00:15.517Z"
+          "last_at": "2026-11-17T12:00:33.040Z"
         }
       ],
       "examples": [
@@ -76,7 +76,7 @@
         {
           "at": "2026-11-17T12:00:15.013Z",
           "slice_id": null,
-          "last_at": "2026-11-17T12:00:15.517Z"
+          "last_at": "2026-11-17T12:00:33.040Z"
         }
       ],
       "examples": [
@@ -116,7 +116,7 @@
         {
           "at": "2026-11-17T12:00:15.013Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T12:00:15.517Z"
+          "last_at": "2026-11-17T12:00:33.040Z"
         }
       ],
       "examples": [
@@ -208,10 +208,16 @@
           "at": "2026-11-17T02:09:31.641Z",
           "slice_id": null,
           "last_at": "2026-11-17T02:10:47.475Z"
+        },
+        {
+          "at": "2026-11-17T12:00:28.183Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T12:00:33.040Z"
         }
       ],
       "examples": [
-        "DRIFT-02 passing feature TASK-003 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
+        "DRIFT-02 passing feature TASK-003 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-005 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
       ]
     },
     "command:rm -rf": {
