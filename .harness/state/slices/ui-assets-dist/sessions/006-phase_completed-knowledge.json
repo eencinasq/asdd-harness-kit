@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ui-assets-dist",
+  "concerns": [],
+  "timestamp": "2026-11-17T00:53:59.000Z",
+  "session_id": "sess-ui-assets-dist-006",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: unit tests that import from cli/src cannot catch packaging gaps; ship checks belong in install.sh against the packed tarball."
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ui-assets-dist",
+  "concerns": [],
+  "timestamp": "2026-11-17T00:53:59.000Z",
+  "session_id": "sess-ui-assets-dist-002",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/kit/build.mjs",
+    "cli/src/kit/fingerprint.mjs",
+    "cli/test/install.sh"
+  ],
+  "evidence": "RED: asdd ui / → 404 from cli/dist; install.sh: 'package misses cli/dist/harness/ui/index.html'."
+}

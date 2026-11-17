@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ui-assets-dist",
+  "concerns": [],
+  "timestamp": "2026-11-17T00:53:59.000Z",
+  "session_id": "sess-ui-assets-dist-003",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/kit/build.mjs",
+    "cli/src/kit/fingerprint.mjs",
+    "cli/test/install.sh"
+  ],
+  "evidence": "GREEN 2026-11-16 (1a473db): build copies 3 assets to cli/dist/harness/ui; kit build --check fails after an asset edit and passes after revert; asdd ui from dist: / 200 text/html, /ui/app.js 200, /ui/styles.css 200; install.sh OK (packed package contains ui assets; RED before: 'package misses cli/dist/harness/ui/index.html'); npm test 201/201."
+}
