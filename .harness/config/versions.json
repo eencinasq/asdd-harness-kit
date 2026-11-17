@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "kit_version": "3.12.0",
-  "generated_at": "2026-11-14T03:42:21.743Z",
+  "generated_at": "2026-11-17T12:04:31.611Z",
   "artifacts": {
     "cli/steering/README.md": "3.12.0",
     "cli/steering/_steering-profile.md": "3.12.0",
@@ -84,6 +84,7 @@
     "cli/skills/documentation-and-adrs/references/writing-docs.md": "3.12.0",
     "cli/skills/domain-language-extraction/SKILL.md": "3.12.0",
     "cli/skills/external-trackers/SKILL.md": "3.12.0",
+    "cli/skills/external-trackers/references/intent-format.md": "3.12.0",
     "cli/skills/external-trackers/references/mcp-configurations.md": "3.12.0",
     "cli/skills/product-delivery/SKILL.md": "3.12.0",
     "cli/skills/product-delivery/contracts/scope-map.schema.yaml": "3.12.0",
