@@ -49,6 +49,44 @@ const ALLOWED_COMMANDS = [
   /^node\s+--test/
 ];
 
+// Read-only mode (po-readonly-gate, G28): the PO/PM shaping session sets HARNESS_GATE_MODE=readonly. Deny by default;
+// only these read commands pass, segment by segment. A denylist cannot enumerate every way a shell writes.
+const ASDD = String.raw`(?:node\s+(?:\S*\/)?cli\/bin\/asdd\.mjs|npx\s+asdd(?:-harness-kit)?|asdd)`;
+const READONLY_COMMANDS = [
+  /^(?:ls|cat|head|tail|wc|pwd|echo|printf|grep|rg|cut|tr|uniq|which|basename|dirname|date|true|test|jq|stat|file|tree)\b/,
+  /^sort\b(?!.*\s-o\b)/,
+  /^find\b(?!.*\s-(?:delete|exec|execdir|ok|okdir|fprint|fprint0|fprintf|fls)\b)/,
+  /^git\s+(?:status|log|diff|show|rev-parse|ls-files|blame|grep|shortlog|describe)\b/,
+  /^git\s+branch(?:\s+(?:-a|-r|-v|-vv|--list|--show-current|--contains\s+\S+))*\s*$/,
+  new RegExp(`^${ASDD}\\s+(?:status|drift|check|check-config|doctor|converge|waves|portfolio|skill-eval|help|--version|knowledge\\s+(?:search|trace|slice|status|patterns|sync))\\b`),
+  new RegExp(`^${ASDD}\\s+intake\\b.*\\s--dry-run\\b`),
+  /^codegraph\s+(?:explore|query|context|node|files|status|sync|init)\b/,
+  /^gh\s+(?:issue|pr)\s+(?:view|list|status)\b/,
+  /^gh\s+search\b/,
+];
+
+/** True when the session runs the gate in read-only mode (HARNESS_GATE_MODE=readonly). */
+export function isReadonlyMode(env = process.env) {
+  return String(env?.HARNESS_GATE_MODE ?? '').trim().toLowerCase() === 'readonly';
+}
+
+/** Read-only verdict: every segment must be an allowlisted read; no file redirection, no command substitution. */
+export function readonlyVerdict(command) {
+  const text = String(command || '').trim();
+  if (!text) return { allowed: false, reason: 'empty command' };
+  if (/\$\(|`|<\(|>\(/.test(text)) return { allowed: false, reason: 'command substitution is not allowed in read-only mode' };
+  const stripped = text.replace(/\d?>&\d/g, ' ').replace(/(?:\d|&)?>>?\s*\/dev\/null/g, ' ');
+  if (/>/.test(stripped)) return { allowed: false, reason: 'writing to a file is not allowed in read-only mode' };
+  for (const raw of stripped.split(/&&|\|\||;|\||\n/)) {
+    const segment = raw.trim().replace(/^(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)+/, '');
+    if (!segment) continue;
+    if (!READONLY_COMMANDS.some((re) => re.test(segment))) {
+      return { allowed: false, reason: `"${segment.split(/\s+/).slice(0, 3).join(' ')}" is not a read-only command` };
+    }
+  }
+  return { allowed: true, reason: 'read-only allowlist' };
+}
+
 export function isDangerousCommand(command) {
   const text = String(command || '').trim();
   if (!text) return true;
@@ -76,13 +114,20 @@ async function recordDenial(command, runtime) {
     const root = process.cwd();
     if (!existsSync(join(root, '.harness'))) return;
     const { writeCommandSignal } = await import('./learning-lib.mjs');
-    writeCommandSignal(root, deniedLabel(command) ?? 'unknown', { runtime });
+    writeCommandSignal(root, isReadonlyMode() ? 'readonly' : deniedLabel(command) ?? 'unknown', { runtime });
   } catch {
     // ignore
   }
 }
 
-export async function checkCommandSafety(command, { override = false } = {}) {
+export async function checkCommandSafety(command, { override = false, env = process.env } = {}) {
+  // Read-only mode: the override flag does not apply (the PO session cannot opt out of it).
+  if (isReadonlyMode(env)) {
+    const v = readonlyVerdict(command);
+    return v.allowed
+      ? { allowed: true, method: 'readonly-allow', reason: v.reason, confidence: 1 }
+      : { allowed: false, method: 'readonly-deny', reason: `${v.reason}; this session is read-only (HARNESS_GATE_MODE=readonly)`, confidence: 1 };
+  }
   if (override) {
     return { allowed: true, method: 'override', reason: 'Manual override specified' };
   }

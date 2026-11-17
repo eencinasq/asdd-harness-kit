@@ -28,5 +28,6 @@ and pnpm) → codegraph (`npm i -g codegraph` when missing, then `codegraph init
 |---|---|
 | `ASDD_NODE24_BIN` | Directory with a Node ≥ 24.22.1 `node`, when the `node` on PATH is older (kit checkout only) |
 | `HARNESS_AUTHOR` | Author name for learning summaries (else the configured user name) |
+| `HARNESS_GATE_MODE` | Set `HARNESS_GATE_MODE=readonly` for a PO/PM shaping session: the command gate allows only read commands (Play O) |
 
 The installer does not copy the script into projects: it ships in the npm package under `cli/runtimes/claude/`.

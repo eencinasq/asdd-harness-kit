@@ -274,8 +274,11 @@ repository already has, and the output lives in the tracker, not in the reposito
    - `product-delivery` splits the bet into scopes, merges or cuts any scope that duplicates an existing capability,
      and creates one **Intent item** per fit scope in the canonical format
      ([`intent-format.md`](../cli/skills/external-trackers/references/intent-format.md)).
-4. Known gap: the shaping agent has no Write or Edit tool, but its shell can still write files; a read-only
-   command-gate mode is pending. Review the session's changes before committing anything from it.
+4. Start the PO/PM session with `HARNESS_GATE_MODE=readonly` (cloud: an environment variable; local: in the shell
+   that launches the agent). The shaping agent has no Write or Edit tool, and this mode makes the command gate allow
+   only read commands (file reads, `git log`/`diff`, `asdd status|drift|check|knowledge`, `codegraph`,
+   `asdd intake --dry-run`): redirections, command substitution, and overrides are denied, so the shell cannot
+   write either.
 
 ### Play P — An engineer picks up an Intent
 
