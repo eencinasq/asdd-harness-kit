@@ -3,7 +3,7 @@
  * classes (tools, prompts, views) only when its toolset is on; services always load, because audit and review use the
  * analysis services. Read when the modules are defined (design ADR-005), so an unknown name fails at startup.
  */
-export const TOOLSETS = ['analysis', 'review', 'audit'] as const;
+export const TOOLSETS = ['analysis', 'review', 'audit', 'security'] as const;
 export type Toolset = (typeof TOOLSETS)[number];
 
 export const TOOLSETS_ENV = 'SPEC_DRIFT_TOOLSETS';

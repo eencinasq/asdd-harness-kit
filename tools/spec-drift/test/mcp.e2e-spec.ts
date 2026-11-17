@@ -25,12 +25,15 @@ const UI = {
 	semgrep: 'ui://spec-drift/dashboard.html',
 	pr: 'ui://spec-drift/pr-review.html',
 	audit: 'ui://spec-drift/audit-dashboard.html',
+	security: 'ui://spec-drift/security-dashboard.html',
 };
 const APP_MIME = 'text/html;profile=mcp-app';
 const EXPECTED_UI: Record<string, { uri: string; appOnly?: boolean }> = {
 	analyze_architecture: { uri: UI.semgrep },
 	analyze_standards: { uri: UI.semgrep },
 	analyze_spec_drift: { uri: UI.semgrep },
+	analyze_security: { uri: UI.semgrep },
+	security_audit_status: { uri: UI.security },
 	rescan: { uri: UI.semgrep, appOnly: true },
 	pr_review_save_draft: { uri: UI.pr },
 	pr_review_status: { uri: UI.pr },
@@ -70,6 +73,9 @@ const TEXT_ONLY = [
 	'pr_review_search',
 	'pr_review_metrics',
 	'pr_review_cleanup',
+	'security_audit_start',
+	'security_audit_checklist',
+	'security_audit_submit_findings',
 ];
 
 const textOf = (result: Awaited<ReturnType<Client['callTool']>>): string =>
@@ -78,7 +84,7 @@ const textOf = (result: Awaited<ReturnType<Client['callTool']>>): string =>
 /** Contract every transport must satisfy. */
 const assertContract = async (client: Client): Promise<void> => {
 	const { tools } = await client.listTools();
-	assert.equal(tools.length, 40, 'tool count');
+	assert.equal(tools.length, 45, 'tool count');
 	for (const [name, ui] of Object.entries(EXPECTED_UI)) {
 		const meta = tools.find((t) => t.name === name)?._meta as Record<string, any> | undefined;
 		assert.equal(meta?.ui?.resourceUri, ui.uri, `${name} ui.resourceUri`);
@@ -132,6 +138,7 @@ const assertContract = async (client: Client): Promise<void> => {
 			[UI.semgrep, APP_MIME],
 			[UI.pr, APP_MIME],
 			[UI.audit, APP_MIME],
+			[UI.security, APP_MIME],
 			['spec://manifest', 'application/json'],
 			['spec://rules/architecture', 'text/markdown'],
 			['spec://drift/latest-report', 'application/json'],
@@ -418,7 +425,7 @@ describe('HTTP transport security', () => {
 			await client.connect(
 				new StreamableHTTPClientTransport(new URL(url), { requestInit: { headers: { 'x-api-key': key } } }),
 			);
-			assert.equal((await client.listTools()).tools.length, 40);
+			assert.equal((await client.listTools()).tools.length, 45);
 			await client.close();
 		} finally {
 			child.kill();

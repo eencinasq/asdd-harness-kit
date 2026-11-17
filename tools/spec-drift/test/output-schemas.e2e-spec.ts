@@ -32,6 +32,11 @@ export const TYPED_TOOLS = [
 	'analyze_spec_drift',
 	'list_rule_packs',
 	'rescan',
+	'analyze_security',
+	'security_audit_start',
+	'security_audit_checklist',
+	'security_audit_submit_findings',
+	'security_audit_status',
 ];
 
 let moduleRef: TestingModule;
