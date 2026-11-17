@@ -177,10 +177,16 @@ export class SecurityAuditService {
 		await writeJsonAtomic(path.join(dir, 'run.json'), run);
 	}
 
-	/** Tracked files (git), else a bounded walk that skips VCS and dependency folders. */
+	/**
+	 * Tracked files plus untracked files that .gitignore does not exclude (code written before the commit is the usual
+	 * case for a local audit); ignored files never count. Without git, a bounded walk that skips VCS and dependency folders.
+	 */
 	private async trackedFiles(): Promise<string[]> {
 		const git = await this.process
-			.run('git', ['ls-files', '-z'], { cwd: this.repoRoot, timeoutMs: 30_000 })
+			.run('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {
+				cwd: this.repoRoot,
+				timeoutMs: 30_000,
+			})
 			.catch(() => null);
 		if (git && git.code === 0) return git.stdout.split('\0').filter(Boolean).slice(0, MAX_FILES);
 		const out: string[] = [];

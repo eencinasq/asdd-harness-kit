@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-security-recon-untracked-002",
+  "timestamp": "2026-11-17T17:44:43.000Z",
+  "agent": "claude-recon",
+  "human": "eencinas",
+  "slice_id": "security-recon-untracked",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "tools/spec-drift/src/security/security.service.ts",
+    "tools/spec-drift/src/security/security.service.spec.ts"
+  ],
+  "evidence": "RED: 'security-recon-untracked REQ-001' fails — surfaces empty for an untracked src/api/run.js (listing used tracked files only). Mapping corrected: the listing lives in security.service.ts, recon.ts is pure.",
+  "concerns": []
+}
