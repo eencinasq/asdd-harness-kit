@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T14:39:54.312Z",
+  "generated_at": "2026-11-17T15:11:57.273Z",
   "threshold": 3,
   "summary": {
     "patterns": 30,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 40,
+      "occurrences": 41,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -51,6 +51,7 @@
         "po-readonly-gate",
         "review-quality",
         "rule-coverage",
+        "security-review",
         "sensor-fixes",
         "shaping-agent",
         "shaping-cloud-setup",
@@ -139,7 +140,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 177
+          "quiet_sessions": 200
         }
       ]
     },
@@ -210,7 +211,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 177
+          "quiet_sessions": 200
         }
       ]
     },
@@ -223,7 +224,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T12:34:07.275Z",
+      "last_seen": "2026-11-17T14:40:26.515Z",
       "sources": [
         "warn"
       ],
@@ -242,7 +243,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T12:34:07.275Z",
+      "last_seen": "2026-11-17T14:40:26.515Z",
       "sources": [
         "warn"
       ],
@@ -316,6 +317,25 @@
       "slices": [],
       "examples": [
         "denied: git reset --hard"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-eb7bb53b",
+      "signature": "command:rm -rf",
+      "kind": "escape",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-10T21:37:19.064Z",
+      "last_seen": "2026-11-17T14:55:02.474Z",
+      "sources": [
+        "command"
+      ],
+      "slices": [],
+      "examples": [
+        "denied: rm -rf"
       ],
       "proposals": []
     },
@@ -418,7 +438,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T12:34:07.275Z",
+      "last_seen": "2026-11-17T14:40:26.515Z",
       "sources": [
         "warn"
       ],
@@ -467,25 +487,6 @@
       ],
       "examples": [
         "Code @6b7cc07; verification needs TASK-004 (jev.md auto)."
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-eb7bb53b",
-      "signature": "command:rm -rf",
-      "kind": "escape",
-      "occurrences": 1,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-11-10T21:37:19.064Z",
-      "last_seen": "2026-11-10T21:37:19.064Z",
-      "sources": [
-        "command"
-      ],
-      "slices": [],
-      "examples": [
-        "denied: rm -rf"
       ],
       "proposals": []
     },

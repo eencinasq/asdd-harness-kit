@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": true,
   "created_at": "2026-11-17T12:39:17.971Z",
-  "updated_at": "2026-11-17T14:39:54.251Z",
+  "updated_at": "2026-11-17T15:11:57.146Z",
   "paths": {
     "specs": ".harness/specs/po-readonly-gate",
     "tasks": ".harness/specs/po-readonly-gate/tasks.md",
