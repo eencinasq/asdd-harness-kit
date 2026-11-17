@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-14T03:20:52.279Z",
-  "updated_at": "2026-11-17T12:42:49.016Z",
+  "updated_at": "2026-11-17T14:39:54.244Z",
   "paths": {
     "specs": ".harness/specs/egm-shaping",
     "tasks": ".harness/specs/egm-shaping/tasks.md",

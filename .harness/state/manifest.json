@@ -442,6 +442,14 @@
       "mode": "lite",
       "manifest": ".harness/state/slices/po-readonly-gate/manifest.json",
       "features": ".harness/features/po-readonly-gate.features.json"
+    },
+    {
+      "slice_id": "security-review",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/security-review/manifest.json",
+      "features": ".harness/features/security-review.features.json"
     }
   ]
 }

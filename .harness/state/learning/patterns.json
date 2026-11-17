@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T12:42:49.156Z",
+  "generated_at": "2026-11-17T14:39:54.312Z",
   "threshold": 3,
   "summary": {
     "patterns": 30,
@@ -139,7 +139,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 176
+          "quiet_sessions": 177
         }
       ]
     },
@@ -210,7 +210,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 176
+          "quiet_sessions": 177
         }
       ]
     },
