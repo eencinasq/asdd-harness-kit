@@ -10,8 +10,17 @@
  * Fail-open: always exits 0 and never writes to stderr. Exit 2 would send stderr to the model (fixtures README, OI-6).
  * Reads only the payload key paths in PAYLOAD_KEYS (ADR-004: each one occurs in a committed fixture); a missing key
  * means the attribute is omitted, a missing path or skill name means no record (REQ-016). Not vendored (ADR-003).
+ *
+ * telemetry-lib is loaded by a guarded dynamic import (REQ-002 c7, ADR-001; as in command-gate.mjs and
+ * verify-on-stop.mjs): a lib that throws on load or is missing leaves `telemetry` null, and every runtime still gets
+ * its exact answer, exit 0, no stderr and no span.
  */
-import * as telemetry from './telemetry-lib.mjs';
+let telemetry = null;
+try {
+  telemetry = await import('./telemetry-lib.mjs').catch(() => null);
+} catch {
+  telemetry = null;
+}
 
 export const CURSOR_ALLOW = '{"permission":"allow"}\n';
 
@@ -75,9 +84,10 @@ export function handleObserve(raw, runtime, deps = {}) {
   let span = null;
   try {
     if (runtime !== 'claude') return { answer, span };
+    if (!telemetry && !deps.lib) return { answer, span };
     const root = deps.root ?? process.cwd();
     const env = deps.env ?? process.env;
-    const lib = { ...telemetry, ...(deps.lib || {}) };
+    const lib = { ...(telemetry || {}), ...(deps.lib || {}) };
     const payload = JSON.parse(String(raw ?? ''));
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return { answer, span };
     const hit = claudeTarget(payload, lib, root);

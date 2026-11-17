@@ -674,3 +674,43 @@ test('TASK-012 latency (TRC-006): Cursor guidance and Cursor non-guidance p99 <=
     assert.deepEqual(streamLines(root), []);
   });
 });
+
+// --- UNCOV-001 (REQ-002 c7, ADR-001): a broken or missing telemetry-lib never changes the hook's answer ---
+
+/** Temp copy of the harness dir with telemetry-lib.mjs replaced by a top-level throw or deleted. */
+function brokenHarness(mode) {
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), 'asdd-observe-harness-')));
+  fs.cpSync(HERE, dir, { recursive: true, filter: (src) => !src.endsWith('.test.mjs') });
+  const lib = join(dir, 'telemetry-lib.mjs');
+  if (mode === 'throws') writeFileSync(lib, "throw new Error('telemetry-lib broken on load');\n");
+  else rmSync(lib, { force: true });
+  return dir;
+}
+
+for (const mode of ['throws', 'deleted']) {
+  test(`REQ-002 c7 telemetry-lib ${mode}: observe claude|cursor answers as normal, exit 0, no stderr, no span`, () => {
+    const harness = brokenHarness(mode);
+    try {
+      withRoot({}, (root) => {
+        const inputs = { guidance: rawPayload('posttooluse-read-steering', root), invalid: '{not json' };
+        for (const [runtime, expected] of [['claude', ''], ['cursor', CURSOR_ALLOW]]) {
+          for (const [kind, input] of Object.entries(inputs)) {
+            const res = spawnSync(process.execPath, [join(harness, 'telemetry-observe.mjs'), runtime], {
+              cwd: root,
+              input,
+              env: cleanEnv(),
+              encoding: 'utf8',
+            });
+            const label = `${mode} ${runtime} ${kind}`;
+            assert.equal(res.status, 0, label);
+            assert.equal(res.stdout, expected, label);
+            assert.equal(res.stderr, '', label);
+          }
+        }
+        assert.deepEqual(streamLines(root), []);
+      });
+    } finally {
+      rmSync(harness, { recursive: true, force: true });
+    }
+  });
+}

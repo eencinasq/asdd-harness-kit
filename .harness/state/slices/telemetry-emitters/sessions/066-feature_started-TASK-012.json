@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-066",
+  "timestamp": "2026-11-17T14:39:48.527Z",
+  "phase": "implementation",
+  "feature_id": "TASK-012",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/telemetry-observe.mjs",
+    "cli/src/harness/telemetry-observe.test.mjs"
+  ],
+  "evidence": "TASK-012 reopened by DRIFT-02: the TASK-010 UNCOV-001 fix (session 065) changed cli/src/harness/telemetry-observe.mjs and appended 2 REQ-002 c7 tests to cli/src/harness/telemetry-observe.test.mjs, both in TASK-012 scope_paths. Re-verification only; no TASK-012 behaviour change intended (the cursor early return runs before the new lib-null check)."
+}

@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:17.015Z",
-  "updated_at": "2026-11-17T12:58:35.141Z",
+  "updated_at": "2026-11-17T14:40:19.410Z",
   "paths": {
     "specs": ".harness/specs/telemetry-emitters",
     "tasks": ".harness/specs/telemetry-emitters/tasks.md",
@@ -536,6 +536,54 @@
       "agent": "asdd-qa-agent",
       "human": "eencinas",
       "event": "phase_blocked",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T14:38:20.409Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-010"
+    },
+    {
+      "timestamp": "2026-11-17T14:39:48.527Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-012"
+    },
+    {
+      "timestamp": "2026-11-17T14:40:03.376Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-010"
+    },
+    {
+      "timestamp": "2026-11-17T14:40:19.349Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-012"
+    },
+    {
+      "timestamp": "2026-11-17T14:39:00.000Z",
+      "agent": "asdd-spec-agent",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T14:37:25.502Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "checkpoint",
       "phase": "qa",
       "feature_id": null
     }
