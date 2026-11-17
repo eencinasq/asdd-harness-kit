@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "drift01-harness-logs",
+  "source_tasks": ".harness/specs/drift01-harness-logs/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "DRIFT-01 exempts the append-only harness logs (SP-006)",
+      "user_visible_behavior": "Writing docs/agent-failure-log.md or docs/dissent-log.md no longer fails DRIFT-01; other unmapped docs still do.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/drift-lib.test.mjs",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "node cli/bin/asdd.mjs kit self --check",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-16 (adcbb25): drift-lib.test.mjs 19/19 incl. 'drift01-harness-logs REQ-001 REQ-002'; kit vendor --check and kit self --check OK; kit guidance PASS; asdd check exit 0 (HARNESS_DRIFT_BASE=5c0a1cc); npm test 217/217.",
+      "scope_paths": [
+        "cli/src/harness/drift-lib.mjs",
+        "cli/src/harness/drift-lib.test.mjs",
+        "cli/steering/spec-drift.md"
+      ],
+      "evidence_hash": "43893a1c63081169175506afd28a54ba767bf9273a64470171a7ebbb3c6892d8"
+    }
+  ]
+}

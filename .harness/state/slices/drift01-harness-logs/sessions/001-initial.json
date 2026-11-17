@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-drift01-harness-logs-001",
+  "timestamp": "2026-11-17T01:05:46.875Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "drift01-harness-logs",
+  "event_type": "phase_started",
+  "phase": "implementation",
+  "mode": "hotfix",
+  "evidence": "Hotfix slice initialized (feature + evidence path; no Discovery theatre)",
+  "concerns": []
+}
