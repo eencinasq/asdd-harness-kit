@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T00:54:05.696Z",
+  "generated_at": "2026-11-17T00:59:19.096Z",
   "threshold": 3,
   "summary": {
-    "patterns": 24,
-    "open": 1,
-    "in_flight": 2,
+    "patterns": 29,
+    "open": 0,
+    "in_flight": 4,
     "verified": 1,
     "unsigned_failures": 0
   },
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 31,
+      "occurrences": 32,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -48,6 +48,7 @@
         "review-quality",
         "rule-coverage",
         "sensor-fixes",
+        "skill-eval",
         "skills-spec",
         "spec-drift-adoption",
         "spec-drift-apps",
@@ -130,7 +131,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 11
+          "quiet_sessions": 20
         }
       ]
     },
@@ -138,9 +139,9 @@
       "id": "LP-f374bf6d",
       "signature": "sensor:DRIFT-02",
       "kind": "escape",
-      "occurrences": 4,
+      "occurrences": 5,
       "threshold": 3,
-      "status": "open",
+      "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-28T01:34:26.022Z",
       "last_seen": "2026-11-17T00:37:39.883Z",
@@ -153,15 +154,23 @@
         "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
         "DRIFT-02 passing feature TASK-001 changed after evidence_commit 67f5a59; set it back to in_progress and rerun verification"
       ],
-      "proposals": []
+      "proposals": [
+        {
+          "id": "SP-005",
+          "file": "docs/knowledge-base/steering-proposals/SP-005.md",
+          "declared": "proposed",
+          "status": "proposed",
+          "recurrences": 0
+        }
+      ]
     },
     {
       "id": "LP-06528643",
       "signature": "sensor:DRIFT-01:docs",
       "kind": "escape",
-      "occurrences": 3,
+      "occurrences": 4,
       "threshold": 3,
-      "status": "rejected",
+      "status": "proposed",
       "reopened": false,
       "first_seen": "2026-10-28T13:22:35.735Z",
       "last_seen": "2026-11-17T00:28:33.442Z",
@@ -170,7 +179,8 @@
       ],
       "slices": [
         "asdd-ui",
-        "jev-module"
+        "jev-module",
+        "skill-eval"
       ],
       "examples": [
         "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)",
@@ -184,6 +194,13 @@
           "declared": "rejected",
           "status": "rejected",
           "recurrences": 0
+        },
+        {
+          "id": "SP-006",
+          "file": "docs/knowledge-base/steering-proposals/SP-006.md",
+          "declared": "proposed",
+          "status": "proposed",
+          "recurrences": 0
         }
       ]
     },
@@ -196,7 +213,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T00:28:33.442Z",
+      "last_seen": "2026-11-17T00:54:24.863Z",
       "sources": [
         "warn"
       ],
@@ -215,7 +232,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T00:28:33.442Z",
+      "last_seen": "2026-11-17T00:54:24.863Z",
       "sources": [
         "warn"
       ],
@@ -297,6 +314,50 @@
       "proposals": []
     },
     {
+      "id": "LP-6c57145e",
+      "signature": "sensor:lite slice \"*\" cannot complete with open escalation signals (EN-scope-spread) — ",
+      "kind": "escape",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:36:35.163Z",
+      "last_seen": "2026-11-17T00:43:54.118Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "asdd-ui",
+        "skill-eval"
+      ],
+      "examples": [
+        "lite slice \"asdd-ui\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate asdd-ui --reasons \"E1-scope-spread\"",
+        "lite slice \"skill-eval\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate skill-eval --reasons \"E1-scope-spread\""
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-7f51c52f",
+      "signature": "sensor:QG-LEARN-04",
+      "kind": "escape",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:26:42.887Z",
+      "last_seen": "2026-11-17T00:29:04.788Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "jev-module"
+      ],
+      "examples": [
+        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-06528643 (sensor:DRIFT-01:docs) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-5684db39",
       "signature": "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali",
       "kind": "noise",
@@ -305,7 +366,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T00:28:33.442Z",
+      "last_seen": "2026-11-17T00:54:24.863Z",
       "sources": [
         "warn"
       ],
@@ -503,6 +564,48 @@
       "proposals": []
     },
     {
+      "id": "LP-f13ce5a3",
+      "signature": "sensor:<path>: feature TASK-N missing user_visible_behavior",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:43:32.908Z",
+      "last_seen": "2026-11-17T00:43:32.908Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "learn-eval-gate"
+      ],
+      "examples": [
+        ".harness/features/learn-eval-gate.features.json: feature TASK-001 missing user_visible_behavior"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-6d388f2e",
+      "signature": "sensor:<path>: feature TASK-N priority must be a positive integer",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:43:32.908Z",
+      "last_seen": "2026-11-17T00:43:32.908Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "learn-eval-gate"
+      ],
+      "examples": [
+        ".harness/features/learn-eval-gate.features.json: feature TASK-001 priority must be a positive integer"
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-1d3df87a",
       "signature": "sensor:<path>: missing portable slot(s): enforcement (kit_steering_rule profile)",
       "kind": "escape",
@@ -522,44 +625,65 @@
       "proposals": []
     },
     {
-      "id": "LP-6c57145e",
-      "signature": "sensor:lite slice \"*\" cannot complete with open escalation signals (EN-scope-spread) — ",
+      "id": "LP-1a43e69b",
+      "signature": "sensor:DRIFT-01:.harness/steering",
       "kind": "escape",
       "occurrences": 1,
       "threshold": 3,
       "status": "watching",
       "reopened": false,
-      "first_seen": "2026-11-17T00:43:54.118Z",
-      "last_seen": "2026-11-17T00:43:54.118Z",
+      "first_seen": "2026-11-17T00:26:22.507Z",
+      "last_seen": "2026-11-17T00:26:22.507Z",
       "sources": [
         "sensor"
       ],
       "slices": [
-        "asdd-ui"
+        "skill-eval"
       ],
       "examples": [
-        "lite slice \"asdd-ui\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate asdd-ui --reasons \"E1-scope-spread\""
+        "DRIFT-01 .harness/steering/domain-layer.project.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
       ],
       "proposals": []
     },
     {
-      "id": "LP-7f51c52f",
-      "signature": "sensor:QG-LEARN-04",
+      "id": "LP-2a52ea2c",
+      "signature": "sensor:DRIFT-01:cli",
       "kind": "escape",
       "occurrences": 1,
       "threshold": 3,
       "status": "watching",
       "reopened": false,
-      "first_seen": "2026-11-17T00:29:04.788Z",
-      "last_seen": "2026-11-17T00:29:04.788Z",
+      "first_seen": "2026-11-17T00:26:22.507Z",
+      "last_seen": "2026-11-17T00:26:22.507Z",
       "sources": [
         "sensor"
       ],
       "slices": [
-        "jev-module"
+        "skill-eval"
       ],
       "examples": [
-        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-06528643 (sensor:DRIFT-01:docs) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+        "DRIFT-01 cli/src/kit/guidance.mjs changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-62e561d2",
+      "signature": "sensor:DRIFT-01:tools",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:49:14.754Z",
+      "last_seen": "2026-11-17T00:49:14.754Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "learn-eval-gate"
+      ],
+      "examples": [
+        "DRIFT-01 tools/jev-gate/src/harness/learning-lib.mjs changed but is not mapped by learn-eval-gate (intent/design/tasks/spec or scope_paths)"
       ],
       "proposals": []
     },

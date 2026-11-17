@@ -1,20 +1,63 @@
 {
   "schema_version": "3.0",
   "slice_id": "learn-eval-gate",
-  "phase": "discovery",
-  "status": "in_progress",
+  "phase": "knowledge",
+  "status": "DONE",
   "mode": "lite",
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:17.535Z",
-  "updated_at": "2026-11-17T00:54:05.602Z",
+  "updated_at": "2026-11-17T00:59:18.988Z",
   "paths": {
     "specs": ".harness/specs/learn-eval-gate",
     "tasks": ".harness/specs/learn-eval-gate/tasks.md",
     "features": ".harness/features/learn-eval-gate.features.json"
   },
-  "gates": {},
+  "gates": {
+    "spec": {
+      "status": "PASS",
+      "by": "squad",
+      "at": "2026-11-16T20:43:32.104",
+      "evidence": "Spec treated as final: human-authored spec.md with REQ-001..004 and Mapped line",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "squad",
+      "at": "2026-11-16T20:43:32.104",
+      "evidence": "design.md written: QG-LEARN-10 eval gate in learning-lib + validators/learning.mjs; eval: <command> => <result-ref> contract",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "squad",
+      "at": "2026-11-16T20:43:32.104",
+      "evidence": "tasks.md TASK-001..003 + features.json (owner devin, cli/-only scope_paths)",
+      "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "squad",
+      "at": "2026-11-16T20:50:51.285",
+      "evidence": "TASK-001/002/003 passing with evidence; QG-LEARN-10 live in asdd check",
+      "concerns": []
+    },
+    "qa": {
+      "status": "PASS",
+      "by": "squad",
+      "at": "2026-11-16T20:50:51.285",
+      "evidence": "QA-light pending final npm test + check --live",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "squad",
+      "at": "2026-11-16T20:51:33.426",
+      "evidence": "QA-light: npm test exit 0 (210 tests, incl. kit self --check + kit vendor --check); asdd check --live exit 0; asdd skill-eval --json 4/4 fixtures pass. Learnings: DRIFT-02 keeps reopening DONE-slice features on shared-file edits — covered by proposed SP-005; DRIFT-01 ignores DONE-slice mappings on stacked branches (documented as carry-over in tasks.md).",
+      "concerns": []
+    }
+  },
   "active_features": [],
   "open_dissents": 0,
   "source": null,
@@ -26,10 +69,107 @@
       "event": "phase_started",
       "phase": "discovery",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T20:43:32.104",
+      "agent": "devin",
+      "human": "squad",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T20:43:32.104",
+      "agent": "devin",
+      "human": "squad",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T20:43:32.104",
+      "agent": "devin",
+      "human": "squad",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T20:46:58.887",
+      "agent": "devin",
+      "human": "squad",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-16T20:47:14.645",
+      "agent": "devin",
+      "human": "squad",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-16T20:47:34.162",
+      "agent": "devin",
+      "human": "squad",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-16T20:49:37.140",
+      "agent": "devin",
+      "human": "squad",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-16T20:50:16.362",
+      "agent": "devin",
+      "human": "squad",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-16T20:50:45.186",
+      "agent": "devin",
+      "human": "squad",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-16T20:50:51.285",
+      "agent": "devin",
+      "human": "squad",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T20:50:51.285",
+      "agent": "devin",
+      "human": "squad",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T20:51:33.426",
+      "agent": "devin",
+      "human": "squad",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
     }
   ],
   "contributors": [
     "squad",
-    "human"
+    "human",
+    "devin"
   ]
 }
