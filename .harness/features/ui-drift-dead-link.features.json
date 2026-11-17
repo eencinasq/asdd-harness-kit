@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "ui-drift-dead-link",
+  "source_tasks": ".harness/specs/ui-drift-dead-link/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Remove the dead spec-drift MCP App link from asdd ui",
+      "user_visible_behavior": "The Drift view no longer offers a link that hangs on 'Waiting for the tool result…'; /vendor/spec-drift/ answers 404.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/ui-server.test.mjs",
+        "node cli/bin/asdd.mjs kit build --check || node cli/bin/asdd.mjs kit build",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-16 (333ce3c): ui-server.test.mjs 9/9 incl. 'ui-drift-dead-link REQ-001 REQ-002' (no /vendor/spec-drift link; route 404); kit build OK; asdd check exit 0; npm test 224/224.",
+      "scope_paths": [
+        "cli/src/harness/ui/app.js",
+        "cli/src/harness/ui-server.mjs",
+        "cli/src/harness/ui-server.test.mjs"
+      ],
+      "evidence_hash": "b8d570af21da67e976ca241ca82639479804ccca064f948bb2ef713d495f09f0"
+    }
+  ]
+}
