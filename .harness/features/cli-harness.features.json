@@ -186,7 +186,7 @@
         "npm test",
         "cd tools/knowledge && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/knowledge && pnpm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-verified 2026-11-16 after hotfixes npm-pack-json (cli/test/install.sh) and guidance-proposal-skip: every verification command exits 0 (npm test 195/195; install.sh OK; skills/agents lint PASS; kit guidance PASS; tools/knowledge and tools/jev-gate tests PASS on Node 24.22.3).",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "cli/src/harness/knowledge-store-sqlite.mjs",
         "cli/src/harness/knowledge-query.mjs",
@@ -208,7 +208,7 @@
         "tools/knowledge/README.md",
         "tools/spec-drift/src/audit/harness-libs.ts"
       ],
-      "evidence_hash": "8a5e659d03e54b9e2eaa68ddda66b23b537a82624cfb08db8d5ffd863fb14886"
+      "evidence_hash": "a27cbfa5225386e9c5b425d601d75361186cb350239a39f6dc6a760d3825b7ee"
     },
     {
       "id": "TASK-009",
@@ -225,7 +225,7 @@
         "npm test",
         "cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-stamped after vendoring proposals to docs/knowledge-base/steering-proposals/external/ (verifications green: npm test 195/195, install.sh, kit versions). | Re-verified 2026-11-16 after binding refresh (.harness/steering/structure.md): npm test 195/195 PASS (run with npm_config_ignore_scripts=true — prepack stdout breaks the `npm pack --json` parse in cli/test/install.sh:203, a pre-existing test bug); tools/jev-gate typecheck + lint + test PASS on Node 24.22.3. | Re-verified 2026-11-16 after hotfixes npm-pack-json (cli/test/install.sh) and guidance-proposal-skip: every verification command exits 0 (npm test 195/195; install.sh OK; skills/agents lint PASS; kit guidance PASS; tools/knowledge and tools/jev-gate tests PASS on Node 24.22.3).",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "cli/src/install/**",
         "cli/src/harness/commands.mjs",
@@ -253,7 +253,7 @@
         ".github/workflows/harness-invariants.yml",
         ".harness/steering/structure.md"
       ],
-      "evidence_hash": "3886315ea2810dd60163f0bac813a60c9e94e6d877d3318b877cd8294ad198b4"
+      "evidence_hash": "54363e7425ff90206707244f72447e9318096fcf7e4a12fea2e40c24a59dadc9"
     },
     {
       "id": "TASK-010",

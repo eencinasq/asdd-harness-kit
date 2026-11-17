@@ -74,14 +74,13 @@
         "node cli/bin/asdd.mjs skill-eval --json",
         "node cli/bin/asdd.mjs kit versions"
       ],
-      "evidence": "`node cli/bin/asdd.mjs skill-eval --json` → ok:true, 4/4 fixtures pass across asdd-status (2), asdd-next (1), codegraph (1); `--baseline 1b1fbae` → all unchanged, exit 0. `node cli/bin/asdd.mjs kit versions` regenerated cli/versions.json (timestamp only — harness sources are not install-shipped artifacts). README command row added.",
+      "evidence": "Re-verified after scope fix: `node cli/bin/asdd.mjs skill-eval --json` → ok:true, 4/4 fixtures pass (asdd-status 2, asdd-next 1, codegraph 1); `--baseline 1b1fbae` all unchanged exit 0; `node cli/bin/asdd.mjs kit versions` runs clean (no shipped-artifact changes — cli/versions.json left untouched). README command row added.",
       "scope_paths": [
         "cli/eval/skills",
-        "README.md",
-        "cli/versions.json"
+        "README.md"
       ],
-      "notes": "Fixtures must be deterministic (files, commands, exit codes); no live model or runtime adapter — STOP and report if one is needed (E1/E4). versions.json tracks only install-shipped artifacts; harness sources are not listed, so regen is a no-op here.",
-      "evidence_hash": "112f971e20e5f78af7486625d732c7088a7e911f3dc2e4517171e910f79305a0"
+      "notes": "Fixtures must be deterministic (files, commands, exit codes); no live model or runtime adapter — STOP and report if one is needed (E1/E4). versions.json tracks only install-shipped artifacts; harness sources are not listed, so regen is a no-op here. cli/versions.json removed from scope: regen was a no-op for shipped artifacts and the file is timestamp-volatile.",
+      "evidence_hash": "b3d80bb80f5181f4bb272e915167f0092535d078e3c5b249d6aae69288d685aa"
     }
   ]
 }

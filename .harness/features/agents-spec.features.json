@@ -136,7 +136,7 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit agents-lint && npm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "cli/src/kit/agents-lint.mjs",
         "cli/src/main.mjs",
@@ -145,7 +145,7 @@
         "cli/README.md",
         "cli/versions.json"
       ],
-      "evidence_hash": "9cef5f9e31fc2867cbeb48ba8ac1b0d16243ff67f84eca28d91c8cf46187ec83"
+      "evidence_hash": "e8768d8fa1f12849109eff5a16a1b9da9401c3606e92369e8052175a33f682ef"
     }
   ]
 }
