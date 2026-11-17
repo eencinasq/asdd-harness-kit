@@ -2,5 +2,59 @@
   "schema_version": "1.0",
   "slice_id": "tracker-binding",
   "source_tasks": ".harness/specs/tracker-binding/tasks.md",
-  "features": []
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Validate the optional tracker block in asdd check-config",
+      "user_visible_behavior": "asdd check-config FAILs on an unknown tracker type, a missing required field, or a malformed project; a valid jira/linear/github block passes; no block changes nothing.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude-p61",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/tracker-config.test.mjs",
+        "node cli/bin/asdd.mjs check-config",
+        "node cli/bin/asdd.mjs kit self --check"
+      ],
+      "evidence": "GREEN 2026-11-17: tracker-config.test.mjs 5/5 (valid jira/linear/github; unknown type; missing fields per type; project formats; check-config subprocess FAILs on type 'trello', passes with no block); asdd check-config PASS; kit self --check OK; check --live exit 0 (HARNESS_DRIFT_BASE=b726956).",
+      "scope_paths": [
+        "cli/src/harness/tracker-config.mjs",
+        "cli/src/harness/tracker-config.test.mjs",
+        "cli/src/harness/check-project-config.mjs",
+        "cli/scaffold/config/project.schema.json",
+        "cli/scaffold/config/README.md",
+        "package.json"
+      ],
+      "evidence_hash": "794267498b3dd55cc30838d68d142fd0aa5ba989afbd3a076667db91fdccb8cf"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Document the canonical Intent item format and per-tracker mapping",
+      "user_visible_behavior": "An engineer or PO finds the exact Intent item format (asdd-intent block keys, required headings, grounding table, evidence-ref grammar) and how it maps to and is read back from Jira, Linear and GitHub.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude-p61",
+      "req_ids": [
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "f=cli/skills/external-trackers/references/intent-format.md; test -f $f && for h in '```asdd-intent' '## Problem' '## Desired Outcome' '## Appetite' '## Must-have outcomes' '## No-gos' '## Grounding' '## Intent fitness' '### Jira' '### Linear' '### GitHub'; do grep -qF \"$h\" $f || { echo missing \"$h\"; exit 1; }; done",
+        "for k in intent_format slice_id mode pitch betting_state appetite reference_slices; do grep -qE \"^$k:\" cli/skills/external-trackers/references/intent-format.md || { echo missing key $k; exit 1; }; done",
+        "grep -q 'intent-format.md' cli/skills/external-trackers/references/mcp-configurations.md"
+      ],
+      "evidence": "GREEN 2026-11-17: intent-format.md has the asdd-intent block, every required heading, the Jira/Linear/GitHub sections and all required keys; mcp-configurations.md links it (3/3 verification commands exit 0); kit self --check OK; skills-lint PASS; guidance PASS; npm test 229/229; check --live exit 0 (HARNESS_DRIFT_BASE=b726956).",
+      "scope_paths": [
+        "cli/skills/external-trackers/references/intent-format.md",
+        "cli/skills/external-trackers/references/mcp-configurations.md"
+      ],
+      "evidence_hash": "55c686ba04cc2610f964e41ca6f0731e8be07e029500a8792337f71417d47125"
+    }
+  ]
 }

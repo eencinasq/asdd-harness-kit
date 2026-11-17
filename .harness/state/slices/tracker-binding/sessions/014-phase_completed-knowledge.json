@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-p61",
+  "human": "eencinas",
+  "slice_id": "tracker-binding",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:05:47.000Z",
+  "session_id": "sess-tracker-binding-014",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: references inside a skill must not use repo-relative links that break once the skill is installed under .agents/skills/; cite the installed path as text."
+}

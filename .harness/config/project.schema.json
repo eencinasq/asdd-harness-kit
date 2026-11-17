@@ -48,6 +48,36 @@
         "contract": { "enum": ["warn", "fail"], "description": "Severity of DRIFT-06 (every feature has scope_paths; passing features have evidence)." }
       }
     },
+    "tracker": {
+      "type": "object",
+      "description": "Where the PO/PM keeps pitches and Intent items (format: cli/skills/external-trackers/references/intent-format.md). Optional; validated by asdd check-config.",
+      "required": ["type", "project", "pitch", "intent"],
+      "properties": {
+        "type": { "enum": ["jira", "linear", "github"] },
+        "project": { "type": "string", "minLength": 1, "description": "jira: project key (PROD); linear: team key (ENG); github: owner/repo." },
+        "site": { "type": "string", "minLength": 1, "description": "jira only: the Atlassian site host (acme.atlassian.net)." },
+        "pitch": {
+          "type": "object",
+          "properties": {
+            "issue_type": { "type": "string", "minLength": 1, "description": "jira: issue type of a pitch (Epic)." },
+            "container": { "enum": ["project", "issue"], "description": "linear: a pitch is a Linear project or a labelled issue." },
+            "label": { "type": "string", "minLength": 1, "description": "github (and linear container=issue): label of a pitch issue." }
+          }
+        },
+        "intent": {
+          "type": "object",
+          "properties": {
+            "issue_type": { "type": "string", "minLength": 1, "description": "jira: issue type of an Intent item (Story)." },
+            "label": { "type": "string", "minLength": 1, "description": "Label of an Intent item (required for linear and github; jira needs issue_type or label)." }
+          }
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "const": "jira" } } }, "then": { "required": ["site"], "properties": { "project": { "pattern": "^[A-Z][A-Z0-9_]+$" }, "pitch": { "required": ["issue_type"] }, "intent": { "anyOf": [{ "required": ["issue_type"] }, { "required": ["label"] }] } } } },
+        { "if": { "properties": { "type": { "const": "linear" } } }, "then": { "properties": { "project": { "pattern": "^[A-Z][A-Z0-9]*$" }, "pitch": { "required": ["container"] }, "intent": { "required": ["label"] } } } },
+        { "if": { "properties": { "type": { "const": "github" } } }, "then": { "properties": { "project": { "pattern": "^[\\w.-]+/[\\w.-]+$" }, "pitch": { "required": ["label"] }, "intent": { "required": ["label"] } } } }
+      ]
+    },
     "capabilities": {
       "type": "object",
       "properties": {
