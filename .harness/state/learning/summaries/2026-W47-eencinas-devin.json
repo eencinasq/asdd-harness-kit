@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0",
+  "author": "eencinas-devin",
+  "week": "2026-W47",
+  "signatures": {
+    "sensor:DRIFT-01:.harness/steering": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": "skill-eval"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 .harness/steering/domain-layer.project.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:cli": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": "skill-eval"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 cli/src/kit/guidance.mjs changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:docs": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": "skill-eval"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T00:28:02.060Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ]
+    },
+    "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T00:28:02.060Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/quality-gates.project.md: coverage keys not reachable via tags (starvation, Phase-2 backlog): validation"
+      ]
+    },
+    "warn:QG-DEC-09": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:22.507Z",
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-17T00:28:02.060Z"
+        }
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ]
+    },
+    "sensor:QG-LEARN-04": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:26:42.887Z",
+          "slice_id": "jev-module",
+          "last_at": "2026-11-17T00:27:09.117Z"
+        }
+      ],
+      "examples": [
+        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-06528643 (sensor:DRIFT-01:docs) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+      ]
+    }
+  }
+}
