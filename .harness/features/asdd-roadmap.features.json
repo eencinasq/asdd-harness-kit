@@ -15,13 +15,13 @@
       ],
       "depends_on": [],
       "verification": [
-        "test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 28"
+        "test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 29"
       ],
-      "evidence": "Amend 2026-11-17 (P6 done + G28): TASK-001 verification with 28 gap rows exits 0.",
+      "evidence": "Amend 2026-11-17 (P5 done, P7 + G29): TASK-001 verification with 29 gap rows exits 0.",
       "scope_paths": [
         "docs/ASDD-ROADMAP.md"
       ],
-      "evidence_hash": "6ea66d278971b3cfbcb8120fd88140cbd39cc00e8565d3a5e84e106d8e8a594b"
+      "evidence_hash": "693474de205bc1b7248c37bab1aafda3fbd6ecbc128707a89ef8079fff9292ee"
     }
   ]
 }

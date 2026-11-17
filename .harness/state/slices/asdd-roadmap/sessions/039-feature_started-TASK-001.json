@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "concerns": [],
+  "timestamp": "2026-11-17T15:43:16.000Z",
+  "session_id": "sess-asdd-roadmap-039",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "docs/ASDD-ROADMAP.md"
+  ],
+  "evidence": "Start TASK-001 amend (P5 done, P7)."
+}
