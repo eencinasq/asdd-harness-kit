@@ -434,6 +434,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/intake-fitness-format/manifest.json",
       "features": ".harness/features/intake-fitness-format.features.json"
+    },
+    {
+      "slice_id": "po-readonly-gate",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/po-readonly-gate/manifest.json",
+      "features": ".harness/features/po-readonly-gate.features.json"
     }
   ]
 }
