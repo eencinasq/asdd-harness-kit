@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T12:30:21.777Z",
+  "generated_at": "2026-11-17T12:36:02.080Z",
   "threshold": 3,
   "summary": {
     "patterns": 30,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 38,
+      "occurrences": 39,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -52,6 +52,7 @@
         "rule-coverage",
         "sensor-fixes",
         "shaping-agent",
+        "shaping-cloud-setup",
         "skill-eval",
         "skills-spec",
         "spec-drift-adoption",
@@ -137,7 +138,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 142
+          "quiet_sessions": 155
         }
       ]
     },
@@ -208,7 +209,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 142
+          "quiet_sessions": 155
         }
       ]
     },
@@ -221,7 +222,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T12:15:54.897Z",
+      "last_seen": "2026-11-17T12:34:07.275Z",
       "sources": [
         "warn"
       ],
@@ -240,7 +241,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T12:15:54.897Z",
+      "last_seen": "2026-11-17T12:34:07.275Z",
       "sources": [
         "warn"
       ],
@@ -416,7 +417,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T12:15:54.897Z",
+      "last_seen": "2026-11-17T12:34:07.275Z",
       "sources": [
         "warn"
       ],
