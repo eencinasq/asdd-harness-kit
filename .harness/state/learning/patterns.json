@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T22:08:44.487Z",
+  "generated_at": "2026-11-17T22:16:32.952Z",
   "threshold": 3,
   "summary": {
-    "patterns": 45,
-    "open": 4,
-    "in_flight": 2,
-    "verified": 1,
+    "patterns": 46,
+    "open": 3,
+    "in_flight": 3,
+    "verified": 2,
     "unsigned_failures": 0
   },
   "patterns": [
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 45,
+      "occurrences": 46,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -33,6 +33,7 @@
         "asdd-p3",
         "asdd-p4",
         "asdd-ui",
+        "ci-npm-ci",
         "claude-hook-cwd",
         "cli-harness",
         "cost-metrics",
@@ -91,7 +92,7 @@
       "kind": "escape",
       "occurrences": 12,
       "threshold": 3,
-      "status": "rejected",
+      "status": "applied",
       "reopened": false,
       "first_seen": "2026-10-28T13:22:35.735Z",
       "last_seen": "2026-11-17T17:43:19.057Z",
@@ -123,8 +124,10 @@
           "id": "SP-006",
           "file": "docs/knowledge-base/steering-proposals/SP-006.md",
           "declared": "applied",
-          "status": "ineffective",
-          "recurrences": 8
+          "status": "applied",
+          "recurrences": 0,
+          "quiet_sessions": 0,
+          "area": "docs"
         }
       ]
     },
@@ -167,8 +170,8 @@
       "kind": "escape",
       "occurrences": 8,
       "threshold": 3,
-      "status": "open",
-      "reopened": true,
+      "status": "verified",
+      "reopened": false,
       "first_seen": "2026-10-28T01:34:26.022Z",
       "last_seen": "2026-11-17T14:38:33.546Z",
       "sources": [
@@ -185,8 +188,9 @@
           "id": "SP-005",
           "file": "docs/knowledge-base/steering-proposals/SP-005.md",
           "declared": "applied",
-          "status": "ineffective",
-          "recurrences": 3
+          "status": "verified",
+          "recurrences": 0,
+          "quiet_sessions": 25
         }
       ]
     },
@@ -268,7 +272,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 366
+          "quiet_sessions": 25
         }
       ]
     },
@@ -973,6 +977,27 @@
       ],
       "examples": [
         "DRIFT-01 README.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-936370d8",
+      "signature": "sensor:hotfix slice \"*\" cannot complete with open escalation signals (EN-scope-spread) ",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T22:14:27.580Z",
+      "last_seen": "2026-11-17T22:14:27.580Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "ci-npm-ci"
+      ],
+      "examples": [
+        "hotfix slice \"ci-npm-ci\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate ci-npm-ci --reasons \"E1-scope-spread\""
       ],
       "proposals": []
     },

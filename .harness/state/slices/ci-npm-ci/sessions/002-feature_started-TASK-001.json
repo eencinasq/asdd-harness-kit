@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ci-npm-ci-002",
+  "timestamp": "2026-11-17T22:13:43.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ci-npm-ci",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    ".github/workflows/harness-invariants.yml",
+    "cli/test/install.sh"
+  ],
+  "evidence": "RED: CI invariants failing on main since 78d1fb9; clean checkout without node_modules: npm pack → Cannot find package 'esbuild' (install.sh hides it).",
+  "concerns": []
+}

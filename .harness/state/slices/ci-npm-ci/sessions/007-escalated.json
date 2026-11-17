@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ci-npm-ci-007",
+  "timestamp": "2026-11-17T22:14:39.016Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "ci-npm-ci",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "CI workflow (.github) and its test script (cli/) by nature; no domain terms, no dissent.",
+  "concerns": []
+}

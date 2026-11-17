@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ci-npm-ci",
+  "concerns": [],
+  "timestamp": "2026-11-17T22:14:26.000Z",
+  "session_id": "sess-ci-npm-ci-003",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    ".github/workflows/harness-invariants.yml",
+    "cli/test/install.sh"
+  ],
+  "evidence": "GREEN 2026-11-17 (ac4fe73): clean checkout without node_modules → install.sh fails with 'npm pack failed … Cannot find package esbuild'; after npm ci → 'OK asdd install smoke test'. Workflow runs npm ci before the tests."
+}

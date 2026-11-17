@@ -15,6 +15,9 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Install root dev dependencies (esbuild for npm pack / prepack)
+        run: npm ci
+
       - name: Unit tests (command gate, spec drift, learning loop)
         run: node --test cli/src/harness/learning-lib.test.mjs cli/src/harness/command-gate.test.mjs cli/src/harness/drift-lib.test.mjs cli/src/harness/audit-codebase.test.mjs cli/modules/http-api/adapters/openapi.test.mjs
 
