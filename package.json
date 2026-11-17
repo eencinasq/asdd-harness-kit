@@ -9,6 +9,7 @@
   "files": [
     "docs/**/*",
     "cli/{bin,dist,templates,modules,runtimes,steering,scaffold,agents,skills,mcp}/**/*",
+    "cli/eval/skills/**/*",
     "cli/README.md",
     "cli/AGENTS.md",
     "cli/versions.json",

@@ -10,6 +10,8 @@ import {
   readSkillBody,
   runSkillEval,
   formatSkillEvalReport,
+  expandProbe,
+  resolveAsdd,
 } from './skill-eval-lib.mjs';
 
 function tmp(prefix = 'skill-eval-test-') {
@@ -225,4 +227,46 @@ test('invalid JSON fixture is reported as a failed case, not a crash', () => {
   const suite = runSkillEval({ root, fixturesDir });
   assert.equal(suite.ok, false);
   assert.equal(suite.failed, 1);
+});
+
+test('skill-eval-portable REQ-001 REQ-006 {asdd} is the running CLI and {skill_dir} the found skill folder, shell-quoted', () => {
+  const asdd = resolveAsdd();
+  assert.match(asdd, /^'.+' '.+cli\/bin\/asdd\.mjs'$/);
+  assert.equal(expandProbe('{asdd} status --json', { asdd: "'node' 'x/cli/bin/asdd.mjs'", skillDir: '.agents/skills/a' }), "'node' 'x/cli/bin/asdd.mjs' status --json");
+  assert.equal(expandProbe("grep -c x {skill_dir}/references/r.md", { asdd: 'a', skillDir: ".agents/skills/it's" }), "grep -c x '.agents/skills/it'\\''s'/references/r.md");
+  const { root, fixturesDir } = makeProject({
+    fixtures: { 'cli.json': { id: 'cli', probes: [{ id: 'p', run: '{asdd} --version', cwd: 'work' }, { id: 'd', run: 'test -f {skill_dir}/SKILL.md', cwd: 'repo' }], assertions: [{ type: 'exit_code', probe: 'p', code: 0 }, { type: 'exit_code', probe: 'd', code: 0 }] } },
+  });
+  const suite = runSkillEval({ root, fixturesDir });
+  assert.equal(suite.ok, true, JSON.stringify(suite.skills[0]?.results[0]?.failures));
+});
+
+test('skill-eval-portable REQ-003 project fixtures in .harness/eval/skills merge with shipped ones; same file name overrides', () => {
+  const { root, fixturesDir } = makeProject({ fixtures: { 'a.json': PASS_FIXTURE, 'b.json': { ...PASS_FIXTURE, id: 'shipped-b' } } });
+  writeJson(join(root, '.harness/eval/skills/fake-skill/b.json'), { ...PASS_FIXTURE, id: 'project-b' });
+  writeJson(join(root, '.harness/eval/skills/fake-skill/c.json'), { ...PASS_FIXTURE, id: 'project-c' });
+  const suite = runSkillEval({ root, fixturesDir, projectFixturesDir: join(root, '.harness/eval/skills') });
+  const ids = suite.skills[0].results.map((r) => [r.id, r.source]);
+  assert.deepEqual(ids, [['echo-pass', 'kit'], ['project-b', 'project'], ['project-c', 'project']]);
+  assert.equal(suite.ok, true);
+});
+
+test('skill-eval-portable REQ-005 unmet requires are skipped with a reason, never failed or regressed', () => {
+  const { root, fixturesDir } = makeProject({
+    fixtures: {
+      'a.json': PASS_FIXTURE,
+      'needs.json': { ...PASS_FIXTURE, id: 'needs-tool', requires: ['command:definitely-not-a-real-tool-xyz', 'path:nope/missing'] },
+      'has.json': { ...PASS_FIXTURE, id: 'has-tool', requires: ['command:node', 'path:.agents'] },
+    },
+  });
+  const suite = runSkillEval({ root, fixturesDir });
+  const byId = Object.fromEntries(suite.skills[0].results.map((r) => [r.id, r]));
+  assert.equal(byId['needs-tool'].skipped, true);
+  assert.match(byId['needs-tool'].reason, /definitely-not-a-real-tool-xyz/);
+  assert.equal(byId['has-tool'].ok, true);
+  assert.deepEqual([suite.passed, suite.failed, suite.skipped], [2, 0, 1]);
+  assert.equal(suite.ok, true);
+  assert.match(formatSkillEvalReport(suite), /SKIP needs-tool/);
+  const onlySkipped = makeProject({ fixtures: { 'n.json': { ...PASS_FIXTURE, requires: ['command:definitely-not-a-real-tool-xyz'] } } });
+  assert.equal(runSkillEval(onlySkipped).ok, false, 'a run where nothing executed is not a pass');
 });

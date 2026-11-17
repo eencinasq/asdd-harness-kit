@@ -70,7 +70,7 @@ Roadmap P5 added:
 |---|---|
 | `asdd ui [--port <n>]` | Local page on 127.0.0.1 (default port 7474): slices, pipeline, drift, learning, knowledge, pending gates; read-only except deciding a gate |
 | `asdd gate-decide <slice> --phase <p> --note "…"` | Tech Lead acknowledges a `WARN` gate: appends an `override` session (`decided_by` from `HARNESS_AUTHOR` or git) and syncs |
-| `asdd skill-eval [--skill <name>] [--baseline <ref>] [--json]` | Run `cli/eval/skills/` fixtures; `--baseline` fails on a regression against the skill at that ref (QG-LEARN-10 evidence) |
+| `asdd skill-eval [--skill <name>] [--baseline <ref>] [--json]` | Run the shipped skill fixtures plus `.harness/eval/skills/` (project cases add or override); `--baseline` fails on a regression against the skill at that ref (QG-LEARN-10 evidence) |
 
 Also: `check`, `verify`, `gate`, `drift`, `check-config`, `skills-index`, `sync`, `repair`,
 `knowledge sync|search|trace|slice|status|patterns`, `learn`, `audit`, `triage`.

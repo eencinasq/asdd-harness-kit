@@ -8,15 +8,67 @@
  *
  * `--baseline <ref>` re-scores every fixture against the skill body at that git ref
  * (`git show <ref>:<path>`, never a checkout) and reports improved / regressed / unchanged.
+ *
+ * Portable (skill-eval-portable): probes use `{asdd}` (the CLI running this evaluation) and `{skill_dir}`
+ * (the evaluated skill's folder); the fixtures ship in the npm package; a project adds or overrides cases
+ * under `.harness/eval/skills/<skill>/`; a case whose `requires` is unmet is `skipped`, never failed.
  */
-import { existsSync, readdirSync, readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+// Two levels under cli/ from both cli/src/harness and cli/dist/harness, and inside the installed package.
 export const DEFAULT_FIXTURES_DIR = join(HERE, '../../eval/skills');
+export const PROJECT_FIXTURES_REL = '.harness/eval/skills';
+const ASDD_BIN = join(HERE, '../../bin/asdd.mjs');
+
+/** POSIX single-quote a value for a shell command line. */
+const shQuote = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
+
+/** `{asdd}`: the asdd CLI running this evaluation (same version), as `node <package>/cli/bin/asdd.mjs`. */
+export function resolveAsdd() {
+  return `${shQuote(process.execPath)} ${shQuote(ASDD_BIN)}`;
+}
+
+/** Substitute `{asdd}` and `{skill_dir}` in a probe command (the values are shell-quoted). */
+export function expandProbe(run, { asdd = resolveAsdd(), skillDir } = {}) {
+  let out = String(run ?? '').split('{asdd}').join(asdd);
+  if (skillDir !== undefined) out = out.split('{skill_dir}').join(shQuote(skillDir));
+  return out;
+}
+
+const onPath = (name) => {
+  if (!/^[\w.-]+$/.test(name)) return false;
+  for (const dir of String(process.env.PATH ?? '').split(':').filter(Boolean)) {
+    try {
+      if (statSync(join(dir, name)).isFile()) return true;
+    } catch {
+      // not in this dir
+    }
+  }
+  return false;
+};
+
+/** Unmet `requires` entries (`command:<name>` on PATH, `path:<repo-relative>`), as human-readable reasons. */
+export function unmetRequirements(requires, root) {
+  const unmet = [];
+  for (const req of Array.isArray(requires) ? requires : []) {
+    const [kind, ...rest] = String(req).split(':');
+    const value = rest.join(':');
+    if (kind === 'command') {
+      if (!onPath(value)) unmet.push(`command "${value}" not on PATH`);
+    } else if (kind === 'path') {
+      const target = resolve(root, value);
+      if (!(target === root || target.startsWith(root + sep)) || !existsSync(target)) unmet.push(`path "${value}" not found`);
+    } else {
+      unmet.push(`unknown requirement "${req}"`);
+    }
+  }
+  return unmet;
+}
 
 const PROBE_TIMEOUT_MS = 30_000;
 const SKILL_CANDIDATES = (name) => [`cli/skills/${name}/SKILL.md`, `.agents/skills/${name}/SKILL.md`];
@@ -36,24 +88,28 @@ export function discoverSkills(fixturesDir = DEFAULT_FIXTURES_DIR) {
  * All fixture cases under fixturesDir (optionally one skill), sorted by skill then file name.
  * Unparseable JSON becomes a synthetic failed case instead of throwing.
  */
-export function loadFixtures(fixturesDir = DEFAULT_FIXTURES_DIR, { skill } = {}) {
-  const skills = skill ? [skill] : listDirs(fixturesDir);
-  const out = [];
-  for (const name of skills) {
-    const dir = join(fixturesDir, name);
-    if (!existsSync(dir)) continue;
-    for (const file of readdirSync(dir).filter((n) => n.endsWith('.json')).sort()) {
-      const path = join(dir, file);
-      let data;
-      try {
-        data = JSON.parse(readFileSync(path, 'utf8'));
-      } catch (err) {
-        data = { __parse_error: String(err?.message || err) };
+export function loadFixtures(fixturesDir = DEFAULT_FIXTURES_DIR, { skill, projectFixturesDir, source = 'kit' } = {}) {
+  const byKey = new Map();
+  const read = (dirRoot, from) => {
+    for (const name of skill ? [skill] : listDirs(dirRoot)) {
+      const dir = join(dirRoot, name);
+      if (!existsSync(dir)) continue;
+      for (const file of readdirSync(dir).filter((n) => n.endsWith('.json')).sort()) {
+        const path = join(dir, file);
+        let data;
+        try {
+          data = JSON.parse(readFileSync(path, 'utf8'));
+        } catch (err) {
+          data = { __parse_error: String(err?.message || err) };
+        }
+        // A project case with the same file name replaces the shipped one.
+        byKey.set(`${name}/${file}`, { skill: name, file, path, source: from, id: data.id || file.replace(/\.json$/, ''), data });
       }
-      out.push({ skill: name, file, path, id: data.id || file.replace(/\.json$/, ''), data });
     }
-  }
-  return out;
+  };
+  read(fixturesDir, source);
+  if (projectFixturesDir && existsSync(projectFixturesDir)) read(projectFixturesDir, 'project');
+  return [...byKey.values()].sort((a, b) => a.skill.localeCompare(b.skill) || a.file.localeCompare(b.file));
 }
 
 /**
@@ -100,9 +156,10 @@ function seedWorkspace(workDir, setup = {}) {
 }
 
 /** Run one probe command; cwd 'work' = temp workspace, 'repo' = project root. */
-export function runProbe(probe, { workDir, root }) {
+export function runProbe(probe, { workDir, root, skillDir }) {
   const cwd = probe.cwd === 'repo' ? root : workDir;
-  const r = spawnSync(probe.run, {
+  const run = expandProbe(probe.run, { skillDir });
+  const r = spawnSync(run, {
     cwd,
     shell: true,
     encoding: 'utf8',
@@ -111,7 +168,7 @@ export function runProbe(probe, { workDir, root }) {
   });
   return {
     id: probe.id,
-    run: probe.run,
+    run,
     cwd: probe.cwd === 'repo' ? 'repo' : 'work',
     code: r.status,
     stdout: r.stdout ?? '',
@@ -188,10 +245,10 @@ export function evalAssertions(fixture, { probes, workDir, skillText }) {
  * Run one fixture once. `body` is the resolved skill text under test (worktree or git ref).
  * Returns { id, ok, failures, probes, assertions }.
  */
-export function runFixture(root, fixtureCase, { body, fixturesDir } = {}) {
+export function runFixture(root, fixtureCase, { body, skillDir } = {}) {
   const { skill, data } = fixtureCase;
   const id = data.id || fixtureCase.file.replace(/\.json$/, '');
-  const base = { id, skill, task: data.task ?? '', expect: data.expect ?? '', probes: [], assertions: [], failures: [] };
+  const base = { id, skill, source: fixtureCase.source ?? 'kit', task: data.task ?? '', expect: data.expect ?? '', probes: [], assertions: [], failures: [] };
   if (data.__parse_error) {
     base.failures.push(`fixture JSON parse error: ${data.__parse_error}`);
     return { ...base, ok: false };
@@ -205,7 +262,7 @@ export function runFixture(root, fixtureCase, { body, fixturesDir } = {}) {
       return { ...base, ok: false };
     }
     for (const probe of Array.isArray(data.probes) ? data.probes : []) {
-      base.probes.push(runProbe(probe, { workDir, root }));
+      base.probes.push(runProbe(probe, { workDir, root, skillDir }));
     }
     base.assertions = evalAssertions(data, { probes: base.probes, workDir, skillText: body });
     for (const a of base.assertions) {
@@ -229,8 +286,8 @@ function deltaFor(currentOk, baselineOk) {
  * Returns { skills: [{name,total,passed,failed,results}], total, passed, failed,
  *           regressed: ["skill/case", …], ok }.
  */
-export function runSkillEval({ root = process.cwd(), fixturesDir = DEFAULT_FIXTURES_DIR, skill, baseline } = {}) {
-  const cases = loadFixtures(fixturesDir, { skill });
+export function runSkillEval({ root = process.cwd(), fixturesDir = DEFAULT_FIXTURES_DIR, projectFixturesDir, skill, baseline } = {}) {
+  const cases = loadFixtures(fixturesDir, { skill, projectFixturesDir });
   const bodies = new Map();
   const bodyFor = (name) => {
     if (!bodies.has(name)) bodies.set(name, readSkillBody(root, name));
@@ -254,17 +311,28 @@ export function runSkillEval({ root = process.cwd(), fixturesDir = DEFAULT_FIXTU
   let total = 0;
   let passed = 0;
   let failed = 0;
+  let skipped = 0;
   for (const [name, skillCases] of [...bySkill.entries()].sort()) {
     const results = [];
     for (const c of skillCases) {
       const body = bodyFor(name);
+      const caseId = c.data.id || c.file.replace(/\.json$/, '');
+      const unmet = c.data.__parse_error ? [] : unmetRequirements(c.data.requires, root);
+      if (unmet.length) {
+        // A property of the machine, not of the skill text: reported, never failed or regressed.
+        results.push({ id: caseId, skill: name, source: c.source, task: c.data.task ?? '', expect: c.data.expect ?? '', probes: [], assertions: [], failures: [], ok: false, skipped: true, reason: unmet.join('; ') });
+        total += 1;
+        skipped += 1;
+        continue;
+      }
+      const skillDir = body.ok ? dirname(body.path) : undefined;
       const result = body.ok
-        ? runFixture(root, c, { body: body.text })
-        : { id: c.data.id || c.file.replace(/\.json$/, ''), skill: name, task: c.data.task ?? '', expect: c.data.expect ?? '', probes: [], assertions: [], failures: [body.error], ok: false };
+        ? runFixture(root, c, { body: body.text, skillDir })
+        : { id: caseId, skill: name, source: c.source, task: c.data.task ?? '', expect: c.data.expect ?? '', probes: [], assertions: [], failures: [body.error], ok: false };
       if (baseline) {
         const bbody = baselineBodyFor(name);
         const baselineResult = bbody.ok
-          ? runFixture(root, c, { body: bbody.text })
+          ? runFixture(root, c, { body: bbody.text, skillDir })
           : { ok: false };
         result.delta = deltaFor(result.ok, bbody.ok ? baselineResult.ok : null);
         if (result.delta === 'regressed') regressed.push(`${name}/${result.id}`);
@@ -278,13 +346,16 @@ export function runSkillEval({ root = process.cwd(), fixturesDir = DEFAULT_FIXTU
       name,
       total: results.length,
       passed: results.filter((r) => r.ok).length,
-      failed: results.filter((r) => !r.ok).length,
+      failed: results.filter((r) => !r.ok && !r.skipped).length,
+      skipped: results.filter((r) => r.skipped).length,
       results,
     });
   }
 
-  const ok = baseline ? regressed.length === 0 && total > 0 : failed === 0 && total > 0;
-  return { skills, total, passed, failed, regressed, baseline: baseline ?? null, ok };
+  // At least one case must have run: a run where everything was skipped proves nothing.
+  const executed = total - skipped;
+  const ok = baseline ? regressed.length === 0 && executed > 0 : failed === 0 && executed > 0;
+  return { skills, total, passed, failed, skipped, regressed, baseline: baseline ?? null, ok };
 }
 
 export function formatSkillEvalReport(suite) {
@@ -293,16 +364,18 @@ export function formatSkillEvalReport(suite) {
     lines.push('  no fixtures found');
   }
   for (const s of suite.skills) {
-    lines.push(`  ${s.name.padEnd(24)} ${s.passed}/${s.total} pass`);
+    lines.push(`  ${s.name.padEnd(24)} ${s.passed}/${s.total - (s.skipped ?? 0)} pass${s.skipped ? ` (${s.skipped} skipped)` : ''}`);
     for (const r of s.results) {
-      if (r.ok) {
+      if (r.skipped) {
+        lines.push(`    SKIP ${r.id}  ${r.reason}`);
+      } else if (r.ok) {
         lines.push(`    OK   ${r.id}${r.delta ? ` (${r.delta})` : ''}`);
       } else {
         lines.push(`    FAIL ${r.id}${r.delta ? ` (${r.delta})` : ''}  ${r.failures.join('; ')}`);
       }
     }
   }
-  lines.push(`  total ${suite.passed}/${suite.total} pass`);
+  lines.push(`  total ${suite.passed}/${suite.total - (suite.skipped ?? 0)} pass${suite.skipped ? ` · ${suite.skipped} skipped` : ''}`);
   if (suite.baseline) {
     lines.push(`  baseline ${suite.baseline}`);
     for (const s of suite.skills) {

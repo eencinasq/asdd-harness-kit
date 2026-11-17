@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "skill-eval-portable",
+  "concerns": [],
+  "timestamp": "2026-11-17T17:47:10.000Z",
+  "session_id": "sess-skill-eval-portable-007",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/eval/skills"
+  ],
+  "evidence": "RED: 7 shipped fixtures hard-code node cli/bin/asdd.mjs or cli/skills/ paths; scope-grounding uses the kit-only slice asdd-roadmap; codegraph has no requires."
+}
