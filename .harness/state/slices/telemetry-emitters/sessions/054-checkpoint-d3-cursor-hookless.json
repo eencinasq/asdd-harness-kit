@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-telemetry-emitters-054",
+  "timestamp": "2026-11-17T12:36:31.383Z",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "note": "PO/TL decision D-3 (chat, 2026-11-17, \"Cursor hookless\"): Cursor is hookless for guidance loads. TASK-002 records the outcome (no fixture); TASK-012 pins allow-with-no-span; TASK-014 wires no Cursor beforeReadFile hook; the TEL-W3 cursor observe clause is dropped (validators/telemetry.mjs)."
+}

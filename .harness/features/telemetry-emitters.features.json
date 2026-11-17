@@ -27,14 +27,14 @@
         "! grep -rn \"$(pwd)\" cli/test/fixtures/telemetry/claude/"
       ],
       "notes": "Wave 0 (T0). Live capture in the running Claude Code session; capture hook never committed. Data task, no RED.",
-      "evidence": "Verification: provenance/parse node check OK on 7 fixtures (method live-capture, Claude Code 2.1.283); no absolute repo path in cli/test/fixtures/telemetry/claude/ (grep empty). check --live exit 0 (HARNESS_DRIFT_BASE=chore/p5-roadmap-runtimes-bindings); npm test exit 0 (fail 0). Findings: A-01 confirmed (Read tool_input.file_path absolute; Skill tool_input.skill bare or plugin:name; sub-agent payloads add agent_id+agent_type, main-session omit them). OI-6: exit 1 and timeout invisible to model; exit 2 stderr reaches the model -> observe must never exit 2.",
-      "evidence_hash": "a0417da32b071a7ede509111ae64b66de533e261de2500826b9d82a8d734f07d"
+      "evidence": "Re-verified after the D-3 note in fixtures/telemetry/README.md (DRIFT-02): provenance/parse check OK on 7 Claude fixtures; no absolute repo path under cli/test/fixtures/telemetry/.",
+      "evidence_hash": "622defb8b6d63f3c85eab77711c8341ab982a249756d2149d9a3ee6a8ad386c0"
     },
     {
       "id": "TASK-002",
       "title": "Obtain Cursor beforeReadFile fixtures or record the D-3 hookless outcome",
       "user_visible_behavior": "The Cursor fixture README states exactly one D-3 outcome (ship or hookless); every committed Cursor fixture has provenance method live-capture or vendor-doc.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 2,
       "area": "telemetry-emitters",
       "owner": "claude",
@@ -52,7 +52,9 @@
         "test -f cli/test/fixtures/telemetry/cursor/README.md && grep -Eq \"D-3 outcome: (ship|hookless)\" cli/test/fixtures/telemetry/cursor/README.md",
         "node -e \"const fs=require('fs'),p='cli/test/fixtures/telemetry/cursor/';for(const f of fs.readdirSync(p).filter(f=>f.endsWith('.json'))){const j=JSON.parse(fs.readFileSync(p+f,'utf8'));if(!['live-capture','vendor-doc'].includes(j.provenance&&j.provenance.method))throw new Error(f)}\""
       ],
-      "notes": "Wave 0 (T0). HUMAN-DEPENDENT: Cursor live capture needs the human; vendor-doc fixture marked unverified. Recommendation: ship only with live-capture. Data task, no RED."
+      "notes": "Wave 0 (T0). HUMAN-DEPENDENT: Cursor live capture needs the human; vendor-doc fixture marked unverified. Recommendation: ship only with live-capture. Data task, no RED.",
+      "evidence": "D-3 outcome recorded (PO decision 2026-11-17, session 054): Cursor hookless. cli/test/fixtures/telemetry/cursor/README.md documents it; no payload fixture committed (none live-captured; vendor-doc fixtures are not proof per ADR-004). fixtures/telemetry/README.md updated.",
+      "evidence_hash": "840d8ed3adbc375e169a6cde71d0b32b76c3ff81e24638280dd71c2eb7498ce7"
     },
     {
       "id": "TASK-003",

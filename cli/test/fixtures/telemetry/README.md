@@ -57,4 +57,4 @@ Applied before commit:
 
 ## Cursor (`cursor/`)
 
-See TASK-002 (D-3): the Cursor load hook ships only with a `live-capture` fixture.
+D-3 decided 2026-11-17: Cursor is hookless (no live capture). See `cursor/README.md`.
