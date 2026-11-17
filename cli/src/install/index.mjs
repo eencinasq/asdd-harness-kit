@@ -116,6 +116,9 @@ function installHarnessIgnores(ctx) {
   ctx.ensureGitignore('.harness/knowledge');
   // raw learning signals are local; learn.mjs commits weekly summaries instead
   ctx.ensureGitignore('.harness/state/learning/signals');
+  // telemetry data is local: the span stream and the per-slice rollups (the contract files are committed)
+  ctx.ensureGitignore('.harness/state/telemetry/spans.jsonl');
+  ctx.ensureGitignore('.harness/state/telemetry/slices/');
   // integration keys (embeddings) are loaded from these files — never commit
   ctx.ensureGitignore('.env.local');
 }
@@ -240,7 +243,7 @@ function printSummary(ctx, previous) {
     log('  Review .harness/config/models.json for tier rationale.');
     if (runtimes.includes('cursor')) log('  Cursor:  verify-on-stop + command-gate hooks active in .cursor/hooks.json');
     if (runtimes.includes('claude')) {
-      log('  Claude:  .claude/settings.json PreToolUse(Bash)+Stop hooks');
+      log('  Claude:  .claude/settings.json PreToolUse(Bash)+Stop hooks, PostToolUse(Read|Skill) guidance load hook (fail-open)');
       log('  Claude:  read CLAUDE.md for session instructions');
     }
     if (runtimes.includes('opencode')) log('  OpenCode: config written to opencode.json');

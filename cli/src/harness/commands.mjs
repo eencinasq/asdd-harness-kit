@@ -68,6 +68,8 @@ export const HARNESS_COMMANDS = {
   audit: { script: 'audit-codebase.mjs', help: 'codebase audit [--json] [--no-write] [--hotspots N] [--since 90.days]' },
   triage: { script: 'audit-triage.mjs', help: 'TL triage: triage <finding-id> --dismiss --reason "…" | --confirm | --clear | --list' },
   ui: { script: 'ui-server.mjs', help: 'read-only local harness UI on 127.0.0.1 [--port <n>]' },
+  profile: { script: 'harness-profile.mjs', help: 'read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation [--slice <id>] [--bottlenecks] [--json]' },
+  observe: { script: 'telemetry-observe.mjs', help: 'the load hook (fail-open): records a steering/skill load as an activation record (stdin: hook payload) <claude|cursor>' },
 };
 
 /**

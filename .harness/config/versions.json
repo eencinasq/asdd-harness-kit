@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "kit_version": "3.12.0",
-  "generated_at": "2026-11-14T03:42:21.743Z",
+  "generated_at": "2026-11-17T12:47:36.115Z",
   "artifacts": {
     "cli/steering/README.md": "3.12.0",
     "cli/steering/_steering-profile.md": "3.12.0",
@@ -50,6 +50,8 @@
     "cli/scaffold/specs/README.md": "3.12.0",
     "cli/scaffold/state/archive/README.md": "3.12.0",
     "cli/scaffold/state/slices/README.md": "3.12.0",
+    "cli/scaffold/state/telemetry/README.md": "3.12.0",
+    "cli/scaffold/state/telemetry/telemetry.schema.json": "3.12.0",
     "cli/versions.json": "3.12.0",
     "cli/agents/README.md": "3.12.0",
     "cli/agents/_runtime-template.md": "3.12.0",

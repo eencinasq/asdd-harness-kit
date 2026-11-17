@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:asdd-harness-kit:schemas:telemetry:1.0",
+  "title": "ASDD Harness Telemetry Span",
+  "description": "One JSONL line in .harness/state/telemetry/spans.jsonl — the single canonical stream. Append-only; writers never edit prior lines.",
+  "type": "object",
+  "required": [
+    "schema_version", "trace_id", "span_id", "kind",
+    "process_name", "start_time_iso", "end_time_iso",
+    "duration_ms", "status"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0" },
+    "trace_id":  { "type": "string", "pattern": "^[a-f0-9]{16,32}$",
+      "description": "per-invocation grouping id — env-propagated (HARNESS_TRACE_ID) or self-minted" },
+    "span_id":   { "type": "string", "pattern": "^[a-f0-9]{8,16}$" },
+    "parent_span_id": { "type": ["string", "null"], "pattern": "^[a-f0-9]{8,16}$",
+      "description": "env-inherited HARNESS_SPAN_ID when present, else null — best-effort within one invocation" },
+    "kind": { "type": "string", "enum": [
+      "phase", "turn", "command", "test", "sensor",
+      "hook", "sync", "subagent", "tool"
+    ] },
+    "slice_id": { "type": ["string", "null"], "pattern": "^[a-z0-9_-]+$" },
+    "phase": { "type": ["string", "null"], "enum": [
+      "discovery", "spec", "validation", "domain", "design",
+      "task_planning", "implementation", "qa", "refactor", "knowledge", null
+    ] },
+    "process_name": { "type": "string", "minLength": 1,
+      "description": "kit process name — e.g. init-slice, sync-state, check-invariants, verify-on-stop, command-gate, test-runner, subagent-dispatch" },
+    "runtime": { "type": ["string", "null"],
+      "description": "cursor | claude | cli | ci | …; mirrors HARNESS_RUNTIME semantics (check-invariants.mjs:89)" },
+    "start_time_iso": { "type": "string", "format": "date-time" },
+    "end_time_iso":   { "type": "string", "format": "date-time" },
+    "duration_ms":    { "type": "number", "minimum": 0 },
+    "status": { "type": "string", "enum": ["OK", "ERROR", "TIMEOUT"] },
+    "attributes": {
+      "type": "object",
+      "description": "kind-scoped attribute bag; unknown keys permitted, namespaced by kind",
+      "properties": {
+        "trace_source":           { "type": "string", "enum": ["env", "self", "synthesized"],
+          "description": "how trace_id/span_id were obtained — env-inherited, self-minted, or deterministically synthesized" },
+        "test_runner":            { "type": "string" },
+        "boot_duration_ms":       { "type": "number", "minimum": 0 },
+        "execution_duration_ms":  { "type": "number", "minimum": 0 },
+        "passed_count":           { "type": "integer", "minimum": 0 },
+        "failed_count":           { "type": "integer", "minimum": 0 },
+        "test_path":              { "type": "string" },
+        "failure_signature":      { "type": "string",
+          "description": "stable dedup key — test:<test_path> | sensor:<validator>:<check> | command:<label>" },
+        "model":                  { "type": "string" },
+        "gen_ai.usage.input_tokens_est":  { "type": "integer", "minimum": 0 },
+        "gen_ai.usage.output_tokens_est": { "type": "integer", "minimum": 0 },
+        "context_bytes_loaded":   { "type": "integer", "minimum": 0 },
+        "tool_name":              { "type": "string" },
+        "target_path":            { "type": "string" },
+        "target_path_exists":     { "type": "boolean" },
+        "result_size_bytes":      { "type": "integer", "minimum": 0 },
+        "sensor_name":            { "type": "string" },
+        "exit_code":              { "type": "integer" },
+        "violations_count":       { "type": "integer", "minimum": 0 },
+        "session_file":           { "type": "string" },
+        "source":                 { "type": "string",
+          "description": "synthesized-span provenance — e.g. session_events; absent on producer-emitted spans" },
+        "command_label":          { "type": "string",
+          "description": "pattern-class LABEL only — never raw command text (command-gate.mjs:18,63-72 precedent)" },
+        "heuristic":              { "type": "string", "enum": ["H-BOOT","H-LOOP","H-SURGE","H-STALL","H-PHANTOM"],
+          "description": "detection spans only — producers never set this" },
+        "trigger_span_id":        { "type": "string", "pattern": "^[a-f0-9]{8,16}$",
+          "description": "detection spans only — the producer span that tripped the rule" },
+        "consecutive_failures":   { "type": "integer", "minimum": 0 },
+        "dedup_window_min":       { "type": "integer", "minimum": 0 },
+        "bottleneck_score":       { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["time_iso", "name"],
+        "properties": {
+          "time_iso": { "type": "string", "format": "date-time" },
+          "name":     { "type": "string",
+            "description": "e.g. steering_load (attrs: files, bytes), session_write (attrs: session_file)" },
+          "attributes": { "type": "object" }
+        }
+      }
+    },
+    "writer": { "type": "string",
+      "description": "emitting process — e.g. command-gate, verify-on-stop, telemetry-lib, runtime-hook, rollup, heuristic-evaluator" }
+  },
+  "additionalProperties": false
+}

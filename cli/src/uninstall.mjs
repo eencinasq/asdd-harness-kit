@@ -11,14 +11,21 @@ import { c, log, ok, setQuiet, warn } from './ui.mjs';
 
 const VERSIONS = '.harness/config/installed-versions.json';
 const KIT_MCP_SERVERS = { knowledge: 'tools/knowledge/', 'spec-drift': 'tools/spec-drift/', 'jev-gate': 'tools/jev-gate/' };
-// Pre-CLI scripts, the old project copy (.harness/cli), and the project resolver (b=node_modules/.bin/asdd; … exec "$b" <verb>).
-const KIT_HOOK = /\.harness\/scripts\/(verify-on-stop|command-gate|jev-command-gate)\.mjs|\.harness\/cli\/bin\/asdd\.mjs (verify|gate)\b|^b=node_modules\/\.bin\/asdd;.*exec "\$b" (verify|gate)$/;
+// Pre-CLI scripts, the old project copy (.harness/cli), the project resolver (b=node_modules/.bin/asdd; … exec "$b" <verb>),
+// and the fail-open load hook (… "$b" observe <runtime> …; exit 0, or the kit's asdd.mjs observe).
+const KIT_HOOK = /\.harness\/scripts\/(verify-on-stop|command-gate|jev-command-gate)\.mjs|\.harness\/cli\/bin\/asdd\.mjs (verify|gate)\b|^b=node_modules\/\.bin\/asdd;.*exec "\$b" (verify|gate)$|"\$b" observe (claude|cursor)\b|asdd\.mjs observe\b/;
 /** Merged with the project's own content: the kit's entries are taken out, the file stays. */
 const MERGED = ['.agents/mcp/mcp.json', '.cursor/hooks.json', '.claude/settings.json'];
 /** Project state the kit created but the project now owns. */
 const PROJECT_STATE = ['.harness/config/project.json', 'opencode.json'];
 /** .gitignore lines the installer adds for its own generated folders (.env.local stays: it guards secrets). */
-const KIT_IGNORES = ['.harness/node_modules', '.harness/knowledge', '.harness/state/learning/signals'];
+const KIT_IGNORES = [
+  '.harness/node_modules',
+  '.harness/knowledge',
+  '.harness/state/learning/signals',
+  '.harness/state/telemetry/spans.jsonl',
+  '.harness/state/telemetry/slices/',
+];
 
 /** Written by the installer (not copied), so not in kit_files. */
 const GENERATED = ['.agents/mcp/mcp.opencode.json', '.agents/mcp/mcp.codex.toml'];

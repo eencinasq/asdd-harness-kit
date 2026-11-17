@@ -410,7 +410,7 @@
       "id": "TASK-014",
       "title": "Register every telemetry surface in one landing (AR-5)",
       "user_visible_behavior": "asdd profile and asdd observe are registered commands; installs provision the telemetry location, gitignore lines and fail-open load hooks; uninstall removes them; npm test runs the five new test files and exits 0; npm pack has no spans.jsonl.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 14,
       "area": "telemetry-emitters",
       "owner": "claude",
@@ -465,7 +465,9 @@
         "node cli/bin/asdd.mjs check",
         "MCP build check only if tools/*/src/harness changed: PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm --dir tools/<t> install --frozen-lockfile && pnpm --dir tools/<t> build && pnpm --dir tools/<t> test (t = jev-gate, knowledge, spec-drift)"
       ],
-      "notes": "Wave 10, single AR-5 landing. Exceeds 3-file limit by design (REQ-024). D-1 assumption: cli/src/uninstall.mjs in scope. Cursor hook wired only if D-3 = ship. Generated files (D-4) via kit vendor/versions/self only."
+      "notes": "Wave 10, single AR-5 landing. Exceeds 3-file limit by design (REQ-024). D-1 assumption: cli/src/uninstall.mjs in scope. Cursor hook wired only if D-3 = ship. Generated files (D-4) via kit vendor/versions/self only.",
+      "evidence": "Re-verified after orchestrator review (README trimmed to the two command-table rows per the shared-file rule; contract README additive \"Phase 2 status\" note kept, schema sha256 unchanged 14ffba1c...): npm test exit 0 (tests 372 pass 372 fail 0, now incl. the slice test files); asdd profile --slice telemetry-emitters exit 0; echo {} | asdd observe claude -> exit 0, no output; npm pack --dry-run ships no telemetry data; check --live exit 0 with HARNESS_DRIFT_BASE=c337df7, TEL-W3 WARNs gone. Cursor: no beforeReadFile hook wired (D-3 hookless).",
+      "evidence_hash": "d9e41dc6daf8b7024384bfc7316d50b88af3ce05b380fd8d93ff76f41e9b2d09"
     }
   ]
 }
