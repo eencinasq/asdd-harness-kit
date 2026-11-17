@@ -66,7 +66,7 @@
 | spec-drift-empty | full | knowledge | DONE | 0 |
 | spec-drift-merge | escalated | qa | ABANDONED | 0 |
 | spec-drift-roadmap | lite | knowledge | DONE | 0 |
-| steering-conformance | lite | discovery | in_progress | 0 |
+| steering-conformance | lite | qa | in_progress | 1 |
 | telemetry-contract | lite | knowledge | DONE | 0 |
 | telemetry-emitters | full | knowledge | DONE | 0 |
 | telemetry-phase2 | lite | discovery | in_progress | 0 |

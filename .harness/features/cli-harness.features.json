@@ -253,7 +253,7 @@
         ".github/workflows/harness-invariants.yml",
         ".harness/steering/structure.md"
       ],
-      "evidence_hash": "4df271e65ac565be87cdcdbfc472f3fa07098f0b010a26045140e0ecc252e08b"
+      "evidence_hash": "740b03d559e39a62447e178c8261a729da2f2991c6c21efef4bbe4c3226195b5"
     },
     {
       "id": "TASK-010",

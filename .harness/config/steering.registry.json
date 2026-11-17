@@ -69,16 +69,14 @@
       "coverage": [
         "discovery",
         "spec",
-        "domain",
-        "design",
+        "validation",
         "task_planning",
         "implementation",
         "qa",
         "knowledge",
-        "refactor",
-        "lite"
+        "refactor"
       ],
-      "note": "G-1 pseudo-always \u2014 Phase 2 decides reclass-always (recorded budget decision) vs retag"
+      "note": "KNO-01..05 duties \u2014 domain/design carry no KNO invariant (D-4b retag)"
     },
     ".harness/steering/manifest.md": {
       "class": "portable",
@@ -115,19 +113,13 @@
       "class": "portable",
       "inclusion": "auto",
       "coverage": [
-        "discovery",
-        "spec",
         "validation",
-        "domain",
-        "design",
-        "task_planning",
-        "implementation",
         "qa",
-        "knowledge",
-        "refactor",
-        "lite"
+        "implementation",
+        "task_planning",
+        "refactor"
       ],
-      "note": "G-2 starvation \u2014 gates defined for untagged phases (QG-DIS/SPEC/DES); QG-DEC-09 chain applies at every phase transition; QG-LEARN is the knowledge-phase gate; G-14 split planned"
+      "note": "G-14 split \u2014 hub machinery (EARS/QG-DEC/actions); ambient at binding phases, other phases reach it via .phases/.exec/.learn links (D-4b retag)"
     },
     ".harness/steering/quality-gates.phases.md": {
       "class": "portable",

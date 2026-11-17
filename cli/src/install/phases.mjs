@@ -88,8 +88,28 @@ export const LEGACY_PROJECT_BIN = `${LEGACY_PROJECT_CLI}/bin/asdd.mjs`;
 export const projectAsdd = (verb) =>
   `b=node_modules/.bin/asdd; [ -x "$b" ] || b=asdd; command -v "$b" >/dev/null 2>&1 || { echo "asdd is not installed: npm i -D asdd-harness-kit (or npm i -g asdd-harness-kit)" >&2; exit 2; }; exec "$b" ${verb}`;
 
+/**
+ * Claude Code runs hooks in the session's current directory, which can be a subfolder; asdd and the kit's relative
+ * cli/bin path need the project root. Claude Code sets CLAUDE_PROJECT_DIR for hooks (fallback: the current directory).
+ */
+export const CLAUDE_ROOT_CD = 'cd "${CLAUDE_PROJECT_DIR:-.}"';
+
+/** A Claude Code hook command that starts at the project root; `onFail` is the exit code when that cd fails. */
+export const claudeHook = (command, onFail = 2) =>
+  String(command).startsWith(CLAUDE_ROOT_CD) ? command : `${CLAUDE_ROOT_CD} || exit ${onFail}; ${command}`;
+
 /** The command a target's hooks run for `verb`: the resolver in a project, cli/ in the kit repo. */
 export const asddCommand = (ctx, verb) => (ctx.self ? `node ${KIT_BIN} ${verb}` : projectAsdd(verb));
+
+/**
+ * The load hook (`asdd observe <runtime>`), fail-open unlike the gate resolver: asdd missing, failing, or slow, the
+ * command prints nothing and exits 0 (a Claude Code hook exiting 2 reaches the model). Only Claude Code gets one:
+ * Cursor is hookless for guidance loads (D-3, cli/test/fixtures/telemetry/cursor/README.md).
+ */
+export const observeCommand = (ctx, runtime) =>
+  ctx.self
+    ? `node ${KIT_BIN} observe ${runtime} >/dev/null 2>&1; exit 0`
+    : `b=node_modules/.bin/asdd; [ -x "$b" ] || b=asdd; command -v "$b" >/dev/null 2>&1 && "$b" observe ${runtime} >/dev/null 2>&1; exit 0`;
 
 /** The asdd the installer itself runs on the target (checks, skills index): this kit's, never one the project had. */
 export const installerBin = (ctx) => join(ctx.kit, KIT_BIN);

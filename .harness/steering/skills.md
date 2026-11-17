@@ -16,6 +16,12 @@ Initial catalog for folders under `.agents/skills/`. Each folder exposes only it
 - **SKL-05.** Authoring a skill? Follow `.agents/skills/capability-authoring/SKILL.md` (profile: `references/skill-profile.md`).
 - **SKL-06.** A skill that is not yet copied into `.agents/skills/` is not part of this index.
 
+## Negative space
+
+- Never restate a skill's body, steps, or examples here — name and description only (SKL-04).
+- Never list a skill outside `.agents/skills/` (SKL-06) or hand-edit the generated block.
+- Never use this file to mandate loading a `SKILL.md` — disclosure is pull-by-task (SKL-02/SKL-03).
+
 ## Enforcement
 
 `asdd skills-index` FAILs on index↔folder drift (SKL-04); `check-skill-profile` / `check-skill-fleet` lint bundles. SKL-02/SKL-03 are reviewer-enforced disclosure economy.

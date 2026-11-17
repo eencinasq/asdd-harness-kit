@@ -19,12 +19,12 @@ Index: `.harness/steering/README.md` · Skills: `.harness/steering/skills.md` ·
 | Work | Read (minimum) |
 |------|----------------|
 | Every turn | the always files above + auto files whose `tags` intersect the phase, `lite`, `review`, or `ui` keys (JIT rule; do not read untagged-for-phase autos) |
-| Discovery | + `domain-layer.md`, `domain-layer.project.md`, `knowledge.md`, `product.md`, `quality-gates.md`, `quality-gates.phases.md`, `structure.md`, `tech.md` |
-| Spec, validation | + `knowledge.md`, `quality-gates.md`, `quality-gates.phases.md` |
-| Domain | + `domain-layer.md`, `domain-layer.project.md`, `knowledge.md`, `quality-gates.md`, `quality-gates.phases.md` |
+| Discovery | + `domain-layer.md`, `domain-layer.project.md`, `knowledge.md`, `product.md`, `quality-gates.phases.md`, `structure.md`, `tech.md` |
+| Spec, validation | + `knowledge.md`, `quality-gates.md`, `quality-gates.phases.md`, `quality-gates.project.md` |
+| Domain | + `domain-layer.md`, `domain-layer.project.md`, `quality-gates.phases.md` |
 | Design, tasks, implementation | + `design-system.md`, `domain-layer.md`, `domain-layer.project.md`, `knowledge.md`, `quality-gates.exec.md`, `quality-gates.md`, `quality-gates.phases.md`, `quality-gates.project.md`, `spec-drift.md`, `structure.md`, `tech.md` |
 | QA, refactor | + `domain-layer.md`, `domain-layer.project.md`, `knowledge.md`, `quality-gates.exec.md`, `quality-gates.md`, `quality-gates.project.md`, `spec-drift.md` |
-| Knowledge | + `knowledge.md`, `quality-gates.learn.md`, `quality-gates.md` |
+| Knowledge | + `knowledge.md`, `quality-gates.learn.md` |
 <!-- steering-gen:end -->
 
 ## Conventions

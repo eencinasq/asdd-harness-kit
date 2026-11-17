@@ -12,8 +12,8 @@
   ],
   "escalation_required": false,
   "escalated_from_lite": true,
-  "created_at": "2026-11-17T03:02:30.539Z",
-  "updated_at": "2026-11-18T03:22:07.691Z",
+  "created_at": "2026-11-18T03:22:13.401Z",
+  "updated_at": "2026-11-18T03:22:13.401Z",
   "paths": {
     "specs": ".harness/specs/grounded-shaping",
     "tasks": ".harness/specs/grounded-shaping/tasks.md",

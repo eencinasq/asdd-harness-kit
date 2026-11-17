@@ -1,17 +1,11 @@
 ---
 inclusion: auto
 tags:
-  - discovery
-  - spec
   - validation
-  - domain
-  - design
-  - task_planning
-  - implementation
   - qa
-  - knowledge
+  - implementation
+  - task_planning
   - refactor
-  - lite
 classification: portable
 ---
 

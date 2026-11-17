@@ -7,8 +7,8 @@
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
-  "created_at": "2026-11-17T15:35:26.784Z",
-  "updated_at": "2026-11-18T03:22:07.729Z",
+  "created_at": "2026-11-18T03:22:13.447Z",
+  "updated_at": "2026-11-18T03:22:13.447Z",
   "paths": {
     "specs": ".harness/specs/ui-insights-host-guard",
     "tasks": ".harness/specs/ui-insights-host-guard/tasks.md",

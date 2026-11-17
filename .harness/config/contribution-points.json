@@ -13,7 +13,7 @@
         "regen": null
       },
       "trust": "declarative",
-      "notes": "All cli/ sources incl. cli/registry/, cli/templates/, cli/scaffold/ \u2014 hand-authored. This file itself is kit_source."
+      "notes": "All cli/ sources incl. cli/registry/, cli/templates/, cli/scaffold/ — hand-authored. This file itself is kit_source."
     },
     "steering": {
       "schema": "cli/steering/_steering-profile.md + cli/scaffold/config/steering.registry.json (instance catalog)",
@@ -108,7 +108,7 @@
         "regen": null
       },
       "trust": "executable",
-      "notes": "patchJson merge \u2014 managed config semantics."
+      "notes": "patchJson merge — managed config semantics."
     },
     "runtime_adapter": {
       "schema": "cli/runtimes/<name>/ recipe",
@@ -122,7 +122,7 @@
         "regen": null
       },
       "trust": "executable",
-      "notes": "Mixed \u2014 asdd-steering.mdc is partially_generated."
+      "notes": "Mixed — asdd-steering.mdc is partially_generated."
     },
     "module": {
       "schema": "module.json (D-1)",
@@ -154,7 +154,7 @@
     "command": {
       "schema": "HARNESS_COMMANDS (commands.mjs:5-66)",
       "source_root": "cli/src/harness",
-      "mount": "dispatcher \u2014 kit-internal only in Phase 1",
+      "mount": "dispatcher — kit-internal only in Phase 1",
       "generator": null,
       "freshness_check": null,
       "merge": {
@@ -762,7 +762,7 @@
       "owns": [
         "vendored_copy"
       ],
-      "notes": "Q-R3 Phase-2 arm resolved: vendoring kept \u2014 bundle-consumption restructure declined (D-4c). tools/*/src/harness copies stay tracked with -merge; conflict resolution = asdd kit vendor, never hunk-editing."
+      "notes": "Q-R3 Phase-2 arm resolved: vendoring kept — bundle-consumption restructure declined (D-4c). tools/*/src/harness copies stay tracked with -merge; conflict resolution = asdd kit vendor, never hunk-editing."
     },
     "runtime-steering": {
       "run": "asdd kit generate-runtime-steering",
@@ -834,7 +834,7 @@
       "owns": [
         "profiling_rollup"
       ],
-      "notes": "Phase 2 \u2014 profiling lineage"
+      "notes": "Phase 2 — profiling lineage"
     }
   },
   "vocabulary": {
@@ -948,7 +948,7 @@
       },
       "drift": {
         "script": "check-spec-drift.mjs",
-        "help": "spec drift DRIFT-01\u202607 [--json] [--base <ref>] [--target <ref>] [--slice <id>] [--requirements]"
+        "help": "spec drift DRIFT-01…07 [--json] [--base <ref>] [--target <ref>] [--slice <id>] [--requirements]"
       },
       "check-config": {
         "script": "check-project-config.mjs",
@@ -1006,11 +1006,11 @@
           },
           "escalate": {
             "script": "escalate-slice.mjs",
-            "help": "lite/hotfix \u2192 escalated: slice escalate <id> --reasons \"E1,E4\" [--by <owner>] [--note \"why\"]"
+            "help": "lite/hotfix → escalated: slice escalate <id> --reasons \"E1,E4\" [--by <owner>] [--note \"why\"]"
           },
           "amend": {
             "script": "amend-slice.mjs",
-            "help": "reopen DONE slice: slice amend <id> [--note \"\u2026\"] [--by <owner>]"
+            "help": "reopen DONE slice: slice amend <id> [--note \"…\"] [--by <owner>]"
           }
         }
       },
@@ -1057,7 +1057,31 @@
       },
       "triage": {
         "script": "audit-triage.mjs",
-        "help": "TL triage: triage <finding-id> --dismiss --reason \"\u2026\" | --confirm | --clear | --list"
+        "help": "TL triage: triage <finding-id> --dismiss --reason \"…\" | --confirm | --clear | --list"
+      },
+      "skill-eval": {
+        "script": "skill-eval.mjs",
+        "help": "score skill fixtures under cli/eval/skills [--skill <name>] [--baseline <ref>] [--json]"
+      },
+      "intake": {
+        "script": "intake.mjs",
+        "help": "import a tracker Intent item as a slice: intake --from <file|-> --ref <url> [--accept-stale] [--dry-run] [--json]"
+      },
+      "ui": {
+        "script": "ui-server.mjs",
+        "help": "read-only local harness UI on 127.0.0.1 [--port <n>]"
+      },
+      "gate-decide": {
+        "script": "gate-decide.mjs",
+        "help": "Tech Lead override for a WARN gate: gate-decide <slice> --phase <phase> --note \"…\""
+      },
+      "profile": {
+        "script": "harness-profile.mjs",
+        "help": "read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation [--slice <id>] [--bottlenecks] [--json]"
+      },
+      "observe": {
+        "script": "telemetry-observe.mjs",
+        "help": "the load hook (fail-open): records a steering/skill load as an activation record (stdin: hook payload) <claude|cursor>"
       }
     },
     "kit": {

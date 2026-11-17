@@ -1,0 +1,14 @@
+{
+ "schema_version": "1.0",
+ "session_id": "sess-steering-conformance-002",
+ "timestamp": "2026-11-17T16:20:00.000Z",
+ "agent": "asdd-pipeline",
+ "human": "eencinas",
+ "slice_id": "steering-conformance",
+ "event_type": "feature_started",
+ "phase": "implementation",
+ "feature_id": "TASK-001",
+ "evidence": "Wave 2 Task 2.2 — retag pseudo-always files per D-4b (retag path, not reclass: always-budget has ~300B headroom, reclass would cost +9.6KB).",
+ "scope_paths": ["cli/steering/knowledge.md","cli/steering/quality-gates.md",".harness/steering/quality-gates.project.md","cli/templates/bindings/quality-gates.project.md"],
+ "concerns": []
+}
