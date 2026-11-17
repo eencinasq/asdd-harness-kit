@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-gate-decisions-012",
+  "timestamp": "2026-11-17T01:23:54.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "ui-gate-decisions",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-003",
+  "scope_paths": [
+    "cli/src/harness/gate-decide.mjs",
+    "cli/src/harness/gate-decide.test.mjs",
+    "cli/src/harness/ui-server.mjs",
+    "cli/src/harness/ui-server.test.mjs",
+    "cli/src/harness/ui",
+    "cli/src/harness/commands.mjs",
+    "package.json",
+    "cli/versions.json",
+    "README.md"
+  ],
+  "evidence": "RED: gate-decide.test.mjs + decide wiring tests.",
+  "concerns": []
+}

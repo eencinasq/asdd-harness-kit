@@ -68,6 +68,10 @@ export const HARNESS_COMMANDS = {
   audit: { script: 'audit-codebase.mjs', help: 'codebase audit [--json] [--no-write] [--hotspots N] [--since 90.days]' },
   triage: { script: 'audit-triage.mjs', help: 'TL triage: triage <finding-id> --dismiss --reason "…" | --confirm | --clear | --list' },
   ui: { script: 'ui-server.mjs', help: 'read-only local harness UI on 127.0.0.1 [--port <n>]' },
+  'gate-decide': {
+    script: 'gate-decide.mjs',
+    help: 'Tech Lead override for a WARN gate: gate-decide <slice> --phase <phase> --note "…"',
+  },
 };
 
 /**

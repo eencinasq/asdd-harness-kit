@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-gate-decisions-015",
+  "timestamp": "2026-11-17T01:25:42.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "ui-gate-decisions",
+  "event_type": "phase_completed",
+  "phase": "qa",
+  "mode": "lite",
+  "evidence": "QA-light: gate-decide+ui-server tests 10/10; npm test 222/222. Host/Origin + decide smoke via unit tests.",
+  "concerns": []
+}

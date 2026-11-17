@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-gate-decisions-016",
+  "timestamp": "2026-11-17T01:25:42.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "ui-gate-decisions",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "mode": "lite",
+  "evidence": "Lite note: asdd ui write path decides WARN gates via asdd gate-decide; REQ-005 Host/Origin blocks DNS rebinding/CSRF.",
+  "concerns": []
+}

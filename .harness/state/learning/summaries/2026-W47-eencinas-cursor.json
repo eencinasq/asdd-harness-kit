@@ -10,11 +10,16 @@
           "at": "2026-11-17T00:28:33.442Z",
           "slice_id": "asdd-ui",
           "last_at": "2026-11-17T00:35:46.524Z"
+        },
+        {
+          "at": "2026-11-17T01:22:33.269Z",
+          "slice_id": "ui-gate-decisions"
         }
       ],
       "examples": [
         "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by asdd-ui (intent/design/tasks/spec or scope_paths)",
-        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-004.md changed but is not mapped by asdd-ui (intent/design/tasks/spec or scope_paths)"
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-004.md changed but is not mapped by asdd-ui (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-003.md changed but is not mapped by ui-gate-decisions (intent/design/tasks/spec or scope_paths)"
       ]
     },
     "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
@@ -24,6 +29,10 @@
           "at": "2026-11-17T00:28:33.442Z",
           "slice_id": null,
           "last_at": "2026-11-17T00:43:54.118Z"
+        },
+        {
+          "at": "2026-11-17T01:22:33.269Z",
+          "slice_id": null
         }
       ],
       "examples": [
@@ -37,6 +46,10 @@
           "at": "2026-11-17T00:28:33.442Z",
           "slice_id": null,
           "last_at": "2026-11-17T00:43:54.118Z"
+        },
+        {
+          "at": "2026-11-17T01:22:33.269Z",
+          "slice_id": null
         }
       ],
       "examples": [
@@ -50,6 +63,10 @@
           "at": "2026-11-17T00:28:33.442Z",
           "slice_id": "sensor-fixes",
           "last_at": "2026-11-17T00:43:54.118Z"
+        },
+        {
+          "at": "2026-11-17T01:22:33.269Z",
+          "slice_id": "sensor-fixes"
         }
       ],
       "examples": [
@@ -93,6 +110,18 @@
       ],
       "examples": [
         "lite slice \"asdd-ui\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate asdd-ui --reasons \"E1-scope-spread\""
+      ]
+    },
+    "sensor:DRIFT-01:tools": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T01:22:33.269Z",
+          "slice_id": "ui-gate-decisions"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 tools/jev-gate/src/harness/drift-lib.mjs changed but is not mapped by ui-gate-decisions (intent/design/tasks/spec or scope_paths)"
       ]
     }
   }
