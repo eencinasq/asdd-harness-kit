@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "claude-hook-cwd",
+  "source_tasks": ".harness/specs/claude-hook-cwd/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Claude Code hooks start at the project root",
+      "user_visible_behavior": "Claude Code hooks work when the session's directory is a subfolder; asdd runs at the project root.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "bash cli/test/install.sh",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-17 (eb01349): install.sh OK (prefix on gate/verify/observe, second install unchanged, gate from a subfolder allows); kit hooks: verify from tools/spec-drift returns {}, bad project dir exits 2, two re-installs leave settings.json unchanged; npm test 430/430; test:full-flow OK; check --live 0.",
+      "scope_paths": [
+        "cli/src/install/phases.mjs",
+        "cli/src/install/runtimes.mjs",
+        "cli/test/install.sh",
+        "cli/src/uninstall.mjs",
+        ".claude/settings.json"
+      ],
+      "evidence_hash": "a8b8db1fe8211f86296616c1ce0adb5379fdb13d8b2b5bce8e8af9e01d30fcf7"
+    }
+  ]
+}

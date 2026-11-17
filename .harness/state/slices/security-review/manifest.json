@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-17T14:39:53.747Z",
-  "updated_at": "2026-11-17T17:52:18.460Z",
+  "updated_at": "2026-11-17T22:04:37.537Z",
   "paths": {
     "specs": ".harness/specs/security-review",
     "tasks": ".harness/specs/security-review/tasks.md",

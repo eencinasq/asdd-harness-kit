@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T17:52:18.518Z",
+  "generated_at": "2026-11-17T22:04:37.592Z",
   "threshold": 3,
   "summary": {
-    "patterns": 42,
+    "patterns": 44,
     "open": 4,
     "in_flight": 2,
     "verified": 1,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 44,
+      "occurrences": 45,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -33,6 +33,7 @@
         "asdd-p3",
         "asdd-p4",
         "asdd-ui",
+        "claude-hook-cwd",
         "cli-harness",
         "cost-metrics",
         "docs-p5-wave1",
@@ -267,7 +268,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 350
+          "quiet_sessions": 358
         }
       ]
     },
@@ -417,7 +418,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T17:43:19.057Z",
+      "last_seen": "2026-11-17T21:55:20.859Z",
       "sources": [
         "warn"
       ],
@@ -436,7 +437,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T17:43:19.057Z",
+      "last_seen": "2026-11-17T21:55:20.859Z",
       "sources": [
         "warn"
       ],
@@ -568,7 +569,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T17:43:19.057Z",
+      "last_seen": "2026-11-17T21:55:20.859Z",
       "sources": [
         "warn"
       ],
@@ -976,6 +977,27 @@
       "proposals": []
     },
     {
+      "id": "LP-936370d8",
+      "signature": "sensor:hotfix slice \"*\" cannot complete with open escalation signals (EN-scope-spread) ",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T22:04:19.933Z",
+      "last_seen": "2026-11-17T22:04:19.933Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "claude-hook-cwd"
+      ],
+      "examples": [
+        "hotfix slice \"claude-hook-cwd\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate claude-hook-cwd --reasons \"E1-scope-spread\""
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-011d46a8",
       "signature": "sensor:QG-LEARN-03:docs",
       "kind": "escape",
@@ -1029,6 +1051,27 @@
       "slices": [],
       "examples": [
         "CONVERGE-02 feature TASK-001 lists REQ-016 but no test file mentions it"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-a7fead7a",
+      "signature": "warn:hotfix slice \"*\": escalation signal EN-scope-spread — scope touches N top-level ",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 5,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T22:01:21.112Z",
+      "last_seen": "2026-11-17T22:01:21.112Z",
+      "sources": [
+        "warn"
+      ],
+      "slices": [
+        "claude-hook-cwd"
+      ],
+      "examples": [
+        "hotfix slice \"claude-hook-cwd\": escalation signal E1-scope-spread — scope touches 2 top-level modules: .claude, cli"
       ],
       "proposals": []
     }

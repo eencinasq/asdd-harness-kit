@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "claude-hook-cwd",
+  "concerns": [],
+  "timestamp": "2026-11-17T22:04:18.000Z",
+  "session_id": "sess-claude-hook-cwd-006",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: hook commands must not assume the session's cwd; anchor them to the runtime's project-root variable."
+}
