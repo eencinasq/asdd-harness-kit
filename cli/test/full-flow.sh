@@ -60,7 +60,7 @@ cat >.harness/features/order-flow.features.json <<'JSON'
       "owner": "test-agent",
       "verification": ["node --test test/reorder.test.mjs"],
       "evidence": "",
-      "scope_paths": ["src/checkout"]
+      "scope_paths": ["src/checkout", "test/reorder.test.mjs"]
     },
     {
       "id": "f2",
@@ -142,6 +142,8 @@ echo "== 6. escalation evidence → DONE blocked → escalate → DONE =="
 cat >.harness/state/slices/order-flow/sessions/005-dissent.json <<JSON
 { "session_id": "sess-of-005", "timestamp": "$(now)", "agent": "ui-agent", "slice_id": "order-flow", "event_type": "dissent", "phase": "implementation", "note": "ui surface implies a second module — architectural decision" }
 JSON
+# f2's stub UI: a passing feature must own files that exist (DRIFT-05)
+mkdir -p web/checkout && printf 'export const ReorderCard = () => null;\n' >web/checkout/ReorderCard.js
 cat >.harness/state/slices/order-flow/sessions/006-f2-done.json <<JSON
 { "session_id": "sess-of-006", "timestamp": "$(now)", "agent": "ui-agent", "slice_id": "order-flow", "event_type": "feature_completed", "feature_id": "f2", "evidence": "stub ui verified" }
 JSON
