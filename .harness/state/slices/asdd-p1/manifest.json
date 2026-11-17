@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": true,
   "created_at": "2026-11-13T02:43:24.628Z",
-  "updated_at": "2026-11-17T03:03:07.980Z",
+  "updated_at": "2026-11-17T12:05:20.823Z",
   "paths": {
     "specs": ".harness/specs/asdd-p1",
     "tasks": ".harness/specs/asdd-p1/tasks.md",

@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T03:03:08.150Z",
+  "generated_at": "2026-11-17T12:05:20.999Z",
   "threshold": 3,
   "summary": {
-    "patterns": 29,
+    "patterns": 30,
     "open": 0,
     "in_flight": 2,
     "verified": 2,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 34,
+      "occurrences": 35,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -49,6 +49,7 @@
         "review-quality",
         "rule-coverage",
         "sensor-fixes",
+        "shaping-agent",
         "skill-eval",
         "skills-spec",
         "spec-drift-adoption",
@@ -133,7 +134,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 78
+          "quiet_sessions": 89
         }
       ]
     },
@@ -204,7 +205,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 78
+          "quiet_sessions": 89
         }
       ]
     },
@@ -217,7 +218,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T01:22:33.269Z",
+      "last_seen": "2026-11-17T12:03:17.315Z",
       "sources": [
         "warn"
       ],
@@ -236,7 +237,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T01:22:33.269Z",
+      "last_seen": "2026-11-17T12:03:17.315Z",
       "sources": [
         "warn"
       ],
@@ -393,7 +394,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T01:22:33.269Z",
+      "last_seen": "2026-11-17T12:03:17.315Z",
       "sources": [
         "warn"
       ],
@@ -442,6 +443,25 @@
       ],
       "examples": [
         "Code @6b7cc07; verification needs TASK-004 (jev.md auto)."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-75f21e68",
+      "signature": "command:git reset --hard",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T12:00:59.033Z",
+      "last_seen": "2026-11-17T12:00:59.033Z",
+      "sources": [
+        "command"
+      ],
+      "slices": [],
+      "examples": [
+        "denied: git reset --hard"
       ],
       "proposals": []
     },

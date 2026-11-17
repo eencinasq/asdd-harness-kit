@@ -38,7 +38,7 @@
 | rule-coverage | full | knowledge | DONE | 0 |
 | rules-landing | lite | knowledge | DONE | 0 |
 | sensor-fixes | escalated | knowledge | DONE | 0 |
-| shaping-agent | lite | discovery | in_progress | 0 |
+| shaping-agent | escalated | knowledge | DONE | 0 |
 | shaping-cloud-setup | lite | discovery | in_progress | 0 |
 | skill-eval | escalated | knowledge | DONE | 0 |
 | skills-bloom | lite | knowledge | DONE | 0 |
