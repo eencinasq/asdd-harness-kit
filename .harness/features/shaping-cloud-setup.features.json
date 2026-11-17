@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "shaping-cloud-setup",
+  "source_tasks": ".harness/specs/shaping-cloud-setup/tasks.md",
+  "features": []
+}
