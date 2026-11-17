@@ -35,12 +35,13 @@
         {
           "at": "2026-11-17T00:26:22.507Z",
           "slice_id": "skill-eval",
-          "last_at": "2026-11-17T00:30:13.172Z"
+          "last_at": "2026-11-17T00:43:32.908Z"
         }
       ],
       "examples": [
         "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)",
-        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-004.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-004.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by learn-eval-gate (intent/design/tasks/spec or scope_paths)"
       ]
     },
     "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
@@ -49,7 +50,7 @@
         {
           "at": "2026-11-17T00:26:22.507Z",
           "slice_id": null,
-          "last_at": "2026-11-17T00:38:05.276Z"
+          "last_at": "2026-11-17T00:43:32.908Z"
         }
       ],
       "examples": [
@@ -62,7 +63,7 @@
         {
           "at": "2026-11-17T00:26:22.507Z",
           "slice_id": null,
-          "last_at": "2026-11-17T00:38:05.276Z"
+          "last_at": "2026-11-17T00:43:32.908Z"
         }
       ],
       "examples": [
@@ -75,7 +76,7 @@
         {
           "at": "2026-11-17T00:26:22.507Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T00:38:05.276Z"
+          "last_at": "2026-11-17T00:43:32.908Z"
         }
       ],
       "examples": [
@@ -119,6 +120,30 @@
       ],
       "examples": [
         "DRIFT-02 passing feature TASK-008 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
+      ]
+    },
+    "sensor:<path>: feature TASK-N missing user_visible_behavior": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:43:32.908Z",
+          "slice_id": "learn-eval-gate"
+        }
+      ],
+      "examples": [
+        ".harness/features/learn-eval-gate.features.json: feature TASK-001 missing user_visible_behavior"
+      ]
+    },
+    "sensor:<path>: feature TASK-N priority must be a positive integer": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:43:32.908Z",
+          "slice_id": "learn-eval-gate"
+        }
+      ],
+      "examples": [
+        ".harness/features/learn-eval-gate.features.json: feature TASK-001 priority must be a positive integer"
       ]
     }
   }
