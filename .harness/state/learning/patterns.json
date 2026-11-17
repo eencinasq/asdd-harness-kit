@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T22:04:19.087Z",
+  "generated_at": "2026-11-17T22:04:37.592Z",
   "threshold": 3,
   "summary": {
-    "patterns": 43,
+    "patterns": 44,
     "open": 4,
     "in_flight": 2,
     "verified": 1,
@@ -268,7 +268,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 356
+          "quiet_sessions": 358
         }
       ]
     },
@@ -973,6 +973,27 @@
       ],
       "examples": [
         "DRIFT-01 README.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-936370d8",
+      "signature": "sensor:hotfix slice \"*\" cannot complete with open escalation signals (EN-scope-spread) ",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T22:04:19.933Z",
+      "last_seen": "2026-11-17T22:04:19.933Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "claude-hook-cwd"
+      ],
+      "examples": [
+        "hotfix slice \"claude-hook-cwd\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate claude-hook-cwd --reasons \"E1-scope-spread\""
       ],
       "proposals": []
     },

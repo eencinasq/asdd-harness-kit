@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-claude-hook-cwd-007",
+  "timestamp": "2026-11-17T22:04:37.124Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "claude-hook-cwd",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Installer (cli/), the kit's own .claude hooks and the install test span top-level modules; no domain terms, no dissent.",
+  "concerns": []
+}

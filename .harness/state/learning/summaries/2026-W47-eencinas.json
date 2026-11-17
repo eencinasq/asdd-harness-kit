@@ -42,7 +42,7 @@
         {
           "at": "2026-11-17T21:55:20.859Z",
           "slice_id": null,
-          "last_at": "2026-11-17T22:04:02.566Z"
+          "last_at": "2026-11-17T22:04:28.473Z"
         }
       ],
       "examples": [
@@ -88,7 +88,7 @@
         {
           "at": "2026-11-17T21:55:20.859Z",
           "slice_id": null,
-          "last_at": "2026-11-17T22:04:02.566Z"
+          "last_at": "2026-11-17T22:04:28.473Z"
         }
       ],
       "examples": [
@@ -134,7 +134,7 @@
         {
           "at": "2026-11-17T21:55:20.859Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T22:04:02.566Z"
+          "last_at": "2026-11-17T22:04:28.473Z"
         }
       ],
       "examples": [
@@ -238,6 +238,19 @@
       ],
       "examples": [
         "hotfix slice \"claude-hook-cwd\": escalation signal E1-scope-spread — scope touches 2 top-level modules: .claude, cli"
+      ]
+    },
+    "sensor:hotfix slice \"*\" cannot complete with open escalation signals (EN-scope-spread) ": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T22:04:19.933Z",
+          "slice_id": "claude-hook-cwd",
+          "last_at": "2026-11-17T22:04:28.473Z"
+        }
+      ],
+      "examples": [
+        "hotfix slice \"claude-hook-cwd\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate claude-hook-cwd --reasons \"E1-scope-spread\""
       ]
     }
   }

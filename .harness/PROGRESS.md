@@ -15,7 +15,7 @@
 | asdd-p4 | escalated | knowledge | DONE | 0 |
 | asdd-roadmap | lite | knowledge | DONE | 0 |
 | asdd-ui | escalated | knowledge | DONE | 0 |
-| claude-hook-cwd | hotfix | knowledge | in_progress | 0 |
+| claude-hook-cwd | escalated | knowledge | DONE | 0 |
 | cli-harness | escalated | implementation | ABANDONED | 0 |
 | cost-metrics | escalated | knowledge | DONE | 0 |
 | docs-p5-wave1 | escalated | knowledge | DONE | 0 |

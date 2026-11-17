@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-13T02:23:40.083Z",
-  "updated_at": "2026-11-17T22:04:19.011Z",
+  "updated_at": "2026-11-17T22:04:37.523Z",
   "paths": {
     "specs": ".harness/specs/asdd-roadmap",
     "tasks": ".harness/specs/asdd-roadmap/tasks.md",
