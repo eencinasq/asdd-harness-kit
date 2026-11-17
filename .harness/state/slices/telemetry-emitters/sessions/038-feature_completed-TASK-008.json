@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-038",
+  "timestamp": "2026-11-17T08:30:37.767Z",
+  "phase": "implementation",
+  "feature_id": "TASK-008",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/sync-state.mjs",
+    "cli/src/harness/sync-state.test.mjs",
+    "tools/jev-gate/src/harness/sync-state.mjs",
+    "tools/knowledge/src/harness/sync-state.mjs",
+    "tools/spec-drift/src/harness/sync-state.mjs",
+    "tools/jev-gate/src/harness/telemetry-lib.mjs",
+    "tools/knowledge/src/harness/telemetry-lib.mjs",
+    "tools/spec-drift/src/harness/telemetry-lib.mjs"
+  ],
+  "evidence": "TASK-008 passing (REQ-010, REQ-002, REQ-005, REQ-006). node --test cli/src/harness/sync-state.test.mjs: 3 runs, tests 22 pass 22 fail 0 (8 TASK-008 cases: span tree full+--slice, HARNESS_RUNTIME, learn absent/failing, knowledge throw, main() throw -> ERROR root via finally + same stdout/stderr/exit, byte-identity matrix 4 states x lib working + throw/deleted for stdout/stderr/exit and every generated file sha256, REQ-006 only spans.jsonl changes, module import emits nothing). Mutation RED: M1 stdout write, M2 unguarded import, M3 dir creation, M4 children via startTrace, M5 no finally, M6 root always OK -> each killed (1-2 fails). One-off HEAD vs new: stdout/stderr/exit and all 14 generated files identical in all 4 states, full and --slice. node cli/bin/asdd.mjs kit vendor -> wrote only the 5 in-scope tools files (jev-gate telemetry-lib unchanged); kit vendor --check exit 0. tools dist not tracked; npm run build + npm test: jev-gate 14/14, knowledge 8/8, spec-drift 226/226 (all exit 0). npm test exit 0 (234/234). HARNESS_DRIFT_BASE=c337df7 asdd check --live exit 0 (TEL-W3 WARNs expected); asdd drift --slice telemetry-emitters: no fail, no feature reopened. Normalization: none of sync output; fixture clock frozen via NODE_OPTIONS --import preload and fixture input mtimes pinned; only the (node:<pid>) prefix of Node's own node:sqlite ExperimentalWarning on stderr is normalized. Implementation confidence: 0.9. Uncertainty: full npm test ran under machine load avg ~40 (slow, but green); jev-gate tool test took ~15 min under that load."
+}
