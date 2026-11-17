@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-metrics-data-quality-002",
+  "timestamp": "2026-11-17T02:00:19.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "metrics-data-quality",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/pipeline-metrics.mjs",
+    "cli/src/harness/pipeline-metrics.test.mjs",
+    "cli/src/harness/harness-status.mjs"
+  ],
+  "evidence": "RED: 'metrics-data-quality REQ-001' fails (by_code keys '<path>' and a message shape); asdd status lists 8 ABANDONED rows.",
+  "concerns": []
+}
