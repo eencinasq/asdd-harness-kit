@@ -24,6 +24,9 @@ export const EXEMPT_PREFIXES = [
   '.harness/audits',
   '.harness/progress',
   '.harness/PROGRESS.md',
+  // Append-only harness logs any slice writes at session close (SP-006); other docs/ files stay mapped.
+  'docs/agent-failure-log.md',
+  'docs/dissent-log.md',
 ];
 
 const SPEC_DOCS = ['intent.md', 'design.md', 'tasks.md', 'spec.md'];
