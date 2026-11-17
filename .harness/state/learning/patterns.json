@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T15:11:57.273Z",
+  "generated_at": "2026-11-17T15:24:52.908Z",
   "threshold": 3,
   "summary": {
-    "patterns": 30,
-    "open": 0,
+    "patterns": 40,
+    "open": 4,
     "in_flight": 2,
-    "verified": 2,
+    "verified": 1,
     "unsigned_failures": 0
   },
   "patterns": [
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 41,
+      "occurrences": 42,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -62,6 +62,7 @@
         "spec-drift-depth",
         "spec-drift-empty",
         "spec-drift-merge",
+        "telemetry-emitters",
         "tracker-binding",
         "ui-gate-decisions",
         "unified-versioning"
@@ -80,6 +81,127 @@
           "recurrences": 0
         }
       ]
+    },
+    {
+      "id": "LP-06528643",
+      "signature": "sensor:DRIFT-01:docs",
+      "kind": "escape",
+      "occurrences": 11,
+      "threshold": 3,
+      "status": "rejected",
+      "reopened": false,
+      "first_seen": "2026-10-28T13:22:35.735Z",
+      "last_seen": "2026-11-17T14:37:29.433Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "asdd-ui",
+        "jev-module",
+        "skill-eval",
+        "telemetry-emitters",
+        "ui-gate-decisions"
+      ],
+      "examples": [
+        "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by agents-use-scripts, asdd-cli, cli-harness, jev-gate-nest, knowledge-nest, mcp-standalone, modules-top-level, spec-drift-merge, spec-drift-adoption (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-003.md changed but is not mapped by telemetry-emitters (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": [
+        {
+          "id": "SP-004",
+          "file": "docs/knowledge-base/steering-proposals/SP-004.md",
+          "declared": "rejected",
+          "status": "rejected",
+          "recurrences": 0
+        },
+        {
+          "id": "SP-006",
+          "file": "docs/knowledge-base/steering-proposals/SP-006.md",
+          "declared": "applied",
+          "status": "ineffective",
+          "recurrences": 7
+        }
+      ]
+    },
+    {
+      "id": "LP-f374bf6d",
+      "signature": "sensor:DRIFT-02",
+      "kind": "escape",
+      "occurrences": 8,
+      "threshold": 3,
+      "status": "open",
+      "reopened": true,
+      "first_seen": "2026-10-28T01:34:26.022Z",
+      "last_seen": "2026-11-17T14:38:33.546Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [],
+      "examples": [
+        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-001 changed after evidence_commit 67f5a59; set it back to in_progress and rerun verification"
+      ],
+      "proposals": [
+        {
+          "id": "SP-005",
+          "file": "docs/knowledge-base/steering-proposals/SP-005.md",
+          "declared": "applied",
+          "status": "ineffective",
+          "recurrences": 3
+        }
+      ]
+    },
+    {
+      "id": "LP-2a52ea2c",
+      "signature": "sensor:DRIFT-01:cli",
+      "kind": "escape",
+      "occurrences": 7,
+      "threshold": 3,
+      "status": "rejected",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:26:22.507Z",
+      "last_seen": "2026-11-17T14:37:29.433Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "skill-eval",
+        "telemetry-emitters"
+      ],
+      "examples": [
+        "DRIFT-01 cli/eval/skills/asdd-next/next-selects-ready-feature.json changed but is not mapped by telemetry-emitters (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 cli/src/kit/guidance.mjs changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": [
+        {
+          "id": "SP-007",
+          "file": "docs/knowledge-base/steering-proposals/SP-007.md",
+          "declared": "rejected",
+          "status": "rejected",
+          "recurrences": 0
+        }
+      ]
+    },
+    {
+      "id": "LP-eb7bb53b",
+      "signature": "command:rm -rf",
+      "kind": "escape",
+      "occurrences": 6,
+      "threshold": 3,
+      "status": "open",
+      "reopened": false,
+      "first_seen": "2026-11-10T21:37:19.064Z",
+      "last_seen": "2026-11-17T14:55:02.474Z",
+      "sources": [
+        "command"
+      ],
+      "slices": [],
+      "examples": [
+        "denied: rm -rf"
+      ],
+      "proposals": []
     },
     {
       "id": "LP-0e072262",
@@ -140,78 +262,109 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 200
+          "quiet_sessions": 267
         }
       ]
     },
     {
-      "id": "LP-06528643",
-      "signature": "sensor:DRIFT-01:docs",
+      "id": "LP-e9c4ddb0",
+      "signature": "blocked:phase:qa",
       "kind": "escape",
-      "occurrences": 5,
+      "occurrences": 4,
       "threshold": 3,
       "status": "rejected",
       "reopened": false,
-      "first_seen": "2026-10-28T13:22:35.735Z",
-      "last_seen": "2026-11-17T01:22:33.269Z",
+      "first_seen": "2026-10-28T01:33:00.148Z",
+      "last_seen": "2026-11-17T14:44:12.000Z",
+      "sources": [
+        "blocked"
+      ],
+      "slices": [
+        "jev-module",
+        "kit-hygiene",
+        "telemetry-emitters"
+      ],
+      "examples": [
+        "Spec Coverage Gate BLOCK (QG-SPEC-05/06): REQ-006 (AC-004) and REQ-008 (AC-005) have no test; SHOULD REQ-011..013 unnamed. Report: spec-coverage-report.md",
+        "Spec Coverage Gate BLOCK (QG-SPEC-05): MUST coverage 10/11, REQ-006 has no test that names it; SHOULD REQ-013 untested (WARN QG-SPEC-07). OBS-001/002 sensor defects logged. Report: spec-coverage-report.md",
+        "Spec Coverage Gate BLOCK (QG-SPEC-06): EARS 126/127 applicable (2 superseded by D-3); MUST 25/25; pass rate 100% (npm test exit 0, 372/372 + install.sh, lifecycle.sh, vendor/self --check; focused slice files 183/183); spec coverage 24/25; drift --requirements clean; no domain-placement finding. UNCOV-001 probe: telemetry-observe.mjs:14 static import -> exit 1 with throwing/deleted lib. Redirect to asdd-implementation-agent (reopen TASK-010). Report: .harness/specs/telemetry-emitters/spec-coverage-report.md"
+      ],
+      "proposals": [
+        {
+          "id": "SP-009",
+          "file": "docs/knowledge-base/steering-proposals/SP-009.md",
+          "declared": "rejected",
+          "status": "rejected",
+          "recurrences": 0
+        }
+      ]
+    },
+    {
+      "id": "LP-c5d0eb9a",
+      "signature": "command:git push --force",
+      "kind": "escape",
+      "occurrences": 4,
+      "threshold": 3,
+      "status": "open",
+      "reopened": false,
+      "first_seen": "2026-11-17T02:24:57.055Z",
+      "last_seen": "2026-11-17T11:35:23.125Z",
+      "sources": [
+        "command"
+      ],
+      "slices": [],
+      "examples": [
+        "denied: git push --force"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-e19c5fd7",
+      "signature": "command:sudo",
+      "kind": "escape",
+      "occurrences": 4,
+      "threshold": 3,
+      "status": "open",
+      "reopened": false,
+      "first_seen": "2026-11-17T02:24:59.276Z",
+      "last_seen": "2026-11-17T11:35:25.374Z",
+      "sources": [
+        "command"
+      ],
+      "slices": [],
+      "examples": [
+        "denied: sudo"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-7f51c52f",
+      "signature": "sensor:QG-LEARN-04",
+      "kind": "escape",
+      "occurrences": 4,
+      "threshold": 3,
+      "status": "rejected",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:26:42.887Z",
+      "last_seen": "2026-11-17T12:58:48.993Z",
       "sources": [
         "sensor"
       ],
       "slices": [
-        "asdd-ui",
         "jev-module",
-        "skill-eval",
-        "ui-gate-decisions"
+        "skill-eval"
       ],
       "examples": [
-        "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)",
-        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by agents-use-scripts, asdd-cli, cli-harness, jev-gate-nest, knowledge-nest, mcp-standalone, modules-top-level, spec-drift-merge, spec-drift-adoption (intent/design/tasks/spec or scope_paths)",
-        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by asdd-ui (intent/design/tasks/spec or scope_paths)"
+        "QG-LEARN-04 slice \"skill-eval\" completed Knowledge while pattern LP-2a52ea2c (sensor:DRIFT-01:cli) it contributed to is open — add a steering proposal (accepted or rejected counts) for it",
+        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-06528643 (sensor:DRIFT-01:docs) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
       ],
       "proposals": [
         {
-          "id": "SP-004",
-          "file": "docs/knowledge-base/steering-proposals/SP-004.md",
+          "id": "SP-008",
+          "file": "docs/knowledge-base/steering-proposals/SP-008.md",
           "declared": "rejected",
           "status": "rejected",
           "recurrences": 0
-        },
-        {
-          "id": "SP-006",
-          "file": "docs/knowledge-base/steering-proposals/SP-006.md",
-          "declared": "applied",
-          "status": "ineffective",
-          "recurrences": 1
-        }
-      ]
-    },
-    {
-      "id": "LP-f374bf6d",
-      "signature": "sensor:DRIFT-02",
-      "kind": "escape",
-      "occurrences": 5,
-      "threshold": 3,
-      "status": "verified",
-      "reopened": false,
-      "first_seen": "2026-10-28T01:34:26.022Z",
-      "last_seen": "2026-11-17T00:37:39.883Z",
-      "sources": [
-        "sensor"
-      ],
-      "slices": [],
-      "examples": [
-        "DRIFT-02 passing feature TASK-005 changed after evidence_commit 9a45bdd; set it back to in_progress and rerun verification",
-        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
-        "DRIFT-02 passing feature TASK-001 changed after evidence_commit 67f5a59; set it back to in_progress and rerun verification"
-      ],
-      "proposals": [
-        {
-          "id": "SP-005",
-          "file": "docs/knowledge-base/steering-proposals/SP-005.md",
-          "declared": "applied",
-          "status": "verified",
-          "recurrences": 0,
-          "quiet_sessions": 200
         }
       ]
     },
@@ -224,7 +377,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T14:40:26.515Z",
+      "last_seen": "2026-11-17T15:12:49.806Z",
       "sources": [
         "warn"
       ],
@@ -243,7 +396,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T14:40:26.515Z",
+      "last_seen": "2026-11-17T15:12:49.806Z",
       "sources": [
         "warn"
       ],
@@ -252,29 +405,6 @@
       ],
       "examples": [
         "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-e9c4ddb0",
-      "signature": "blocked:phase:qa",
-      "kind": "escape",
-      "occurrences": 2,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-10-28T01:33:00.148Z",
-      "last_seen": "2026-10-28T13:23:19.357Z",
-      "sources": [
-        "blocked"
-      ],
-      "slices": [
-        "jev-module",
-        "kit-hygiene"
-      ],
-      "examples": [
-        "Spec Coverage Gate BLOCK (QG-SPEC-05/06): REQ-006 (AC-004) and REQ-008 (AC-005) have no test; SHOULD REQ-011..013 unnamed. Report: spec-coverage-report.md",
-        "Spec Coverage Gate BLOCK (QG-SPEC-05): MUST coverage 10/11, REQ-006 has no test that names it; SHOULD REQ-013 untested (WARN QG-SPEC-07). OBS-001/002 sensor defects logged. Report: spec-coverage-report.md"
       ],
       "proposals": []
     },
@@ -317,25 +447,6 @@
       "slices": [],
       "examples": [
         "denied: git reset --hard"
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-eb7bb53b",
-      "signature": "command:rm -rf",
-      "kind": "escape",
-      "occurrences": 2,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-11-10T21:37:19.064Z",
-      "last_seen": "2026-11-17T14:55:02.474Z",
-      "sources": [
-        "command"
-      ],
-      "slices": [],
-      "examples": [
-        "denied: rm -rf"
       ],
       "proposals": []
     },
@@ -409,27 +520,6 @@
       "proposals": []
     },
     {
-      "id": "LP-7f51c52f",
-      "signature": "sensor:QG-LEARN-04",
-      "kind": "escape",
-      "occurrences": 2,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-11-17T00:26:42.887Z",
-      "last_seen": "2026-11-17T00:29:04.788Z",
-      "sources": [
-        "sensor"
-      ],
-      "slices": [
-        "jev-module"
-      ],
-      "examples": [
-        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-06528643 (sensor:DRIFT-01:docs) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
-      ],
-      "proposals": []
-    },
-    {
       "id": "LP-5684db39",
       "signature": "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali",
       "kind": "noise",
@@ -438,7 +528,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T14:40:26.515Z",
+      "last_seen": "2026-11-17T15:12:49.806Z",
       "sources": [
         "warn"
       ],
@@ -487,6 +577,27 @@
       ],
       "examples": [
         "Code @6b7cc07; verification needs TASK-004 (jev.md auto)."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-bade7092",
+      "signature": "blocked:phase:discovery",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-16T23:59:00Z",
+      "last_seen": "2026-11-16T23:59:00Z",
+      "sources": [
+        "blocked"
+      ],
+      "slices": [
+        "telemetry-emitters"
+      ],
+      "examples": [
+        "capability.md drafted (DRAFT — AWAITING CLARIFICATION). Discovery confidence 0.78 (< 0.85 → QG-DIS-01 BLOCK); anti-pattern score 0.875 (no CRITICAL unresolved; 1 HIGH unclear AP-4 bounded-tail N). Uncertainty factors: Claude/Cursor load-hook payloads vendor-documented but unverified in repo (A-01/A-02); no self-report write path (Q-2); hook-load slice/phase attribution undecided (Q-3); pre-execution gate cannot observe command duration vs v2 D-3/AR-9 (Q-4); vendored closures of command-gate/sync-state and scaffold/registration files outside Mapped files (Q-5/Q-6/Q-7); 7 new domain terms. Schema expresses all must-haves unchanged. glossary.md/anti-patterns.md inlined in capability.md per orchestrator write constraint. Codegraph unavailable (no .codegraph/ index); knowledge search used. Next: PO answers Q-1..Q-15, then asdd-spec-agent."
       ],
       "proposals": []
     },
@@ -617,6 +728,111 @@
       "proposals": []
     },
     {
+      "id": "LP-c8595ad4",
+      "signature": "override:design",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T01:49:35.951Z",
+      "last_seen": "2026-11-17T01:49:35.951Z",
+      "sources": [
+        "override"
+      ],
+      "slices": [
+        "telemetry-emitters"
+      ],
+      "examples": [
+        "Tech Lead acknowledges the design gate WARN (session 009): D-1 cli/src/uninstall.mjs added to Mapped files (KIT_HOOK, KIT_IGNORES); D-2 REQ-007 errata accepted: direct CLI gate calls are labelled runtime 'cli'; D-4 vendored command-gate/sync-state copies under tools/*/src/harness/ and .harness/config/versions.json are generated-only (asdd kit vendor/versions/self, never hand-edited); D-3 stands: if captured fixtures show Cursor beforeReadFile does not fire for agent reads or lacks file_path, Cursor is treated as hookless (unknown); GOV-001 closed by this session and the validation override. Also approved 2026-11-16 at checkpoint b: generator runs (kit vendor/kit self) inside waves TASK-005/008/009/011 (generated output only); TASK-014 exceeds the 3-file limit as required by AR-5; D-3: Cursor hook ships only with a live-captured Cursor fixture, otherwise Cursor is hookless (unknown); drift base for this slice is chore/p5-roadmap-runtimes-bindings via HARNESS_DRIFT_BASE."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-734f50ab",
+      "signature": "override:task_planning",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T01:49:54.479Z",
+      "last_seen": "2026-11-17T01:49:54.479Z",
+      "sources": [
+        "override"
+      ],
+      "slices": [
+        "telemetry-emitters"
+      ],
+      "examples": [
+        "Tech Lead acknowledges the task planning gate WARN (session 010): generator runs (kit vendor/kit self) inside waves TASK-005/008/009/011 accepted as generated output; TASK-014 exceeds the 3-file limit as required by AR-5; D-3: TASK-002 ships the Cursor hook only with a live-captured Cursor fixture, else Cursor is hookless (unknown); DRIFT-01 FAILs come from the base-branch merges (f41a3ff) and are resolved by HARNESS_DRIFT_BASE=chore/p5-roadmap-runtimes-bindings; D-1/D-2/D-4 confirmed (session 012)."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-b1ebd24a",
+      "signature": "override:validation",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T01:49:35.950Z",
+      "last_seen": "2026-11-17T01:49:35.950Z",
+      "sources": [
+        "override"
+      ],
+      "slices": [
+        "telemetry-emitters"
+      ],
+      "examples": [
+        "Tech Lead confirms the decisions relayed in sessions 003/006/007 (GOV-001): AP-7 accepted, no split (REQ-012 sequences the AR-2 waves); AR-3 rotation, profiling.json rollup and H-* findings in --slice deferred; Q-14 budget = in-process handler time, >=200 samples per fixture class, gated at p99 <=50 ms, whole-process time recorded not gated; Verify-on-Stop own-crash behaviour out of scope (KPI-1, follow-up); mapped files widened (discovery Q-1/Q-5/Q-6, validation TRC-003); OI-7: add the AR-5 missing-registration WARN in validators/telemetry.mjs, active only when .harness/state/telemetry/ exists."
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-8dffb0eb",
+      "signature": "sensor:<path>: concurrent features TASK-N and TASK-N have overlapping scopes: <path> / ",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T14:39:49.447Z",
+      "last_seen": "2026-11-17T14:39:49.447Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "telemetry-emitters"
+      ],
+      "examples": [
+        ".harness/features/telemetry-emitters.features.json: concurrent features TASK-010 and TASK-012 have overlapping scopes: cli/src/harness/telemetry-observe.mjs / cli/src/harness/telemetry-observe.mjs"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-18f0f1aa",
+      "signature": "sensor:<path>: feature TASK-N is in_progress before dependency TASK-N is passing",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T14:39:49.447Z",
+      "last_seen": "2026-11-17T14:39:49.447Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "telemetry-emitters"
+      ],
+      "examples": [
+        ".harness/features/telemetry-emitters.features.json: feature TASK-012 is in_progress before dependency TASK-010 is passing"
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-f13ce5a3",
       "signature": "sensor:<path>: feature TASK-N missing user_visible_behavior",
       "kind": "escape",
@@ -699,23 +915,21 @@
       "proposals": []
     },
     {
-      "id": "LP-2a52ea2c",
-      "signature": "sensor:DRIFT-01:cli",
+      "id": "LP-011d46a8",
+      "signature": "sensor:QG-LEARN-03:docs",
       "kind": "escape",
       "occurrences": 1,
       "threshold": 3,
       "status": "watching",
       "reopened": false,
-      "first_seen": "2026-11-17T00:26:22.507Z",
-      "last_seen": "2026-11-17T00:26:22.507Z",
+      "first_seen": "2026-11-17T14:37:29.433Z",
+      "last_seen": "2026-11-17T14:37:29.433Z",
       "sources": [
         "sensor"
       ],
-      "slices": [
-        "skill-eval"
-      ],
+      "slices": [],
       "examples": [
-        "DRIFT-01 cli/src/kit/guidance.mjs changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+        "QG-LEARN-03 docs/knowledge-base/steering-proposals/SP-009.md: control must name the guide or sensor file to change"
       ],
       "proposals": []
     },
@@ -735,6 +949,25 @@
       "slices": [],
       "examples": [
         "asdd-steering.mdc mandates reads for auto files bypassing tags: structure.md, product.md, codegraph.md (recorded G-6 — Phase-2 generated projections)"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-b05001e2",
+      "signature": "warn:CONVERGE-02",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 5,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T01:52:06.060Z",
+      "last_seen": "2026-11-17T12:30:28.206Z",
+      "sources": [
+        "warn"
+      ],
+      "slices": [],
+      "examples": [
+        "CONVERGE-02 feature TASK-001 lists REQ-016 but no test file mentions it"
       ],
       "proposals": []
     }
