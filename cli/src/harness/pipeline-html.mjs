@@ -39,6 +39,25 @@ export function renderPipelineHtml(opts = {}) {
     .map(([c, n]) => `${esc(c)}×${n}`)
     .join(', ') || '—';
 
+  // cost-metrics: same metrics.cost as `asdd status --metrics --json`.
+  const cost = metrics.cost;
+  const tokens = (r) => (r.input_tokens ?? 0) + (r.output_tokens ?? 0) + (r.cache_read_tokens ?? 0) + (r.cache_write_tokens ?? 0);
+  const usd = (v) => (v == null ? 'n/a' : `$${v}`);
+  const costRow = (label, r) => (r.unknown
+    ? `<tr><td>${esc(label)}</td><td colspan="5">unknown — no token source; not estimated</td></tr>`
+    : `<tr><td>${esc(label)}</td><td>${r.input_tokens}</td><td>${r.output_tokens}</td><td>${r.cache_read_tokens}</td><td>${r.cache_write_tokens}</td><td>${esc(usd(r.usd))}</td></tr>`);
+  const costSection = cost
+    ? `
+  <h2>Tokens and cost</h2>
+  <p class="meta">${cost.source.length ? `Source: ${esc(cost.source.join(', '))}. USD only from .harness/config/model-prices.json.` : 'No usage recorded yet (Claude Code records it at Stop).'}${cost.unknown_runtimes.length ? ` Unknown (not estimated): ${esc(cost.unknown_runtimes.join(', '))}.` : ''}</p>
+  <table>
+    <thead><tr><th>Model / runtime</th><th>Input</th><th>Output</th><th>Cache read</th><th>Cache write</th><th>USD</th></tr></thead>
+    <tbody>
+${[...cost.by_model.map((r) => costRow(r.model, r)), ...cost.by_runtime.map((r) => costRow(`runtime: ${r.runtime}`, r))].join('\n') || '<tr><td colspan="6">No usage</td></tr>'}
+    </tbody>
+  </table>`
+    : '';
+
   const body = sliceRows
     .map(
       (s) => `<tr>
@@ -83,7 +102,9 @@ export function renderPipelineHtml(opts = {}) {
     <div class="card"><span>Lite share</span><strong>${pct(metrics.slices.lite_share)}</strong></div>
     <div class="card"><span>Escalation</span><strong>${pct(metrics.slices.escalation_rate)}</strong></div>
     <div class="card"><span>Stop FAILs</span><strong>${metrics.stop_fail.episodes}</strong></div>
-    <div class="card"><span>Open patterns</span><strong>${metrics.open_patterns}</strong></div>
+    <div class="card"><span>Open patterns</span><strong>${metrics.open_patterns}</strong></div>${cost ? `
+    <div class="card"><span>Tokens</span><strong>${tokens(cost.totals)}</strong></div>
+    <div class="card"><span>Cost (USD)</span><strong>${esc(usd(cost.totals.usd))}</strong></div>` : ''}
   </div>
   <p class="meta">Stop FAIL codes: ${codes}</p>
   <table>
@@ -91,7 +112,7 @@ export function renderPipelineHtml(opts = {}) {
     <tbody>
 ${body || '<tr><td colspan="6">No slices</td></tr>'}
     </tbody>
-  </table>
+  </table>${costSection}
 </body>
 </html>
 `;

@@ -79,9 +79,25 @@ async function emitHookSpan(outcome, attrs) {
       status: outcome === 'could-not-run' ? 'ERROR' : 'OK',
       attributes: { outcome, ...attrs },
     });
+    await addUsage(span, tel);
     tel.emit(span, { root: where });
   } catch {
     // ignore
+  }
+}
+
+// cost-metrics: on a Claude Stop, the session's cumulative token usage per model from the transcript the payload
+// names. Guarded like telemetry-lib: a missing lib, an unreadable transcript, or a line over the limit drops only it.
+async function addUsage(span, tel) {
+  if (hookRuntime(input) !== 'claude' || typeof input.transcript_path !== 'string') return;
+  const cost = await import('./cost-lib.mjs').catch(() => null);
+  try {
+    const usage = cost?.usageAttribute(cost.readTranscriptUsage(input.transcript_path), input.session_id);
+    if (!usage) return;
+    span.attributes.usage = usage;
+    if (Buffer.byteLength(`${JSON.stringify(span)}\n`) > (tel.MAX_LINE_BYTES ?? 4096)) delete span.attributes.usage;
+  } catch {
+    delete span.attributes?.usage;
   }
 }
 
