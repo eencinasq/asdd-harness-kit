@@ -3,16 +3,48 @@
   "task": "A PO/PM splits a bet pitch into Intent items in the project's tracker for engineers to import",
   "expect": "The PO-mode reference carries a complete Intent body with every required heading of the canonical format, and the skill writes one Intent item per fit scope to the tracker, never intent.md or a slice",
   "probes": [
-    { "id": "example", "run": "grep -cE '^## (Problem|Desired Outcome|Appetite|Must-have outcomes|No-gos|Grounding|Intent fitness)$' cli/skills/product-delivery/references/po-mode-tracker-output.md", "cwd": "repo" },
-    { "id": "block", "run": "grep -c '^```asdd-intent$' cli/skills/product-delivery/references/po-mode-tracker-output.md", "cwd": "repo" }
+    {
+      "id": "example",
+      "run": "grep -cE '^## (Problem|Desired Outcome|Appetite|Must-have outcomes|No-gos|Grounding|Intent fitness)$' {skill_dir}/references/po-mode-tracker-output.md",
+      "cwd": "repo"
+    },
+    {
+      "id": "block",
+      "run": "grep -c '^```asdd-intent$' {skill_dir}/references/po-mode-tracker-output.md",
+      "cwd": "repo"
+    }
   ],
   "assertions": [
-    { "type": "exit_code", "probe": "example", "code": 0 },
-    { "type": "stdout_matches", "probe": "example", "pattern": "^7\\s*$" },
-    { "type": "exit_code", "probe": "block", "code": 0 },
-    { "type": "skill_contains", "pattern": "## PO mode" },
-    { "type": "skill_contains", "pattern": "Intent item" },
-    { "type": "skill_contains", "pattern": "intent-format.md" },
-    { "type": "skill_contains", "pattern": "never runs `asdd slice init`" }
+    {
+      "type": "exit_code",
+      "probe": "example",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "example",
+      "pattern": "^7\\s*$"
+    },
+    {
+      "type": "exit_code",
+      "probe": "block",
+      "code": 0
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "## PO mode"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "Intent item"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "intent-format.md"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "never runs `asdd slice init`"
+    }
   ]
 }

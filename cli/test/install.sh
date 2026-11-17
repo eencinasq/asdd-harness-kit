@@ -261,6 +261,12 @@ test ! -e "$PKG_DIR/app/.harness/cli"
 for f in index.html app.js styles.css; do
   test -f "$(find "$PKG_DIR/prefix" -path '*/asdd-harness-kit/cli/dist/harness/ui' -type d | head -1)/$f" || { echo "package misses cli/dist/harness/ui/$f" >&2; exit 1; }
 done
+# skill-eval-portable REQ-002 REQ-004: the package ships the skill-eval fixtures, and they pass in the installed app
+SKILL_EVAL_DIR="$(find "$PKG_DIR/prefix" -path '*/asdd-harness-kit/cli/eval/skills' -type d | head -1)"
+test -n "$SKILL_EVAL_DIR" && ls "$SKILL_EVAL_DIR"/*/*.json >/dev/null || { echo "package misses cli/eval/skills fixtures" >&2; exit 1; }
+if grep -rq 'cli/bin/asdd.mjs' "$SKILL_EVAL_DIR"; then echo "shipped skill-eval fixtures hard-code the kit CLI path" >&2; exit 1; fi
+SKILL_EVAL_OUT="$(cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" asdd skill-eval 2>&1)" || { echo "$SKILL_EVAL_OUT" >&2; echo "asdd skill-eval failed in the installed app" >&2; exit 1; }
+grep -qE 'total [0-9]+/[0-9]+ pass' <<<"$SKILL_EVAL_OUT"
 echo '{"command":"git status"}' | (cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" sh -c "$EXPECT_GATE") | grep -q '"permission": *"allow"'
 (cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" asdd check >/dev/null)
 # telemetry-emitters REQ-025: the packaged install gets the telemetry location and a Claude load hook that records a load

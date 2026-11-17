@@ -3,19 +3,61 @@
   "task": "Shape a pitch grounded in what the repository already has",
   "expect": "The grounding tools run (knowledge index, slice detail, pipeline metrics), and the skill makes grounding a mandatory step before the pitch, with a Reuse / Extend / New table, evidence refs, and reference slices for the appetite",
   "probes": [
-    { "id": "index", "run": "node cli/bin/asdd.mjs knowledge sync && node cli/bin/asdd.mjs knowledge search \"pitch\" --k 2", "cwd": "repo" },
-    { "id": "metrics", "run": "node cli/bin/asdd.mjs status --metrics --json", "cwd": "repo" }
+    {
+      "id": "index",
+      "run": "{asdd} knowledge sync && {asdd} knowledge search \"pitch\" --k 2",
+      "cwd": "repo"
+    },
+    {
+      "id": "metrics",
+      "run": "{asdd} status --metrics --json",
+      "cwd": "repo"
+    }
   ],
   "assertions": [
-    { "type": "exit_code", "probe": "index", "code": 0 },
-    { "type": "stdout_matches", "probe": "index", "pattern": "\"results\"" },
-    { "type": "exit_code", "probe": "metrics", "code": 0 },
-    { "type": "stdout_matches", "probe": "metrics", "pattern": "\"slices\"" },
-    { "type": "skill_contains", "pattern": "### Step 3: Ground the pitch" },
-    { "type": "skill_contains", "pattern": "Reuse / Extend / New" },
-    { "type": "skill_contains", "pattern": "asdd knowledge search" },
-    { "type": "skill_contains", "pattern": "codegraph explore" },
-    { "type": "skill_contains", "pattern": "reference slice" },
-    { "type": "skill_contains", "pattern": "product-delivery/references/grounding.md" }
+    {
+      "type": "exit_code",
+      "probe": "index",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "index",
+      "pattern": "\"results\""
+    },
+    {
+      "type": "exit_code",
+      "probe": "metrics",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "metrics",
+      "pattern": "\"slices\""
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "### Step 3: Ground the pitch"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "Reuse / Extend / New"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "asdd knowledge search"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "codegraph explore"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "reference slice"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "product-delivery/references/grounding.md"
+    }
   ]
 }

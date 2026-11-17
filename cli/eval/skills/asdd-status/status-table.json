@@ -3,11 +3,26 @@
   "task": "Show the active slices table in the terminal",
   "expect": "`asdd status` exits 0 and prints the Active Slices table",
   "probes": [
-    { "id": "p1", "run": "node cli/bin/asdd.mjs status", "cwd": "repo" }
+    {
+      "id": "p1",
+      "run": "{asdd} status",
+      "cwd": "repo"
+    }
   ],
   "assertions": [
-    { "type": "exit_code", "probe": "p1", "code": 0 },
-    { "type": "stdout_contains", "probe": "p1", "text": "Active Slices" },
-    { "type": "skill_contains", "pattern": "asdd status --metrics" }
+    {
+      "type": "exit_code",
+      "probe": "p1",
+      "code": 0
+    },
+    {
+      "type": "stdout_contains",
+      "probe": "p1",
+      "text": "Active Slices"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "asdd status --metrics"
+    }
   ]
 }

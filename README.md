@@ -273,7 +273,7 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 | `asdd slice escalate <id> --reasons "<triggers>"` | Lite/hotfix → escalated |
 | `asdd converge [--strict] [--json]` | Cheap REQ / test-mention / evidence gate before `passing` |
 | `asdd converge-eval` | Score EARS/converge fixtures under `cli/eval/converge-ears/` |
-| `asdd skill-eval [--skill <name>] [--baseline <ref>]` | Score skill fixtures under `cli/eval/skills/`; `--baseline` diffs against a git ref and fails on regressions |
+| `asdd skill-eval [--skill <name>] [--baseline <ref>]` | Score the shipped skill fixtures plus the project's `.harness/eval/skills/`; `--baseline` diffs against a git ref and fails on regressions |
 | `asdd waves [--slice <id>]` | Parallelism hints from owners, deps, and scopes |
 | `asdd portfolio` | Read-only multi-repo summary (`.harness/config/portfolio.json`) |
 | `asdd tracker-sync [--apply]` | Plan bi-directional tracker sync from handoff + sessions (local receipt with `--apply`) |
@@ -671,7 +671,7 @@ applied_commit: 3f2c1ab     # must change the control file (checked with git)
 
 **Back to the kit.** `asdd learn --export --out lessons.md` writes the verified and ineffective proposals on kit-owned controls, with generic fields only (no examples, slice names, proposal text, or commands), and prints the `gh issue create` command to send it to the kit. Nothing is sent automatically.
 
-**Evaluating skills.** `asdd skill-eval` runs deterministic fixtures per skill (`cli/eval/skills/<skill>/*.json`: shell probes plus assertions on exit codes, stdout, files, and the skill text; no LLM judge). `--baseline <ref>` re-scores each fixture against the skill body at that git ref and exits non-zero on a regression. A guide-changing proposal records its run in frontmatter, `eval: asdd skill-eval --skill <name> --json => <result-ref>`, before the Tech Lead accepts it. Fixture format: [`cli/eval/skills/README.md`](cli/eval/skills/README.md).
+**Evaluating skills.** `asdd skill-eval` runs deterministic fixtures per skill (`cli/eval/skills/<skill>/*.json`, shipped in the package, plus the project's `.harness/eval/skills/<skill>/*.json`, which add or override cases: shell probes plus assertions on exit codes, stdout, files, and the skill text; no LLM judge). It works the same in the kit and in an installed project; a case whose `requires` the machine lacks (e.g. `codegraph`) is skipped, not failed. `--baseline <ref>` re-scores each fixture against the skill body at that git ref and exits non-zero on a regression. A guide-changing proposal records its run in frontmatter, `eval: asdd skill-eval --skill <name> --json => <result-ref>`, before the Tech Lead accepts it. Fixture format: [`cli/eval/skills/README.md`](cli/eval/skills/README.md).
 
 Rules: `QG-LEARN-01`…`10` in [`quality-gates.md`](.harness/steering/quality-gates.md) and [`quality-gates.learn.md`](.harness/steering/quality-gates.learn.md). See open patterns with `asdd status`, `asdd learn`, `asdd knowledge patterns`, or the `knowledge_patterns` MCP tool.
 

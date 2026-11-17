@@ -1,16 +1,40 @@
 {
   "id": "scope-grounding",
   "task": "Split a bet pitch into scopes that reuse what the repository already has",
-  "expect": "The slice-detail tool runs, and the skill grounds every scope (Reuse / Extend / New with evidence) before classifying it, and merges or cuts a scope that duplicates an existing capability",
+  "expect": "the knowledge index builds and reports its nodes (the grounding step reads it); the skill keeps the per-scope grounding and the merge-or-cut rule",
   "probes": [
-    { "id": "slice", "run": "node cli/bin/asdd.mjs knowledge sync && node cli/bin/asdd.mjs knowledge slice asdd-roadmap", "cwd": "repo" }
+    {
+      "id": "slice",
+      "run": "{asdd} knowledge sync && {asdd} knowledge status",
+      "cwd": "repo"
+    }
   ],
   "assertions": [
-    { "type": "exit_code", "probe": "slice", "code": 0 },
-    { "type": "stdout_matches", "probe": "slice", "pattern": "\"features\"" },
-    { "type": "skill_contains", "pattern": "### Step 3: Ground the scopes" },
-    { "type": "skill_contains", "pattern": "Reuse / Extend / New" },
-    { "type": "skill_contains", "pattern": "merge or cut" },
-    { "type": "skill_contains", "pattern": "references/grounding.md" }
+    {
+      "type": "exit_code",
+      "probe": "slice",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "slice",
+      "pattern": "\"nodes\""
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "### Step 3: Ground the scopes"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "Reuse / Extend / New"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "merge or cut"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "references/grounding.md"
+    }
   ]
 }
