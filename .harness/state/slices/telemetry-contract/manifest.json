@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-11T05:20:04.589Z",
-  "updated_at": "2026-11-17T12:06:52.155Z",
+  "updated_at": "2026-11-17T12:28:00.594Z",
   "paths": {
     "specs": ".harness/specs/telemetry-contract",
     "tasks": ".harness/specs/telemetry-contract/tasks.md",

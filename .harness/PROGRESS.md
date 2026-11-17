@@ -20,10 +20,10 @@
 | drift01-harness-logs | hotfix | knowledge | DONE | 0 |
 | drift02-open-slices | hotfix | knowledge | DONE | 0 |
 | egm-shaping | full | knowledge | DONE | 0 |
-| grounded-shaping | lite | discovery | in_progress | 0 |
+| grounded-shaping | escalated | knowledge | DONE | 0 |
 | guidance-proposal-skip | hotfix | knowledge | DONE | 0 |
 | harness-green | escalated | knowledge | DONE | 0 |
-| intent-intake | lite | discovery | in_progress | 0 |
+| intent-intake | escalated | knowledge | DONE | 0 |
 | jev-gate-nest | escalated | implementation | ABANDONED | 0 |
 | jev-module | full | knowledge | DONE | 0 |
 | kit-hygiene | full | knowledge | DONE | 0 |

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T12:06:52.206Z",
+  "generated_at": "2026-11-17T12:28:00.665Z",
   "threshold": 3,
   "summary": {
     "patterns": 30,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 36,
+      "occurrences": 38,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -37,7 +37,9 @@
         "docs-p5-wave1",
         "drift-consistency",
         "egm-shaping",
+        "grounded-shaping",
         "harness-green",
+        "intent-intake",
         "jev-gate-nest",
         "jev-module",
         "kit-hygiene",
@@ -135,7 +137,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 102
+          "quiet_sessions": 136
         }
       ]
     },
@@ -206,7 +208,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 102
+          "quiet_sessions": 136
         }
       ]
     },
@@ -219,7 +221,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T12:03:31.077Z",
+      "last_seen": "2026-11-17T12:15:54.897Z",
       "sources": [
         "warn"
       ],
@@ -238,7 +240,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T12:03:31.077Z",
+      "last_seen": "2026-11-17T12:15:54.897Z",
       "sources": [
         "warn"
       ],
@@ -414,7 +416,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T12:03:31.077Z",
+      "last_seen": "2026-11-17T12:15:54.897Z",
       "sources": [
         "warn"
       ],
