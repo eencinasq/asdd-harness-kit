@@ -170,6 +170,15 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 					endLine: line,
 					severity: 'high',
 					category: 'security',
+					evidence: `An untrusted caller controls the parsed input that reaches the call at ${inGroup}:${line}.`,
+				},
+				{
+					path: inGroup,
+					content: 'Looks risky but names no boundary.',
+					startLine: line,
+					endLine: line,
+					severity: 'high',
+					category: 'security',
 				},
 				{
 					path: inGroup,
@@ -204,6 +213,11 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 		);
 		assert.ok(
 			v.warnings?.some((w) => w.includes('Finding path not in group [0]')),
+			JSON.stringify(v.warnings),
+		);
+		// security-review REQ-008: a security finding without boundary + file:line evidence is not kept.
+		assert.ok(
+			v.warnings?.some((w) => /Security finding skipped \(security finding with no evidence/.test(w)),
 			JSON.stringify(v.warnings),
 		);
 		assert.ok(fs.existsSync(artifact('comments.md')), 'draft written during the loop');

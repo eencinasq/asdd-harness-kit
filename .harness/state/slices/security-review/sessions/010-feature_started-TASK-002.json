@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-security-review-010",
+  "timestamp": "2026-11-17T14:47:28.000Z",
+  "agent": "claude-sec",
+  "human": "eencinas",
+  "slice_id": "security-review",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "RED: recon.spec.ts and findings.spec.ts fail — modules recon.ts / findings.ts do not exist.",
+  "concerns": [],
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "tools/spec-drift/src/security/recon.ts",
+    "tools/spec-drift/src/security/recon.spec.ts",
+    "tools/spec-drift/src/security/findings.ts",
+    "tools/spec-drift/src/security/findings.spec.ts"
+  ]
+}

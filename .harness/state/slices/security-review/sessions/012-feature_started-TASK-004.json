@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-security-review-012",
+  "timestamp": "2026-11-17T14:50:30.000Z",
+  "agent": "claude-sec",
+  "human": "eencinas",
+  "slice_id": "security-review",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "RED: builtin-pack.spec.ts fails — builtin-pack.ts does not exist; ScanMode has no 'security'. Rule pack written test-first: semgrep --test src/security/semgrep 10/10.",
+  "concerns": [],
+  "feature_id": "TASK-004",
+  "scope_paths": [
+    "tools/spec-drift/src/security/builtin-pack.ts",
+    "tools/spec-drift/src/security/builtin-pack.spec.ts",
+    "tools/spec-drift/src/security/semgrep",
+    "tools/spec-drift/src/analysis/analysis.types.ts",
+    "tools/spec-drift/src/analysis/analysis.schemas.ts",
+    "tools/spec-drift/src/analysis/analysis.tools.ts",
+    "tools/spec-drift/src/analysis/analysis.service.ts",
+    "tools/spec-drift/src/analysis/domain/pack-selection.ts"
+  ]
+}

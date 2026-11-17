@@ -54,6 +54,18 @@ test('spec-drift-adoption REQ-003: "analysis,audit" loads both and no review too
 	assert.ok(!tools.some((t) => t.startsWith('pr_review_')));
 	assert.ok(prompts.includes('generate-architecture-rules') && prompts.includes('pr-review'), prompts.join(', '));
 	assert.ok(!prompts.includes('review-pr'));
+	assert.ok(!tools.some((t) => t.startsWith('security_audit_')), 'no security audit tool without the security toolset');
+});
+
+test('security-review REQ-010: "security" loads only the security audit tools and their view', async () => {
+	const { tools, resources } = await listWith('security');
+	assert.deepEqual(tools.sort(), [
+		'security_audit_checklist',
+		'security_audit_start',
+		'security_audit_status',
+		'security_audit_submit_findings',
+	]);
+	assert.deepEqual(resources, ['ui://spec-drift/security-dashboard.html']);
 });
 
 test('spec-drift-adoption REQ-003: an unknown toolset stops the server and names the valid ones', () => {
@@ -65,6 +77,6 @@ test('spec-drift-adoption REQ-003: an unknown toolset stops the server and names
 		timeout: 60_000,
 	});
 	assert.notEqual(r.status, 0);
-	assert.match(r.stderr, /unknown toolset "reviews"\. Use: analysis, review, audit\./);
+	assert.match(r.stderr, /unknown toolset "reviews"\. Use: analysis, review, audit, security\./);
 	assert.equal(r.stdout, '', 'stdout stays clean for the protocol');
 });

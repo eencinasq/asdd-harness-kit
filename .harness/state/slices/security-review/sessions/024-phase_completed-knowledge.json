@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-security-review-024",
+  "timestamp": "2026-11-17T15:06:29.000Z",
+  "agent": "claude-sec",
+  "human": "eencinas",
+  "slice_id": "security-review",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lessons: vendor a third-party validator instead of porting it (exact contract, MIT); MCP App views need their own Vite input and the e2e that reads every view; tools/spec-drift e2e already had a stale failing test on the base — measure a clean baseline before attributing failures.",
+  "concerns": []
+}

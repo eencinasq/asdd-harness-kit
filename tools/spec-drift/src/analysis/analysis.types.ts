@@ -32,7 +32,7 @@ export type RuleTestReport = {
 export const SEVERITIES = ['ERROR', 'WARNING', 'INFO'] as const;
 export type Severity = (typeof SEVERITIES)[number];
 
-export type ScanMode = 'architecture' | 'standards' | 'all' | 'spec-drift';
+export type ScanMode = 'architecture' | 'standards' | 'security' | 'all' | 'spec-drift';
 
 /** The analyzer behind a scan, shown in tool output and dashboards. */
 export type EngineInfo = {

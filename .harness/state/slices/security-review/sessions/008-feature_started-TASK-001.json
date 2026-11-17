@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-security-review-008",
+  "timestamp": "2026-11-17T14:45:18.000Z",
+  "agent": "claude-sec",
+  "human": "eencinas",
+  "slice_id": "security-review",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "RED: checklists.spec.ts fails — Cannot find module src/security/checklists.ts (no vendored methodology yet).",
+  "concerns": [],
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "tools/spec-drift/src/security/methodology",
+    "tools/spec-drift/src/security/checklists.ts",
+    "tools/spec-drift/src/security/checklists.spec.ts",
+    "tools/spec-drift/THIRD_PARTY_NOTICES.md",
+    "tools/spec-drift/biome.json",
+    "tools/spec-drift/scripts/build-server.mjs"
+  ]
+}

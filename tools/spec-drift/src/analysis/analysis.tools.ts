@@ -77,6 +77,20 @@ export class AnalysisTools {
 	}
 
 	@Tool({
+		name: 'analyze_security',
+		annotations: { readOnlyHint: true, openWorldHint: false },
+		title: 'Analyze security (static baseline)',
+		description:
+			"Run the repository's security rule set (.semgrep/security/) with the configured static analyzer, or — when the repo has none and the engine is Semgrep — the server's built-in starter pack (command, code and SQL injection, DOM XSS, unsafe deserialization, weak hashes, disabled TLS checks), and open the dashboard. Deterministic, no model, read-only: it never runs project code or reaches the network. For a methodology-driven audit use security_audit_start.",
+		inputSchema: scopedAnalyzeSchema('security'),
+		outputSchema: ScanSummaryOutput,
+		_meta: appToolMeta(ANALYSIS_UI_URI),
+	})
+	analyzeSecurity(args: ScopedAnalyzeInput) {
+		return this.scan('security', args);
+	}
+
+	@Tool({
 		name: 'analyze_spec_drift',
 		annotations: { readOnlyHint: true, openWorldHint: false },
 		title: 'Analyze architecture & standards spec drift',
@@ -157,7 +171,9 @@ export class AnalysisTools {
 				? 'analyze_architecture'
 				: args.mode === 'standards'
 					? 'analyze_standards'
-					: 'analyze_spec_drift';
+					: args.mode === 'security'
+						? 'analyze_security'
+						: 'analyze_spec_drift';
 		try {
 			const job = this.jobs.start(tool, (progress) =>
 				// A context of its own: the start call has returned, so progress goes to the job, not to that call.
