@@ -13,8 +13,9 @@ Discovery → Spec → Validation → Domain → Design → Task planning → Im
 ```
 
 Roles: one per agent (`metadata.tier`). QA audits only; tests come from Implementation's TDD step; requirements are
-reviewed by Validation; spikes are read-only research by `asdd-spike-researcher`. Rendered runtime files and the
-capability schema: [`_runtime-template.md`](_runtime-template.md).
+reviewed by Validation; spikes are read-only research by `asdd-spike-researcher`. Before the pipeline, a PO or PM
+shapes pitches and intents with `asdd-shaping-agent`: read-only on the repository, output only to the project's
+tracker. Rendered runtime files and the capability schema: [`_runtime-template.md`](_runtime-template.md).
 
 Small work (≤3 files, ≤1 new domain concept): `asdd-lite-agent` — see [`asdd-lite.md`](../../.harness/steering/asdd-lite.md).
 

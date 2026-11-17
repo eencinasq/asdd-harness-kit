@@ -162,6 +162,31 @@ test('agents-spec REQ-004: the renderers project capabilities per runtime', () =
   assert.doesNotMatch(renderClaude(mcp, 'x'), /^tools:/m);
 });
 
+test('shaping-agent REQ-001 REQ-002: the shaping agent is read-only with MCP in every rendered runtime', () => {
+  const source = 'cli/agents/asdd-shaping-agent.md';
+  const parsed = parseAgent(readFileSync(join(KIT_ROOT, source), 'utf8'));
+  assert.equal(parsed.data.name, 'asdd-shaping-agent');
+  assert.equal(parsed.data.capabilities.mcp_tools, true);
+  assert.deepEqual([...parsed.data.capabilities.deny].sort(), ['edit_file', 'write_file']);
+  const claude = renderClaude(parsed, source);
+  assert.doesNotMatch(claude, /^tools:/m, 'an allowlist would drop the MCP tools');
+  const denied = claude.match(/^disallowedTools: (.*)$/m)?.[1].split(', ') ?? [];
+  for (const t of ['Write', 'Edit', 'Agent']) assert.ok(denied.includes(t), `Claude Code must deny ${t}`);
+  assert.match(renderCursor(parsed, source), /^readonly: true$/m);
+  const oc = renderOpenCode(parsed, source);
+  assert.match(oc, /- action: edit\n {4}resource: "\*"\n {4}effect: deny/);
+  assert.match(oc, /- action: subagent\n {4}resource: "\*"\n {4}effect: deny/);
+  assert.deepEqual(lintAgents(KIT_ROOT).errors.filter((e) => e.agent === 'asdd-shaping-agent'), []);
+});
+
+test('shaping-agent REQ-003: the shaping agent states repo-evidence-in, tracker-out, zero repo files', () => {
+  const body = readFileSync(join(KIT_ROOT, 'cli/agents/asdd-shaping-agent.md'), 'utf8');
+  const boundary = body.match(/\*\*Operational Boundary:\*\*([\s\S]*?)\n- \*\*Quarantine Boundary/)?.[1] ?? '';
+  assert.match(boundary, /read-only/i);
+  assert.match(boundary, /tracker/i);
+  assert.match(boundary, /zero/i, 'it writes zero repository files');
+});
+
 test('agents-spec REQ-006: in a project the sensor lints .agents/agents; --only narrows the report', () => {
   const root = mkdtempSync(join(tmpdir(), 'agents-lint-project-'));
   try {
