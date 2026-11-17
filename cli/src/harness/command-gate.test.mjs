@@ -368,3 +368,19 @@ test('TASK-005 proof (d) NFR-001: verdict write -> emit return p99 <= 50 ms over
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('TASK-005 REQ-006 isolation: a denial through the seam records its learning signal under root, never in the cwd repo', async () => {
+  const repoSignals = join(dirname(fileURLToPath(import.meta.url)), '../../../.harness/state/learning/signals');
+  const count = () => (existsSync(repoSignals) ? readdirSync(repoSignals).length : 0);
+  const root = tempRoot('writable');
+  try {
+    const before = count();
+    const raw = JSON.stringify({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command: 'sudo ls' } });
+    const lines = await runSeam(raw, root);
+    assert.match(lines[0], /"permissionDecision":"deny"/);
+    assert.equal(count(), before, 'no signal written into the repository the tests run from');
+    assert.equal(readdirSync(join(root, '.harness/state/learning/signals')).length, 1, 'one signal under the seam root');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

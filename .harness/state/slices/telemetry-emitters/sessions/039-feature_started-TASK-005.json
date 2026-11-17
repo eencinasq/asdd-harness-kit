@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-039",
+  "timestamp": "2026-11-17T11:59:20.449Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/command-gate.mjs",
+    "cli/src/harness/command-gate.test.mjs",
+    "tools/jev-gate/src/harness/command-gate.mjs",
+    "tools/jev-gate/src/harness/telemetry-lib.mjs"
+  ],
+  "evidence": "Reopen TASK-005: test-isolation defect. command-gate.test.mjs (TASK-005) wrote 43 gate-deny learning signals into the repo per run (pre-TASK-005 test: 0), because recordDenial() used process.cwd() and ignored the runHook root seam; this opened bogus learning patterns (command:git push --force, sudo, rm -rf). RED: new test \"TASK-005 REQ-006 isolation\" -> tests 1 pass 0 fail 1 (\"no signal written into the repository the tests run from\")."
+}

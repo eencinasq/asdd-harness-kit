@@ -120,9 +120,9 @@ async function emitGateSpan(root, { runtime, start, end, status, attributes }) {
 }
 
 // Learning is best-effort and lazy: a missing lib must never change the verdict.
-async function recordDenial(command, runtime) {
+async function recordDenial(command, runtime, where) {
   try {
-    const root = process.cwd();
+    const root = where ?? process.cwd();
     if (!existsSync(join(root, '.harness'))) return;
     const { writeCommandSignal } = await import('./learning-lib.mjs');
     writeCommandSignal(root, deniedLabel(command) ?? 'unknown', { runtime });
@@ -174,7 +174,7 @@ export async function runHook({ readInput = readStdin, write = writeStdout, safe
   const verdict = command
     ? await safety(command, { override: input.override === true })
     : { allowed: true, method: 'no-command', reason: 'no command in hook payload' };
-  if (!verdict.allowed) await recordDenial(command, isClaude ? 'claude' : 'cursor');
+  if (!verdict.allowed) await recordDenial(command, isClaude ? 'claude' : 'cursor', root);
 
   let output;
   if (isClaude) {
