@@ -1,6 +1,7 @@
 /**
  * telemetry-emitters TASK-003 — telemetry-lib span core: ids, buildSpan, fail-open emit, validateSpan, readTail.
  * REQ-001…REQ-006, REQ-022. TASK-004 — policy: attribute(), guidanceTarget(), skillTarget() (REQ-015, REQ-017).
+ * TASK-011 — profile model: phaseMarkers, percentile, surfaceScores, activationRows, profileModel (REQ-020, REQ-021).
  * Every case runs in a temp dir, never against the repo's .harness/state/ (the kit repo has several in_progress slices).
  */
 import assert from 'node:assert/strict';
@@ -38,6 +39,8 @@ import {
   startTrace,
   validateSpan,
 } from './telemetry-lib.mjs';
+// TASK-011 exports are read through the namespace so a missing export fails its own cases only.
+import * as telemetryLib from './telemetry-lib.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LIB_PATH = join(HERE, 'telemetry-lib.mjs');
@@ -1007,4 +1010,427 @@ test('REQ-011 runtime template: guidance loads with the read or skill tool; no s
   assert.doesNotMatch(flat, /\bspans?\b/i);
   assert.doesNotMatch(flat, /spans\.jsonl|telemetry\//i);
   assert.doesNotMatch(flat, /\bturn[- ]span|\bsubagent[- ]span/i);
+});
+
+// ── TASK-011 (REQ-020, REQ-021): profile model, pure functions over arrays ──────────────────────────────────────
+
+const H = 3_600_000;
+const T0 = Date.parse('2026-11-01T00:00:00.000Z');
+const at = (hours) => new Date(T0 + hours * H).toISOString();
+const ev = (event_type, phase, hours) => ({ event_type, phase, timestamp: at(hours), slice_id: 'demo' });
+
+// Amended slice: spec and validation are re-run after a mid-slice phase_started (ADR-005), domain is open.
+// Listed out of order on purpose (unsorted input).
+const AMENDED_SESSIONS = [
+  ev('phase_completed', 'spec', 11),
+  ev('phase_started', 'discovery', 0),
+  ev('phase_completed', 'validation', 4),
+  ev('phase_blocked', 'validation', 3.5),
+  { event_type: 'feature_completed', feature_id: 'TASK-001', timestamp: at(3.75) },
+  ev('phase_completed', 'discovery', 1),
+  ev('phase_started', 'domain', 12),
+  ev('phase_completed', 'spec', 3),
+  ev('phase_started', 'spec', 10),
+  ev('phase_completed', 'validation', 11.5),
+];
+// Completed segments: discovery 1h, spec 2h + 1h, validation 1h + 0.5h; domain open. Idle 04:00→10:00 never counted.
+const AMENDED_DENOMINATOR_MS = 5.5 * H;
+
+function span(kind, duration_ms, extra = {}) {
+  return {
+    schema_version: '1.0',
+    trace_id: 'a'.repeat(32),
+    span_id: 'b'.repeat(16),
+    parent_span_id: null,
+    kind,
+    slice_id: 'demo',
+    phase: 'implementation',
+    process_name: kind === 'tool' ? 'asdd-observe' : `${kind}-producer`,
+    start_time_iso: at(20),
+    end_time_iso: at(20),
+    duration_ms,
+    status: 'OK',
+    attributes: { trace_source: 'self' },
+    writer: kind === 'tool' ? 'runtime-hook' : `${kind}-producer`,
+    ...extra,
+  };
+}
+
+function record(target_path, runtime, phase, attrs = {}, slice_id = 'demo') {
+  return span('tool', 1, {
+    runtime,
+    phase,
+    slice_id,
+    attributes: { trace_source: 'self', target_path, ...(runtime === 'claude' ? { tool_name: 'Read' } : {}), ...attrs },
+  });
+}
+
+test('REQ-020 phaseMarkers: disjoint segments over an amended slice, unsorted input, open phase', () => {
+  const markers = telemetryLib.phaseMarkers(AMENDED_SESSIONS);
+  assert.deepEqual(markers, [
+    {
+      phase: 'discovery',
+      status: 'completed',
+      start_iso: at(0),
+      end_iso: at(1),
+      duration_ms: 1 * H,
+      start_source: 'phase_started',
+      segments: 1,
+    },
+    {
+      phase: 'spec',
+      status: 'completed',
+      start_iso: at(1),
+      end_iso: at(11),
+      duration_ms: 3 * H,
+      start_source: 'previous_phase_completed',
+      segments: 2,
+    },
+    {
+      phase: 'validation',
+      status: 'completed',
+      start_iso: at(3),
+      end_iso: at(11.5),
+      duration_ms: 1.5 * H,
+      start_source: 'previous_phase_completed',
+      segments: 2,
+    },
+    // Open phase: no end, no duration (no "now"), excluded from the denominator.
+    { phase: 'domain', status: 'open', start_iso: at(12), start_source: 'phase_started' },
+  ]);
+  const completed = markers.filter((m) => m.status === 'completed').reduce((sum, m) => sum + m.duration_ms, 0);
+  assert.equal(completed, AMENDED_DENOMINATOR_MS);
+});
+
+test('REQ-020 phaseMarkers: order-independent, ignores phase_blocked and non-phase events, no clock', () => {
+  const nowSpy = mock.method(Date, 'now', () => {
+    throw new Error('the profile model never reads the clock');
+  });
+  try {
+    const sorted = telemetryLib.phaseMarkers(AMENDED_SESSIONS);
+    const reversed = telemetryLib.phaseMarkers([...AMENDED_SESSIONS].reverse());
+    const withoutNoise = telemetryLib.phaseMarkers(
+      AMENDED_SESSIONS.filter((s) => s.event_type === 'phase_started' || s.event_type === 'phase_completed'),
+    );
+    assert.deepEqual(reversed, sorted);
+    assert.deepEqual(withoutNoise, sorted);
+    assert.equal(nowSpy.mock.callCount(), 0);
+  } finally {
+    nowSpy.mock.restore();
+  }
+});
+
+test('REQ-020 phaseMarkers: a phase re-opened by a trailing phase_started keeps its completed time and is marked open', () => {
+  const markers = telemetryLib.phaseMarkers([
+    ev('phase_started', 'spec', 0),
+    ev('phase_completed', 'spec', 2),
+    ev('phase_started', 'spec', 5),
+  ]);
+  assert.deepEqual(markers, [
+    {
+      phase: 'spec',
+      status: 'completed',
+      start_iso: at(0),
+      end_iso: at(2),
+      duration_ms: 2 * H,
+      start_source: 'phase_started',
+      segments: 1,
+      open_since_iso: at(5),
+    },
+  ]);
+});
+
+test('REQ-020 phaseMarkers: empty, malformed, and anchorless input never throws', () => {
+  assert.deepEqual(telemetryLib.phaseMarkers([]), []);
+  assert.deepEqual(telemetryLib.phaseMarkers(undefined), []);
+  assert.deepEqual(
+    telemetryLib.phaseMarkers([null, 7, { event_type: 'phase_started' }, { event_type: 'phase_started', phase: 'spec', timestamp: 'nope' }]),
+    [],
+  );
+  // A completion with no preceding phase event has no segment start: listed with its end, no duration.
+  assert.deepEqual(telemetryLib.phaseMarkers([ev('phase_completed', 'spec', 2)]), [
+    { phase: 'spec', status: 'completed', end_iso: at(2), segments: 0 },
+  ]);
+});
+
+test('REQ-020 percentile: nearest rank against precomputed values', () => {
+  const { percentile } = telemetryLib;
+  assert.equal(percentile([15, 20, 35, 40, 50], 50), 35);
+  assert.equal(percentile([50, 40, 35, 20, 15], 95), 50);
+  const twenty = [7, 3, 19, 1, 12, 20, 5, 14, 9, 16, 2, 18, 11, 6, 13, 4, 17, 8, 15, 10];
+  assert.equal(percentile(twenty, 50), 10);
+  assert.equal(percentile(twenty, 95), 19);
+  assert.equal(percentile(twenty, 100), 20);
+  assert.equal(percentile([42], 50), 42);
+  // Unmeasured -> absent (OI-3): no 0 and no null stand-in.
+  assert.equal(percentile([], 50), undefined);
+  assert.equal(percentile(['x', NaN, null], 95), undefined);
+  assert.deepEqual(twenty.length, 20); // input is not mutated by the sort
+  assert.equal(twenty[0], 7);
+});
+
+test('REQ-020 surfaceScores: 0 hits + floor(share / 10%), ordered by score desc then name asc', () => {
+  const { surfaceScores } = telemetryLib;
+  const spans = [
+    span('command', 4_000_000),
+    span('command', 2_000_000), // command 6,000,000 / 19,800,000 = 30.3% -> 3
+    span('hook', 1_980_000), // exactly 10% -> 1
+    span('tool', 9_000_000), // not a surface
+  ];
+  assert.deepEqual(surfaceScores(spans, AMENDED_DENOMINATOR_MS), [
+    { surface: 'command', hits: 0, total_ms: 6_000_000, share: 6_000_000 / AMENDED_DENOMINATOR_MS, score: 3 },
+    { surface: 'hook', hits: 0, total_ms: 1_980_000, share: 0.1, score: 1 },
+    { surface: 'sync', hits: 0, total_ms: 0, share: 0, score: 0 },
+  ]);
+  // Float trap: 0.3 / 0.1 = 2.999… must still score 3.
+  assert.equal(surfaceScores([span('sync', 3)], 10).find((s) => s.surface === 'sync').score, 3);
+  // Tie on score -> name ascending.
+  assert.deepEqual(
+    surfaceScores([span('sync', 1), span('hook', 1), span('command', 1)], 1000).map((s) => s.surface),
+    ['command', 'hook', 'sync'],
+  );
+});
+
+test('REQ-020 surfaceScores: denominator 0 -> share term 0 and share unknown (no share key)', () => {
+  const scores = telemetryLib.surfaceScores([span('command', 500)], 0);
+  assert.deepEqual(scores, [
+    { surface: 'command', hits: 0, total_ms: 500, share_unknown: true, score: 0 },
+    { surface: 'hook', hits: 0, total_ms: 0, share_unknown: true, score: 0 },
+    { surface: 'sync', hits: 0, total_ms: 0, share_unknown: true, score: 0 },
+  ]);
+});
+
+const STEERING = [
+  { path: '.harness/steering/always.md', inclusion: 'always', tags: [] },
+  { path: '.harness/steering/impl.md', inclusion: 'auto', tags: ['implementation', 'qa'] },
+  { path: '.harness/steering/spec-only.md', inclusion: 'auto', tags: ['spec'] },
+];
+const SKILLS = ['.agents/skills/tdd/SKILL.md'];
+
+test('REQ-021 activationRows: three states per runtime column, hooked runtimes only, missing ids -> unknown', () => {
+  const records = [
+    record('.harness/steering/always.md', 'claude', 'implementation', { runtime_session_id: 's1' }),
+    record('.harness/steering/always.md', 'claude', 'implementation', { agent_id: 'ag1' }),
+    record('.harness/steering/always.md', 'claude', 'spec', { runtime_session_id: 's9' }), // other phase
+  ];
+  const table = telemetryLib.activationRows({
+    phase: 'implementation',
+    records,
+    steering: STEERING,
+    skills: SKILLS,
+    runtimes: ['claude', 'cursor', 'devin'],
+    observeHooks: { claude: true, cursor: false, devin: true }, // devin has no load hooks: never `not observed`
+    configured: [{ path: 'CLAUDE.md', runtime: 'claude' }],
+  });
+  assert.equal(table.phase, 'implementation');
+  assert.deepEqual(table.columns, ['claude', 'cursor', 'devin']);
+  assert.equal(table.runtimes_configured, true);
+  assert.deepEqual(
+    table.rows.map((r) => [r.target, r.type, r.expected]),
+    [
+      ['.harness/steering/always.md', 'steering', true],
+      ['.harness/steering/impl.md', 'steering', true],
+      ['.agents/skills/tdd/SKILL.md', 'skill', true],
+    ],
+  );
+  const [always, impl, skill] = table.rows;
+  assert.deepEqual(always.cells.claude, {
+    state: 'observed',
+    label: 'observed (2)',
+    count: 2,
+    runtime_session_ids: ['s1', 'unknown'],
+    agent_ids: ['ag1', 'unknown'],
+  });
+  assert.deepEqual(always.cells.cursor, { state: 'unknown', label: 'unknown' }); // observe entry not wired
+  assert.deepEqual(always.cells.devin, { state: 'unknown', label: 'unknown' }); // hookless runtime
+  assert.deepEqual(impl.cells.claude, { state: 'not observed', label: 'not observed' });
+  assert.deepEqual(skill.cells.claude, { state: 'not observed', label: 'not observed' });
+  assert.deepEqual(table.configured, [
+    { target: 'CLAUDE.md', runtime: 'claude', state: 'configured, not observed', label: 'configured, not observed' },
+  ]);
+
+  // Cursor with its observe entry present -> `not observed`.
+  const wired = telemetryLib.activationRows({
+    phase: 'implementation',
+    records,
+    steering: STEERING,
+    skills: SKILLS,
+    runtimes: ['claude', 'cursor'],
+    observeHooks: { claude: true, cursor: true },
+    configured: [],
+  });
+  assert.deepEqual(wired.rows[1].cells.cursor, { state: 'not observed', label: 'not observed' });
+});
+
+test('REQ-021 activationRows: observed targets outside the expected set get their own row; runtimes not configured', () => {
+  const table = telemetryLib.activationRows({
+    phase: 'implementation',
+    records: [
+      record('.harness/steering/spec-only.md', 'cursor', 'implementation', { runtime_session_id: 'c1' }),
+      record('.agents/skills/tdd/references/x.md', 'claude', 'implementation', { runtime_session_id: 's1', agent_id: 'a' }),
+    ],
+    steering: STEERING,
+    skills: SKILLS,
+    runtimes: undefined,
+    observeHooks: {},
+    configured: [],
+  });
+  assert.equal(table.runtimes_configured, false);
+  assert.deepEqual(table.columns, ['claude', 'cursor']); // runtimes seen in the records, sorted
+  const extra = table.rows.filter((r) => !r.expected).map((r) => r.target);
+  assert.deepEqual(extra, ['.agents/skills/tdd/references/x.md', '.harness/steering/spec-only.md']);
+  const specOnly = table.rows.find((r) => r.target === '.harness/steering/spec-only.md');
+  assert.deepEqual(specOnly.cells.cursor.agent_ids, ['unknown']); // Cursor never carries an agent id
+  assert.deepEqual(specOnly.cells.claude, { state: 'unknown', label: 'unknown' }); // claude observe entry absent
+});
+
+test('REQ-021 ACTIVATION_LEGEND states exactly the three states with the required meanings', () => {
+  assert.deepEqual(telemetryLib.ACTIVATION_LEGEND, [
+    { state: 'not observed', meaning: 'a runtime with load hooks reported no load' },
+    {
+      state: 'unknown',
+      meaning:
+        'the load is not visible to the kit (loads through shell commands, and every load on a runtime without load hooks)',
+    },
+    { state: 'configured, not observed', meaning: 'the file enters context without a tool call' },
+  ]);
+  assert.equal(Object.isFrozen(telemetryLib.ACTIVATION_LEGEND), true);
+});
+
+function modelInput(spans) {
+  return {
+    sliceId: 'demo',
+    spans,
+    sessions: AMENDED_SESSIONS,
+    steering: STEERING,
+    skills: SKILLS,
+    runtimes: ['claude', 'cursor', 'devin'],
+    observeHooks: { claude: true },
+    configured: [{ path: 'CLAUDE.md', runtime: 'claude' }],
+  };
+}
+
+function fixtureStream() {
+  const command = [5, 1, 9, 3, 7, 2, 8, 4, 6, 10].map((d) => span('command', d));
+  return [
+    ...command,
+    span('hook', 30),
+    span('hook', 10),
+    span('hook', 20),
+    span('sync', 100, { process_name: 'sync-state' }),
+    span('sync', 40, { process_name: 'sync-state/knowledge-index', parent_span_id: 'b'.repeat(16) }),
+    span('command', 999, { slice_id: 'other' }), // other slice: never counted
+    span('command', 7, { slice_id: null, phase: null }), // unattributed
+    record('.harness/steering/always.md', 'claude', 'implementation', { runtime_session_id: 's1' }),
+    record('.harness/steering/always.md', 'claude', null, {}, null), // unattributed activation record
+  ];
+}
+
+test('REQ-020 profileModel: phase durations, p50/p95 per kind, scores, unattributed count, not_measured', () => {
+  const model = telemetryLib.profileModel(modelInput(fixtureStream()));
+  assert.equal(model.slice_id, 'demo');
+  assert.deepEqual(model.phase_durations, telemetryLib.phaseMarkers(AMENDED_SESSIONS));
+  assert.deepEqual(model.latencies, {
+    command: { count: 10, p50: 5, p95: 10 },
+    hook: { count: 3, p50: 20, p95: 30 },
+    sync: { count: 2, p50: 40, p95: 100 }, // root and child sync spans both count
+  });
+  assert.deepEqual(model.scores, telemetryLib.surfaceScores(fixtureStream().filter((s) => s.slice_id === 'demo'), AMENDED_DENOMINATOR_MS));
+  assert.equal(model.unattributed_spans, 2);
+  assert.equal(model.attributed_spans, 16);
+  assert.deepEqual(model.not_measured, ['turn_latency', 'boot_tax', 'tokens', 'h_findings']);
+  assert.deepEqual(model.legend, telemetryLib.ACTIVATION_LEGEND);
+  // One activation table per listed phase plus any phase seen only in records.
+  assert.deepEqual(
+    model.activation.map((t) => t.phase),
+    ['discovery', 'spec', 'validation', 'domain', 'implementation'],
+  );
+  const impl = model.activation.find((t) => t.phase === 'implementation');
+  assert.equal(impl.rows[0].cells.claude.label, 'observed (1)');
+});
+
+test('REQ-020 profileModel: unmeasured latencies are absent, never 0 or null (OI-3)', () => {
+  const model = telemetryLib.profileModel(modelInput([span('hook', 12)]));
+  assert.deepEqual(Object.keys(model.latencies), ['hook']);
+  assert.equal(JSON.stringify(model.latencies).includes('null'), false);
+});
+
+test('REQ-020 profileModel: deterministic across runs and input order', () => {
+  const a = telemetryLib.profileModel(modelInput(fixtureStream()));
+  const b = telemetryLib.profileModel(modelInput(fixtureStream().reverse()));
+  const c = telemetryLib.profileModel({ ...modelInput(fixtureStream()), sessions: [...AMENDED_SESSIONS].reverse() });
+  assert.deepEqual(b, a);
+  assert.deepEqual(c, a);
+  assert.equal(JSON.stringify(telemetryLib.profileModel(modelInput(fixtureStream()))), JSON.stringify(a));
+});
+
+test('REQ-020 AR-10 profileModel: streams differing only in trace_id/parent_span_id give the same model', () => {
+  const base = fixtureStream();
+  const rewired = base.map((s, i) => ({
+    ...s,
+    trace_id: createHash('sha256').update(`t${i}`).digest('hex').slice(0, 32),
+    parent_span_id: i % 2 ? createHash('sha256').update(`p${i}`).digest('hex').slice(0, 16) : null,
+  }));
+  assert.deepEqual(telemetryLib.profileModel(modelInput(rewired)), telemetryLib.profileModel(modelInput(base)));
+});
+
+test('REQ-020 AR-10 profileModel never reads trace topology (trace_id, parent_span_id, span_id)', () => {
+  const touched = new Set();
+  const guarded = fixtureStream().map(
+    (s) =>
+      new Proxy(s, {
+        get(target, key, receiver) {
+          if (key === 'trace_id' || key === 'parent_span_id' || key === 'span_id') touched.add(key);
+          return Reflect.get(target, key, receiver);
+        },
+        ownKeys(target) {
+          touched.add('ownKeys');
+          return Reflect.ownKeys(target);
+        },
+      }),
+  );
+  telemetryLib.profileModel(modelInput(guarded));
+  assert.deepEqual([...touched], []);
+});
+
+test('REQ-021 the profile model never yields the words `not loaded`', () => {
+  const outputs = [
+    telemetryLib.profileModel(modelInput(fixtureStream())),
+    telemetryLib.profileModel({ ...modelInput([]), runtimes: undefined, observeHooks: {} }),
+    telemetryLib.profileModel({ ...modelInput(fixtureStream()), runtimes: ['devin', 'opencode', 'kimi', 'junie', 'kiro'] }),
+    telemetryLib.ACTIVATION_LEGEND,
+  ];
+  for (const out of outputs) assert.doesNotMatch(JSON.stringify(out), /not loaded/i);
+  // Hookless columns: every row `unknown`, never `not observed`.
+  const hookless = outputs[2].activation.flatMap((t) => t.rows.flatMap((r) => Object.values(r.cells)));
+  assert.ok(hookless.length > 0);
+  assert.ok(hookless.every((c) => c.state === 'unknown'));
+});
+
+test('REQ-022 TEL-9 the profile model writes nothing and reads no file, clock, or network', () => {
+  const spies = ['writeFileSync', 'appendFileSync', 'openSync', 'writeSync', 'mkdirSync', 'readFileSync', 'readSync', 'statSync']
+    .map((name) => mock.method(fs, name));
+  const nowSpy = mock.method(Date, 'now');
+  try {
+    const input = modelInput(fixtureStream());
+    const before = JSON.stringify(input);
+    telemetryLib.profileModel(input);
+    telemetryLib.phaseMarkers(AMENDED_SESSIONS);
+    telemetryLib.surfaceScores(fixtureStream(), 1);
+    telemetryLib.percentile([1, 2, 3], 50);
+    telemetryLib.activationRows({ phase: 'spec', records: [], steering: STEERING, skills: SKILLS, runtimes: ['claude'], observeHooks: {}, configured: [] });
+    for (const spy of spies) assert.equal(spy.mock.callCount(), 0, 'no fs call');
+    assert.equal(nowSpy.mock.callCount(), 0, 'no clock read');
+    assert.equal(JSON.stringify(input), before, 'inputs are not mutated');
+  } finally {
+    for (const spy of spies) spy.mock.restore();
+    nowSpy.mock.restore();
+  }
+});
+
+test('REQ-020 OI-2 no H-* heuristic weights or evaluation in the library', () => {
+  const src = readFileSync(LIB_PATH, 'utf8');
+  assert.doesNotMatch(src, /\bH-[A-Z]+\b/);
+  assert.doesNotMatch(src, /severity|weight/i);
+  assert.doesNotMatch(src, /pipeline-metrics|sync-state\.mjs['"]/);
 });

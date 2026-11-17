@@ -1,6 +1,7 @@
 /**
  * Telemetry library (slice telemetry-emitters, design §3.1): span ids, buildSpan, fail-open emit,
- * schema-subset validator, bounded tail reader, and policy (attribute, guidanceTarget, skillTarget).
+ * schema-subset validator, bounded tail reader, policy (attribute, guidanceTarget, skillTarget), and the pure
+ * profile model (phaseMarkers, percentile, surfaceScores, activationRows, profileModel; design §4.5–§4.6).
  * Imports only node: built-ins (REQ-004) and never sync-state.mjs (cycle rule). Writes only .harness/state/telemetry/spans.jsonl (REQ-006).
  */
 import fs from 'node:fs';
@@ -337,4 +338,254 @@ export function skillTarget(name, root = process.cwd()) {
   } catch {
     return null;
   }
+}
+
+// --- Profile model (TASK-011, design §4.5–§4.6): pure functions over arrays ---
+// No filesystem, no clock, no trace topology: grouping keys are only slice_id, phase, kind, failure_signature (AR-10).
+
+const SURFACES = ['command', 'hook', 'sync'];
+// Runtimes with load hooks (design §12.1). Only these can render `not observed`.
+const HOOKED_RUNTIMES = new Set(['claude', 'cursor']);
+const NOT_MEASURED = Object.freeze(['turn_latency', 'boot_tax', 'tokens', 'h_findings']);
+const UNKNOWN = 'unknown';
+const NOT_OBSERVED = 'not observed';
+const CONFIGURED = 'configured, not observed';
+
+/** REQ-021 legend: exactly three states (TEL-7). */
+export const ACTIVATION_LEGEND = Object.freeze([
+  Object.freeze({ state: NOT_OBSERVED, meaning: 'a runtime with load hooks reported no load' }),
+  Object.freeze({
+    state: UNKNOWN,
+    meaning:
+      'the load is not visible to the kit (loads through shell commands, and every load on a runtime without load hooks)',
+  }),
+  Object.freeze({ state: CONFIGURED, meaning: 'the file enters context without a tool call' }),
+]);
+
+function isObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
+/**
+ * REQ-020 / ADR-005 disjoint segments. Sorted phase events (completion before start on a tie, then phase name, so the
+ * input order never matters): each phase_completed(P) owns (previous phase event of any phase, its own time].
+ * phase_started is an anchor only; phase_blocked and other events are ignored. A completed phase gets
+ * { start_iso, end_iso, duration_ms (sum of its segments), start_source, segments }; `open_since_iso` when the slice's
+ * last phase event re-opens it. A phase with only phase_started is `open`: no end, no duration (no "now").
+ */
+export function phaseMarkers(sessions) {
+  const events = [];
+  for (const s of Array.isArray(sessions) ? sessions : []) {
+    if (!isObject(s) || (s.event_type !== 'phase_started' && s.event_type !== 'phase_completed')) continue;
+    if (typeof s.phase !== 'string' || s.phase === '' || typeof s.timestamp !== 'string') continue;
+    const ms = Date.parse(s.timestamp);
+    if (Number.isFinite(ms)) events.push({ type: s.event_type, phase: s.phase, ms });
+  }
+  events.sort((a, b) => a.ms - b.ms || (a.type === b.type ? 0 : a.type === 'phase_completed' ? -1 : 1) || byText(a.phase, b.phase));
+
+  const phases = new Map();
+  const state = (phase) => {
+    if (!phases.has(phase)) phases.set(phase, { segments: 0, total: 0, start: null, source: null, end: null, started: null });
+    return phases.get(phase);
+  };
+  let prev = null;
+  for (const e of events) {
+    const p = state(e.phase);
+    if (e.type === 'phase_started') {
+      p.started = e.ms;
+    } else {
+      if (prev) {
+        if (p.segments === 0) {
+          p.start = prev.ms;
+          p.source = prev.type === 'phase_started' && prev.phase === e.phase ? 'phase_started' : 'previous_phase_completed';
+        }
+        p.segments += 1;
+        p.total += e.ms - prev.ms;
+      }
+      p.end = e.ms;
+    }
+    prev = e;
+  }
+  const openPhase = prev && prev.type === 'phase_started' ? prev.phase : null;
+
+  const markers = [];
+  for (const [phase, p] of phases) {
+    let marker;
+    let key;
+    if (p.end === null) {
+      marker = { phase, status: 'open', start_iso: new Date(p.started).toISOString(), start_source: 'phase_started' };
+      key = p.started;
+    } else if (p.segments === 0) {
+      marker = { phase, status: 'completed', end_iso: new Date(p.end).toISOString(), segments: 0 };
+      key = p.end;
+    } else {
+      marker = {
+        phase,
+        status: 'completed',
+        start_iso: new Date(p.start).toISOString(),
+        end_iso: new Date(p.end).toISOString(),
+        duration_ms: p.total,
+        start_source: p.source,
+        segments: p.segments,
+      };
+      key = p.start;
+    }
+    if (p.end !== null && openPhase === phase) marker.open_since_iso = new Date(p.started).toISOString();
+    markers.push({ key, marker });
+  }
+  markers.sort((a, b) => a.key - b.key || byText(a.marker.phase, b.marker.phase));
+  return markers.map((m) => m.marker);
+}
+
+/** Nearest-rank percentile (0 < p ≤ 100) of the finite numbers in values; undefined when there are none (OI-3). */
+export function percentile(values, p) {
+  const nums = (Array.isArray(values) ? values : []).filter((v) => typeof v === 'number' && Number.isFinite(v));
+  if (nums.length === 0 || !(p > 0 && p <= 100)) return undefined;
+  nums.sort((a, b) => a - b);
+  const rank = Math.max(1, Math.ceil((p * nums.length) / 100));
+  return nums[rank - 1];
+}
+
+function durationOf(span) {
+  const d = span.duration_ms;
+  return typeof d === 'number' && Number.isFinite(d) && d >= 0 ? d : null;
+}
+
+/**
+ * REQ-020 bottleneck_score per surface (span kind command|hook|sync): hits (always 0, OI-2) + floor(share / 10%),
+ * share = Σ duration_ms(surface) / denominatorMs. Denominator 0 -> share term 0, `share_unknown: true`, no share key.
+ * Ordered by score desc, then surface name asc.
+ */
+export function surfaceScores(spans, denominatorMs) {
+  const totals = Object.fromEntries(SURFACES.map((k) => [k, 0]));
+  for (const s of Array.isArray(spans) ? spans : []) {
+    if (!isObject(s) || !SURFACES.includes(s.kind)) continue;
+    const d = durationOf(s);
+    if (d !== null) totals[s.kind] += d;
+  }
+  const known = typeof denominatorMs === 'number' && Number.isFinite(denominatorMs) && denominatorMs > 0;
+  const hits = 0;
+  return SURFACES.map((surface) => {
+    const total = totals[surface];
+    if (!known) return { surface, hits, total_ms: total, share_unknown: true, score: hits };
+    // (total × 10) / denominator avoids the 0.3 / 0.1 = 2.999… float trap.
+    return { surface, hits, total_ms: total, share: total / denominatorMs, score: hits + Math.floor((total * 10) / denominatorMs) };
+  }).sort((a, b) => b.score - a.score || byText(a.surface, b.surface));
+}
+
+function idsOf(records, key) {
+  const ids = new Set();
+  for (const r of records) {
+    const v = r.attributes[key];
+    ids.add(typeof v === 'string' && v !== '' ? v : UNKNOWN);
+  }
+  return [...ids].sort(byText);
+}
+
+function isActivationRecord(s) {
+  return isObject(s) && s.kind === 'tool' && isObject(s.attributes) && typeof s.attributes.target_path === 'string';
+}
+
+/**
+ * REQ-021 activation table of one phase. records: the slice's activation spans (any phase); steering:
+ * [{ path, inclusion, tags }] (parsed frontmatter); skills: installed `.agents/skills/<n>/SKILL.md` paths; runtimes:
+ * project.json `runtimes` (non-array -> columns are the runtimes seen in records, runtimes_configured false);
+ * observeHooks: { claude, cursor } true when that runtime's observe entry is present; configured: [{ path, runtime }]
+ * files that enter context without a tool call. Cell states: `observed (n)`, `not observed` (hooked runtime with its
+ * observe entry only), `unknown`.
+ */
+export function activationRows({ phase, records, steering, skills, runtimes, observeHooks, configured } = {}) {
+  const all = (Array.isArray(records) ? records : []).filter(isActivationRecord);
+  const inPhase = all.filter((r) => r.phase === phase);
+  const runtimesConfigured = Array.isArray(runtimes);
+  const columns = runtimesConfigured
+    ? [...new Set(runtimes.filter((r) => typeof r === 'string' && r !== ''))]
+    : [...new Set(all.map((r) => r.runtime).filter((r) => typeof r === 'string' && r !== ''))].sort(byText);
+  const hooks = isObject(observeHooks) ? observeHooks : {};
+
+  const expectedSteering = (Array.isArray(steering) ? steering : [])
+    .filter((f) => isObject(f) && typeof f.path === 'string')
+    .filter((f) => f.inclusion === 'always' || (f.inclusion === 'auto' && Array.isArray(f.tags) && f.tags.includes(phase)))
+    .map((f) => f.path)
+    .sort(byText);
+  const expectedSkills = (Array.isArray(skills) ? skills : []).filter((p) => typeof p === 'string').sort(byText);
+  const rows = [
+    ...expectedSteering.map((target) => ({ target, type: 'steering', expected: true })),
+    ...expectedSkills.map((target) => ({ target, type: 'skill', expected: true })),
+  ];
+  const listed = new Set(rows.map((r) => r.target));
+  const extra = [...new Set(inPhase.map((r) => r.attributes.target_path))].filter((t) => !listed.has(t)).sort(byText);
+  for (const target of extra) {
+    rows.push({ target, type: target.startsWith('.agents/skills/') ? 'skill' : 'steering', expected: false });
+  }
+
+  for (const row of rows) {
+    row.cells = {};
+    for (const runtime of columns) {
+      const hit = inPhase.filter((r) => r.attributes.target_path === row.target && r.runtime === runtime);
+      if (hit.length > 0) {
+        row.cells[runtime] = {
+          state: 'observed',
+          label: `observed (${hit.length})`,
+          count: hit.length,
+          runtime_session_ids: idsOf(hit, 'runtime_session_id'),
+          agent_ids: idsOf(hit, 'agent_id'),
+        };
+      } else {
+        const state = HOOKED_RUNTIMES.has(runtime) && hooks[runtime] === true ? NOT_OBSERVED : UNKNOWN;
+        row.cells[runtime] = { state, label: state };
+      }
+    }
+  }
+
+  const configuredRows = (Array.isArray(configured) ? configured : [])
+    .filter((c) => isObject(c) && typeof c.path === 'string')
+    .map((c) => ({ target: c.path, runtime: c.runtime, state: CONFIGURED, label: CONFIGURED }))
+    .sort((a, b) => byText(a.target, b.target) || byText(String(a.runtime), String(b.runtime)));
+
+  return { phase, columns, runtimes_configured: runtimesConfigured, rows, configured: configuredRows };
+}
+
+/**
+ * REQ-020/REQ-021 profile of one slice. spans: parsed tail lines; sessions: the slice's sessions; the rest is passed to
+ * activationRows. Unmeasured values are absent (OI-3), with the fixed `not_measured` list. Writes nothing (REQ-022).
+ */
+export function profileModel({ sliceId, spans, sessions, steering, skills, runtimes, observeHooks, configured } = {}) {
+  const list = (Array.isArray(spans) ? spans : []).filter(isObject);
+  const attributed = list.filter((s) => s.slice_id === sliceId);
+  const unattributed = list.filter((s) => s.slice_id === null || s.slice_id === undefined).length;
+
+  const markers = phaseMarkers(sessions);
+  const denominator = markers.reduce((sum, m) => sum + (m.status === 'completed' && m.duration_ms ? m.duration_ms : 0), 0);
+
+  const latencies = {};
+  for (const kind of SURFACES) {
+    const durations = attributed.filter((s) => s.kind === kind).map(durationOf).filter((d) => d !== null);
+    if (durations.length > 0) {
+      latencies[kind] = { count: durations.length, p50: percentile(durations, 50), p95: percentile(durations, 95) };
+    }
+  }
+
+  const phases = markers.map((m) => m.phase);
+  const recordPhases = attributed
+    .filter(isActivationRecord)
+    .map((r) => r.phase)
+    .filter((p) => typeof p === 'string' && !phases.includes(p));
+  phases.push(...[...new Set(recordPhases)].sort(byText));
+
+  return {
+    slice_id: sliceId,
+    phase_durations: markers,
+    latencies,
+    scores: surfaceScores(attributed, denominator),
+    activation: phases.map((phase) =>
+      activationRows({ phase, records: attributed, steering, skills, runtimes, observeHooks, configured }),
+    ),
+    attributed_spans: attributed.length,
+    unattributed_spans: unattributed,
+    legend: ACTIVATION_LEGEND,
+    not_measured: [...NOT_MEASURED],
+  };
 }
