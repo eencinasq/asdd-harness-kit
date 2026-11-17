@@ -15,6 +15,8 @@
  *   Always exits 0 with a JSON verdict; hooks should set failClosed: true
  *   so a gate crash blocks the command instead of letting it through.
  *   A hook denial is recorded as a learning signal by pattern label (never the command text).
+ *   After the verdict is written, each hook call appends one `command` span (verdict + command_label, never the
+ *   command text) through a guarded import of telemetry-lib.mjs; a telemetry failure never changes the verdict.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -70,6 +72,52 @@ export function deniedLabel(command) {
   return text.startsWith('sudo ') ? 'sudo' : null;
 }
 
+/**
+ * Span label from the closed set (REQ-007, ADR-007 AMB-009): `override`, `empty`, the denied pattern label,
+ * `allowlist`, or `unmatched`. Never command text beyond the pattern label.
+ */
+export function commandLabel(command, verdict) {
+  if (verdict?.method === 'override') return 'override';
+  if (verdict?.method === 'no-command') return 'empty';
+  if (verdict?.method === 'pattern-deny') return deniedLabel(command) ?? 'unmatched';
+  const text = String(command || '').trim();
+  if (!text) return 'empty';
+  return ALLOWED_COMMANDS.some((pattern) => pattern.test(text)) ? 'allowlist' : 'unmatched';
+}
+
+/** Span runtime (ACT-002, D-2): claude for PreToolUse, cursor for a Cursor-shaped payload, else cli. */
+export function gateRuntime(input) {
+  if (!input || typeof input !== 'object') return 'cli';
+  if (input.hook_event_name === 'PreToolUse') return 'claude';
+  if (Object.hasOwn(input, 'command') || input.hook_event_name === 'beforeShellExecution') return 'cursor';
+  return 'cli';
+}
+
+// Telemetry is best-effort and runs only after the verdict is written (ADR-001): a missing or broken lib, a throw,
+// or emit() returning false is a no-op.
+async function emitGateSpan(root, { runtime, start, end, status, attributes }) {
+  const tel = await import('./telemetry-lib.mjs').catch(() => null);
+  try {
+    if (!tel) return;
+    const where = root ?? process.cwd();
+    const { slice_id, phase } = tel.attribute(where);
+    const span = tel.buildSpan(tel.startTrace(), {
+      kind: 'command',
+      process_name: 'command-gate',
+      runtime,
+      slice_id,
+      phase,
+      start,
+      end,
+      status,
+      attributes,
+    });
+    tel.emit(span, { root: where });
+  } catch {
+    // ignore
+  }
+}
+
 // Learning is best-effort and lazy: a missing lib must never change the verdict.
 async function recordDenial(command, runtime) {
   try {
@@ -107,19 +155,29 @@ function readStdin() {
   }
 }
 
-async function runHook() {
-  const input = readStdin();
+const writeStdout = (line) => process.stdout.write(line);
+
+/**
+ * One hook call: read the payload, write the verdict JSON, then emit one `command` span (REQ-007).
+ * Seam for tests: `readInput`, `write`, `safety` (defaults: stdin, stdout, checkCommandSafety), `root` for the
+ * telemetry stream (default cwd), and `state`, which runHookCli reads on its error path.
+ */
+export async function runHook({ readInput = readStdin, write = writeStdout, safety = checkCommandSafety, root, state = {} } = {}) {
+  state.start = Date.now();
+  const input = readInput();
+  state.input = input;
   const isClaude = input.hook_event_name === 'PreToolUse';
   const command = isClaude
     ? String(input.tool_input?.command ?? '')
     : typeof input.command === 'string' ? input.command : '';
   const verdict = command
-    ? await checkCommandSafety(command, { override: input.override === true })
+    ? await safety(command, { override: input.override === true })
     : { allowed: true, method: 'no-command', reason: 'no command in hook payload' };
   if (!verdict.allowed) await recordDenial(command, isClaude ? 'claude' : 'cursor');
 
+  let output;
   if (isClaude) {
-    const output = {
+    output = {
       hookSpecificOutput: {
         hookEventName: 'PreToolUse',
         permissionDecision: verdict.allowed ? 'allow' : 'deny',
@@ -129,21 +187,31 @@ async function runHook() {
       output.hookSpecificOutput.permissionDecisionReason =
         `Blocked by harness command gate (${verdict.method}): ${verdict.reason || 'unsafe command'}. Ask the user to confirm before retrying.`;
     }
-    process.stdout.write(`${JSON.stringify(output)}\n`);
-    return;
+  } else {
+    output = { permission: verdict.allowed ? 'allow' : 'deny' };
+    if (!verdict.allowed) {
+      output.user_message = `Blocked by harness command gate (${verdict.method}): ${verdict.reason || 'unsafe command'}`;
+      output.agent_message = `Command denied by the asdd command gate (${verdict.method}). Ask the user to confirm and retry with an explicit override if it is intentional.`;
+    }
   }
+  state.label = commandLabel(command, verdict);
+  write(`${JSON.stringify(output)}\n`);
+  const end = Date.now();
 
-  const output = { permission: verdict.allowed ? 'allow' : 'deny' };
-  if (!verdict.allowed) {
-    output.user_message = `Blocked by harness command gate (${verdict.method}): ${verdict.reason || 'unsafe command'}`;
-    output.agent_message = `Command denied by the asdd command gate (${verdict.method}). Ask the user to confirm and retry with an explicit override if it is intentional.`;
-  }
-  process.stdout.write(`${JSON.stringify(output)}\n`);
+  await emitGateSpan(root, {
+    runtime: gateRuntime(input),
+    start: state.start,
+    end,
+    status: 'OK',
+    attributes: { verdict: verdict.allowed ? 'allow' : 'deny', command_label: state.label },
+  });
 }
 
-/** Hook entrypoint: read the payload on stdin, print the verdict JSON. Never exits non-zero. */
-export async function runHookCli() {
-  await runHook().catch((error) => {
+/** Hook entrypoint: read the payload on stdin, print the verdict JSON. Never exits non-zero. Accepts runHook's seam. */
+export async function runHookCli(deps = {}) {
+  const write = deps.write ?? writeStdout;
+  const state = {};
+  await runHook({ ...deps, write, state }).catch(async (error) => {
     const claudeDeny = {
       hookSpecificOutput: {
         hookEventName: 'PreToolUse',
@@ -151,10 +219,18 @@ export async function runHookCli() {
         permissionDecisionReason: `Command gate error: ${error.message}`,
       },
     };
-    process.stdout.write(
+    write(
       `${JSON.stringify({ permission: 'deny', user_message: `Command gate error: ${error.message}`, ...claudeDeny })}\n`
     );
     process.exitCode = 0;
+    // REQ-007: the error path still emits its span, after the deny is written (fail-closed first).
+    await emitGateSpan(deps.root, {
+      runtime: gateRuntime(state.input),
+      start: state.start,
+      end: Date.now(),
+      status: 'ERROR',
+      attributes: { verdict: 'deny', command_label: state.label },
+    });
   });
 }
 

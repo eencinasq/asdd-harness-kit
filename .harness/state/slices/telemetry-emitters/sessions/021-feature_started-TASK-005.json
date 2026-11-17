@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-021",
+  "timestamp": "2026-11-17T02:25:32.672Z",
+  "phase": "implementation",
+  "feature_id": "TASK-005",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/command-gate.mjs",
+    "cli/src/harness/command-gate.test.mjs",
+    "tools/jev-gate/src/harness/command-gate.mjs",
+    "tools/jev-gate/src/harness/telemetry-lib.mjs"
+  ],
+  "evidence": "Start TASK-005 (REQ-007, REQ-008, REQ-002, REQ-004, REQ-005). RED: added 9 cases to cli/src/harness/command-gate.test.mjs before any gate change (commandLabel set incl. override; gateRuntime claude/cursor/cli (D-2); one command span after the verdict write with verdict+label+validateSpan; SECRET-MARKER-123 never in the stream; proof (a) seam crash -> deny/exit 0/one ERROR span; proof (a) subprocess null-payload crash x lib working/throw/deleted; proof (b) corpus of 13 payloads x {location absent, stream absent, writable, unwritable} + lib throw/deleted -> 0 diffs in stdout/stderr/exit; proof (c) checkCommandSafety in a cwd with a telemetry dir -> no spans.jsonl; proof (d) NFR-001 corpus x 50 runs p99 <= 50 ms). Run 1 node --test cli/src/harness/command-gate.test.mjs against the unchanged gate -> exit 1, 1 file-level failure (SyntaxError: no export named commandLabel). Run 2 (scratch copy, exports stubbed to throw) -> exit 1, tests 15, pass 7 (6 existing + proof (c) pin), fail 8 (every new behavioral case incl. (a) and (b)). Mutation RED on a scratch copy of the GREEN gate, each reverted: M1 unguarded telemetry import before the deny write in runHookCli catch -> proof (a) subprocess case fails (exit 1 instead of 0 with lib throw); M2 unguarded import before the verdict write in runHook -> proof (b) fails (claude allowlist [writable/throw] stdout deny Command gate error: boom != allow); M3 emit before the verdict write -> span-after-verdict case fails; M4 emit inside checkCommandSafety -> proof (c) fails; M5 60 ms busy wait in the emit path -> proof (d) fails."
+}

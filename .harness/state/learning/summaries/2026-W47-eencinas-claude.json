@@ -14,7 +14,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
-          "last_at": "2026-11-17T02:12:55.090Z"
+          "last_at": "2026-11-17T02:26:38.552Z"
         }
       ],
       "examples": [
@@ -32,7 +32,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
-          "last_at": "2026-11-17T02:12:55.090Z"
+          "last_at": "2026-11-17T02:26:38.552Z"
         }
       ],
       "examples": [
@@ -50,7 +50,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T02:12:55.090Z"
+          "last_at": "2026-11-17T02:26:38.552Z"
         }
       ],
       "examples": [
@@ -63,7 +63,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
-          "last_at": "2026-11-17T02:12:55.090Z"
+          "last_at": "2026-11-17T02:26:38.552Z"
         }
       ],
       "examples": [
@@ -76,7 +76,7 @@
         {
           "at": "2026-11-17T01:53:15.891Z",
           "slice_id": "telemetry-emitters",
-          "last_at": "2026-11-17T02:10:47.475Z"
+          "last_at": "2026-11-17T02:26:38.552Z"
         }
       ],
       "examples": [
@@ -89,7 +89,7 @@
         {
           "at": "2026-11-17T01:53:15.891Z",
           "slice_id": "telemetry-emitters",
-          "last_at": "2026-11-17T02:10:47.475Z"
+          "last_at": "2026-11-17T02:26:38.552Z"
         }
       ],
       "examples": [
@@ -121,6 +121,45 @@
       ],
       "examples": [
         "DRIFT-02 passing feature TASK-003 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
+      ]
+    },
+    "command:rm -rf": {
+      "source": "command",
+      "episodes": [
+        {
+          "at": "2026-11-17T02:24:50.087Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T02:26:10.314Z"
+        }
+      ],
+      "examples": [
+        "denied: rm -rf"
+      ]
+    },
+    "command:git push --force": {
+      "source": "command",
+      "episodes": [
+        {
+          "at": "2026-11-17T02:24:57.055Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T02:26:10.321Z"
+        }
+      ],
+      "examples": [
+        "denied: git push --force"
+      ]
+    },
+    "command:sudo": {
+      "source": "command",
+      "episodes": [
+        {
+          "at": "2026-11-17T02:24:59.276Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T02:26:10.315Z"
+        }
+      ],
+      "examples": [
+        "denied: sudo"
       ]
     }
   }

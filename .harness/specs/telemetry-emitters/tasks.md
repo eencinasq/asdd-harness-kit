@@ -328,7 +328,7 @@ TASK-009 (runtime template). Fixture capture TASK-001/TASK-002 precedes the payl
     `agent_id` only when present and matching `^[A-Za-z0-9._:-]+$`, ≤128 chars), `emit`. A top-level `try` always
     reaches the answer. For argv `cursor` this task writes `{"permission":"allow"}\n` and emits **no** span (hookless
     default until TASK-012). The CLI block reads stdin and exits 0.
-  - **Depends on:** TASK-001, TASK-004, TASK-009
+  - **Depends on:** TASK-001, TASK-004 (TASK-009 dropped 2026-11-16 by PO decision: `observe` is outside the AR-2 chain; runs concurrently with TASK-005, owner `claude-observe`)
   - **Acceptance:** `node --test cli/src/harness/telemetry-observe.test.mjs` exits 0 including the
     payload-keys-in-fixtures guard and the four Claude/Cursor-default latency classes at p99 ≤ 50 ms.
   - **Requirement(s):** REQ-013, REQ-015, REQ-016, REQ-018, REQ-004, REQ-005, REQ-006
