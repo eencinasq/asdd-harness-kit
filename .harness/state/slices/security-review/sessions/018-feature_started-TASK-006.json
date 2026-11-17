@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-security-review-018",
+  "timestamp": "2026-11-17T15:01:36.000Z",
+  "agent": "claude-sec",
+  "human": "eencinas",
+  "slice_id": "security-review",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "RED: ui/security-dashboard/model.spec.ts fails — no security view; dist has no security-dashboard.html (mcp.e2e reads every UI resource); PR view shows no security marker.",
+  "concerns": [],
+  "feature_id": "TASK-006",
+  "scope_paths": [
+    "tools/spec-drift/ui/security-dashboard.html",
+    "tools/spec-drift/ui/security-dashboard",
+    "tools/spec-drift/ui/pr-review/main.ts",
+    "tools/spec-drift/package.json",
+    "tools/spec-drift/vite.config.ts",
+    "tools/spec-drift/test/mcp.e2e-spec.ts"
+  ]
+}

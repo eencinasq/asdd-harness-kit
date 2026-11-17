@@ -151,7 +151,7 @@
       "id": "TASK-006",
       "title": "Security view and PR marker",
       "user_visible_behavior": "A security MCP App view shows counts, ledger and findings; PR review marks security findings.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 6,
       "owner": "claude-sec",
       "req_ids": [
@@ -164,7 +164,7 @@
         "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test",
         "cd tools/spec-drift && pnpm build && test -f dist/security-dashboard.html && pnpm test:e2e"
       ],
-      "evidence": "",
+      "evidence": "GREEN: ui/security-dashboard/model.spec.ts 2/2 (statusOf, escaped render of counts/coverage/ledger/needs-validation/findings); dist/security-dashboard.html built (4th vite input); PR review view marks category=security findings with a Security badge; pnpm test 249/249, typecheck OK, lint exit 0 (also fixes a format error TASK-003 left in toolsets.spec.ts and an optional-chain suggestion in lens.ts); pnpm build OK; pnpm test:e2e 140/141 — mcp.e2e reads the new view resource, tool count 45; the one failure ('each group brings its own diff…') also fails on a clean build of 08c3e8a (baseline 131/133).",
       "scope_paths": [
         "tools/spec-drift/ui/security-dashboard.html",
         "tools/spec-drift/ui/security-dashboard",
