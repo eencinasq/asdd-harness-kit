@@ -4,7 +4,7 @@
 
 Branch carry-over (mapped context — landed on `feat/skill-eval` by prior work, not authored by this slice;
 listed so DRIFT-01 accounts for the stacked-branch diff vs `main`): `docs/ASDD-ROADMAP.md` (P5 base branch
-content), `docs/knowledge-base/steering-proposals/SP-004.md`, `docs/knowledge-base/steering-proposals/SP-005.md`
+content), `docs/knowledge-base/steering-proposals/SP-006.md`, `docs/knowledge-base/steering-proposals/SP-005.md`
 (filed by slice skill-eval, DONE).
 
 Generated vendor output of `cli/src/harness/learning-lib.mjs` (refreshed by `asdd kit vendor`, committed with the
