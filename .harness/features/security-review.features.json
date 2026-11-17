@@ -26,7 +26,8 @@
         "tools/spec-drift/THIRD_PARTY_NOTICES.md",
         "tools/spec-drift/biome.json",
         "tools/spec-drift/scripts/build-server.mjs"
-      ]
+      ],
+      "evidence_hash": "8e48698dc3cd5e88335456d1b58a5092fbc1ec07968e423d2e22579f6772e615"
     },
     {
       "id": "TASK-002",
@@ -51,7 +52,8 @@
         "tools/spec-drift/src/security/recon.spec.ts",
         "tools/spec-drift/src/security/findings.ts",
         "tools/spec-drift/src/security/findings.spec.ts"
-      ]
+      ],
+      "evidence_hash": "4282a531bb824ca7cf223271a4e6eecf74dced1365c17ccad359f830d2243d4b"
     },
     {
       "id": "TASK-003",
@@ -89,7 +91,8 @@
         "tools/spec-drift/test/toolsets.e2e-spec.ts",
         "tools/spec-drift/test/output-schemas.e2e-spec.ts",
         "tools/spec-drift/src/config/toolsets.spec.ts"
-      ]
+      ],
+      "evidence_hash": "427d17d107156d23b4e86f110eb15d678287225161c17c38d3041077ac80e9e7"
     },
     {
       "id": "TASK-004",
@@ -118,7 +121,8 @@
         "tools/spec-drift/src/analysis/analysis.tools.ts",
         "tools/spec-drift/src/analysis/analysis.service.ts",
         "tools/spec-drift/src/analysis/domain/pack-selection.ts"
-      ]
+      ],
+      "evidence_hash": "aeefc359fd8979baebc2ccc20cddf00addf26d12b692dc8ce5e1c1a13ebca49a"
     },
     {
       "id": "TASK-005",
@@ -145,7 +149,8 @@
         "tools/spec-drift/src/pr-review/pr-review.views.ts",
         "tools/spec-drift/src/pr-review/pr-review.service.ts",
         "tools/spec-drift/test/pr-review.e2e-spec.ts"
-      ]
+      ],
+      "evidence_hash": "4f5d79d48034ac8a32f251f46d477f3f0f92f908d9117368a06e8da32445ae73"
     },
     {
       "id": "TASK-006",
@@ -172,13 +177,14 @@
         "tools/spec-drift/package.json",
         "tools/spec-drift/vite.config.ts",
         "tools/spec-drift/test/mcp.e2e-spec.ts"
-      ]
+      ],
+      "evidence_hash": "1a015d4a678817bdb4a104a008b735b78879d2d4fbffa63f449c411cf0d8a8fb"
     },
     {
       "id": "TASK-007",
       "title": "Docs",
       "user_visible_behavior": "README of spec-drift and the kit describe the security tools, toolset and notice.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 7,
       "owner": "claude-sec",
       "req_ids": [
@@ -199,11 +205,12 @@
       "verification": [
         "grep -q security_audit_start tools/spec-drift/README.md && grep -q analyze_security README.md"
       ],
-      "evidence": "",
+      "evidence": "GREEN: tools/spec-drift/README.md gains the security toolset row, analyze_security row, tool count 45, a Security section (tools, verdicts, run state, PR lens) and project-structure entry; root README spec-drift paragraph names analyze_security, security_audit_* and the PR lens. Verification grep OK; spec-drift lint 0 (README formatted by biome; lens.ts optional chain), typecheck OK, pnpm test 249/249.",
       "scope_paths": [
         "tools/spec-drift/README.md",
         "README.md"
-      ]
+      ],
+      "evidence_hash": "c403977c06b0fb3eeed4dd7997171385f167281714dd493d06838de4110384c6"
     }
   ]
 }

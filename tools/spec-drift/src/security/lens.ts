@@ -125,7 +125,7 @@ export const securityLens = (files: readonly string[], diff: string): SecurityLe
 	const surfaces: LensSurface[] = [];
 	for (const rule of SURFACES) {
 		const hit = files.filter(
-			(file) => Boolean(rule.path?.test(file)) || Boolean(rule.added && rule.added.test(added.get(file) ?? '')),
+			(file) => Boolean(rule.path?.test(file)) || Boolean(rule.added?.test(added.get(file) ?? '')),
 		);
 		if (hit.length) surfaces.push({ id: rule.id, label: rule.label, checklists: rule.checklists, files: hit });
 	}
