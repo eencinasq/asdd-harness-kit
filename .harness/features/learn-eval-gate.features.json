@@ -7,10 +7,15 @@
       "id": "TASK-001",
       "title": "proposalEvalFinding: eval field parse + result resolution in learning-lib",
       "user_visible_behavior": "asdd check can verify that accepted/applied add-guide or tighten-guide steering proposals carry a skill-eval result reference.",
-      "status": "pending",
+      "status": "passing",
       "priority": 1,
       "owner": "devin",
-      "req_ids": ["REQ-001", "REQ-002", "REQ-003", "REQ-004"],
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
       "depends_on": [],
       "scope_paths": [
         "cli/src/harness/learning-lib.mjs",
@@ -19,8 +24,9 @@
       "verification": [
         "node --test cli/src/harness/learning-lib.test.mjs"
       ],
-      "evidence": "",
-      "notes": "RED first: failing test recorded in feature_started session evidence."
+      "evidence": "RED: import failure recorded in sess-learn-eval-gate-005. GREEN: `node --test cli/src/harness/learning-lib.test.mjs` → 23/23 pass, incl. REQ-LEARN-10 cases: exempt change kinds/statuses, missing eval, unresolvable/non-JSON/regressed result refs, ok result for accepted+applied, git show <ref>:<path> resolution.",
+      "notes": "RED first: failing test recorded in feature_started session evidence.",
+      "evidence_hash": "7c1eb7b2aa31e28a755bad9b1346a38b7cdd7281c826cbeaa1fde78af83045f6"
     },
     {
       "id": "TASK-002",
@@ -29,8 +35,14 @@
       "status": "pending",
       "priority": 2,
       "owner": "devin",
-      "req_ids": ["REQ-002", "REQ-003", "REQ-004"],
-      "depends_on": ["TASK-001"],
+      "req_ids": [
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
       "scope_paths": [
         "cli/src/harness/validators/learning.mjs",
         "cli/src/harness/learning-lib.test.mjs"
@@ -49,8 +61,12 @@
       "status": "pending",
       "priority": 3,
       "owner": "devin",
-      "req_ids": ["REQ-001"],
-      "depends_on": ["TASK-002"],
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
       "scope_paths": [
         "cli/steering/quality-gates.learn.md",
         "cli/steering/templates/steering-proposal.md",

@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-learn-eval-gate-005",
+  "timestamp": "2026-11-16T20:46:58.887",
+  "agent": "devin",
+  "human": "squad",
+  "slice_id": "learn-eval-gate",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-001",
+  "evidence": "RED: `node --test cli/src/harness/learning-lib.test.mjs` fails at import \u2014 proposalEvalFinding does not exist yet (2 new REQ-LEARN-10 tests).",
+  "scope_paths": [
+    "cli/src/harness/learning-lib.mjs",
+    "cli/src/harness/learning-lib.test.mjs"
+  ],
+  "concerns": []
+}
