@@ -42,7 +42,7 @@
 | review-quality | full | knowledge | DONE | 0 |
 | rule-coverage | full | knowledge | DONE | 0 |
 | rules-landing | lite | knowledge | DONE | 0 |
-| security-recon-untracked | hotfix | implementation | in_progress | 0 |
+| security-recon-untracked | hotfix | knowledge | DONE | 0 |
 | security-review | full | knowledge | DONE | 0 |
 | sensor-fixes | escalated | knowledge | DONE | 0 |
 | shaping-agent | escalated | knowledge | DONE | 0 |

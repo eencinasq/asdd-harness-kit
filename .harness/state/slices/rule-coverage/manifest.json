@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-12T23:02:45.239Z",
-  "updated_at": "2026-11-17T17:44:34.401Z",
+  "updated_at": "2026-11-17T17:50:20.157Z",
   "paths": {
     "specs": ".harness/specs/rule-coverage",
     "tasks": ".harness/specs/rule-coverage/tasks.md",

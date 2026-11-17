@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": true,
   "created_at": "2026-11-10T20:02:00.926Z",
-  "updated_at": "2026-11-17T17:44:34.378Z",
+  "updated_at": "2026-11-17T17:50:20.134Z",
   "paths": {
     "specs": ".harness/specs/agents-use-scripts",
     "tasks": ".harness/specs/agents-use-scripts/tasks.md",
