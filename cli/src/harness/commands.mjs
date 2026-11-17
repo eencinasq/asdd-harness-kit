@@ -21,6 +21,10 @@ export const HARNESS_COMMANDS = {
     script: 'converge-eval.mjs',
     help: 'score EARS/converge fixtures under cli/eval/converge-ears [--json] [--cases <dir>]',
   },
+  'skill-eval': {
+    script: 'skill-eval.mjs',
+    help: 'score skill fixtures under cli/eval/skills [--skill <name>] [--baseline <ref>] [--json]',
+  },
   waves: {
     script: 'waves.mjs',
     help: 'parallelism hints from feature owners/deps/scopes [--slice <id>] [--json]',
