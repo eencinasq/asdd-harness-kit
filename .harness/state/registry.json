@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-11-17T17:50:20.175Z",
+  "generated_at": "2026-11-17T17:52:13.717Z",
   "slices": [
     {
       "slice_id": "agents-spec",
@@ -12,7 +12,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.132Z",
+      "last_activity": "2026-11-17T17:52:13.680Z",
       "contributors": [
         "squad",
         "human",
@@ -30,7 +30,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.134Z",
+      "last_activity": "2026-11-17T17:52:13.681Z",
       "contributors": [
         "squad",
         "human",
@@ -49,7 +49,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.135Z",
+      "last_activity": "2026-11-17T17:52:13.682Z",
       "contributors": [
         "squad",
         "human",
@@ -67,7 +67,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.135Z",
+      "last_activity": "2026-11-17T17:52:13.682Z",
       "contributors": [
         "squad",
         "human",
@@ -86,7 +86,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.136Z",
+      "last_activity": "2026-11-17T17:52:13.683Z",
       "contributors": [
         "squad",
         "human",
@@ -105,7 +105,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.137Z",
+      "last_activity": "2026-11-17T17:52:13.683Z",
       "contributors": [
         "squad",
         "human",
@@ -124,7 +124,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.137Z",
+      "last_activity": "2026-11-17T17:52:13.684Z",
       "contributors": [
         "squad",
         "human",
@@ -143,7 +143,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.138Z",
+      "last_activity": "2026-11-17T17:52:13.685Z",
       "contributors": [
         "squad",
         "human",
@@ -162,7 +162,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.139Z",
+      "last_activity": "2026-11-17T17:52:13.686Z",
       "contributors": [
         "squad",
         "human",
@@ -181,7 +181,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.140Z",
+      "last_activity": "2026-11-17T17:52:13.687Z",
       "contributors": [
         "squad",
         "human",
@@ -201,7 +201,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.141Z",
+      "last_activity": "2026-11-17T17:52:13.687Z",
       "contributors": [
         "squad",
         "human",
@@ -219,7 +219,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.144Z",
+      "last_activity": "2026-11-17T17:52:13.690Z",
       "contributors": [
         "squad",
         "human",
@@ -239,7 +239,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.145Z",
+      "last_activity": "2026-11-17T17:52:13.691Z",
       "contributors": [
         "squad",
         "human",
@@ -257,7 +257,25 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.145Z",
+      "last_activity": "2026-11-17T17:52:13.691Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "drift-test-env",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:13.691Z",
       "contributors": [
         "squad",
         "human",
@@ -275,7 +293,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.145Z",
+      "last_activity": "2026-11-17T17:52:13.692Z",
       "contributors": [
         "squad",
         "human",
@@ -293,7 +311,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.146Z",
+      "last_activity": "2026-11-17T17:52:13.692Z",
       "contributors": [
         "squad",
         "human",
@@ -311,7 +329,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.146Z",
+      "last_activity": "2026-11-17T17:52:13.692Z",
       "contributors": [
         "squad",
         "human",
@@ -330,7 +348,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.146Z",
+      "last_activity": "2026-11-17T17:52:13.693Z",
       "contributors": [
         "squad",
         "human",
@@ -348,7 +366,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.147Z",
+      "last_activity": "2026-11-17T17:52:13.693Z",
       "contributors": [
         "squad",
         "human",
@@ -366,7 +384,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.147Z",
+      "last_activity": "2026-11-17T17:52:13.693Z",
       "contributors": [
         "squad",
         "human",
@@ -384,7 +402,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.148Z",
+      "last_activity": "2026-11-17T17:52:13.694Z",
       "contributors": [
         "squad",
         "human",
@@ -403,7 +421,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.148Z",
+      "last_activity": "2026-11-17T17:52:13.694Z",
       "contributors": [
         "squad",
         "human",
@@ -421,7 +439,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.149Z",
+      "last_activity": "2026-11-17T17:52:13.695Z",
       "contributors": [
         "squad",
         "human",
@@ -439,7 +457,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.149Z",
+      "last_activity": "2026-11-17T17:52:13.695Z",
       "contributors": [
         "squad",
         "human",
@@ -458,7 +476,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.150Z",
+      "last_activity": "2026-11-17T17:52:13.696Z",
       "contributors": [
         "squad",
         "human",
@@ -484,7 +502,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.152Z",
+      "last_activity": "2026-11-17T17:52:13.697Z",
       "contributors": [
         "squad",
         "human",
@@ -512,7 +530,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.153Z",
+      "last_activity": "2026-11-17T17:52:13.698Z",
       "contributors": [
         "squad",
         "human",
@@ -531,7 +549,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.153Z",
+      "last_activity": "2026-11-17T17:52:13.698Z",
       "contributors": [
         "squad",
         "human",
@@ -550,7 +568,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.153Z",
+      "last_activity": "2026-11-17T17:52:13.698Z",
       "contributors": [
         "squad",
         "human",
@@ -567,7 +585,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.154Z",
+      "last_activity": "2026-11-17T17:52:13.699Z",
       "contributors": [
         "squad",
         "human",
@@ -586,7 +604,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.154Z",
+      "last_activity": "2026-11-17T17:52:13.699Z",
       "contributors": [
         "squad",
         "human",
@@ -604,7 +622,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.154Z",
+      "last_activity": "2026-11-17T17:52:13.699Z",
       "contributors": [
         "squad",
         "human",
@@ -623,7 +641,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.155Z",
+      "last_activity": "2026-11-17T17:52:13.699Z",
       "contributors": [
         "squad",
         "human",
@@ -641,7 +659,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.155Z",
+      "last_activity": "2026-11-17T17:52:13.700Z",
       "contributors": [
         "squad",
         "human",
@@ -659,7 +677,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.155Z",
+      "last_activity": "2026-11-17T17:52:13.700Z",
       "contributors": [
         "squad",
         "human",
@@ -677,7 +695,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.156Z",
+      "last_activity": "2026-11-17T17:52:13.701Z",
       "contributors": [
         "squad",
         "human",
@@ -695,7 +713,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.157Z",
+      "last_activity": "2026-11-17T17:52:13.702Z",
       "contributors": [
         "squad",
         "human",
@@ -713,7 +731,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.158Z",
+      "last_activity": "2026-11-17T17:52:13.702Z",
       "contributors": [
         "squad",
         "human",
@@ -731,7 +749,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.158Z",
+      "last_activity": "2026-11-17T17:52:13.702Z",
       "contributors": [
         "squad",
         "human",
@@ -749,7 +767,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.159Z",
+      "last_activity": "2026-11-17T17:52:13.703Z",
       "contributors": [
         "squad",
         "human",
@@ -767,7 +785,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.159Z",
+      "last_activity": "2026-11-17T17:52:13.704Z",
       "contributors": [
         "squad",
         "human",
@@ -786,7 +804,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.160Z",
+      "last_activity": "2026-11-17T17:52:13.704Z",
       "contributors": [
         "squad",
         "human",
@@ -804,7 +822,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.161Z",
+      "last_activity": "2026-11-17T17:52:13.705Z",
       "contributors": [
         "squad",
         "human",
@@ -822,7 +840,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.161Z",
+      "last_activity": "2026-11-17T17:52:13.705Z",
       "contributors": [
         "squad",
         "human",
@@ -840,7 +858,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.161Z",
+      "last_activity": "2026-11-17T17:52:13.705Z",
       "contributors": [
         "squad",
         "human"
@@ -856,7 +874,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.162Z",
+      "last_activity": "2026-11-17T17:52:13.706Z",
       "contributors": [
         "squad",
         "human",
@@ -874,7 +892,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.164Z",
+      "last_activity": "2026-11-17T17:52:13.707Z",
       "contributors": [
         "squad",
         "human",
@@ -893,7 +911,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.165Z",
+      "last_activity": "2026-11-17T17:52:13.708Z",
       "contributors": [
         "squad",
         "human",
@@ -911,7 +929,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.166Z",
+      "last_activity": "2026-11-17T17:52:13.710Z",
       "contributors": [
         "squad",
         "human",
@@ -929,7 +947,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.167Z",
+      "last_activity": "2026-11-17T17:52:13.710Z",
       "contributors": [
         "squad",
         "human",
@@ -947,7 +965,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.168Z",
+      "last_activity": "2026-11-17T17:52:13.711Z",
       "contributors": [
         "squad",
         "human",
@@ -965,7 +983,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.169Z",
+      "last_activity": "2026-11-17T17:52:13.712Z",
       "contributors": [
         "squad",
         "human",
@@ -983,7 +1001,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.170Z",
+      "last_activity": "2026-11-17T17:52:13.713Z",
       "contributors": [
         "squad",
         "human",
@@ -1002,7 +1020,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.170Z",
+      "last_activity": "2026-11-17T17:52:13.713Z",
       "contributors": [
         "squad",
         "human",
@@ -1021,7 +1039,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.170Z",
+      "last_activity": "2026-11-17T17:52:13.714Z",
       "contributors": [
         "squad",
         "human",
@@ -1039,7 +1057,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.172Z",
+      "last_activity": "2026-11-17T17:52:13.715Z",
       "contributors": [
         "squad",
         "human",
@@ -1065,7 +1083,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.173Z",
+      "last_activity": "2026-11-17T17:52:13.716Z",
       "contributors": [
         "squad",
         "human",
@@ -1083,7 +1101,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.173Z",
+      "last_activity": "2026-11-17T17:52:13.716Z",
       "contributors": [
         "squad",
         "human",
@@ -1101,7 +1119,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.173Z",
+      "last_activity": "2026-11-17T17:52:13.716Z",
       "contributors": [
         "squad",
         "human",
@@ -1119,7 +1137,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.174Z",
+      "last_activity": "2026-11-17T17:52:13.717Z",
       "contributors": [
         "squad",
         "human",
@@ -1137,7 +1155,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.174Z",
+      "last_activity": "2026-11-17T17:52:13.717Z",
       "contributors": [
         "squad",
         "human",
@@ -1155,7 +1173,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-17T17:50:20.175Z",
+      "last_activity": "2026-11-17T17:52:13.717Z",
       "contributors": [
         "squad",
         "human",

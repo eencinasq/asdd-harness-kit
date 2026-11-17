@@ -498,6 +498,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/security-recon-untracked/manifest.json",
       "features": ".harness/features/security-recon-untracked.features.json"
+    },
+    {
+      "slice_id": "drift-test-env",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/drift-test-env/manifest.json",
+      "features": ".harness/features/drift-test-env.features.json"
     }
   ]
 }

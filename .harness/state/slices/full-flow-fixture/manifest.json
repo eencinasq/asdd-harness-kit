@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-17T15:57:56.255Z",
-  "updated_at": "2026-11-17T17:50:20.146Z",
+  "updated_at": "2026-11-17T17:52:13.693Z",
   "paths": {
     "specs": ".harness/specs/full-flow-fixture",
     "tasks": ".harness/specs/full-flow-fixture/tasks.md",

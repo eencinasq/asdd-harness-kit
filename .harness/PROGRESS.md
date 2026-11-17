@@ -18,6 +18,7 @@
 | cli-harness | escalated | implementation | ABANDONED | 0 |
 | cost-metrics | escalated | knowledge | DONE | 0 |
 | docs-p5-wave1 | escalated | knowledge | DONE | 0 |
+| drift-test-env | hotfix | knowledge | DONE | 0 |
 | drift01-harness-logs | hotfix | knowledge | DONE | 0 |
 | drift02-open-slices | hotfix | knowledge | DONE | 0 |
 | egm-shaping | full | knowledge | DONE | 0 |
