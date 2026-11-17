@@ -36,7 +36,7 @@
         {
           "at": "2026-11-17T12:00:15.013Z",
           "slice_id": null,
-          "last_at": "2026-11-17T12:52:20.392Z"
+          "last_at": "2026-11-17T12:59:54.180Z"
         }
       ],
       "examples": [
@@ -76,7 +76,7 @@
         {
           "at": "2026-11-17T12:00:15.013Z",
           "slice_id": null,
-          "last_at": "2026-11-17T12:52:20.392Z"
+          "last_at": "2026-11-17T12:59:54.180Z"
         }
       ],
       "examples": [
@@ -116,7 +116,7 @@
         {
           "at": "2026-11-17T12:00:15.013Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T12:52:20.392Z"
+          "last_at": "2026-11-17T12:59:54.180Z"
         }
       ],
       "examples": [
@@ -166,7 +166,7 @@
         {
           "at": "2026-11-17T12:00:52.955Z",
           "slice_id": "telemetry-emitters",
-          "last_at": "2026-11-17T12:41:48.650Z"
+          "last_at": "2026-11-17T12:59:54.180Z"
         }
       ],
       "examples": [
@@ -196,7 +196,7 @@
         {
           "at": "2026-11-17T12:00:52.955Z",
           "slice_id": "telemetry-emitters",
-          "last_at": "2026-11-17T12:41:48.650Z"
+          "last_at": "2026-11-17T12:59:54.180Z"
         }
       ],
       "examples": [
@@ -211,10 +211,16 @@
           "at": "2026-11-17T02:03:16.683Z",
           "slice_id": "skill-eval",
           "last_at": "2026-11-17T02:06:38.498Z"
+        },
+        {
+          "at": "2026-11-17T12:58:48.993Z",
+          "slice_id": "jev-module",
+          "last_at": "2026-11-17T12:59:54.180Z"
         }
       ],
       "examples": [
-        "QG-LEARN-04 slice \"skill-eval\" completed Knowledge while pattern LP-2a52ea2c (sensor:DRIFT-01:cli) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+        "QG-LEARN-04 slice \"skill-eval\" completed Knowledge while pattern LP-2a52ea2c (sensor:DRIFT-01:cli) it contributed to is open — add a steering proposal (accepted or rejected counts) for it",
+        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-e9c4ddb0 (blocked:phase:qa) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
       ]
     },
     "sensor:DRIFT-02": {

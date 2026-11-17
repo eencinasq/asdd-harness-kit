@@ -54,6 +54,7 @@ Design narrows this list; nothing outside it changes.
   - Hook payload fixtures: `cli/test/fixtures/telemetry/**`
 - Widened 2026-11-16 by PO decision (learning patterns LP-2a52ea2c, LP-7f51c52f opened by this slice's Stop-hook runs):
   - Steering proposals: `docs/knowledge-base/steering-proposals/SP-007.md`, `docs/knowledge-base/steering-proposals/SP-008.md`
+- Widened 2026-11-17 by TL decision (checkpoint c, LP-e9c4ddb0): `docs/knowledge-base/steering-proposals/SP-009.md`
 
 ## Depends on
 
