@@ -17,6 +17,7 @@
  * - Spec drift DRIFT-01 … DRIFT-07 (drift-lib.mjs)
  * - Phase chain QG-DEC-09 (WARN; validators/phase-chain.mjs)
  * - Learning loop QG-LEARN-* (validators/learning.mjs)
+ * - Telemetry TEL-W1…W3 (WARN only, never a learning signal; validators/telemetry.mjs, ADR-006)
  * - Orphan slice detection
  * - Registry consistency
  */
@@ -100,8 +101,22 @@ try {
   // hill is best-effort
 }
 
-if (warnings.length) {
-  for (const w of warnings) console.warn(`WARN  ${w}`);
+// Telemetry (REQ-019, ADR-006): WARN-only and best-effort. Its ctx maps fail to warn (and omits readJson, which
+// fails), its WARNs stay in their own list (printed, never passed to writeSensorSignal), and a load failure or a
+// throw adds no output (AMB-010).
+const telemetryWarnings = [];
+try {
+  const { default: validateTelemetry } = await import('./validators/telemetry.mjs');
+  const found = [];
+  const keep = (msg) => found.push(msg);
+  validateTelemetry({ root, fail: keep, warn: keep });
+  telemetryWarnings.push(...found);
+} catch {
+  // telemetry is best-effort
+}
+
+if (warnings.length || telemetryWarnings.length) {
+  for (const w of [...warnings, ...telemetryWarnings]) console.warn(`WARN  ${w}`);
 }
 const argv = process.argv.slice(2);
 if (argv.includes('--live') || argv.includes('--record') || process.env.HARNESS_JEV_LIVE === '1') {

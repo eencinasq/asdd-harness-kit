@@ -182,7 +182,7 @@
       "id": "TASK-007",
       "title": "WARN-only validators/telemetry.mjs wired into asdd check, isolated from learning signals",
       "user_visible_behavior": "asdd check prints TEL-W1/W2/W3 WARNs when the telemetry location exists, never changes its exit code, and never writes telemetry WARNs as learning signals.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 7,
       "area": "telemetry-emitters",
       "owner": "claude",
@@ -204,7 +204,9 @@
         "npm test",
         "node cli/bin/asdd.mjs check"
       ],
-      "notes": "Wave 5 (AR-2 W4). RED first. TEL-W3 may WARN on the kit until TASK-014."
+      "notes": "Wave 5 (AR-2 W4). RED first. TEL-W3 may WARN on the kit until TASK-014.",
+      "evidence": "node --test cli/src/harness/validators/telemetry.test.mjs -> exit 0, 11/11 (3 runs); verify-on-stop+command-gate+telemetry-lib+learning-lib tests -> 94/94; npm test -> exit 0 (226/226); kit vendor --check -> exit 0 (check-invariants/validators not vendored); HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live -> exit 0 (3 expected TEL-W3 WARNs, none in the learning signal); asdd check vs HEAD check-invariants: same exit 0, diff = the 3 TEL-W3 lines only; drift --slice (base c337df7) PASS",
+      "evidence_hash": "17e817418fe37b91f41890bd26802d3695b5b2279c19c96665017ce6aeca0113"
     },
     {
       "id": "TASK-008",
