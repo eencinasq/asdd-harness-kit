@@ -375,6 +375,8 @@ export function runDrift(opts) {
         }));
       }
     }
+    // DONE/PARKED/ABANDONED slices hold historical evidence (SP-003); amending one makes it in_progress again.
+    if (s.status !== 'in_progress') continue;
     // Not stamped yet (marked passing since the last asdd sync): nothing to compare.
     const recorded = String(f.evidence_hash ?? '');
     if (!EVIDENCE_HASH_RE.test(recorded) || scopes.length === 0) continue;

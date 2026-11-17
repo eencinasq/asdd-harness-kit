@@ -154,6 +154,24 @@ test('REQ-005 DRIFT-02: passing feature reopens when its scope files change afte
   }
 });
 
+test('drift02-open-slices REQ-001 REQ-002 DRIFT-02: only in-progress slices reopen; DRIFT-05 checks every slice', () => {
+  const root = fixture();
+  try {
+    const feature = { id: 'F-01', title: 'a', user_visible_behavior: 'a', status: 'passing', priority: 1, verification: ['x'], evidence: 'ok', req_ids: ['REQ-001'], scope_paths: ['src'] };
+    write(root, '.harness/features/s1.features.json', { schema_version: '1.0', slice_id: 's1', source_tasks: 'x', features: [{ ...feature, evidence_hash: evidenceHash(root, ['src']) }] });
+    write(root, 'src/a.js', 'changed by a later slice\n');
+    assert.equal(checks(runDrift({ root }), 'DRIFT-02').length, 1, 'in_progress slice still reopens');
+    for (const status of ['DONE', 'PARKED', 'ABANDONED']) {
+      write(root, '.harness/state/slices/s1/manifest.json', { slice_id: 's1', phase: 'knowledge', status });
+      assert.deepEqual(checks(runDrift({ root }), 'DRIFT-02'), [], `${status} slice holds historical evidence`);
+    }
+    write(root, '.harness/features/s1.features.json', { schema_version: '1.0', slice_id: 's1', source_tasks: 'x', features: [{ ...feature, scope_paths: ['src/gone.js'] }] });
+    assert.equal(checks(runDrift({ root }), 'DRIFT-05').length, 1, 'DRIFT-05 still checks a DONE slice');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('sensor-fixes REQ-001 DRIFT-02: deleting a file changes the hash once; committing the deletion does not', () => {
   const root = fixture();
   try {

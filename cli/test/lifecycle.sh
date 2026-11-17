@@ -389,7 +389,14 @@ grep -qxF '.harness/state/learning/signals' .gitignore
 asdd drift --json >/tmp/asdd-lifecycle-drift.json && exit 1
 grep -q '"drift_level": "blocking"' /tmp/asdd-lifecycle-drift.json
 mkdir -p src/api && mv src/rogue/file.js src/api/file.js && rmdir src/rogue
-# Mapped now (no DRIFT-01), but src/api belongs to the passing feature g1: its evidence_hash no longer matches (DRIFT-02)
+# Mapped now (no DRIFT-01). src/api belongs to the passing feature g1 of the DONE slice grow-slice: a DONE slice keeps
+# its historical evidence, so DRIFT-02 does not reopen it (SP-003)
+if asdd check 2>&1 | grep -q 'DRIFT-02 passing feature g1'; then
+  echo "DRIFT-02 reopened a feature of a DONE slice" >&2
+  exit 1
+fi
+# Amending the slice makes it in_progress again: now the stale evidence_hash reopens g1 (DRIFT-02)
+asdd slice amend grow-slice --by test-agent >/dev/null
 expect_fail "file added to a passing feature's scope (DRIFT-02)"
 grep -q 'DRIFT-02 passing feature g1 changed after its verification' /tmp/asdd-lifecycle-neg.log
 if grep -q 'DRIFT-01 src/api/file.js' /tmp/asdd-lifecycle-neg.log; then echo "a mapped file still reported as DRIFT-01" >&2; exit 1; fi
