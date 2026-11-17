@@ -40,6 +40,18 @@ Design narrows this list; nothing outside it changes.
 - Emitters: `cli/src/harness/command-gate.mjs`, `cli/src/harness/verify-on-stop.mjs`, `cli/src/harness/sync-state.mjs`, `cli/src/harness/check-invariants.mjs` (validator wiring), `cli/agents/_runtime-template.md` (source; `.agents/agents/_runtime-template.md` is its `asdd kit self` copy)
 - Registration (AR-5, one atomic landing): `cli/src/harness/commands.mjs`, `cli/src/install/**`, `cli/src/kit/versions.mjs`, `cli/versions.json`, `package.json` (`files[]` negations, `test` script), `.gitignore`, `.harness/state/telemetry/**`
 - Docs: `README.md` (command row)
+- Widened 2026-11-16 by PO decision (discovery Q-1/Q-5/Q-6):
+  - Load hooks (`asdd observe`, a hook-only, fail-open command):
+    - `.claude/settings.json`
+    - `.cursor/hooks.json`
+    - `cli/runtimes/**` hook wiring, including `cli/runtimes/cursor/hooks.json`
+    - installer runtime wiring under `cli/src/install/**` (already mapped)
+    - `cli/src/harness/telemetry-observe.mjs` (with its `*.test.mjs`; Design may fold it into `telemetry-lib.mjs`)
+  - Generated copies `tools/*/src/harness/telemetry-lib.mjs`: written only by `asdd kit vendor`, never hand-edited.
+  - Shipped contract source: `cli/scaffold/state/telemetry/**`.
+- Widened 2026-11-16 by PO decision (validation TRC-003):
+  - Tests: `cli/src/harness/command-gate.test.mjs`, `cli/src/harness/sync-state.test.mjs`, `cli/src/harness/verify-on-stop.test.mjs` (new), `cli/test/install.sh`
+  - Hook payload fixtures: `cli/test/fixtures/telemetry/**`
 
 ## Depends on
 

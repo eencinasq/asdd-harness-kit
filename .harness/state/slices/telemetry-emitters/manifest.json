@@ -1,20 +1,42 @@
 {
   "schema_version": "3.0",
   "slice_id": "telemetry-emitters",
-  "phase": "discovery",
+  "phase": "domain",
   "status": "in_progress",
   "mode": "full",
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:17.015Z",
-  "updated_at": "2026-11-17T01:07:06.563Z",
+  "updated_at": "2026-11-17T01:12:59.876Z",
   "paths": {
     "specs": ".harness/specs/telemetry-emitters",
     "tasks": ".harness/specs/telemetry-emitters/tasks.md",
     "features": ".harness/features/telemetry-emitters.features.json"
   },
-  "gates": {},
+  "gates": {
+    "discovery": {
+      "status": "PASS",
+      "by": "asdd-discovery-agent",
+      "at": "2026-11-17T00:30:00Z",
+      "evidence": "Discovery gate PASS (QG-DIS-04): confidence 0.87, anti-pattern score 1.0 (anti-patterns.md; AP-4 bounded-tail resolved by 500 lines/256 KB constants). PO decisions on Q-1..Q-15 ('approve recommendations', eencinas, 2026-11-16) received through the orchestrator and recorded by this agent (not a human-authored session): Q-1 fail-open load hooks (Claude PostToolUse Read|Skill, Cursor beforeReadFile) via new hook-only command `asdd observe`; Q-2 no self-report path (hookless runtimes = unknown; runtime-template turn/subagent spans deferred); Q-3a unambiguous attribution only; Q-4a gate verdict spans only, test spans deferred; Q-5 vendored tools/*/src/harness/telemetry-lib.mjs copies allowed (generated only); Q-6 MH-05 narrowed + cli/scaffold/state/telemetry/** mapped; Q-7 project.json/lifecycle row dropped; Q-8 shell reads unknown; Q-9 configured-not-observed computed at read time; Q-10 tail 500 lines/256 KB code constants; Q-11 --bottlenecks in-memory; Q-12 tokens out of scope; Q-13 per runtime-session, agent id when present; Q-14 load hook p99<=50 ms fail-open; Q-15 no per-validator spans; A-01..A-10 accepted. intent.md Mapped files widened (dated line). Residual uncertainty: A-01/A-02 hook payload shapes unverified in repo (captured fixtures in Design, R-3); MCP server rebuild need after vendoring (R-1); PO-approved MH-02 runtime-template emitter reduction (R-7); 7 new domain terms for the Domain phase (glossary.md). Artifacts: capability.md, glossary.md, anti-patterns.md. Next: @asdd-spec-agent.",
+      "concerns": []
+    },
+    "spec": {
+      "status": "PASS",
+      "by": "asdd-spec-agent",
+      "at": "2026-11-17T03:30:00Z",
+      "evidence": "Spec revision 1.1.0, spec gate PASS (QG-SPC-04): requirements.md READY, 25 MUST REQs (REQ-001..REQ-025), spec confidence 0.88, anti-pattern score 1.0 (QG-SPC-02). Addresses spec-validation-report.md v1.0 (session 005, WARN). PO decisions on the validation findings were received through the orchestrator ('approve recommendations', eencinas, 2026-11-16) and are recorded by this agent; this is not a human-authored session. HIGH: CON-001 parent_span_id null only on the invocation root span, children reference the run span (REQ-005/REQ-010); NFR-002 telemetry loaded so a load failure is caught, no crashing static import (REQ-002), load-failure/failed-emit clause added to REQ-009, REQ-010, REQ-019; Verify-on-Stop own-crash behaviour OUT of scope by PO decision, recorded as known pre-existing issue KPI-1 for a follow-up; NFR-003 installed load-hook exits 0 with allow when asdd cannot be resolved, asserted in cli/test/install.sh (REQ-025); AMB-001 (PO answer to Q-14) observe p99<=50 ms gated on in-process handler time, >=200 samples per fixture class, whole-process wall time recorded not gated (REQ-018); TRC-001 PO DEFERRAL of AR-3 stream rotation, profiling.json rollup and H-* findings in --slice output, risk accepted because bounded tail reads (500 lines/256 KB) stay safe on an unrotated file, matrix shows AR-3 partial+deferred; RSK-001/AP-7 ACCEPTED BY TL/PO OVERRIDE (Option B, no split; REQ-012 sequences the AR-2 waves), recorded in anti-patterns.md. MEDIUM fixed: CON-002 absent fields omitted (AR-7), profile renders unknown; CON-003 three-state legend; CON-004 exit 3 only with neither spans nor session events; AMB-002 writable stream; AMB-003 closed command_label set (denied label, allowlist, unmatched, empty); AMB-004 uninstalled skill names give no record; AMB-005 surface share defined, hits term 0; ACT-001 attribution env var contract (name stays OI-1); TRC-004 AR-10 pinned for profile; AMB-006 and AMB-007 wording applied. LOW fixed: AMB-008, DUP-001, DOM-008, EARS-001. TRC-003 PO widening of Mapped files reflected in test locations. Noted not applied: TRC-002 (OI-7, needs PO), TRC-005, ACT-002, NFR-001. Uncertainty factors (QG-DEC-10): (1) A-01/A-02 payload shapes and hook exit-code semantics unverified in repo (R-3, RSK-004); (2) six terms absent from domain-model.md (Span, Trace, Activation record, Profile report, Phase marker, Runtime hook host; DOM-001..008); (3) open items OI-1..OI-7. Next: @asdd-validation-agent re-validation (or TL override for validation), then @asdd-domain-agent.",
+      "concerns": []
+    },
+    "validation": {
+      "status": "PASS",
+      "by": "asdd-validation-agent",
+      "at": "2026-11-17T04:30:00Z",
+      "evidence": "Re-validation of requirements 1.1.0: gate PASS (QG-VAL-04, PASSED), report .harness/specs/telemetry-emitters/spec-validation-report.md v1.1. BLOCKING 0, HIGH 0. All six v1.0 HIGH findings closed: AMB-001, CON-001, NFR-002 and NFR-003 resolved in the spec; TRC-001 (AR-3 rotation, rollup, H-* output) explicitly deferred; RSK-001/AP-7 overridden (Option B); the Verify-on-Stop own-crash part of NFR-002 deferred as KPI-1. The MEDIUM findings are resolved except TRC-002 (OI-7, ruled MEDIUM non-blocking: may go to Design, PO answer needed before Task Planning, recommended: WARN-only check in validators/telemetry.mjs) and DOM-001..006 (Domain phase required, QG-DMN-02). New findings: GOV-001 MEDIUM (the PO/TL decisions closing HIGH findings are recorded only in agent-authored artifacts; a human-authored TL session is recommended before Design); AMB-009 LOW (REQ-007: no command_label for an override-allowed command, command-gate.mjs:85-87,117); AMB-010 LOW (REQ-019 criterion 7 baseline); TRC-006 LOW (REQ-018: no Cursor non-guidance latency class). Code citations re-checked at f41a3ff: the cited files are unchanged since 1b1fbae; the lazy-import precedent is now check-invariants.mjs:108-114. No schema change. Validation confidence 0.86. Uncertainty factors (QG-DEC-10): (1) the PO/TL decisions were relayed by the orchestrator and not human-authored (GOV-001); (2) the A-01/A-02 payload shapes and hook exit-code semantics are unverified (RSK-004, OI-6); (3) OI-7 is open. Next: @asdd-domain-agent.",
+      "concerns": []
+    }
+  },
   "active_features": [],
   "open_dissents": 0,
   "source": null,
@@ -26,10 +48,55 @@
       "event": "phase_started",
       "phase": "discovery",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T23:59:00Z",
+      "agent": "asdd-discovery-agent",
+      "event": "phase_blocked",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T00:30:00Z",
+      "agent": "asdd-discovery-agent",
+      "event": "phase_completed",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:30:00Z",
+      "agent": "asdd-spec-agent",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T02:30:00Z",
+      "agent": "asdd-validation-agent",
+      "event": "phase_completed",
+      "phase": "validation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T03:30:00Z",
+      "agent": "asdd-spec-agent",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T04:30:00Z",
+      "agent": "asdd-validation-agent",
+      "event": "phase_completed",
+      "phase": "validation",
+      "feature_id": null
     }
   ],
   "contributors": [
     "squad",
-    "human"
+    "human",
+    "asdd-discovery-agent",
+    "asdd-spec-agent",
+    "asdd-validation-agent"
   ]
 }

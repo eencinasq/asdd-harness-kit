@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "author": "eencinas-claude",
+  "week": "2026-W47",
+  "signatures": {
+    "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:33:46.710Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T01:10:57.863Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ]
+    },
+    "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:33:46.710Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T01:10:57.863Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/quality-gates.project.md: coverage keys not reachable via tags (starvation, Phase-2 backlog): validation"
+      ]
+    },
+    "warn:QG-DEC-09": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:33:46.710Z",
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-17T01:10:57.863Z"
+        }
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ]
+    }
+  }
+}
