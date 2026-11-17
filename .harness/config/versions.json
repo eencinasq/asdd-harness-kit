@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "kit_version": "3.12.0",
-  "generated_at": "2026-11-17T12:06:35.550Z",
+  "generated_at": "2026-11-17T12:14:53.080Z",
   "artifacts": {
     "cli/steering/README.md": "3.12.0",
     "cli/steering/_steering-profile.md": "3.12.0",
@@ -91,6 +91,8 @@
     "cli/skills/product-delivery/contracts/scope-map.schema.yaml": "3.12.0",
     "cli/skills/product-delivery/examples/end-to-end-example.md": "3.12.0",
     "cli/skills/product-delivery/references/asdd-harness-handoff.md": "3.12.0",
+    "cli/skills/product-delivery/references/grounding.md": "3.12.0",
+    "cli/skills/product-delivery/references/po-mode-tracker-output.md": "3.12.0",
     "cli/skills/product-delivery/references/scope-split-review.md": "3.12.0",
     "cli/skills/product-delivery/references/shape-up-input.md": "3.12.0",
     "cli/skills/shape-up/SKILL.md": "3.12.0",

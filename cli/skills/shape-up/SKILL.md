@@ -19,15 +19,25 @@ appetite and no-gos). Shaping produces options; the betting table decides. Philo
 every verdict quotes the artifact. Drafting may use conversation history (Elephant); prefer a fresh-context (Goldfish)
 pass before `ready_for_bet`.
 
-**Operational boundary:** talks with the shaper; writes only the pitch file and the derived artifacts the user asks
-for, under the pitch directory (`docs/pitches/<pitch-id>/` unless the project names another) — including optional
-`concepts_brief.md` and brownfield `context-pack.md`. It never writes `.harness/` files, intents, or tracker items.
+**Operational boundary:** talks with the shaper; in repo mode writes only the pitch file and the derived artifacts the
+user asks for, under the pitch directory (`docs/pitches/<pitch-id>/` unless the project names another) — including
+optional `concepts_brief.md` and brownfield `context-pack.md`; in PO mode writes only to the tracker (see PO mode). It
+never writes `.harness/` files or intents.
+
+## PO mode
+
+When `.harness/config/project.json` has a `tracker` block and the session is a PO/PM session (the
+`asdd-shaping-agent`, or the user says so), the skill writes no repository file: the pitch, its review, and the betting
+decision go to the tracker's pitch item, with the operations and placement of
+`.agents/skills/product-delivery/references/po-mode-tracker-output.md`. Grounding (Step 3) is the same in both modes —
+the repository is read as evidence. Without a `tracker` block, PO mode stops and asks for one.
 
 | Component | Path | Purpose |
 |---|---|---|
 | Flows | [`references/flows.md`](./references/flows.md) | Coaching questions per flow |
 | Concepts brief | [`references/concepts-brief-template.md`](./references/concepts-brief-template.md) | Hypothesis + readiness before a formal pitch |
 | Pitch template | [`references/pitch-template.md`](./references/pitch-template.md) | Five ingredients |
+| Grounding | `.agents/skills/product-delivery/references/grounding.md` | Mandatory: Reuse / Extend / New with evidence, reference slices |
 | Brownfield pack | [`references/brownfield-bootstrap.md`](./references/brownfield-bootstrap.md) | Optional context before shaping |
 | Techniques | [`references/techniques.md`](./references/techniques.md) | Breadboard / fat marker |
 | Conversions | [`references/conversions.md`](./references/conversions.md) | Share / discovery / bundle |
@@ -39,7 +49,8 @@ for, under the pitch directory (`docs/pitches/<pitch-id>/` unless the project na
   `product_mode` (`enum`, `established` | `new`, asked when not given).
 - **Outputs:** `concepts_brief` (`markdown`, optional, [`concepts-brief-template.md`](./references/concepts-brief-template.md));
   `pitch` (`markdown`, [`pitch-template.md`](./references/pitch-template.md) with a `pitch_id:` and a
-  `betting_state:` line, written to `docs/pitches/<pitch-id>/pitch.md`); `pitch_review` (`markdown table`, Step 4, in
+  `betting_state:` line and a `## Grounding` table, written to `docs/pitches/<pitch-id>/pitch.md`); `pitch_review`
+  (`markdown table`, Step 5, in
   the same directory as `review.md`); `derived` (`markdown`, a conversion of
   [`conversions.md`](./references/conversions.md) — `share`, `discovery`, `bundle`, or `scope_map` outside a harness
   repository — written next to the pitch).
@@ -87,15 +98,29 @@ deferrals with `decided_by`) — see [`concepts-brief-template.md`](./references
   `.harness/steering/skills.md`), **or** Flow 4 left a brief with an explicit readiness outcome; nothing was invented
   for the shaper.
 
-### Step 3: Write the pitch
+### Step 3: Ground the pitch
+
+- **Action:** before writing anything, run the grounding of `.agents/skills/product-delivery/references/grounding.md`:
+  `asdd knowledge search` for capabilities, requirements, and slices the idea touches; `asdd knowledge slice` and
+  `asdd knowledge trace` for what they cover; `codegraph explore` for the components a solution would reuse or extend;
+  `.harness/PROGRESS.md` plus `asdd knowledge slice` for DONE slices of similar shape. Build the Reuse / Extend / New
+  table, every row with evidence refs (`REQ:<slice>/REQ-NNN`, `slice:<id>`, `path:<repo-path>`; `none` only on `New`),
+  and pick at least one reference slice with its feature count — or record that none exists and what was searched.
+  Bring each `Reuse` row back into the Solution: the pitch shapes the gap, not what already works.
+- **Target:** the conversation with the shaper; the `## Grounding` table and the appetite's reference slices.
+- **Assertion:** every row cites a ref that exists today or is `PENDING_DEFINITION` (then the pitch stays
+  `needs_shaping`); `Reuse` and `Extend` rows never cite only `none`; nothing was asserted without a tool result.
+
+### Step 4: Write the pitch
 
 - **Action:** when readiness allows, fill [`references/pitch-template.md`](./references/pitch-template.md) with the five
-  ingredients; give the pitch a stable `pitch_id` (keep an existing one) and `betting_state: needs_shaping` or
-  `ready_for_bet`. Link or note `concepts_brief.md` when one was used.
+  ingredients, the Step 3 `## Grounding` table, and the reference-slice lines under `## Appetite`; give the pitch a
+  stable `pitch_id` (keep an existing one) and `betting_state: needs_shaping` or `ready_for_bet`. Link or note
+  `concepts_brief.md` when one was used.
 - **Target:** `docs/pitches/<pitch-id>/pitch.md`.
-- **Assertion:** the file has the five ingredient headings, `pitch_id:`, and `betting_state:`.
+- **Assertion:** the file has the five ingredient headings, `## Grounding`, `pitch_id:`, and `betting_state:`.
 
-### Step 4: Review against the ingredients
+### Step 5: Review against the ingredients
 
 - **Action:** **critique-first** — state the strongest reason the pitch could fail appetite before any praise. Judge
   each element and cite the pitch for every verdict — quote the sentence that passes it, or name what is missing (a
@@ -110,6 +135,9 @@ deferrals with `decided_by`) — see [`concepts-brief-template.md`](./references
   | Rabbit holes | Technical risks flagged with a patch | "Should be straightforward" |
   | No-gos | Explicit exclusions listed | Nothing out of scope |
 
+  Also check the grounding: a `New` row that an existing capability covers, or an appetite far above its reference
+  slices, is the review's weakest point to state first.
+
   Write `| Element | Verdict | Evidence from the pitch | Fix |`, one row per element. Before "Ready for betting",
   restate the riskiest element or unpatched rabbit hole and why it does not block — or refuse `ready_for_bet`. Present
   the Gates to the human.
@@ -117,7 +145,7 @@ deferrals with `decided_by`) — see [`concepts-brief-template.md`](./references
 - **Assertion:** five verdict rows, each with a quote or a named gap; the gate answers carry `decided_by`; no empty
   praise lines.
 
-### Step 5: Convert or record the bet
+### Step 6: Convert or record the bet
 
 - **Action:** for Flow 5, produce the smallest conversion the request needs (`share`, `discovery`, `bundle`; `scope_map`
   only when the pitch leaves this repository) per [`references/conversions.md`](./references/conversions.md): the
@@ -133,12 +161,17 @@ deferrals with `decided_by`) — see [`concepts-brief-template.md`](./references
 
 1. `grep -cE '^## (Problem|Appetite|Solution|Rabbit [Hh]oles|No-[Gg]os)' docs/pitches/<pitch-id>/pitch.md` prints 5.
 2. `grep -cE '^(pitch_id|betting_state):' docs/pitches/<pitch-id>/pitch.md` prints 2.
-3. After a review: `grep -cE '^\| (Problem|Appetite|Solution|Rabbit holes|No-gos) \|' docs/pitches/<pitch-id>/review.md`
+3. Grounding: `grep -c '^| Kind | What | Evidence |' docs/pitches/<pitch-id>/pitch.md` prints 1, and
+   `grep -cE '^- [a-z0-9][a-z0-9_-]*: [0-9]+ features|^Reference slices: none' docs/pitches/<pitch-id>/pitch.md` prints
+   1 or more.
+4. After a review: `grep -cE '^\| (Problem|Appetite|Solution|Rabbit holes|No-gos) \|' docs/pitches/<pitch-id>/review.md`
    prints 5.
-4. After Flow 4 with a brief: `test -f docs/pitches/<pitch-id>/concepts_brief.md` exits 0.
-5. After a conversion: `grep -L 'source_pitch_id' docs/pitches/<pitch-id>/*.md` lists only `pitch.md`, `review.md`, and
+5. After Flow 4 with a brief: `test -f docs/pitches/<pitch-id>/concepts_brief.md` exits 0.
+6. After a conversion: `grep -L 'source_pitch_id' docs/pitches/<pitch-id>/*.md` lists only `pitch.md`, `review.md`, and
    optional `concepts_brief.md` / `context-pack.md`.
-6. Negative check: `git status --porcelain -- .harness` lists nothing this run changed (no intent, slice, or session).
+7. PO mode: the pitch item read back from the tracker has the five ingredient headings, `## Grounding`, and
+   `betting_state:`, and `git status --porcelain` lists nothing this run changed (it writes no repository file).
+8. Negative check: `git status --porcelain -- .harness` lists nothing this run changed (no intent, slice, or session).
 
 ## Escalation Gate
 

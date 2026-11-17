@@ -1,0 +1,16 @@
+{
+  "id": "po-mode-pitch",
+  "task": "A PO/PM shapes a pitch from Claude Desktop; the output goes to the project's tracker",
+  "expect": "The project configuration validates, and the skill defines a PO mode that writes the pitch only to the configured tracker and no repository file",
+  "probes": [
+    { "id": "config", "run": "node cli/bin/asdd.mjs check-config", "cwd": "repo" }
+  ],
+  "assertions": [
+    { "type": "exit_code", "probe": "config", "code": 0 },
+    { "type": "skill_contains", "pattern": "## PO mode" },
+    { "type": "skill_contains", "pattern": "asdd-shaping-agent" },
+    { "type": "skill_contains", "pattern": "writes no repository file" },
+    { "type": "skill_contains", "pattern": "po-mode-tracker-output.md" },
+    { "type": "skill_lacks", "pattern": "It never writes `.harness/` files, intents, or tracker items." }
+  ]
+}
