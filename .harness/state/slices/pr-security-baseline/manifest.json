@@ -7,8 +7,8 @@
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
-  "created_at": "2026-11-18T03:22:19.561Z",
-  "updated_at": "2026-11-18T03:22:19.561Z",
+  "created_at": "2026-11-18T03:22:22.983Z",
+  "updated_at": "2026-11-18T03:22:22.983Z",
   "paths": {
     "specs": ".harness/specs/pr-security-baseline",
     "tasks": ".harness/specs/pr-security-baseline/tasks.md",

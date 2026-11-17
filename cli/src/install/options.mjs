@@ -80,7 +80,7 @@ const FLAGS = {
   '--pr': 'pr',
   '--json': 'json',
 };
-const VALUES = { '--kit-dir': 'kitDir', '--modules': 'modules', '--runtime': 'runtimes' };
+const VALUES = { '--kit-dir': 'kitDir', '--modules': 'modules', '--runtime': 'runtimes', '--target-os': 'targetOs' };
 
 /** @returns {Record<string, any>} the parsed options; `help: true` when help was asked for. */
 export function parseInstallArgs(argv) {
@@ -103,6 +103,9 @@ export function parseInstallArgs(argv) {
     if (arg.startsWith('-')) throw new CliError(`unknown option: ${arg}`);
     if (o.target) throw new CliError(`unexpected argument: ${arg}`);
     o.target = arg;
+  }
+  if (o.targetOs && !['win32', 'linux', 'darwin'].includes(o.targetOs)) {
+    throw new CliError(`unknown --target-os: ${o.targetOs} (expected win32, linux, or darwin)`);
   }
   return o;
 }

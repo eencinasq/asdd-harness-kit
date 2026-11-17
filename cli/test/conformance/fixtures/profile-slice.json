@@ -1,0 +1,14 @@
+{
+  "name": "profile-slice",
+  "setup": [
+    { "op": "install" },
+    { "op": "slice", "id": "demo" }
+  ],
+  "invoke": { "cmd": "profile", "args": ["--slice", "demo"] },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["PROFILE demo"],
+    "files": { ".harness/state/telemetry/slices/demo/profiling.json": { "exists": true, "json": { "slice_id": "demo" } } }
+  },
+  "normalize": ["timestamps", "paths"]
+}

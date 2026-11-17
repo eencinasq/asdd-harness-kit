@@ -1,0 +1,10 @@
+{
+  "name": "span-append",
+  "setup": [
+    { "op": "install" },
+    { "op": "write", "path": ".harness/state/telemetry/.keep", "content": "" }
+  ],
+  "invoke": { "cmd": "span", "stdin": "{\"kind\":\"command\",\"process_name\":\"conf-test\",\"runtime\":\"cli\",\"slice_id\":\"demo\",\"phase\":\"implementation\",\"start_time_iso\":\"2026-01-01T00:00:00.000Z\",\"end_time_iso\":\"2026-01-01T00:00:01.000Z\",\"duration_ms\":1000,\"status\":\"OK\",\"attributes\":{\"command_label\":\"conf\"}}" },
+  "expect": { "exit": 0, "spans_tail": { "kind": "command", "slice_id": "demo", "status": "OK" } },
+  "normalize": ["ids", "timestamps"]
+}

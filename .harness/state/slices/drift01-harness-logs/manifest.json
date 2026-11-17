@@ -7,8 +7,8 @@
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
-  "created_at": "2026-11-18T03:22:19.544Z",
-  "updated_at": "2026-11-18T03:22:19.544Z",
+  "created_at": "2026-11-18T03:22:22.968Z",
+  "updated_at": "2026-11-18T03:22:22.968Z",
   "paths": {
     "specs": ".harness/specs/drift01-harness-logs",
     "tasks": ".harness/specs/drift01-harness-logs/tasks.md",

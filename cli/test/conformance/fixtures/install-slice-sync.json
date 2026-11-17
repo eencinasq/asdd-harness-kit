@@ -1,0 +1,17 @@
+{
+  "name": "install-slice-sync",
+  "setup": [
+    { "op": "install" },
+    { "op": "slice", "id": "demo" }
+  ],
+  "invoke": { "cmd": "sync", "args": ["--slice", "demo"] },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["SYNC"],
+    "files": {
+      ".harness/state/slices/demo/manifest.json": { "exists": true, "json": { "slice_id": "demo" } },
+      ".harness/state/registry.json": { "exists": true }
+    }
+  },
+  "normalize": ["timestamps", "paths"]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "verify-stop-clean",
+  "setup": [
+    { "op": "install" },
+    { "op": "slice", "id": "demo" }
+  ],
+  "invoke": { "cmd": "verify", "stdin": "{\"status\":\"completed\",\"loop_count\":0}" },
+  "expect": { "exit": 0, "stdout_contains": ["{"] },
+  "normalize": ["paths"]
+}

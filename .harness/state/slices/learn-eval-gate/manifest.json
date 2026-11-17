@@ -7,8 +7,8 @@
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
-  "created_at": "2026-11-18T03:22:19.554Z",
-  "updated_at": "2026-11-18T03:22:19.554Z",
+  "created_at": "2026-11-18T03:22:22.976Z",
+  "updated_at": "2026-11-18T03:22:22.976Z",
   "paths": {
     "specs": ".harness/specs/learn-eval-gate",
     "tasks": ".harness/specs/learn-eval-gate/tasks.md",

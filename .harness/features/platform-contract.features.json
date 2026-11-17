@@ -46,7 +46,7 @@
         "cli/src/install/phases.mjs",
         "cli/src/install/modules.mjs"
       ],
-      "evidence_hash": "4f6cb050b450bd09edb15b852b135c10caacb3ea81e42c9f3b6b5d8c071a4965"
+      "evidence_hash": "8034392133a7c166262753c7257d1eebeaf2745c31a7980e311db7acafe8dea3"
     },
     {
       "id": "TASK-003",
@@ -69,7 +69,7 @@
         "cli/src/install/options.mjs",
         "cli/src/install/phases.mjs"
       ],
-      "evidence_hash": "55100d020e23ba35a6041f606eb1ddbd1e4366002f88e280cd72397dfcbd6658"
+      "evidence_hash": "bce9e9800b37aceddf96ef9e0610857590d45217a6d8446438d33c3db2ed5ede"
     },
     {
       "id": "TASK-004",

@@ -85,8 +85,20 @@ export const LEGACY_PROJECT_BIN = `${LEGACY_PROJECT_CLI}/bin/asdd.mjs`;
  * How a project's hooks run asdd, with nothing of the CLI in the project: the project's devDependency
  * (node_modules/.bin/asdd) first, else a global asdd on the PATH. Neither installed fails (closed) with how to install.
  */
-export const projectAsdd = (verb) =>
-  `b=node_modules/.bin/asdd; [ -x "$b" ] || b=asdd; command -v "$b" >/dev/null 2>&1 || { echo "asdd is not installed: npm i -D asdd-harness-kit (or npm i -g asdd-harness-kit)" >&2; exit 2; }; exec "$b" ${verb}`;
+/** The resolver string a project's hooks run for `verb`, per shell family (platform v0 D-8/RT-3). */
+const RESOLVERS = {
+  posix: (verb) =>
+    `b=node_modules/.bin/asdd; [ -x "$b" ] || b=asdd; command -v "$b" >/dev/null 2>&1 || { echo "asdd is not installed: npm i -D asdd-harness-kit (or npm i -g asdd-harness-kit)" >&2; exit 2; }; exec "$b" ${verb}`,
+  cmd: (verb) =>
+    `if exist "node_modules\\.bin\\asdd.cmd" (call "node_modules\\.bin\\asdd.cmd" ${verb}) else (asdd ${verb} || (echo asdd is not installed: npm i -D asdd-harness-kit or npm i -g asdd-harness-kit 1>&2 & exit /b 2))`,
+  powershell: (verb) =>
+    `$b='node_modules\\.bin\\asdd.cmd'; if(Test-Path $b){& $b ${verb}}else{$c=Get-Command asdd -ErrorAction SilentlyContinue; if($c){asdd ${verb}}else{[Console]::Error.WriteLine('asdd is not installed: npm i -D asdd-harness-kit (or npm i -g asdd-harness-kit)'); exit 2}}`,
+};
+
+/** Shell family for an OS target: Windows hooks must never require POSIX syntax. */
+export const hookShellFor = (os) => (os === 'win32' ? 'cmd' : 'posix');
+
+export const projectAsdd = (verb, shell = 'posix') => (RESOLVERS[shell] ?? RESOLVERS.posix)(verb);
 
 /**
  * Claude Code runs hooks in the session's current directory, which can be a subfolder; asdd and the kit's relative
@@ -99,7 +111,7 @@ export const claudeHook = (command, onFail = 2) =>
   String(command).startsWith(CLAUDE_ROOT_CD) ? command : `${CLAUDE_ROOT_CD} || exit ${onFail}; ${command}`;
 
 /** The command a target's hooks run for `verb`: the resolver in a project, cli/ in the kit repo. */
-export const asddCommand = (ctx, verb) => (ctx.self ? `node ${KIT_BIN} ${verb}` : projectAsdd(verb));
+export const asddCommand = (ctx, verb) => (ctx.self ? `node ${KIT_BIN} ${verb}` : projectAsdd(verb, hookShellFor(ctx.targetOs ?? process.platform)));
 
 /**
  * The load hook (`asdd observe <runtime>`), fail-open unlike the gate resolver: asdd missing, failing, or slow, the

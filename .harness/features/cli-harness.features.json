@@ -208,7 +208,7 @@
         "tools/knowledge/README.md",
         "tools/spec-drift/src/audit/harness-libs.ts"
       ],
-      "evidence_hash": "d0bbd93fca0de97286fd794b28dc4369024fe743bae0891e322d8e388beab266"
+      "evidence_hash": "301a9628f36fde396091037fde5707cd94f438e770934888f2ff25733e3bb2ae"
     },
     {
       "id": "TASK-009",
@@ -253,7 +253,7 @@
         ".github/workflows/harness-invariants.yml",
         ".harness/steering/structure.md"
       ],
-      "evidence_hash": "fe68172f7ee7693d59f5032f1b00c63d5d87b4fcc7adf3780292e056131cb983"
+      "evidence_hash": "e41bc780fd2a0aa7e5d19f019564ee3df8d5e139b3e1c9f2baa0437c31e05207"
     },
     {
       "id": "TASK-010",

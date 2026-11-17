@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "kit_version": "3.12.0",
-  "generated_at": "2026-11-17T13:26:08.137Z",
+  "generated_at": "2026-11-17T15:59:04.247Z",
   "artifacts": {
     ".github/CODEOWNERS.harness.example": "3.12.0",
     ".github/workflows/harness-audit.yml.example": "3.12.0",
@@ -436,7 +436,7 @@
     ".harness/config/README.md": "fda5dfc0f151de695a3be72d64b65e3f5c1fce7e9da2fd21dd721cd6ed45006d",
     ".harness/config/skill-profile-waivers.json": "5a09105b9591bbd39addf55defa95fbb91201df3004bad6fdd39255d22e97e5f",
     ".harness/config/steering.registry.json": "51de99893e87d32d36f9b9e088181e6a5be9511be2c9d78998230156cb970e11",
-    ".harness/config/versions.json": "483a15c98fe7379d7d5a761e58ebbb6342f77061a059605a451ed4b0e4d10118",
+    ".harness/config/versions.json": "b5484d4a79ee014814ff9c48991737340fea1811e67bc709f9a8b27ea3702d28",
     ".harness/features/feature.schema.json": "cb693eb11b330651c4dffce62806bca4c5a6b26206c39920efd00d98aeada2bb",
     ".harness/features/README.md": "b55e52ba2c3f0ca3a024cea243a56f87234449c4e21f087edd71999ff79f40b9",
     ".harness/specs/README.md": "049e2c1f8d81b17f15e20e178fead9d494fd31452a4570f615ade8e4fabaf6c1",

@@ -17,7 +17,7 @@
       "verification": [
         "npm test && node cli/bin/asdd.mjs kit guidance && cd tools/knowledge && pnpm test"
       ],
-      "evidence": "re-verified under microkernel-polish: npm test: 234 pass + asdd kit guidance PASS (v2.md:88 stale MCP row fixed to CLI names) + tools/knowledge pnpm test: 8 pass",
+      "evidence": "re-verified 2026-11-17 (platform-spec final regen)",
       "scope_paths": [
         "cli/skills/asdd-converge/SKILL.md",
         "cli/skills/asdd-implement/SKILL.md",
@@ -30,7 +30,7 @@
         "cli/versions.json",
         "tools/knowledge/test/knowledge.e2e-spec.ts"
       ],
-      "evidence_hash": "514abe0dff605ddc3cb44abf39bcc4bd242f46943440156ca9e0607f26eeba96"
+      "evidence_hash": "c6307a32ce403ebc8e95c63808b7d9becaf97d8b463fe1b6d21237096dda59f2"
     }
   ]
 }

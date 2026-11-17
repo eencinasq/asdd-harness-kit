@@ -1,0 +1,10 @@
+{
+  "name": "check-clean-install",
+  "setup": [
+    { "op": "install" },
+    { "op": "slice", "id": "demo" }
+  ],
+  "invoke": { "cmd": "check" },
+  "expect": { "exit": 0, "stdout_contains": ["PASS"] },
+  "normalize": ["paths"]
+}

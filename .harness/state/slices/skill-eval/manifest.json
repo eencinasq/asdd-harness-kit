@@ -12,8 +12,8 @@
   ],
   "escalation_required": false,
   "escalated_from_lite": true,
-  "created_at": "2026-11-18T03:22:19.568Z",
-  "updated_at": "2026-11-18T03:22:19.568Z",
+  "created_at": "2026-11-18T03:22:22.990Z",
+  "updated_at": "2026-11-18T03:22:22.990Z",
   "paths": {
     "specs": ".harness/specs/skill-eval",
     "tasks": ".harness/specs/skill-eval/tasks.md",

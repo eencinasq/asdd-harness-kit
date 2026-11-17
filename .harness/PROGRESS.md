@@ -42,7 +42,7 @@
 | modules-top-level | escalated | qa | ABANDONED | 0 |
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
 | platform-contract | full | knowledge | DONE | 0 |
-| platform-spec | full | discovery | in_progress | 0 |
+| platform-spec | full | qa | in_progress | 0 |
 | po-readonly-gate | escalated | knowledge | DONE | 0 |
 | pr-review-dashboard-ux | hotfix | knowledge | DONE | 0 |
 | pr-review-group-brief | hotfix | knowledge | DONE | 0 |

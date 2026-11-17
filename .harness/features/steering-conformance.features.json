@@ -73,7 +73,7 @@
         "TASK-001",
         "TASK-002"
       ],
-      "evidence": "generate-runtime-steering --check PASS; kit self --check PASS; regen --check all generators; v1.md Status=converged ratified 2026-11-17 in vault; 5 DRIFT-02 sibling features re-verified+re-stamped",
+      "evidence": "re-verified 2026-11-17 (platform-spec final regen)",
       "evidence_hash": "dd84a62f15c11d8ef05f3e807d37805dcc48df4d34fb06ab9bc5fa011fa4d7d3"
     }
   ]

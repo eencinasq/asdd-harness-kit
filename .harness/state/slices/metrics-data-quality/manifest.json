@@ -7,8 +7,8 @@
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
-  "created_at": "2026-11-18T03:22:19.555Z",
-  "updated_at": "2026-11-18T03:22:19.555Z",
+  "created_at": "2026-11-18T03:22:22.978Z",
+  "updated_at": "2026-11-18T03:22:22.978Z",
   "paths": {
     "specs": ".harness/specs/metrics-data-quality",
     "tasks": ".harness/specs/metrics-data-quality/tasks.md",

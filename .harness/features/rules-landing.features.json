@@ -31,7 +31,7 @@
         "cli/test/install.sh",
         "cli/versions.json"
       ],
-      "evidence_hash": "0410d9412f0d28a9cfaf010b37382729afbf9a98389b3fd233984ccb1b0ea2c2"
+      "evidence_hash": "62a749814ab9052c2fe8fd5df9fa2bc81dd11d07f6efb074f37e6c564ca7d546"
     },
     {
       "id": "TASK-002",
