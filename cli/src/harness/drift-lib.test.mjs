@@ -69,6 +69,19 @@ test('REQ-004 DRIFT-01: unmapped changed product file fails, mapped and exempt f
   }
 });
 
+test('drift01-harness-logs REQ-001 REQ-002 DRIFT-01: append-only harness logs are exempt, other docs are not', () => {
+  const root = fixture();
+  try {
+    write(root, 'docs/agent-failure-log.md', '- failure entry\n');
+    write(root, 'docs/dissent-log.md', '- dissent entry\n');
+    assert.deepEqual(checks(runDrift({ root }), 'DRIFT-01'), [], 'session-close logs are harness records (SP-006)');
+    write(root, 'docs/ROADMAP.md', 'unmapped product doc\n');
+    assert.deepEqual(checks(runDrift({ root }), 'DRIFT-01').map((f) => f.paths[0]), ['docs/ROADMAP.md']);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('REQ-004 (drift-consistency) DRIFT-01: a test file naming a REQ of the editing slice is mapped', () => {
   const root = fixture();
   try {

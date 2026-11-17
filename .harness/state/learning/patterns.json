@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T01:04:17.898Z",
+  "generated_at": "2026-11-17T01:07:06.611Z",
   "threshold": 3,
   "summary": {
     "patterns": 29,
@@ -131,7 +131,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 20
+          "quiet_sessions": 26
         }
       ]
     },
@@ -161,7 +161,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 20
+          "quiet_sessions": 26
         }
       ]
     },
@@ -171,7 +171,7 @@
       "kind": "escape",
       "occurrences": 4,
       "threshold": 3,
-      "status": "accepted",
+      "status": "applied",
       "reopened": false,
       "first_seen": "2026-10-28T13:22:35.735Z",
       "last_seen": "2026-11-17T00:28:33.442Z",
@@ -199,9 +199,11 @@
         {
           "id": "SP-006",
           "file": "docs/knowledge-base/steering-proposals/SP-006.md",
-          "declared": "accepted",
-          "status": "accepted",
-          "recurrences": 0
+          "declared": "applied",
+          "status": "applied",
+          "recurrences": 0,
+          "quiet_sessions": 0,
+          "area": "docs"
         }
       ]
     },

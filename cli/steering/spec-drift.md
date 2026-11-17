@@ -25,6 +25,7 @@ Checks `DRIFT-00`…`DRIFT-07` and their gates `QG-DRIFT-01`…`05` are defined 
 - No check definitions — `DRIFT-*`/`QG-DRIFT-*` semantics live in the gates file; this file is the author/review workflow around them.
 - No silencing shortcuts — mapping a file only to quiet `DRIFT-01` is a violation, not a fix.
 - Kit-refreshed files are never slice drift — `managed_files` in `installed-versions.json` is exempt.
+- The append-only harness logs `docs/agent-failure-log.md` and `docs/dissent-log.md` are never slice drift; any other file under `docs/` must be mapped.
 
 ## Engineers (author — invariants)
 
