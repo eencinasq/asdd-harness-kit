@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-learn-eval-gate-002",
+  "timestamp": "2026-11-16T20:43:32.104",
+  "agent": "devin",
+  "human": "squad",
+  "slice_id": "learn-eval-gate",
+  "event_type": "phase_completed",
+  "phase": "spec",
+  "mode": "lite",
+  "evidence": "Spec treated as final: human-authored spec.md with REQ-001..004 and Mapped line",
+  "concerns": []
+}

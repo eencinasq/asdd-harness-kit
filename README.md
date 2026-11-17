@@ -272,6 +272,7 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 | `asdd slice escalate <id> --reasons "<triggers>"` | Lite/hotfix → escalated |
 | `asdd converge [--strict] [--json]` | Cheap REQ / test-mention / evidence gate before `passing` |
 | `asdd converge-eval` | Score EARS/converge fixtures under `cli/eval/converge-ears/` |
+| `asdd skill-eval [--skill <name>] [--baseline <ref>]` | Score skill fixtures under `cli/eval/skills/`; `--baseline` diffs against a git ref and fails on regressions |
 | `asdd waves [--slice <id>]` | Parallelism hints from owners, deps, and scopes |
 | `asdd portfolio` | Read-only multi-repo summary (`.harness/config/portfolio.json`) |
 | `asdd tracker-sync [--apply]` | Plan bi-directional tracker sync from handoff + sessions (local receipt with `--apply`) |

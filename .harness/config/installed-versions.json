@@ -470,7 +470,7 @@
     ".harness/steering/knowledge.md": "0daca705ca1de08fde95d837c135a85b6c4dd32368be17d499102b355b18313c",
     ".harness/steering/manifest.md": "1803c46b995d5c67b4b5c0c8e8996494e4ab50619353fe77b83f5a20c04229c8",
     ".harness/steering/quality-gates.exec.md": "5659998fbe7d414977dac49c23296d6324f0b0d8682bd9d58d7453785c2b93dd",
-    ".harness/steering/quality-gates.learn.md": "88aa2bef5a285c731eaad010c3da823df5cab11ba7365291a782d82e09162fda",
+    ".harness/steering/quality-gates.learn.md": "530273eb913a39ad02f744a5b600e748f118668859855e0ee7177e645b7eec39",
     ".harness/steering/quality-gates.md": "86dee531cf11c1860c657c836e1d19262fee8b5aa80acd4779a094b7b317e639",
     ".harness/steering/quality-gates.phases.md": "3f45f863ebc7c25ff5847ec74f837cb51f7579d3c0135a37b4da99c90c455456",
     ".harness/steering/README.md": "a1ca5aa8b9a20ab594237185fdda9868a3626854f56980c698a9ce2ec7e5b328",
@@ -487,7 +487,7 @@
     ".harness/steering/templates/spec-coverage-report.md": "cff3fdf6bd23bca7c37a7986131ce9efa50e96fefee874070328e8e106afb8fb",
     ".harness/steering/templates/spec-peer-review.md": "689a863c1c13b710c0343b4ee8c8e25ee8aa9fc60f702a330becc2e307484399",
     ".harness/steering/templates/spec-validation-report.md": "1701e7efb6bba070c59daface458b629ed54e87972028976c9b5f876e4c996b3",
-    ".harness/steering/templates/steering-proposal.md": "7d7508392b93d0a3086a926c6470d01ac93e6104ba92dda5997fd2f63fc5efe7",
+    ".harness/steering/templates/steering-proposal.md": "3cdea3b0545301d9e5522893422e7165a65248a8309f681cae90b4e70caab426",
     ".harness/steering/templates/tasks.md": "98201becd9235e81a3fd78c7caa30d91dfa6276337fc763e68a73dcf098760e9",
     "AGENTS.md": "1adc08a9c3470cc63c1350687bd74c70f46069e05257517b9b1262f4dc337ff8"
   }

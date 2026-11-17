@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-learn-eval-gate-009",
+  "timestamp": "2026-11-16T20:50:16.362",
+  "agent": "devin",
+  "human": "squad",
+  "slice_id": "learn-eval-gate",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-003",
+  "evidence": "Docs task (no behavioral RED): eval field added to steering-proposal template, QG-LEARN-10 criterion added to quality-gates.learn.md.",
+  "scope_paths": [
+    "cli/steering/quality-gates.learn.md",
+    "cli/steering/templates/steering-proposal.md",
+    "cli/versions.json"
+  ],
+  "concerns": []
+}

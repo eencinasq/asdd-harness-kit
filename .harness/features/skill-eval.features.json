@@ -2,5 +2,85 @@
   "schema_version": "1.0",
   "slice_id": "skill-eval",
   "source_tasks": ".harness/specs/skill-eval/tasks.md",
-  "features": []
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "skill-eval lib: fixtures, probes, assertions",
+      "user_visible_behavior": "asdd skill-eval can discover and score deterministic fixtures under cli/eval/skills/<skill>/ and report a pass rate per skill.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/skill-eval-lib.test.mjs"
+      ],
+      "evidence": "RED recorded in sess-skill-eval-005 (module missing). GREEN: `node --test cli/src/harness/skill-eval-lib.test.mjs` → 12/12 pass (discovery, loadFixtures, readSkillBody, probes cwd work/repo, setup+file assertions, skill_contains/lacks, baseline improved/regressed/unchanged via git show, invalid JSON case, report format).",
+      "scope_paths": [
+        "cli/src/harness/skill-eval-lib.mjs",
+        "cli/src/harness/skill-eval-lib.test.mjs"
+      ],
+      "notes": "RED first: failing test recorded in feature_started session evidence.",
+      "evidence_hash": "6d64f870a1fd734e534489e28ffb9c8a624f21ed776afb103227b9fd2e9ddfbc"
+    },
+    {
+      "id": "TASK-002",
+      "title": "CLI entry, --baseline delta, registration",
+      "user_visible_behavior": "asdd skill-eval [--skill <name>] [--json] [--baseline <ref>] runs the fixtures, reports improved/regressed/unchanged vs a git ref, and exits non-zero naming regressed fixtures.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-001",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/src/harness/skill-eval-lib.test.mjs",
+        "node cli/bin/asdd.mjs skill-eval --json"
+      ],
+      "evidence": "RED recorded in sess-skill-eval-007 (unknown command). GREEN: `node cli/bin/asdd.mjs skill-eval --json` runs the suite (empty fixtures → ok:false, exit 1); `node cli/bin/asdd.mjs help` lists skill-eval; `node --test cli/src/harness/skill-eval-lib.test.mjs` → 12/12 incl. baseline deltas (REQ-003) and regressed-naming (REQ-004).",
+      "scope_paths": [
+        "cli/src/harness/skill-eval.mjs",
+        "cli/src/harness/skill-eval-lib.mjs",
+        "cli/src/harness/skill-eval-lib.test.mjs",
+        "cli/src/harness/commands.mjs",
+        "package.json"
+      ],
+      "notes": "RED first: failing test recorded in feature_started session evidence. Baseline reads skill body via git show <ref>:<path>, never checks out.",
+      "evidence_hash": "e81a328f9d3cf61f6332fdbd6840a1ab1bb5ed6960d89a366d214d48e64a5dd5"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Starter fixtures + README + versions",
+      "user_visible_behavior": "asdd skill-eval scores real fixtures for asdd-status, asdd-next and codegraph; README documents the command; cli/versions.json is regenerated.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs skill-eval --json",
+        "node cli/bin/asdd.mjs kit versions"
+      ],
+      "evidence": "Re-verified after scope fix: `node cli/bin/asdd.mjs skill-eval --json` → ok:true, 4/4 fixtures pass (asdd-status 2, asdd-next 1, codegraph 1); `--baseline 1b1fbae` all unchanged exit 0; `node cli/bin/asdd.mjs kit versions` runs clean (no shipped-artifact changes — cli/versions.json left untouched). README command row added.",
+      "scope_paths": [
+        "cli/eval/skills",
+        "README.md"
+      ],
+      "notes": "Fixtures must be deterministic (files, commands, exit codes); no live model or runtime adapter — STOP and report if one is needed (E1/E4). versions.json tracks only install-shipped artifacts; harness sources are not listed, so regen is a no-op here. cli/versions.json removed from scope: regen was a no-op for shipped artifacts and the file is timestamp-volatile.",
+      "evidence_hash": "b3d80bb80f5181f4bb272e915167f0092535d078e3c5b249d6aae69288d685aa"
+    }
+  ]
 }
