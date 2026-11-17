@@ -7,7 +7,7 @@ import { c, log, warn } from '../ui.mjs';
 import { RENDERERS, parseAgent } from './agent-frontmatter.mjs';
 import { isSymlink } from './context.mjs';
 import { list, RUNTIMES } from './options.mjs';
-import { asddCommand, KIT_BIN, LEGACY_PROJECT_BIN, observeCommand } from './phases.mjs';
+import { asddCommand, claudeHook, KIT_BIN, LEGACY_PROJECT_BIN, observeCommand } from './phases.mjs';
 
 /** Hook commands for this install target: the asdd resolver in a project, cli/ in the kit repo. */
 const hookCmds = (ctx) => {
@@ -163,7 +163,10 @@ function installCursorVerifyHook(ctx) {
 }
 
 function installClaudeHooks(ctx) {
-  const { verify, gate } = hookCmds(ctx);
+  // Claude Code hooks start at the project root (claude-hook-cwd): blocking hooks exit 2 when that fails, observe 0.
+  const verify = claudeHook(hookCmds(ctx).verify);
+  const gate = claudeHook(hookCmds(ctx).gate);
+  const observe = claudeHook(observeCommand(ctx, 'claude'), 0);
   const dest = join(ctx.target, '.claude/settings.json');
   if (ctx.dryRun) {
     log(`${c.dim('HOOK')}  ${dest} PreToolUse(Bash) → command-gate, Stop → verify-on-stop, PostToolUse(Read|Skill) → observe`);
@@ -177,10 +180,18 @@ function installClaudeHooks(ctx) {
     const preList = Array.isArray(data.hooks.PreToolUse) ? data.hooks.PreToolUse : [];
     const stopList = Array.isArray(data.hooks.Stop) ? data.hooks.Stop : [];
     for (const h of [...preList, ...stopList].flatMap((e) => e?.hooks ?? [])) {
+      // Already root-anchored: leave it (the upgrade regexes would match the asdd call inside and wrap it twice).
+      if (String(h?.command ?? '').startsWith('cd "${CLAUDE_PROJECT_DIR')) continue;
       const next = upgradeHookCommand(h?.command, verify, gate);
       if (next) {
         h.command = next;
         log(`MERGE ${dest} (${next})`);
+      }
+      // An unwrapped asdd gate/verify hook (earlier installs) takes the root-anchored command, once.
+      const target = isGateCmd(h?.command) ? gate : isVerifyCmd(h?.command) ? verify : null;
+      if (target && h.command !== target && !String(h.command).startsWith('cd "${CLAUDE_PROJECT_DIR')) {
+        h.command = target;
+        log(`MERGE ${dest} (${target})`);
       }
     }
     if (!preList.some((e) => (e?.hooks ?? []).some((h) => isGateCmd(h?.command)))) {
@@ -195,8 +206,14 @@ function installClaudeHooks(ctx) {
     }
     // The guidance load hook (telemetry): fail-open, no failClosed (REQ-018). Cursor gets none (D-3, hookless).
     const postList = Array.isArray(data.hooks.PostToolUse) ? data.hooks.PostToolUse : [];
+    for (const h of postList.flatMap((e) => e?.hooks ?? [])) {
+      if (isObserveCmd(h?.command) && h.command !== observe && !String(h.command).startsWith('cd "${CLAUDE_PROJECT_DIR')) {
+        h.command = observe;
+        log(`MERGE ${dest} (${observe})`);
+      }
+    }
     if (!postList.some((e) => (e?.hooks ?? []).some((h) => isObserveCmd(h?.command)))) {
-      postList.push({ matcher: 'Read|Skill', hooks: [{ type: 'command', command: observeCommand(ctx, 'claude'), timeout: 10 }] });
+      postList.push({ matcher: 'Read|Skill', hooks: [{ type: 'command', command: observe, timeout: 10 }] });
       data.hooks.PostToolUse = postList;
       log(`MERGE ${dest} (PostToolUse/Read|Skill → observe)`);
     }

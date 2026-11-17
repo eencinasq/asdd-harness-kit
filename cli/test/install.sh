@@ -7,7 +7,9 @@ asdd() { node "$ROOT/cli/bin/asdd.mjs" "$@"; }
 export EXPECT_GATE="$(node --input-type=module -e "import { projectAsdd } from '$ROOT/cli/src/install/phases.mjs'; process.stdout.write(projectAsdd('gate'))")"
 export EXPECT_VERIFY="$(node --input-type=module -e "import { projectAsdd } from '$ROOT/cli/src/install/phases.mjs'; process.stdout.write(projectAsdd('verify'))")"
 # telemetry-emitters REQ-025 (design §12.2): the Claude load hook is fail-open; it never exits 2 like the gate resolver.
-export EXPECT_OBSERVE_CLAUDE='b=node_modules/.bin/asdd; [ -x "$b" ] || b=asdd; command -v "$b" >/dev/null 2>&1 && "$b" observe claude >/dev/null 2>&1; exit 0'
+export EXPECT_CLAUDE_GATE="$(node --input-type=module -e "import { claudeHook, projectAsdd } from '$ROOT/cli/src/install/phases.mjs'; process.stdout.write(claudeHook(projectAsdd('gate')))")"
+export EXPECT_CLAUDE_VERIFY="$(node --input-type=module -e "import { claudeHook, projectAsdd } from '$ROOT/cli/src/install/phases.mjs'; process.stdout.write(claudeHook(projectAsdd('verify')))")"
+export EXPECT_OBSERVE_CLAUDE="$(node --input-type=module -e "import { claudeHook, observeCommand } from '$ROOT/cli/src/install/phases.mjs'; process.stdout.write(claudeHook(observeCommand({ self: false }, 'claude'), 0))")"
 TEL_IGNORES=(.harness/state/telemetry/spans.jsonl .harness/state/telemetry/slices/)
 # REQ-025: each telemetry gitignore line is in the project's .gitignore exactly once.
 assert_tel_ignores_once() {
@@ -495,9 +497,9 @@ node -e '
   const [cursorPath, claudePath] = process.argv.slice(1);
   const cursor = JSON.parse(fs.readFileSync(cursorPath, "utf8")).hooks.beforeShellExecution.map((e) => e.command);
   const claude = JSON.parse(fs.readFileSync(claudePath, "utf8")).hooks.PreToolUse.flatMap((e) => e.hooks.map((h) => h.command));
-  for (const [name, cmds] of [["cursor", cursor], ["claude", claude]]) {
-    const gates = cmds.filter((c) => c.includes(".harness/scripts/") || c.includes("asdd.mjs gate") || c === process.env.EXPECT_GATE);
-    if (gates.length !== 1 || gates[0] !== process.env.EXPECT_GATE)
+  for (const [name, cmds, want] of [["cursor", cursor, process.env.EXPECT_GATE], ["claude", claude, process.env.EXPECT_CLAUDE_GATE]]) {
+    const gates = cmds.filter((c) => c.includes(".harness/scripts/") || c.includes("asdd.mjs gate") || / gate$/.test(c));
+    if (gates.length !== 1 || gates[0] !== want)
       throw new Error(`${name}: expected one gate entry calling command-gate.mjs, got ${JSON.stringify(cmds)}`);
   }
   if (!cursor.includes("node tools/jev-command-gate.mjs --mine")) throw new Error("a project-owned hook with a similar name was rewritten");
@@ -540,9 +542,19 @@ for rt in cursor claude opencode kimi junie devin kiro; do
       validate_runtime_mcp "$RTMP/$rt-app" "$rt" ".mcp.json"
       test -f "$RTMP/$rt-app/CLAUDE.md"
       test -f "$RTMP/$rt-app/.claude/settings.json"
-      hook_has "$RTMP/$rt-app/.claude/settings.json" "$EXPECT_GATE"
-      hook_has "$RTMP/$rt-app/.claude/settings.json" "$EXPECT_VERIFY"
+      hook_has "$RTMP/$rt-app/.claude/settings.json" "$EXPECT_CLAUDE_GATE"
+      hook_has "$RTMP/$rt-app/.claude/settings.json" "$EXPECT_CLAUDE_VERIFY"
       assert_claude_observe "$RTMP/$rt-app/.claude/settings.json"
+      # claude-hook-cwd REQ-002: a second install leaves the root-anchored hooks unchanged (no double wrap)
+      cp "$RTMP/$rt-app/.claude/settings.json" "$RTMP/$rt-app/settings.before.json"
+      (cd "$RTMP/$rt-app" && env PATH="$GBIN:$NODE_DIR:/usr/bin:/bin" node "$ROOT/cli/bin/asdd.mjs" install . --runtime=claude --no-interactive >/dev/null 2>&1)
+      cmp -s "$RTMP/$rt-app/settings.before.json" "$RTMP/$rt-app/.claude/settings.json" || { echo "second install changed the claude hooks" >&2; diff "$RTMP/$rt-app/settings.before.json" "$RTMP/$rt-app/.claude/settings.json" >&2; exit 1; }
+      rm "$RTMP/$rt-app/settings.before.json"
+      # claude-hook-cwd REQ-003: a hook run from a subfolder runs asdd at the project root (CLAUDE_PROJECT_DIR)
+      mkdir -p "$RTMP/$rt-app/sub/dir"
+      node -e 'const s=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));const cmds=Object.values(s.hooks).flat().flatMap((e)=>e.hooks).map((h)=>h.command);for (const v of ["gate","verify","observe"]){const c=cmds.find((x)=>new RegExp(` ${v}\\b`).test(x));if(!c||!c.startsWith("cd \"${CLAUDE_PROJECT_DIR:-.}\" || exit ")) throw new Error(`claude ${v} hook does not start at the project root: ${c}`)}' "$RTMP/$rt-app/.claude/settings.json"
+      SUB_GATE="$(node -e 'const s=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));process.stdout.write(s.hooks.PreToolUse.flatMap((e)=>e.hooks).find((h)=>/ gate\b/.test(h.command)).command)' "$RTMP/$rt-app/.claude/settings.json")"
+      echo '{"hook_event_name":"PreToolUse","tool_input":{"command":"git status"}}' | (cd "$RTMP/$rt-app/sub/dir" && env CLAUDE_PROJECT_DIR="$RTMP/$rt-app" PATH="$GBIN:$NODE_DIR:/usr/bin:/bin" sh -c "$SUB_GATE") | grep -q '"permissionDecision":"allow"' || { echo "claude gate hook failed from a subfolder" >&2; exit 1; }
       # REQ-025 / NFR-003: asdd unresolvable → the load hook exits 0 and prints nothing (exit 2 would reach the model)
       set +e; OBS_OUT="$(cd "$RTMP/$rt-app" && echo '{}' | env PATH="$NODE_DIR:/usr/bin:/bin" sh -c "$EXPECT_OBSERVE_CLAUDE" 2>&1)"; OBS_CODE=$?; set -e
       [[ "$OBS_CODE" == 0 && -z "$OBS_OUT" ]] || { echo "observe hook without asdd: exit $OBS_CODE, output: $OBS_OUT" >&2; exit 1; }
