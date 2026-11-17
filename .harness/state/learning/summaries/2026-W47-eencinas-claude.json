@@ -10,6 +10,11 @@
           "at": "2026-11-17T00:33:46.710Z",
           "slice_id": null,
           "last_at": "2026-11-17T01:10:57.863Z"
+        },
+        {
+          "at": "2026-11-17T01:52:06.060Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T01:52:08.874Z"
         }
       ],
       "examples": [
@@ -23,6 +28,11 @@
           "at": "2026-11-17T00:33:46.710Z",
           "slice_id": null,
           "last_at": "2026-11-17T01:10:57.863Z"
+        },
+        {
+          "at": "2026-11-17T01:52:06.060Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T01:52:08.874Z"
         }
       ],
       "examples": [
@@ -36,10 +46,28 @@
           "at": "2026-11-17T00:33:46.710Z",
           "slice_id": "sensor-fixes",
           "last_at": "2026-11-17T01:10:57.863Z"
+        },
+        {
+          "at": "2026-11-17T01:52:06.060Z",
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-17T01:52:08.874Z"
         }
       ],
       "examples": [
         "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ]
+    },
+    "warn:CONVERGE-02": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T01:52:06.060Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T01:52:08.874Z"
+        }
+      ],
+      "examples": [
+        "CONVERGE-02 feature TASK-001 lists REQ-016 but no test file mentions it"
       ]
     }
   }

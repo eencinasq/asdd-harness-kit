@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-015",
+  "timestamp": "2026-11-17T01:52:57.377Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/test/fixtures/telemetry/claude/",
+    "cli/test/fixtures/telemetry/README.md"
+  ],
+  "evidence": "Verification: provenance/parse node check OK on 7 fixtures (method live-capture, Claude Code 2.1.283); no absolute repo path in cli/test/fixtures/telemetry/claude/ (grep empty). check --live exit 0 (HARNESS_DRIFT_BASE=chore/p5-roadmap-runtimes-bindings); npm test exit 0 (fail 0). Findings: A-01 confirmed (Read tool_input.file_path absolute; Skill tool_input.skill bare or plugin:name; sub-agent payloads add agent_id+agent_type, main-session omit them). OI-6: exit 1 and timeout invisible to model; exit 2 stderr reaches the model -> observe must never exit 2."
+}

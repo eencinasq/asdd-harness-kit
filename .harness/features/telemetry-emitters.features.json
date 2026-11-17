@@ -7,7 +7,7 @@
       "id": "TASK-001",
       "title": "Capture Claude Code PostToolUse hook payload fixtures with provenance",
       "user_visible_behavior": "Committed Claude Code PostToolUse fixtures (Read/Skill cases) each carry a complete provenance object with method live-capture and no absolute repo path; the README records redaction and the hook exit/timeout reaction.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 1,
       "area": "telemetry-emitters",
       "owner": "claude",
@@ -26,7 +26,9 @@
         "node -e \"const fs=require('fs'),p='cli/test/fixtures/telemetry/claude/';const fx=fs.readdirSync(p).filter(f=>f.endsWith('.json'));if(!fx.length)process.exit(1);for(const f of fx){const j=JSON.parse(fs.readFileSync(p+f,'utf8'));for(const k of ['runtime','runtime_version','captured_at','captured_by','method'])if(!j.provenance||!j.provenance[k])throw new Error(f+' '+k);if(!j.payload)throw new Error(f)}\"",
         "! grep -rn \"$(pwd)\" cli/test/fixtures/telemetry/claude/"
       ],
-      "notes": "Wave 0 (T0). Live capture in the running Claude Code session; capture hook never committed. Data task, no RED."
+      "notes": "Wave 0 (T0). Live capture in the running Claude Code session; capture hook never committed. Data task, no RED.",
+      "evidence": "Verification: provenance/parse node check OK on 7 fixtures (method live-capture, Claude Code 2.1.283); no absolute repo path in cli/test/fixtures/telemetry/claude/ (grep empty). check --live exit 0 (HARNESS_DRIFT_BASE=chore/p5-roadmap-runtimes-bindings); npm test exit 0 (fail 0). Findings: A-01 confirmed (Read tool_input.file_path absolute; Skill tool_input.skill bare or plugin:name; sub-agent payloads add agent_id+agent_type, main-session omit them). OI-6: exit 1 and timeout invisible to model; exit 2 stderr reaches the model -> observe must never exit 2.",
+      "evidence_hash": "a0417da32b071a7ede509111ae64b66de533e261de2500826b9d82a8d734f07d"
     },
     {
       "id": "TASK-002",
