@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-amend-close-001",
+  "timestamp": "2026-11-17T15:41:23.821Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "amend-close",
+  "event_type": "phase_started",
+  "phase": "implementation",
+  "mode": "hotfix",
+  "evidence": "Hotfix slice initialized (feature + evidence path; no Discovery theatre)",
+  "concerns": []
+}

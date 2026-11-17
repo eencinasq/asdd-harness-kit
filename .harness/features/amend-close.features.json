@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "amend-close",
+  "source_tasks": ".harness/specs/amend-close/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Amended slices close when knowledge completes again",
+      "user_visible_behavior": "After asdd slice amend, completing knowledge again returns the slice to DONE without a manual checkpoint.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/amend-slice.test.mjs cli/src/harness/sync-state.test.mjs",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-17 (09f8ec1): amend-slice + sync-state tests 26/26 incl. 'amend-close REQ-001 REQ-002'; kit vendor --check OK; no existing slice changed status on sync; npm test 427/427.",
+      "scope_paths": [
+        "cli/src/harness/sync-state.mjs",
+        "cli/src/harness/amend-slice.test.mjs"
+      ],
+      "evidence_hash": "f2d0b74b0365d1c195c172a65cf5e0b4a999cfdce39ef71ed71e53f81b429a45"
+    }
+  ]
+}
