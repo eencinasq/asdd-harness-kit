@@ -120,7 +120,7 @@ export function validateIntentItem(parsed) {
   const headings = new Set(parsed.sections.map((s) => s.heading));
   for (const h of REQUIRED_HEADINGS) if (!headings.has(h)) errors.push(`missing heading: ## ${h}`);
   const fitness = parsed.sections.find((s) => s.heading === 'Intent fitness');
-  if (fitness && !/^\s*-\s*\**status\**\s*:\s*`?fit`?\s*$/m.test(fitness.body)) {
+  if (fitness && !/^\s*-\s*(?:\*\*status:\*\*|\*\*status\*\*\s*:|status\s*:)\s*`?fit`?\s*$/m.test(fitness.body)) {
     errors.push('## Intent fitness: status must be fit');
   }
   if (headings.has('Grounding')) errors.push(...groundingErrors(parsed.grounding, parsed.groundingHeader));

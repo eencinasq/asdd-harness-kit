@@ -264,3 +264,12 @@ test('intent-intake REQ-004 the validator reports stale grounding: WARN by defau
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('intake-fitness-format REQ-001 the template fitness bullet (**status:** fit) is accepted; other values are not', () => {
+  for (const line of ['- **status:** fit', '- **status**: fit', '- status: fit']) {
+    const text = item().replace(/^- status: fit$/m, line);
+    assert.deepEqual(validateIntentItem(parseIntentItem(text)).errors, [], line);
+  }
+  const unfit = item().replace(/^- status: fit$/m, '- **status:** unfit');
+  assert.ok(validateIntentItem(parseIntentItem(unfit)).errors.includes('## Intent fitness: status must be fit'));
+});
