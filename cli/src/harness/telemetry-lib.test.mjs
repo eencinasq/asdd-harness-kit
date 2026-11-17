@@ -993,3 +993,18 @@ test('REQ-006 attribute, guidanceTarget and skillTarget change no state (hash ch
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+// ── TASK-009 (REQ-011): runtime template ────────────────────────────────────────────────────────────────────────
+
+test('REQ-011 runtime template: guidance loads with the read or skill tool; no span instruction', () => {
+  const template = readFileSync(join(HERE, '../../agents/_runtime-template.md'), 'utf8');
+  const flat = template.replace(/\s+/g, ' ');
+  assert.match(
+    flat,
+    /Load steering files and skill bodies with the runtime's file-read or skill tool, never with a shell command \(`cat`, `sed`, `head`\)\./,
+  );
+  // No span write path of any kind: no span, turn span, or subagent span instruction, no derivation from sessions.
+  assert.doesNotMatch(flat, /\bspans?\b/i);
+  assert.doesNotMatch(flat, /spans\.jsonl|telemetry\//i);
+  assert.doesNotMatch(flat, /\bturn[- ]span|\bsubagent[- ]span/i);
+});
