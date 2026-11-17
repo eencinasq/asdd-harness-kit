@@ -20,8 +20,10 @@
 | drift01-harness-logs | hotfix | knowledge | DONE | 0 |
 | drift02-open-slices | hotfix | knowledge | DONE | 0 |
 | egm-shaping | full | knowledge | DONE | 0 |
+| grounded-shaping | lite | discovery | in_progress | 0 |
 | guidance-proposal-skip | hotfix | knowledge | DONE | 0 |
 | harness-green | escalated | knowledge | DONE | 0 |
+| intent-intake | lite | discovery | in_progress | 0 |
 | jev-gate-nest | escalated | implementation | ABANDONED | 0 |
 | jev-module | full | knowledge | DONE | 0 |
 | kit-hygiene | full | knowledge | DONE | 0 |
@@ -36,6 +38,8 @@
 | rule-coverage | full | knowledge | DONE | 0 |
 | rules-landing | lite | knowledge | DONE | 0 |
 | sensor-fixes | escalated | knowledge | DONE | 0 |
+| shaping-agent | lite | discovery | in_progress | 0 |
+| shaping-cloud-setup | lite | discovery | in_progress | 0 |
 | skill-eval | escalated | knowledge | DONE | 0 |
 | skills-bloom | lite | knowledge | DONE | 0 |
 | skills-spec | escalated | knowledge | DONE | 0 |
@@ -48,6 +52,7 @@
 | spec-drift-roadmap | lite | knowledge | DONE | 0 |
 | telemetry-contract | lite | knowledge | DONE | 0 |
 | telemetry-emitters | full | discovery | in_progress | 0 |
+| tracker-binding | lite | discovery | in_progress | 0 |
 | ui-assets-dist | hotfix | knowledge | DONE | 0 |
 | ui-drift-dead-link | hotfix | knowledge | DONE | 0 |
 | ui-gate-decisions | escalated | knowledge | DONE | 0 |

@@ -386,6 +386,46 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/ui-drift-dead-link/manifest.json",
       "features": ".harness/features/ui-drift-dead-link.features.json"
+    },
+    {
+      "slice_id": "tracker-binding",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/tracker-binding/manifest.json",
+      "features": ".harness/features/tracker-binding.features.json"
+    },
+    {
+      "slice_id": "shaping-agent",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/shaping-agent/manifest.json",
+      "features": ".harness/features/shaping-agent.features.json"
+    },
+    {
+      "slice_id": "grounded-shaping",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/grounded-shaping/manifest.json",
+      "features": ".harness/features/grounded-shaping.features.json"
+    },
+    {
+      "slice_id": "intent-intake",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/intent-intake/manifest.json",
+      "features": ".harness/features/intent-intake.features.json"
+    },
+    {
+      "slice_id": "shaping-cloud-setup",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/shaping-cloud-setup/manifest.json",
+      "features": ".harness/features/shaping-cloud-setup.features.json"
     }
   ]
 }

@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-14T01:16:15.939Z",
-  "updated_at": "2026-11-17T02:06:50.694Z",
+  "updated_at": "2026-11-17T03:03:08.081Z",
   "paths": {
     "specs": ".harness/specs/spec-drift-demand",
     "tasks": ".harness/specs/spec-drift-demand/tasks.md",
