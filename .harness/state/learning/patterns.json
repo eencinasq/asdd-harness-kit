@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T12:05:20.999Z",
+  "generated_at": "2026-11-17T12:06:52.206Z",
   "threshold": 3,
   "summary": {
     "patterns": 30,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 35,
+      "occurrences": 36,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -57,6 +57,7 @@
         "spec-drift-depth",
         "spec-drift-empty",
         "spec-drift-merge",
+        "tracker-binding",
         "ui-gate-decisions",
         "unified-versioning"
       ],
@@ -134,7 +135,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 89
+          "quiet_sessions": 102
         }
       ]
     },
@@ -205,7 +206,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 89
+          "quiet_sessions": 102
         }
       ]
     },
@@ -218,7 +219,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T12:03:17.315Z",
+      "last_seen": "2026-11-17T12:03:31.077Z",
       "sources": [
         "warn"
       ],
@@ -237,7 +238,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T12:03:17.315Z",
+      "last_seen": "2026-11-17T12:03:31.077Z",
       "sources": [
         "warn"
       ],
@@ -292,6 +293,25 @@
       "examples": [
         "Validation Gate BLOCK (QG-VAL-01): VAL-001 on MUST REQ-005 - upgrade detection enables Jev on every existing project with no way off. Validation confidence 0.78.",
         "Validation Gate BLOCK (QG-VAL-01): VAL-001 BLOCKING on MUST REQ-008 - upgrade behavior for existing hook configs undefined; installer substring match would keep the old path forever. Validation confidence 0.80. Report: .harness/specs/kit-hygiene/spec-validation-report.md"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-75f21e68",
+      "signature": "command:git reset --hard",
+      "kind": "escape",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T12:00:59.033Z",
+      "last_seen": "2026-11-17T12:01:00.999Z",
+      "sources": [
+        "command"
+      ],
+      "slices": [],
+      "examples": [
+        "denied: git reset --hard"
       ],
       "proposals": []
     },
@@ -394,7 +414,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T12:03:17.315Z",
+      "last_seen": "2026-11-17T12:03:31.077Z",
       "sources": [
         "warn"
       ],
@@ -443,25 +463,6 @@
       ],
       "examples": [
         "Code @6b7cc07; verification needs TASK-004 (jev.md auto)."
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-75f21e68",
-      "signature": "command:git reset --hard",
-      "kind": "escape",
-      "occurrences": 1,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-11-17T12:00:59.033Z",
-      "last_seen": "2026-11-17T12:00:59.033Z",
-      "sources": [
-        "command"
-      ],
-      "slices": [],
-      "examples": [
-        "denied: git reset --hard"
       ],
       "proposals": []
     },

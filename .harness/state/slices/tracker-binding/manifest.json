@@ -1,20 +1,82 @@
 {
   "schema_version": "3.0",
   "slice_id": "tracker-binding",
-  "phase": "discovery",
-  "status": "in_progress",
-  "mode": "lite",
-  "escalation_signals": [],
+  "phase": "knowledge",
+  "status": "DONE",
+  "mode": "escalated",
+  "escalation_signals": [
+    {
+      "type": "E1-scope-spread",
+      "evidence": "scope touches 2 top-level modules: cli, package.json"
+    }
+  ],
   "escalation_required": false,
-  "escalated_from_lite": false,
+  "escalated_from_lite": true,
   "created_at": "2026-11-17T03:02:29.808Z",
-  "updated_at": "2026-11-17T12:05:20.917Z",
+  "updated_at": "2026-11-17T12:06:52.155Z",
   "paths": {
     "specs": ".harness/specs/tracker-binding",
     "tasks": ".harness/specs/tracker-binding/tasks.md",
     "features": ".harness/features/tracker-binding.features.json"
   },
-  "gates": {},
+  "gates": {
+    "spec": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T12:02:22.000Z",
+      "evidence": "spec.md: REQ-001…003; Mapped line extended with tracker-config.mjs, its test, package.json test entry and the config README copy.",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T12:02:22.000Z",
+      "evidence": "design.md: tracker block shape and per-type required fields; Intent format summary; no domain terms; no ADRs.",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T12:02:22.000Z",
+      "evidence": "tasks.md + features.json: TASK-001 → REQ-001; TASK-002 → REQ-002, REQ-003.",
+      "concerns": []
+    },
+    "validation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T12:05:47.000Z",
+      "evidence": "Self-review after E1 escalation: REQ-001…003 trace to the spec intent; each is pinned by tracker-config.test.mjs or a TASK-002 verification command.",
+      "concerns": []
+    },
+    "domain": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T12:05:47.000Z",
+      "evidence": "No new domain terms (tracker, pitch, Intent, grounding already used by the shaping skills and the P6 roadmap).",
+      "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T12:05:47.000Z",
+      "evidence": "TASK-001 and TASK-002 passing.",
+      "concerns": []
+    },
+    "qa": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T12:05:47.000Z",
+      "evidence": "tracker-config.test.mjs 5/5; npm test 229/229; check --live exit 0 (HARNESS_DRIFT_BASE=b726956).",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T12:05:47.000Z",
+      "evidence": "Lesson: references inside a skill must not use repo-relative links that break once the skill is installed under .agents/skills/; cite the installed path as text.",
+      "concerns": []
+    }
+  },
   "active_features": [],
   "open_dissents": 0,
   "source": null,
@@ -26,10 +88,116 @@
       "event": "phase_started",
       "phase": "discovery",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:02:22.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:02:22.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:02:22.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:02:47.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T12:03:42.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T12:03:42.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-17T12:05:33.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-17T12:05:47.165Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": null,
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:05:47.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "validation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:05:47.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "domain",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:05:47.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:05:47.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:05:47.000Z",
+      "agent": "claude-p61",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
     }
   ],
   "contributors": [
     "squad",
-    "human"
+    "human",
+    "eencinas",
+    "claude-p61"
   ]
 }
