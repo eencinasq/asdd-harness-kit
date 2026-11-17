@@ -94,7 +94,7 @@
       "id": "TASK-004",
       "title": "Static baseline analyze_security",
       "user_visible_behavior": "analyze_security runs the repo security set or the built-in starter pack (Semgrep), no model.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 4,
       "owner": "claude-sec",
       "req_ids": [
@@ -107,7 +107,7 @@
         "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test",
         "semgrep --test tools/spec-drift/src/security/semgrep"
       ],
-      "evidence": "",
+      "evidence": "GREEN: semgrep --test src/security/semgrep 10/10; builtin-pack.spec.ts 2/2 (repo security set wins, Semgrep falls back to builtin-security, CodeQL gets none → no-rules); ScanMode 'security', analyze_security tool, analysis_start mapping; typecheck OK, lint exit 0, pnpm test 238/238. End-to-end scan covered in test/security.e2e-spec.ts (TASK-003).",
       "scope_paths": [
         "tools/spec-drift/src/security/builtin-pack.ts",
         "tools/spec-drift/src/security/builtin-pack.spec.ts",

@@ -14,9 +14,9 @@ const RepoRelativePath = z
 
 export const AnalyzeInputSchema = z.object({
 	mode: z
-		.enum(['architecture', 'standards', 'all', 'spec-drift'])
+		.enum(['architecture', 'standards', 'security', 'all', 'spec-drift'])
 		.default('spec-drift')
-		.describe('Which rule set to run: architecture, standards, or every pack (all / spec-drift)'),
+		.describe('Which rule set to run: architecture, standards, security, or every pack (all / spec-drift)'),
 	packs: z
 		.array(z.string().regex(PACK_ID_PATTERN, 'pack ids use letters, digits, dots, dashes or underscores'))
 		.optional()
@@ -26,7 +26,7 @@ export const AnalyzeInputSchema = z.object({
 });
 
 /** Same as AnalyzeInputSchema, with `mode` pinned to one value. */
-export const scopedAnalyzeSchema = <M extends 'architecture' | 'standards'>(mode: M) =>
+export const scopedAnalyzeSchema = <M extends 'architecture' | 'standards' | 'security'>(mode: M) =>
 	AnalyzeInputSchema.omit({ mode: true }).extend({ mode: z.literal(mode).default(mode) });
 
 export const EmptyInputSchema = z.object({});

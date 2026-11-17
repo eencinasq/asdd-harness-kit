@@ -1,0 +1,64 @@
+# Built-in starter security pack for analyze_security (security-review REQ-006), Python. Test file: python.py.
+rules:
+  - id: security.py.shell-injection
+    languages: [python]
+    severity: ERROR
+    message: >-
+      A subprocess runs through the shell. With any untrusted part in the command it runs arbitrary commands. Pass an
+      argument list and keep shell=False.
+    metadata:
+      category: security
+      cwe: 'CWE-78: OS Command Injection'
+      checklist: web-protocol-and-auth
+    pattern-either:
+      - pattern: subprocess.$F(..., shell=True, ...)
+      - pattern: os.system($X)
+
+  - id: security.py.unsafe-deserialization
+    languages: [python]
+    severity: ERROR
+    message: >-
+      pickle and yaml.load without a safe loader execute code embedded in the data. Never load untrusted bytes with
+      them; use json or yaml.safe_load.
+    metadata:
+      category: security
+      cwe: 'CWE-502: Deserialization of Untrusted Data'
+      checklist: attack-classes
+    patterns:
+      - pattern-either:
+          - pattern: pickle.loads(...)
+          - pattern: pickle.load(...)
+          - pattern: yaml.load(...)
+      - pattern-not: yaml.load(..., Loader=yaml.SafeLoader, ...)
+      - pattern-not: yaml.load(..., Loader=yaml.CSafeLoader, ...)
+
+  - id: security.py.code-injection
+    languages: [python]
+    severity: ERROR
+    message: >-
+      eval / exec run a non-literal value. Untrusted input reaching it executes as code.
+    metadata:
+      category: security
+      cwe: 'CWE-95: Eval Injection'
+      checklist: attack-classes
+    patterns:
+      - pattern-either:
+          - pattern: eval($X)
+          - pattern: exec($X)
+      - pattern-not: eval("...")
+      - pattern-not: exec("...")
+
+  - id: security.py.sql-injection
+    languages: [python]
+    severity: ERROR
+    message: >-
+      A SQL statement is built with string formatting. Use query parameters so request data cannot change the query.
+    metadata:
+      category: security
+      cwe: 'CWE-89: SQL Injection'
+      checklist: data-isolation-and-lifecycle
+    pattern-either:
+      - pattern: $CUR.execute(f"...", ...)
+      - pattern: $CUR.execute("..." % $X, ...)
+      - pattern: $CUR.execute("..." + $X, ...)
+      - pattern: $CUR.execute("...".format(...), ...)
