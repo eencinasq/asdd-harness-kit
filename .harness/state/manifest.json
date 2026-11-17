@@ -522,6 +522,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/ui-insights-host-guard/manifest.json",
       "features": ".harness/features/ui-insights-host-guard.features.json"
+    },
+    {
+      "slice_id": "ci-npm-ci",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/ci-npm-ci/manifest.json",
+      "features": ".harness/features/ci-npm-ci.features.json"
     }
   ]
 }

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ci-npm-ci",
+  "concerns": [],
+  "timestamp": "2026-11-17T22:14:26.000Z",
+  "session_id": "sess-ci-npm-ci-006",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: never discard the output of a step a test depends on; CI was red on main for several merges unnoticed."
+}

@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T22:08:44.487Z",
+  "generated_at": "2026-11-17T22:14:39.519Z",
   "threshold": 3,
   "summary": {
-    "patterns": 45,
+    "patterns": 46,
     "open": 4,
     "in_flight": 2,
     "verified": 1,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 45,
+      "occurrences": 46,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -33,6 +33,7 @@
         "asdd-p3",
         "asdd-p4",
         "asdd-ui",
+        "ci-npm-ci",
         "claude-hook-cwd",
         "cli-harness",
         "cost-metrics",
@@ -268,7 +269,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 366
+          "quiet_sessions": 374
         }
       ]
     },
@@ -973,6 +974,27 @@
       ],
       "examples": [
         "DRIFT-01 README.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-936370d8",
+      "signature": "sensor:hotfix slice \"*\" cannot complete with open escalation signals (EN-scope-spread) ",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T22:14:27.580Z",
+      "last_seen": "2026-11-17T22:14:27.580Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "ci-npm-ci"
+      ],
+      "examples": [
+        "hotfix slice \"ci-npm-ci\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate ci-npm-ci --reasons \"E1-scope-spread\""
       ],
       "proposals": []
     },

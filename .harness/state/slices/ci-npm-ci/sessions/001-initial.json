@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ci-npm-ci-001",
+  "timestamp": "2026-11-17T22:13:43.047Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "ci-npm-ci",
+  "event_type": "phase_started",
+  "phase": "implementation",
+  "mode": "hotfix",
+  "evidence": "Hotfix slice initialized (feature + evidence path; no Discovery theatre)",
+  "concerns": []
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "ci-npm-ci",
+  "source_tasks": ".harness/specs/ci-npm-ci/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Install root deps in CI; surface pack errors",
+      "user_visible_behavior": "The invariants CI job passes; a failed npm pack in install.sh names the step.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "grep -q 'run: npm ci' .github/workflows/harness-invariants.yml",
+        "bash cli/test/install.sh"
+      ],
+      "evidence": "GREEN 2026-11-17 (ac4fe73): clean checkout without node_modules → install.sh fails with 'npm pack failed … Cannot find package esbuild'; after npm ci → 'OK asdd install smoke test'. Workflow runs npm ci before the tests.",
+      "scope_paths": [
+        ".github/workflows/harness-invariants.yml",
+        "cli/test/install.sh"
+      ],
+      "evidence_hash": "ae5e53285edc95f8e1c00fee90e8c013ecbabf13bdf373d925147c67bc303abb"
+    }
+  ]
+}
