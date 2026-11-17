@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T17:42:49.866Z",
+  "generated_at": "2026-11-17T17:44:34.470Z",
   "threshold": 3,
   "summary": {
-    "patterns": 40,
+    "patterns": 42,
     "open": 4,
     "in_flight": 2,
     "verified": 1,
@@ -87,18 +87,19 @@
       "id": "LP-06528643",
       "signature": "sensor:DRIFT-01:docs",
       "kind": "escape",
-      "occurrences": 11,
+      "occurrences": 12,
       "threshold": 3,
       "status": "rejected",
       "reopened": false,
       "first_seen": "2026-10-28T13:22:35.735Z",
-      "last_seen": "2026-11-17T14:37:29.433Z",
+      "last_seen": "2026-11-17T17:43:19.057Z",
       "sources": [
         "sensor"
       ],
       "slices": [
         "asdd-ui",
         "jev-module",
+        "security-recon-untracked",
         "skill-eval",
         "telemetry-emitters",
         "ui-gate-decisions"
@@ -121,7 +122,40 @@
           "file": "docs/knowledge-base/steering-proposals/SP-006.md",
           "declared": "applied",
           "status": "ineffective",
-          "recurrences": 7
+          "recurrences": 8
+        }
+      ]
+    },
+    {
+      "id": "LP-2a52ea2c",
+      "signature": "sensor:DRIFT-01:cli",
+      "kind": "escape",
+      "occurrences": 8,
+      "threshold": 3,
+      "status": "rejected",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:26:22.507Z",
+      "last_seen": "2026-11-17T17:43:19.057Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "security-recon-untracked",
+        "skill-eval",
+        "telemetry-emitters"
+      ],
+      "examples": [
+        "DRIFT-01 cli/eval/skills/asdd-next/next-selects-ready-feature.json changed but is not mapped by telemetry-emitters (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 cli/src/kit/guidance.mjs changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 cli/README.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": [
+        {
+          "id": "SP-007",
+          "file": "docs/knowledge-base/steering-proposals/SP-007.md",
+          "declared": "rejected",
+          "status": "rejected",
+          "recurrences": 0
         }
       ]
     },
@@ -151,37 +185,6 @@
           "declared": "applied",
           "status": "ineffective",
           "recurrences": 3
-        }
-      ]
-    },
-    {
-      "id": "LP-2a52ea2c",
-      "signature": "sensor:DRIFT-01:cli",
-      "kind": "escape",
-      "occurrences": 7,
-      "threshold": 3,
-      "status": "rejected",
-      "reopened": false,
-      "first_seen": "2026-11-17T00:26:22.507Z",
-      "last_seen": "2026-11-17T14:37:29.433Z",
-      "sources": [
-        "sensor"
-      ],
-      "slices": [
-        "skill-eval",
-        "telemetry-emitters"
-      ],
-      "examples": [
-        "DRIFT-01 cli/eval/skills/asdd-next/next-selects-ready-feature.json changed but is not mapped by telemetry-emitters (intent/design/tasks/spec or scope_paths)",
-        "DRIFT-01 cli/src/kit/guidance.mjs changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
-      ],
-      "proposals": [
-        {
-          "id": "SP-007",
-          "file": "docs/knowledge-base/steering-proposals/SP-007.md",
-          "declared": "rejected",
-          "status": "rejected",
-          "recurrences": 0
         }
       ]
     },
@@ -268,6 +271,39 @@
       ]
     },
     {
+      "id": "LP-7f51c52f",
+      "signature": "sensor:QG-LEARN-04",
+      "kind": "escape",
+      "occurrences": 5,
+      "threshold": 3,
+      "status": "rejected",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:26:42.887Z",
+      "last_seen": "2026-11-17T17:43:40.562Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "jev-module",
+        "learn-eval-gate",
+        "skill-eval"
+      ],
+      "examples": [
+        "QG-LEARN-04 slice \"skill-eval\" completed Knowledge while pattern LP-2a52ea2c (sensor:DRIFT-01:cli) it contributed to is open — add a steering proposal (accepted or rejected counts) for it",
+        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-06528643 (sensor:DRIFT-01:docs) it contributed to is open — add a steering proposal (accepted or rejected counts) for it",
+        "QG-LEARN-04 slice \"learn-eval-gate\" completed Knowledge while pattern LP-62e561d2 (sensor:DRIFT-01:tools) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+      ],
+      "proposals": [
+        {
+          "id": "SP-008",
+          "file": "docs/knowledge-base/steering-proposals/SP-008.md",
+          "declared": "rejected",
+          "status": "rejected",
+          "recurrences": 0
+        }
+      ]
+    },
+    {
       "id": "LP-e9c4ddb0",
       "signature": "blocked:phase:qa",
       "kind": "escape",
@@ -339,30 +375,32 @@
       "proposals": []
     },
     {
-      "id": "LP-7f51c52f",
-      "signature": "sensor:QG-LEARN-04",
+      "id": "LP-62e561d2",
+      "signature": "sensor:DRIFT-01:tools",
       "kind": "escape",
-      "occurrences": 4,
+      "occurrences": 3,
       "threshold": 3,
       "status": "rejected",
       "reopened": false,
-      "first_seen": "2026-11-17T00:26:42.887Z",
-      "last_seen": "2026-11-17T12:58:48.993Z",
+      "first_seen": "2026-11-17T00:49:14.754Z",
+      "last_seen": "2026-11-17T17:43:19.057Z",
       "sources": [
         "sensor"
       ],
       "slices": [
-        "jev-module",
-        "skill-eval"
+        "learn-eval-gate",
+        "security-recon-untracked",
+        "ui-gate-decisions"
       ],
       "examples": [
-        "QG-LEARN-04 slice \"skill-eval\" completed Knowledge while pattern LP-2a52ea2c (sensor:DRIFT-01:cli) it contributed to is open — add a steering proposal (accepted or rejected counts) for it",
-        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-06528643 (sensor:DRIFT-01:docs) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+        "DRIFT-01 tools/jev-gate/src/harness/drift-lib.mjs changed but is not mapped by ui-gate-decisions (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 tools/jev-gate/src/harness/learning-lib.mjs changed but is not mapped by learn-eval-gate (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 tools/jev-gate/src/harness/command-gate.mjs changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
       ],
       "proposals": [
         {
-          "id": "SP-008",
-          "file": "docs/knowledge-base/steering-proposals/SP-008.md",
+          "id": "SP-010",
+          "file": "docs/knowledge-base/steering-proposals/SP-010.md",
           "declared": "rejected",
           "status": "rejected",
           "recurrences": 0
@@ -378,7 +416,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T15:12:49.806Z",
+      "last_seen": "2026-11-17T17:43:19.057Z",
       "sources": [
         "warn"
       ],
@@ -397,7 +435,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T15:12:49.806Z",
+      "last_seen": "2026-11-17T17:43:19.057Z",
       "sources": [
         "warn"
       ],
@@ -475,25 +513,25 @@
       "proposals": []
     },
     {
-      "id": "LP-62e561d2",
-      "signature": "sensor:DRIFT-01:tools",
+      "id": "LP-1a43e69b",
+      "signature": "sensor:DRIFT-01:.harness/steering",
       "kind": "escape",
       "occurrences": 2,
       "threshold": 3,
       "status": "watching",
       "reopened": false,
-      "first_seen": "2026-11-17T00:49:14.754Z",
-      "last_seen": "2026-11-17T01:22:33.269Z",
+      "first_seen": "2026-11-17T00:26:22.507Z",
+      "last_seen": "2026-11-17T17:43:19.057Z",
       "sources": [
         "sensor"
       ],
       "slices": [
-        "learn-eval-gate",
-        "ui-gate-decisions"
+        "security-recon-untracked",
+        "skill-eval"
       ],
       "examples": [
-        "DRIFT-01 tools/jev-gate/src/harness/drift-lib.mjs changed but is not mapped by ui-gate-decisions (intent/design/tasks/spec or scope_paths)",
-        "DRIFT-01 tools/jev-gate/src/harness/learning-lib.mjs changed but is not mapped by learn-eval-gate (intent/design/tasks/spec or scope_paths)"
+        "DRIFT-01 .harness/steering/domain-layer.project.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 .harness/steering/domain-layer.project.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
       ],
       "proposals": []
     },
@@ -529,7 +567,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T15:12:49.806Z",
+      "last_seen": "2026-11-17T17:43:19.057Z",
       "sources": [
         "warn"
       ],
@@ -895,23 +933,44 @@
       "proposals": []
     },
     {
-      "id": "LP-1a43e69b",
-      "signature": "sensor:DRIFT-01:.harness/steering",
+      "id": "LP-178ee38a",
+      "signature": "sensor:DRIFT-01:package.json",
       "kind": "escape",
       "occurrences": 1,
       "threshold": 3,
       "status": "watching",
       "reopened": false,
-      "first_seen": "2026-11-17T00:26:22.507Z",
-      "last_seen": "2026-11-17T00:26:22.507Z",
+      "first_seen": "2026-11-17T17:43:19.057Z",
+      "last_seen": "2026-11-17T17:43:19.057Z",
       "sources": [
         "sensor"
       ],
       "slices": [
-        "skill-eval"
+        "security-recon-untracked"
       ],
       "examples": [
-        "DRIFT-01 .harness/steering/domain-layer.project.md changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
+        "DRIFT-01 package.json changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-4553c365",
+      "signature": "sensor:DRIFT-01:README.md",
+      "kind": "escape",
+      "occurrences": 1,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T17:43:19.057Z",
+      "last_seen": "2026-11-17T17:43:19.057Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "security-recon-untracked"
+      ],
+      "examples": [
+        "DRIFT-01 README.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
       ],
       "proposals": []
     },

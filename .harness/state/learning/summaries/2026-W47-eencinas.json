@@ -33,6 +33,11 @@
           "at": "2026-11-17T15:12:49.806Z",
           "slice_id": null,
           "last_at": "2026-11-17T16:10:32.159Z"
+        },
+        {
+          "at": "2026-11-17T17:43:19.057Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T17:44:28.579Z"
         }
       ],
       "examples": [
@@ -69,6 +74,11 @@
           "at": "2026-11-17T15:12:49.806Z",
           "slice_id": null,
           "last_at": "2026-11-17T16:10:32.159Z"
+        },
+        {
+          "at": "2026-11-17T17:43:19.057Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T17:44:28.579Z"
         }
       ],
       "examples": [
@@ -105,10 +115,101 @@
           "at": "2026-11-17T15:12:49.806Z",
           "slice_id": "sensor-fixes",
           "last_at": "2026-11-17T16:10:32.159Z"
+        },
+        {
+          "at": "2026-11-17T17:43:19.057Z",
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-17T17:44:28.579Z"
         }
       ],
       "examples": [
         "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ]
+    },
+    "sensor:DRIFT-01:.harness/steering": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T17:43:19.057Z",
+          "slice_id": "security-recon-untracked"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 .harness/steering/domain-layer.project.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:README.md": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T17:43:19.057Z",
+          "slice_id": "security-recon-untracked"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 README.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:cli": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T17:43:19.057Z",
+          "slice_id": "security-recon-untracked"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 cli/README.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:docs": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T17:43:19.057Z",
+          "slice_id": "security-recon-untracked",
+          "last_at": "2026-11-17T17:44:28.579Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-010.md changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:package.json": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T17:43:19.057Z",
+          "slice_id": "security-recon-untracked"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 package.json changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:tools": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T17:43:19.057Z",
+          "slice_id": "security-recon-untracked"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 tools/jev-gate/src/harness/command-gate.mjs changed but is not mapped by security-recon-untracked (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:QG-LEARN-04": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T17:43:40.562Z",
+          "slice_id": "learn-eval-gate"
+        }
+      ],
+      "examples": [
+        "QG-LEARN-04 slice \"learn-eval-gate\" completed Knowledge while pattern LP-62e561d2 (sensor:DRIFT-01:tools) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
       ]
     }
   }
