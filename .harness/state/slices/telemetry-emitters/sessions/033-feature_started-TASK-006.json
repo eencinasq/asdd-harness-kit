@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-033",
+  "timestamp": "2026-11-17T02:38:08.137Z",
+  "phase": "implementation",
+  "feature_id": "TASK-006",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/verify-on-stop.mjs",
+    "cli/src/harness/verify-on-stop.test.mjs"
+  ],
+  "evidence": "Start TASK-006 (REQ-009, REQ-002, REQ-005). RED: new cli/src/harness/verify-on-stop.test.mjs (4 cases) written before any hook change: (1) every exit path (12 scenarios: pass claude/cursor/cli, block claude/cursor, advisory claude/cursor via HARNESS_STOP_MODE, guard-skip Claude stop_hook_active / Cursor status aborted / status error, could-not-run missing check-invariants / self-SIGKILL null status) writes its payload then one kind:hook span (process_name/writer verify-on-stop, runtime rule §4.3, outcome, ERROR for could-not-run, exit_code+violations_count only on numeric status, 2 FAIL lines counted, validateSpan []); (2) fail-open byte-identity: stdout, stderr, exit per scenario x {location-absent, stream-absent, writable, unwritable} + lib top-level throw / deleted == working-lib baseline; (3) fail-open proof: unwritable stream + passing check -> stdout {} , exit 0, no stderr; (4) ordering: payload line precedes lib load (marker lib). node --test cli/src/harness/verify-on-stop.test.mjs against the unchanged hook -> exit 1, tests 4, pass 1 (case 3 pins existing behaviour), fail 3. Mutation RED on a scratch copy of the GREEN hook, each reverted: M1 unguarded import (no .catch) -> case 2 fails; M2 stderr line when emit returns false -> cases 2 and 3 fail; M3 could-not-run status OK -> case 1 fails; M4 exit_code always set -> cases 1 and 2 fail; M5 span emitted before the payload -> case 4 fails. Scratch comparison HEAD vs new hook: 11 payloads x 2 telemetry states, 0 differences in stdout/stderr/exit."
+}

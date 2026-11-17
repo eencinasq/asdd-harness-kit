@@ -153,7 +153,7 @@
       "id": "TASK-006",
       "title": "Verify-on-Stop emits one hook span per exit path through finish()",
       "user_visible_behavior": "Every Verify-on-Stop outcome (pass, block, advisory, guard-skip, could-not-run) writes byte-identical output and exit, then one hook span; telemetry failure changes nothing.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 6,
       "area": "telemetry-emitters",
       "owner": "claude",
@@ -174,7 +174,9 @@
         "npm test",
         "node cli/bin/asdd.mjs check"
       ],
-      "notes": "Wave 4 (AR-2 W3). RED first (new test file). KPI-1 out of scope."
+      "notes": "Wave 4 (AR-2 W3). RED first (new test file). KPI-1 out of scope.",
+      "evidence": "node --test cli/src/harness/verify-on-stop.test.mjs -> exit 0, 4/4 (3 runs); npm test -> exit 0 (226/226); HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live -> exit 0; kit vendor --check -> exit 0 (verify-on-stop not vendored)",
+      "evidence_hash": "470dec11878810a2331361280e40ebf41c9b2389a3bca4b5b947f6fe5b75c307"
     },
     {
       "id": "TASK-007",
