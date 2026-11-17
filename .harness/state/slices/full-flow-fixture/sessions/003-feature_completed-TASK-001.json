@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "full-flow-fixture",
+  "concerns": [],
+  "timestamp": "2026-11-17T16:01:03.000Z",
+  "session_id": "sess-full-flow-fixture-003",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/test/full-flow.sh"
+  ],
+  "evidence": "GREEN 2026-11-17 (72ab4ce): npm run test:full-flow exits 0 ('OK full-flow e2e test'); it failed on main with DRIFT-01 then DRIFT-05."
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "full-flow-fixture",
+  "source_tasks": ".harness/specs/full-flow-fixture/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Map the full-flow fixture test file",
+      "user_visible_behavior": "npm run test:full-flow passes.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "npm run test:full-flow"
+      ],
+      "evidence": "GREEN 2026-11-17 (72ab4ce): npm run test:full-flow exits 0 ('OK full-flow e2e test'); it failed on main with DRIFT-01 then DRIFT-05.",
+      "scope_paths": [
+        "cli/test/full-flow.sh"
+      ],
+      "evidence_hash": "5f23d613ce944db4cffa4f196581e5ecf0ff63892987e4d4e56a09c7f835d8c8"
+    }
+  ]
+}
