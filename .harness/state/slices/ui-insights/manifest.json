@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:18.522Z",
-  "updated_at": "2026-11-17T12:42:17.689Z",
+  "updated_at": "2026-11-17T12:42:49.111Z",
   "paths": {
     "specs": ".harness/specs/ui-insights",
     "tasks": ".harness/specs/ui-insights/tasks.md",
