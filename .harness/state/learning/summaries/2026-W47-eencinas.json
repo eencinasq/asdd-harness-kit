@@ -37,7 +37,11 @@
         {
           "at": "2026-11-17T17:43:19.057Z",
           "slice_id": null,
-          "last_at": "2026-11-17T17:44:35.363Z"
+          "last_at": "2026-11-17T18:11:53.703Z"
+        },
+        {
+          "at": "2026-11-17T21:52:14.894Z",
+          "slice_id": null
         }
       ],
       "examples": [
@@ -78,7 +82,11 @@
         {
           "at": "2026-11-17T17:43:19.057Z",
           "slice_id": null,
-          "last_at": "2026-11-17T17:44:35.363Z"
+          "last_at": "2026-11-17T18:11:53.703Z"
+        },
+        {
+          "at": "2026-11-17T21:52:14.894Z",
+          "slice_id": null
         }
       ],
       "examples": [
@@ -119,7 +127,11 @@
         {
           "at": "2026-11-17T17:43:19.057Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T17:44:35.363Z"
+          "last_at": "2026-11-17T18:11:53.703Z"
+        },
+        {
+          "at": "2026-11-17T21:52:14.894Z",
+          "slice_id": "sensor-fixes"
         }
       ],
       "examples": [
@@ -210,6 +222,42 @@
       ],
       "examples": [
         "QG-LEARN-04 slice \"learn-eval-gate\" completed Knowledge while pattern LP-62e561d2 (sensor:DRIFT-01:tools) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+      ]
+    },
+    "sensor:orphan slice \"*\" has state but is not in global active_slices": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T21:52:14.894Z",
+          "slice_id": "pr-security-baseline"
+        }
+      ],
+      "examples": [
+        "orphan slice \"pr-security-baseline\" has state but is not in global active_slices"
+      ]
+    },
+    "warn:slice \"*\" is in registry.json but not in global active_slices": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T21:52:14.894Z",
+          "slice_id": "pr-security-baseline"
+        }
+      ],
+      "examples": [
+        "slice \"pr-security-baseline\" is in registry.json but not in global active_slices"
+      ]
+    },
+    "warn:features file \"*\" references slice \"*\" not in global manifest": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T21:52:14.894Z",
+          "slice_id": "pr-security-baseline"
+        }
+      ],
+      "examples": [
+        "features file \".harness/features/pr-security-baseline.features.json\" references slice \"pr-security-baseline\" not in global manifest"
       ]
     }
   }

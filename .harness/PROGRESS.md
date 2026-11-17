@@ -40,6 +40,7 @@
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
 | po-readonly-gate | escalated | knowledge | DONE | 0 |
 | pr-review-group-brief | hotfix | knowledge | DONE | 0 |
+| pr-security-baseline | hotfix | knowledge | DONE | 0 |
 | review-quality | full | knowledge | DONE | 0 |
 | rule-coverage | full | knowledge | DONE | 0 |
 | rules-landing | lite | knowledge | DONE | 0 |
