@@ -27,6 +27,9 @@ await build({
 
 // The review engine reads its rule docs next to its module (import.meta.url → dist/server).
 await fs.cp(path.join(root, 'src/pr-review/engine/rules'), path.join(outdir, 'rules'), { recursive: true });
+// The security tools read the vendored methodology and the built-in Semgrep pack the same way.
+await fs.cp(path.join(root, 'src/security/methodology'), path.join(outdir, 'methodology'), { recursive: true });
+await fs.cp(path.join(root, 'src/security/semgrep'), path.join(outdir, 'semgrep'), { recursive: true });
 
 const { size } = await fs.stat(path.join(outdir, 'main.js'));
 console.log(`dist/server/main.js ${(size / 1024).toFixed(0)} kB`);

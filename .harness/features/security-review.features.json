@@ -2,5 +2,204 @@
   "schema_version": "1.0",
   "slice_id": "security-review",
   "source_tasks": ".harness/specs/security-review/tasks.md",
-  "features": []
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Vendor the methodology and notice",
+      "user_visible_behavior": "The server ships the Cloudflare checklists, schema and validator with the MIT notice.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude-sec",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test",
+        "grep -q 'security-audit-skill' tools/spec-drift/THIRD_PARTY_NOTICES.md"
+      ],
+      "evidence": "GREEN: checklists.spec.ts 3/3 (15 checklists load with source header; pages ≤ 6000 chars; unknown id refused; schema + validator vendored). pnpm typecheck OK, pnpm lint exit 0 (pre-existing warnings only in ci-templates.ts, pr-review.prompts.ts), pnpm test 232/232. THIRD_PARTY_NOTICES.md carries the MIT notice.",
+      "scope_paths": [
+        "tools/spec-drift/src/security/methodology",
+        "tools/spec-drift/src/security/checklists.ts",
+        "tools/spec-drift/src/security/checklists.spec.ts",
+        "tools/spec-drift/THIRD_PARTY_NOTICES.md",
+        "tools/spec-drift/biome.json",
+        "tools/spec-drift/scripts/build-server.mjs"
+      ]
+    },
+    {
+      "id": "TASK-002",
+      "title": "Reconnaissance and findings validation",
+      "user_visible_behavior": "Recon picks checklists from repo files; findings are validated by the vendored validator plus repo evidence.",
+      "status": "not_started",
+      "priority": 2,
+      "owner": "claude-sec",
+      "req_ids": [
+        "REQ-002",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "tools/spec-drift/src/security/recon.ts",
+        "tools/spec-drift/src/security/recon.spec.ts",
+        "tools/spec-drift/src/security/findings.ts",
+        "tools/spec-drift/src/security/findings.spec.ts"
+      ]
+    },
+    {
+      "id": "TASK-003",
+      "title": "Security audit service, tools, toolset",
+      "user_visible_behavior": "security_audit_start/checklist/submit_findings/status under the security toolset; state outside the repo.",
+      "status": "not_started",
+      "priority": 3,
+      "owner": "claude-sec",
+      "req_ids": [
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005",
+        "REQ-010"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test",
+        "cd tools/spec-drift && pnpm build && pnpm test:e2e"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "tools/spec-drift/src/security/security.service.ts",
+        "tools/spec-drift/src/security/security.tools.ts",
+        "tools/spec-drift/src/security/security.schemas.ts",
+        "tools/spec-drift/src/security/security.output.ts",
+        "tools/spec-drift/src/security/security.module.ts",
+        "tools/spec-drift/src/security/security.service.spec.ts",
+        "tools/spec-drift/src/config/toolsets.ts",
+        "tools/spec-drift/src/app.module.ts",
+        "tools/spec-drift/test/security.e2e-spec.ts",
+        "tools/spec-drift/test/mcp.e2e-spec.ts",
+        "tools/spec-drift/test/toolsets.e2e-spec.ts",
+        "tools/spec-drift/test/output-schemas.e2e-spec.ts"
+      ]
+    },
+    {
+      "id": "TASK-004",
+      "title": "Static baseline analyze_security",
+      "user_visible_behavior": "analyze_security runs the repo security set or the built-in starter pack (Semgrep), no model.",
+      "status": "not_started",
+      "priority": 4,
+      "owner": "claude-sec",
+      "req_ids": [
+        "REQ-006"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test",
+        "semgrep --test tools/spec-drift/src/security/semgrep"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "tools/spec-drift/src/security/builtin-pack.ts",
+        "tools/spec-drift/src/security/builtin-pack.spec.ts",
+        "tools/spec-drift/src/security/semgrep",
+        "tools/spec-drift/src/analysis/analysis.types.ts",
+        "tools/spec-drift/src/analysis/analysis.schemas.ts",
+        "tools/spec-drift/src/analysis/analysis.tools.ts",
+        "tools/spec-drift/src/analysis/analysis.service.ts",
+        "tools/spec-drift/src/analysis/domain/pack-selection.ts"
+      ]
+    },
+    {
+      "id": "TASK-005",
+      "title": "PR review security lens",
+      "user_visible_behavior": "Security-relevant review groups get a <security> block; security findings without boundary and file:line are skipped with a warning.",
+      "status": "not_started",
+      "priority": 5,
+      "owner": "claude-sec",
+      "req_ids": [
+        "REQ-007",
+        "REQ-008"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "tools/spec-drift/src/security/lens.ts",
+        "tools/spec-drift/src/security/lens.spec.ts",
+        "tools/spec-drift/src/pr-review/pr-review.views.ts",
+        "tools/spec-drift/src/pr-review/pr-review.service.ts"
+      ]
+    },
+    {
+      "id": "TASK-006",
+      "title": "Security view and PR marker",
+      "user_visible_behavior": "A security MCP App view shows counts, ledger and findings; PR review marks security findings.",
+      "status": "not_started",
+      "priority": 6,
+      "owner": "claude-sec",
+      "req_ids": [
+        "REQ-009"
+      ],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test",
+        "cd tools/spec-drift && pnpm build && test -f dist/security-dashboard.html"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "tools/spec-drift/ui/security-dashboard.html",
+        "tools/spec-drift/ui/security-dashboard",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/package.json",
+        "tools/spec-drift/vite.config.ts"
+      ]
+    },
+    {
+      "id": "TASK-007",
+      "title": "Docs",
+      "user_visible_behavior": "README of spec-drift and the kit describe the security tools, toolset and notice.",
+      "status": "not_started",
+      "priority": 7,
+      "owner": "claude-sec",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005",
+        "REQ-006",
+        "REQ-007",
+        "REQ-008",
+        "REQ-009",
+        "REQ-010"
+      ],
+      "depends_on": [
+        "TASK-006"
+      ],
+      "verification": [
+        "grep -q security_audit_start tools/spec-drift/README.md && grep -q analyze_security README.md"
+      ],
+      "evidence": "",
+      "scope_paths": [
+        "tools/spec-drift/README.md",
+        "README.md"
+      ]
+    }
+  ]
 }
