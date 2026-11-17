@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T01:07:06.611Z",
+  "generated_at": "2026-11-17T01:30:12.076Z",
   "threshold": 3,
   "summary": {
     "patterns": 29,
     "open": 0,
-    "in_flight": 3,
+    "in_flight": 2,
     "verified": 2,
     "unsigned_failures": 0
   },
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 32,
+      "occurrences": 33,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -55,6 +55,7 @@
         "spec-drift-depth",
         "spec-drift-empty",
         "spec-drift-merge",
+        "ui-gate-decisions",
         "unified-versioning"
       ],
       "examples": [
@@ -131,7 +132,48 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 26
+          "quiet_sessions": 42
+        }
+      ]
+    },
+    {
+      "id": "LP-06528643",
+      "signature": "sensor:DRIFT-01:docs",
+      "kind": "escape",
+      "occurrences": 5,
+      "threshold": 3,
+      "status": "rejected",
+      "reopened": false,
+      "first_seen": "2026-10-28T13:22:35.735Z",
+      "last_seen": "2026-11-17T01:22:33.269Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "asdd-ui",
+        "jev-module",
+        "skill-eval",
+        "ui-gate-decisions"
+      ],
+      "examples": [
+        "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by agents-use-scripts, asdd-cli, cli-harness, jev-gate-nest, knowledge-nest, mcp-standalone, modules-top-level, spec-drift-merge, spec-drift-adoption (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by asdd-ui (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": [
+        {
+          "id": "SP-004",
+          "file": "docs/knowledge-base/steering-proposals/SP-004.md",
+          "declared": "rejected",
+          "status": "rejected",
+          "recurrences": 0
+        },
+        {
+          "id": "SP-006",
+          "file": "docs/knowledge-base/steering-proposals/SP-006.md",
+          "declared": "applied",
+          "status": "ineffective",
+          "recurrences": 1
         }
       ]
     },
@@ -161,49 +203,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 26
-        }
-      ]
-    },
-    {
-      "id": "LP-06528643",
-      "signature": "sensor:DRIFT-01:docs",
-      "kind": "escape",
-      "occurrences": 4,
-      "threshold": 3,
-      "status": "applied",
-      "reopened": false,
-      "first_seen": "2026-10-28T13:22:35.735Z",
-      "last_seen": "2026-11-17T00:28:33.442Z",
-      "sources": [
-        "sensor"
-      ],
-      "slices": [
-        "asdd-ui",
-        "jev-module",
-        "skill-eval"
-      ],
-      "examples": [
-        "DRIFT-01 docs/agent-failure-log.md changed but is not mapped by jev-module (intent/design/tasks/spec or scope_paths)",
-        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by agents-use-scripts, asdd-cli, cli-harness, jev-gate-nest, knowledge-nest, mcp-standalone, modules-top-level, spec-drift-merge, spec-drift-adoption (intent/design/tasks/spec or scope_paths)",
-        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by asdd-ui (intent/design/tasks/spec or scope_paths)"
-      ],
-      "proposals": [
-        {
-          "id": "SP-004",
-          "file": "docs/knowledge-base/steering-proposals/SP-004.md",
-          "declared": "rejected",
-          "status": "rejected",
-          "recurrences": 0
-        },
-        {
-          "id": "SP-006",
-          "file": "docs/knowledge-base/steering-proposals/SP-006.md",
-          "declared": "applied",
-          "status": "applied",
-          "recurrences": 0,
-          "quiet_sessions": 0,
-          "area": "docs"
+          "quiet_sessions": 42
         }
       ]
     },
@@ -216,7 +216,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T00:54:24.863Z",
+      "last_seen": "2026-11-17T01:22:33.269Z",
       "sources": [
         "warn"
       ],
@@ -235,7 +235,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T00:54:24.863Z",
+      "last_seen": "2026-11-17T01:22:33.269Z",
       "sources": [
         "warn"
       ],
@@ -317,6 +317,29 @@
       "proposals": []
     },
     {
+      "id": "LP-62e561d2",
+      "signature": "sensor:DRIFT-01:tools",
+      "kind": "escape",
+      "occurrences": 2,
+      "threshold": 3,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T00:49:14.754Z",
+      "last_seen": "2026-11-17T01:22:33.269Z",
+      "sources": [
+        "sensor"
+      ],
+      "slices": [
+        "learn-eval-gate",
+        "ui-gate-decisions"
+      ],
+      "examples": [
+        "DRIFT-01 tools/jev-gate/src/harness/drift-lib.mjs changed but is not mapped by ui-gate-decisions (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 tools/jev-gate/src/harness/learning-lib.mjs changed but is not mapped by learn-eval-gate (intent/design/tasks/spec or scope_paths)"
+      ],
+      "proposals": []
+    },
+    {
       "id": "LP-6c57145e",
       "signature": "sensor:lite slice \"*\" cannot complete with open escalation signals (EN-scope-spread) — ",
       "kind": "escape",
@@ -369,7 +392,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T00:54:24.863Z",
+      "last_seen": "2026-11-17T01:22:33.269Z",
       "sources": [
         "warn"
       ],
@@ -666,27 +689,6 @@
       ],
       "examples": [
         "DRIFT-01 cli/src/kit/guidance.mjs changed but is not mapped by skill-eval (intent/design/tasks/spec or scope_paths)"
-      ],
-      "proposals": []
-    },
-    {
-      "id": "LP-62e561d2",
-      "signature": "sensor:DRIFT-01:tools",
-      "kind": "escape",
-      "occurrences": 1,
-      "threshold": 3,
-      "status": "watching",
-      "reopened": false,
-      "first_seen": "2026-11-17T00:49:14.754Z",
-      "last_seen": "2026-11-17T00:49:14.754Z",
-      "sources": [
-        "sensor"
-      ],
-      "slices": [
-        "learn-eval-gate"
-      ],
-      "examples": [
-        "DRIFT-01 tools/jev-gate/src/harness/learning-lib.mjs changed but is not mapped by learn-eval-gate (intent/design/tasks/spec or scope_paths)"
       ],
       "proposals": []
     },
