@@ -217,7 +217,7 @@ test('--json: one object on stdout, for the result and for an error', () => {
   assert.deepEqual(Object.keys(json(bad)), ['ok', 'error']);
 });
 
-test('uninstall removes what the kit added and keeps the project changes', () => {
+test('uninstall (REQ-015): removes what the kit added and keeps the project changes', () => {
   const dir = app('uninstall');
   writeFileSync(join(dir, '.gitignore'), 'dist/\n');
   mkdirSync(join(dir, '.agents/mcp'), { recursive: true });

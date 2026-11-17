@@ -25,7 +25,7 @@
         "tools/jev-gate/src/harness/scope-lib.mjs",
         "tools/knowledge/src/harness/scope-lib.mjs"
       ],
-      "evidence_hash": "c7c7412f2b378886d7d3c23e82c00c2bfaf6b4ad57b12b38104a6dbeb2bfc20c"
+      "evidence_hash": "fff7c194f9d8e204d1ed37c2b3f8389e0b8aae2f90d705aaed32123d8461ba7d"
     },
     {
       "id": "TASK-002",

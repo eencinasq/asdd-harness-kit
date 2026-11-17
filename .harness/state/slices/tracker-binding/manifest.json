@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": true,
   "created_at": "2026-11-17T03:02:29.808Z",
-  "updated_at": "2026-11-17T22:16:32.884Z",
+  "updated_at": "2026-11-18T03:22:03.531Z",
   "paths": {
     "specs": ".harness/specs/tracker-binding",
     "tasks": ".harness/specs/tracker-binding/tasks.md",

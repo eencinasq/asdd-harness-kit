@@ -17,7 +17,7 @@
       "verification": [
         "node --test cli/src/harness/tracker-sync-lib.test.mjs"
       ],
-      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
+      "evidence": "Re-verified in slice harness-green (after asdd kit vendor, kit self, shorter skill descriptions for the always-loaded budget, and versions.json entries for the asdd-* skills): `node --test cli/src/harness/tracker-sync-lib.test.mjs` exits 0. Kit npm test 174/174; tools/knowledge 8/8; tools/jev-gate 14/14; tools/spec-drift 226 unit + 140 e2e.",
       "scope_paths": [
         "cli/src/harness/tracker-sync-lib.mjs",
         "cli/src/harness/tracker-sync-lib.test.mjs",
@@ -26,7 +26,7 @@
         "cli/src/harness/commands.mjs"
       ],
       "hill": "downhill",
-      "evidence_hash": "4d4783988d0cc580cc19c0a763e91c4be5f6067d5370afc75031154c87f127aa"
+      "evidence_hash": "a410311c8dd313c5264756ae7ad05a109aa835f002413b6d9df3666463cfe8e8"
     },
     {
       "id": "TASK-002",
@@ -72,7 +72,7 @@
         "node --test cli/src/harness/spec-source-lib.test.mjs",
         "test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md"
       ],
-      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/spec-source-lib.test.mjs && test -f cli/docs/guides/spec-as-source.md && grep -q 'not the default' cli/docs/guides/spec-as-source.md` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/spec-source-lib.mjs",
         "cli/src/harness/spec-source-lib.test.mjs",
@@ -84,7 +84,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "eb64847aec31bca1b35063fa3365dc967c43f8e221fe8e8dfd85a03eb9e806d5"
+      "evidence_hash": "87d08a199c5fbf7d6ec38145ff6f7a4ea2aeab914ccfd4014896f72b4d8985fe"
     }
   ]
 }

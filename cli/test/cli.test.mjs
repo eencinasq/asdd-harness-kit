@@ -80,7 +80,7 @@ test('repair restores missing slice sessions, specs, and features', () => {
   }
 });
 
-test('bin: in the kit, a dist/ older than src/ never runs (src/ does)', () => {
+test('bin (REQ-014): in the kit, a dist/ older than src/ never runs (src/ does)', () => {
   const cli = join(import.meta.dirname, '..');
   const copy = mkdtempSync(join(tmpdir(), 'asdd-stale-'));
   try {

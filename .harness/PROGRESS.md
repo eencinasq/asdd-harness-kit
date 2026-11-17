@@ -5,9 +5,9 @@
 | Slice | Mode | Phase | Status | Active features |
 |-------|------|-------|--------|-----------------|
 | agents-spec | full | knowledge | DONE | 0 |
-| agents-use-scripts | escalated | implementation | ABANDONED | 0 |
+| agents-use-scripts | escalated | qa | ABANDONED | 0 |
 | amend-close | hotfix | knowledge | DONE | 0 |
-| asdd-cli | escalated | implementation | ABANDONED | 0 |
+| asdd-cli | escalated | qa | ABANDONED | 0 |
 | asdd-p0 | escalated | knowledge | DONE | 0 |
 | asdd-p1 | escalated | knowledge | DONE | 0 |
 | asdd-p2 | escalated | knowledge | DONE | 0 |
@@ -17,7 +17,7 @@
 | asdd-ui | escalated | knowledge | DONE | 0 |
 | ci-npm-ci | escalated | knowledge | DONE | 0 |
 | claude-hook-cwd | escalated | knowledge | DONE | 0 |
-| cli-harness | escalated | implementation | ABANDONED | 0 |
+| cli-harness | escalated | knowledge | ABANDONED | 0 |
 | cost-metrics | escalated | knowledge | DONE | 0 |
 | docs-p5-wave1 | escalated | knowledge | DONE | 0 |
 | drift-test-env | hotfix | knowledge | DONE | 0 |
@@ -30,16 +30,19 @@
 | harness-green | escalated | knowledge | DONE | 0 |
 | intake-fitness-format | hotfix | knowledge | DONE | 0 |
 | intent-intake | escalated | knowledge | DONE | 0 |
-| jev-gate-nest | escalated | implementation | ABANDONED | 0 |
+| jev-gate-nest | escalated | qa | ABANDONED | 0 |
 | jev-module | full | knowledge | DONE | 0 |
 | kit-hygiene | full | knowledge | DONE | 0 |
 | kit-playbook | escalated | knowledge | DONE | 0 |
-| knowledge-nest | escalated | implementation | ABANDONED | 0 |
+| knowledge-nest | escalated | qa | ABANDONED | 0 |
 | learn-eval-gate | lite | knowledge | DONE | 0 |
-| mcp-standalone | escalated | implementation | ABANDONED | 0 |
+| mcp-standalone | escalated | qa | ABANDONED | 0 |
 | metrics-data-quality | hotfix | knowledge | DONE | 0 |
-| modules-top-level | escalated | implementation | ABANDONED | 0 |
+| microkernel-polish | lite | discovery | in_progress | 0 |
+| modules-top-level | escalated | qa | ABANDONED | 0 |
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
+| platform-contract | full | knowledge | DONE | 0 |
+| platform-spec | full | discovery | in_progress | 0 |
 | po-readonly-gate | escalated | knowledge | DONE | 0 |
 | pr-review-dashboard-ux | hotfix | knowledge | DONE | 0 |
 | pr-review-group-brief | hotfix | knowledge | DONE | 0 |
@@ -61,10 +64,12 @@
 | spec-drift-demand | full | knowledge | DONE | 0 |
 | spec-drift-depth | full | knowledge | DONE | 0 |
 | spec-drift-empty | full | knowledge | DONE | 0 |
-| spec-drift-merge | escalated | implementation | ABANDONED | 0 |
+| spec-drift-merge | escalated | qa | ABANDONED | 0 |
 | spec-drift-roadmap | lite | knowledge | DONE | 0 |
+| steering-conformance | lite | discovery | in_progress | 0 |
 | telemetry-contract | lite | knowledge | DONE | 0 |
 | telemetry-emitters | full | knowledge | DONE | 0 |
+| telemetry-phase2 | lite | discovery | in_progress | 0 |
 | tracker-binding | escalated | knowledge | DONE | 0 |
 | ui-assets-dist | hotfix | knowledge | DONE | 0 |
 | ui-drift-dead-link | hotfix | knowledge | DONE | 0 |

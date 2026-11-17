@@ -18,7 +18,7 @@
       "verification": [
         "node --test cli/src/harness/pipeline-metrics.test.mjs"
       ],
-      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/pipeline-metrics.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/pipeline-metrics.mjs",
         "cli/src/harness/pipeline-metrics.test.mjs",
@@ -26,7 +26,7 @@
         "cli/src/harness/commands.mjs",
         "cli/README.md"
       ],
-      "evidence_hash": "42d58baca8d60d4db1531778f832b5b480ae916f27783ec14c671948a38c7037"
+      "evidence_hash": "4c35b3a8628455a7a399212ab30e63280ae2be7031934f4d624e9e2d0b7bbfe0"
     },
     {
       "id": "TASK-002",
@@ -46,7 +46,7 @@
         "node --test cli/src/harness/init-flow.test.mjs",
         "test -f cli/docs/guides/spec-kit-to-asdd.md && grep -q \"Spec Kit\" cli/docs/guides/spec-kit-to-asdd.md"
       ],
-      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/init-flow.test.mjs && test -f cli/docs/guides/spec-kit-to-asdd.md && grep -q \"Spec Kit\" cli/docs/guides/spec-kit-to-asdd.md` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/harness/init-flow.mjs",
         "cli/src/harness/init-flow.test.mjs",
@@ -55,7 +55,7 @@
         "cli/README.md",
         "package.json"
       ],
-      "evidence_hash": "fa15aac3df4c0de540d32c63b89172fae3099605c2456e609381b0eb001eaf6a"
+      "evidence_hash": "0209715d6b8a319b82f6d7d29c0280a3fa5d8e5c4f19368ac8fa95209b8dbc26"
     }
   ]
 }
