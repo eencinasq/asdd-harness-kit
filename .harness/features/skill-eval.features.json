@@ -7,20 +7,24 @@
       "id": "TASK-001",
       "title": "skill-eval lib: fixtures, probes, assertions",
       "user_visible_behavior": "asdd skill-eval can discover and score deterministic fixtures under cli/eval/skills/<skill>/ and report a pass rate per skill.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 1,
       "owner": "devin",
-      "req_ids": ["REQ-001", "REQ-002"],
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
       "depends_on": [],
       "verification": [
         "node --test cli/src/harness/skill-eval-lib.test.mjs"
       ],
-      "evidence": "",
+      "evidence": "RED recorded in sess-skill-eval-005 (module missing). GREEN: `node --test cli/src/harness/skill-eval-lib.test.mjs` → 12/12 pass (discovery, loadFixtures, readSkillBody, probes cwd work/repo, setup+file assertions, skill_contains/lacks, baseline improved/regressed/unchanged via git show, invalid JSON case, report format).",
       "scope_paths": [
         "cli/src/harness/skill-eval-lib.mjs",
         "cli/src/harness/skill-eval-lib.test.mjs"
       ],
-      "notes": "RED first: failing test recorded in feature_started session evidence."
+      "notes": "RED first: failing test recorded in feature_started session evidence.",
+      "evidence_hash": "6d64f870a1fd734e534489e28ffb9c8a624f21ed776afb103227b9fd2e9ddfbc"
     },
     {
       "id": "TASK-002",
@@ -29,8 +33,14 @@
       "status": "not_started",
       "priority": 2,
       "owner": "devin",
-      "req_ids": ["REQ-001", "REQ-003", "REQ-004"],
-      "depends_on": ["TASK-001"],
+      "req_ids": [
+        "REQ-001",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
       "verification": [
         "node --test cli/src/harness/skill-eval-lib.test.mjs",
         "node cli/bin/asdd.mjs skill-eval --json"
@@ -52,8 +62,13 @@
       "status": "not_started",
       "priority": 3,
       "owner": "devin",
-      "req_ids": ["REQ-001", "REQ-002"],
-      "depends_on": ["TASK-002"],
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
       "verification": [
         "node cli/bin/asdd.mjs skill-eval --json",
         "node cli/bin/asdd.mjs kit versions && grep -q skill-eval-lib.mjs cli/versions.json"
