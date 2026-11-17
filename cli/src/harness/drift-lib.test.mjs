@@ -8,6 +8,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { evidenceHash, globToRegExp, linkedSlices, readBinding, runDrift, specPaths } from './drift-lib.mjs';
 
+// Tests must not depend on the shell that runs them (sessions set HARNESS_DRIFT_BASE per SP-004).
+for (const name of ['HARNESS_DRIFT_BASE', 'HARNESS_PR_BRANCH', 'HARNESS_PR_BODY']) delete process.env[name];
+
 const here = dirname(fileURLToPath(import.meta.url));
 
 function write(root, rel, content) {
