@@ -1,14 +1,14 @@
 {
   "schema_version": "3.0",
   "slice_id": "telemetry-emitters",
-  "phase": "design",
+  "phase": "task_planning",
   "status": "in_progress",
   "mode": "full",
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:17.015Z",
-  "updated_at": "2026-11-17T01:15:55.259Z",
+  "updated_at": "2026-11-17T01:32:03.118Z",
   "paths": {
     "specs": ".harness/specs/telemetry-emitters",
     "tasks": ".harness/specs/telemetry-emitters/tasks.md",
@@ -42,6 +42,18 @@
       "at": "2026-11-17T05:30:00Z",
       "evidence": "Domain gate PASS (QG-DMN-03): domain confidence 0.88 >= 0.85 (QG-DMN-01); every entity named in requirements.md 1.1.0 Domain Entities lines is in docs/architecture/domain-model.md (QG-DMN-02). Additive section 'Telemetry (added by telemetry-emitters)' appended; existing terms of kit-hygiene and jev-module unchanged except one header sentence naming the new section; no BREAKING_CHANGE. Resolved: DOM-001 Span (entity; sub-types producer span and Activation record), DOM-002 Trace (value object, display grouping only, AR-10), DOM-003 Activation record (sub-type of Span, kind tool, writer runtime-hook, refers to Guidance document by canonical path), DOM-004 Profile report (transient read model, writes nothing), DOM-005 Phase marker (value object, in-memory window from session phase events, distinct from Phase), DOM-006 Runtime hook host (actor, not a Hook config qualifier), DOM-007 Tail, Telemetry state, Telemetry location/Stream, Activation state, Command label (value objects) and Guidance load observed (telemetry event, not one of the nine session events). Invariants TEL-1..TEL-9 with REQ/AR sources (labels only, append-only, no session forging per v2.md DOM-003, fail-open, topology is not a key, unambiguous attribution, evidence not absence / never 'not loaded', absent is omitted, read-only readers). State ownership recorded per domain-layer.project.md (spans durable append-only gitignored observation data at .harness/state/telemetry/spans.jsonl; others transient). glossary.md gained a 'Domain phase rulings' section. Design pointers: cli/src/harness/pipeline-metrics.mjs:31-40 already derives phase durations from session events but between consecutive phase_completed events, which differs from the Phase marker window of REQ-020 (reuse or diverge is a Design call); schema span_id/trace_id are hex ids (fixed contract), not uuids. Format note: the kit's domain model is a markdown-table model, so the additions follow that format instead of the agent prompt's YAML schema; converting would rewrite other slices' terms. Uncertainty factors (QG-DEC-10): (1) A-01/A-02 payload field names unverified, so Activation record attribute keys stay open (OI-4, RSK-004); (2) the PO/TL decisions behind the spec are relayed, not human-authored (GOV-001 open); (3) the rulings Activation record = Span sub-type, Trace = value object, Runtime hook host = actor are agent decisions a TL may revisit. Codegraph: no .codegraph index in this repo, code anchors checked by grep/sed. Next: @asdd-design-agent.",
       "concerns": []
+    },
+    "design": {
+      "status": "WARN",
+      "by": "asdd-design-agent",
+      "at": "2026-11-17T06:30:00Z",
+      "evidence": "Design gate QG-DES-01 criteria met: design confidence 0.86 >= 0.85, requirements 1.1.0 READY, validation v1.1 PASSED. Artifact .harness/specs/telemetry-emitters/design.md v1.0.0 (Status READY): 14 sections; all 25 REQs traced to component and test (section 10); 6 Mermaid sequence diagrams (structurally checked; no offline mermaid parser available); ADR-001..ADR-007 inline per structure.md:56 (ADR index: decisions live in slice designs). Decisions: telemetry-lib.mjs domain service (dependency-free) + separate telemetry-observe.mjs adapter (ADR-003); guarded dynamic import after producer output (ADR-001); per-runtime native load hooks with fail-open shell wrapper owning the reply (ADR-002); parser reads only fixture-proven payload keys, fixture capture is task T0 (ADR-004); phase windows by disjoint segments, diverge from pipeline-metrics.mjs:29-44 (ADR-005); validator WARN-only and excluded from learning signals, AR-5 registration WARN TEL-W3 (ADR-006, OI-7). OIs: OI-1 HARNESS_SLICE_ID; OI-2 no H-* evaluation, hits=0, no weight constants; OI-3 omit + not_measured list; OI-4 attributes verdict, outcome, runtime_session_id, agent_id; OI-5 tail-relative numbering stated in the WARN; OI-6 claude no stdout exit 0, cursor {\"permission\":\"allow\"} exit 0, wrapper-owned. Low findings: AMB-009 label override; ACT-002 runtime cli for non-Cursor-shaped payloads; NFR-001 added-time p99<=50 ms test; AMB-010 baseline; TRC-006 fifth latency class. R-1: MCP rebuild needed for build health only, verification steps listed. Mapped files narrowed (section 13). Uncertainty factors (QG-DEC-10): (1) A-01/A-02 payload shapes and hook exit semantics unverified (fixtures first); (2) cli/src/uninstall.mjs must change but is outside Mapped files (D-1); (3) GOV-001 human-authored TL session still missing. Codegraph: no .codegraph index; code anchors checked by targeted reads. Next: TL override session acknowledging concerns, then @asdd-task-planning-agent.",
+      "concerns": [
+        "D-1: cli/src/uninstall.mjs (KIT_HOOK, KIT_IGNORES) must change or cli/test/install-lifecycle.test.mjs:123-150 fails; outside Mapped files, PO widening needed before Task Planning",
+        "D-2: ACT-002 resolution narrows REQ-007 'cursor otherwise' to 'cli' for non-Cursor-shaped payloads; needs REQ-007 errata or TL acknowledgement",
+        "D-4: generated copies not named in intent (vendored command-gate/sync-state copies, .harness/config/versions.json) need PO confirmation as generated-only",
+        "GOV-001: relayed PO/TL decisions still lack a human-authored override session"
+      ]
     }
   },
   "active_features": [],
@@ -104,6 +116,13 @@
       "event": "phase_completed",
       "phase": "domain",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T06:30:00Z",
+      "agent": "asdd-design-agent",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
     }
   ],
   "contributors": [
@@ -112,6 +131,7 @@
     "asdd-discovery-agent",
     "asdd-spec-agent",
     "asdd-validation-agent",
-    "asdd-domain-agent"
+    "asdd-domain-agent",
+    "asdd-design-agent"
   ]
 }
