@@ -322,6 +322,12 @@ async function handleApi(root, req, res, url, ctx) {
   }
 
   if (path === '/api/insights/skill-eval') {
+    // Starts a process (fixture probes run with a shell): loopback Host only, against DNS rebinding.
+    const hostHeader = String(req.headers.host || '').trim().toLowerCase();
+    if (!new Set([`127.0.0.1:${ctx.port}`, `localhost:${ctx.port}`]).has(hostHeader)) {
+      sendJson(res, 403, { error: `invalid Host: ${hostHeader || '(missing)'}` });
+      return;
+    }
     const baseline = url.searchParams.get('baseline') || null;
     if (baseline !== null && !isSafeRef(baseline)) {
       sendJson(res, 400, { error: 'baseline must be a git ref (letters, digits, . _ / ~ ^ -; not starting with -)' });

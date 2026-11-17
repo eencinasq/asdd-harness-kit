@@ -518,3 +518,35 @@ test('ui-insights REQ-001…004 GET endpoints serve the models; skill-eval uses 
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('ui-insights-host-guard REQ-001 skill-eval refuses a foreign Host (DNS rebinding) and starts no process', async () => {
+  const { startUiServer } = await import('./ui-server.mjs');
+  const { request } = await import('node:http');
+  let runs = 0;
+  const handle = await startUiServer({
+    root: ROOT,
+    port: 0,
+    skillEvalRunner: async () => {
+      runs += 1;
+      return { ok: true, total: 0, passed: 0, failed: 0, skills: [] };
+    },
+  });
+  const port = handle.address.port;
+  const get = (host) =>
+    new Promise((resolve, reject) => {
+      const req = request({ host: '127.0.0.1', port, path: '/api/insights/skill-eval?refresh=1', method: 'GET', headers: { host } }, (res) => {
+        res.resume();
+        res.on('end', () => resolve(res.statusCode));
+      });
+      req.on('error', reject);
+      req.end();
+    });
+  try {
+    assert.equal(await get(`evil.example:${port}`), 403);
+    assert.equal(runs, 0, 'no skill-eval run for a foreign Host');
+    assert.equal(await get(`127.0.0.1:${port}`), 200);
+    assert.equal(runs, 1);
+  } finally {
+    await handle.close();
+  }
+});
