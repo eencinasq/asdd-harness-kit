@@ -13,9 +13,10 @@
 | asdd-p3 | escalated | knowledge | DONE | 0 |
 | asdd-p4 | escalated | knowledge | DONE | 0 |
 | asdd-roadmap | lite | knowledge | DONE | 0 |
-| asdd-ui | lite | discovery | in_progress | 0 |
+| asdd-ui | escalated | knowledge | DONE | 0 |
 | cli-harness | escalated | implementation | ABANDONED | 0 |
 | cost-metrics | lite | discovery | in_progress | 0 |
+| drift02-open-slices | hotfix | knowledge | DONE | 0 |
 | egm-shaping | full | knowledge | DONE | 0 |
 | guidance-proposal-skip | hotfix | knowledge | DONE | 0 |
 | harness-green | escalated | knowledge | DONE | 0 |
@@ -44,5 +45,6 @@
 | spec-drift-roadmap | lite | knowledge | DONE | 0 |
 | telemetry-contract | lite | knowledge | DONE | 0 |
 | telemetry-emitters | full | discovery | in_progress | 0 |
+| ui-assets-dist | hotfix | knowledge | DONE | 0 |
 | ui-gate-decisions | lite | discovery | in_progress | 0 |
 | ui-insights | lite | discovery | in_progress | 0 |
