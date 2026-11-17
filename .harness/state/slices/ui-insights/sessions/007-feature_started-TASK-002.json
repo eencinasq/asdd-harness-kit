@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-insights-007",
+  "timestamp": "2026-11-17T16:21:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ui-insights",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/src/harness/ui/app.js",
+    "cli/src/harness/ui/styles.css"
+  ],
+  "evidence": "RED: 'ui-insights TASK-002' fails — app.js has no insights view, no /api/insights/* calls, Slices tab shows only the total.",
+  "concerns": []
+}

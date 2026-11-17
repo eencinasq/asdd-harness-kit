@@ -15,6 +15,7 @@ import { readPatterns } from './learning-lib.mjs';
 import { renderPipelineHtml } from './pipeline-html.mjs';
 import { computePipelineMetrics } from './pipeline-metrics.mjs';
 import { readSessions } from './sync-state.mjs';
+import { activationInsights, costInsights, createSkillEvalRunner, isSafeRef, WINDOW_RE } from './ui-server-insights.mjs';
 
 const ASDD_BIN = join(dirname(fileURLToPath(import.meta.url)), '../../bin/asdd.mjs');
 
@@ -309,6 +310,33 @@ async function handleApi(root, req, res, url, ctx) {
     return;
   }
 
+  // ui-insights (P5.7): read-only insight models; each says when its source is absent (REQ-004).
+  if (path === '/api/insights/activation') {
+    const window = url.searchParams.get('window') ?? '30';
+    if (!WINDOW_RE.test(window)) {
+      sendJson(res, 400, { error: 'window must be a number of days (1–999) or "all"' });
+      return;
+    }
+    sendJson(res, 200, activationInsights(root, { window }));
+    return;
+  }
+
+  if (path === '/api/insights/skill-eval') {
+    const baseline = url.searchParams.get('baseline') || null;
+    if (baseline !== null && !isSafeRef(baseline)) {
+      sendJson(res, 400, { error: 'baseline must be a git ref (letters, digits, . _ / ~ ^ -; not starting with -)' });
+      return;
+    }
+    sendJson(res, 200, await ctx.skillEval({ refresh: url.searchParams.get('refresh') === '1', baseline }));
+    return;
+  }
+
+  if (path === '/api/insights/cost') {
+    const registry = readJson(root, '.harness/state/registry.json') ?? { slices: [] };
+    sendJson(res, 200, costInsights(computePipelineMetrics({ root, slices: registry.slices })));
+    return;
+  }
+
   if (path === '/api/pipeline') {
     send(res, 200, renderPipelineHtml({ root }), { 'content-type': 'text/html; charset=utf-8' });
     return;
@@ -359,6 +387,8 @@ export async function startUiServer(opts = {}) {
 
   const stateDir = join(root, '.harness/state');
   if (!existsSync(stateDir)) mkdirSync(stateDir, { recursive: true });
+  // ui-insights: skill-eval runs on demand (argv only) and is cached per baseline; tests inject `skillEvalRunner`.
+  const skillEval = createSkillEvalRunner({ root, bin: ASDD_BIN, run: opts.skillEvalRunner });
 
   const broadcastReload = () => {
     const payload = `event: reload\ndata: ${JSON.stringify({ at: new Date().toISOString() })}\n\n`;
@@ -400,6 +430,7 @@ export async function startUiServer(opts = {}) {
         await handleApi(root, req, res, url, {
           port: boundPort,
           decideRunner: opts.decideRunner,
+          skillEval,
         });
         return;
       }

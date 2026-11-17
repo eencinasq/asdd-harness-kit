@@ -2,5 +2,59 @@
   "schema_version": "1.0",
   "slice_id": "ui-insights",
   "source_tasks": ".harness/specs/ui-insights/tasks.md",
-  "features": []
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Insight models and GET endpoints",
+      "user_visible_behavior": "asdd ui serves activation, skill-eval and cost insights as JSON, each saying when its source is absent and which command produces it.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude-ui",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/ui-server.test.mjs"
+      ],
+      "evidence": "2026-11-17: node --test cli/src/harness/ui-server.test.mjs 14/14 incl. 4 ui-insights model/endpoint tests (activation window + never_loaded + runtime measurement, absent hint, skill-eval summary + safe baseline ref, cost pass-through/absent, endpoint cache, 400 on bad window/ref, 405 on POST).",
+      "scope_paths": [
+        "cli/src/harness/ui-server-insights.mjs",
+        "cli/src/harness/ui-server.mjs",
+        "cli/src/harness/ui-server.test.mjs"
+      ],
+      "evidence_hash": "a7fe14d43c0f38af50b2e01c00cef3996513449b70ccdcfca924f85d378ef8ee"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Insights tab and Slices metric cards",
+      "user_visible_behavior": "The Insights tab shows activation, skill-eval and cost panels; the Slices tab shows the pipeline metric cards.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude-ui",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/src/harness/ui-server.test.mjs",
+        "node cli/bin/asdd.mjs kit build",
+        "npm test"
+      ],
+      "evidence": "2026-11-17: ui-server.test.mjs 14/14 (TASK-002 page test: Insights tab, three endpoints, Slices cards for lite_share/escalation_rate/stop_fail/phase_median_hours/open_patterns, hints); kit build OK (97 modules, 3 assets); npm test 414/414; manual smoke of asdd ui on port 47401: / and /ui/app.js 200, /api/insights/activation 200 (absent + hint in a fresh worktree), /api/insights/cost 200 (absent + hint), /api/insights/skill-eval 200 (8/8, 872 bytes), window=x and baseline=-x 400.",
+      "scope_paths": [
+        "cli/src/harness/ui/app.js",
+        "cli/src/harness/ui/styles.css"
+      ],
+      "evidence_hash": "3703d43de4c3dc2fae5e7e59835f0804f13056a2e9b1e861b658f6cce4e4290d"
+    }
+  ]
 }

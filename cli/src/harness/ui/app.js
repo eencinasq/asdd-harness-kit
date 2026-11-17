@@ -1,7 +1,7 @@
 /** asdd ui shell — aggregate read views (REQ-002); SSE wired in TASK-003. */
 
 const app = document.getElementById('app');
-const VIEWS = ['slices', 'pipeline', 'drift', 'learning', 'knowledge', 'gates'];
+const VIEWS = ['slices', 'pipeline', 'drift', 'learning', 'knowledge', 'gates', 'insights'];
 
 app.innerHTML = `
   <nav class="tabs" role="tablist" aria-label="Views"></nav>
@@ -39,6 +39,7 @@ async function show(id) {
     else if (id === 'learning') await renderLearn();
     else if (id === 'knowledge') renderKnowledge();
     else if (id === 'gates') await renderGates();
+    else if (id === 'insights') await renderInsights();
   } catch (err) {
     panel.innerHTML = `<p class="meta">Error: ${escapeHtml(String(err.message || err))}</p>`;
   }
@@ -66,14 +67,176 @@ async function renderSlices() {
     </tr>`,
     )
     .join('');
-  const m = data.metrics?.slices || {};
+  const metrics = data.metrics || {};
+  const m = metrics.slices || {};
   panel.innerHTML = `
-    <p class="meta">Registry ${escapeHtml(data.generated_at || '')} · total ${m.total ?? slices.length}</p>
+    <p class="meta">Registry ${escapeHtml(data.generated_at || '')} · total ${escapeHtml(m.total ?? slices.length)}</p>
+    ${metricCards(metrics)}
     <table>
       <thead><tr><th>Slice</th><th>Mode</th><th>Phase</th><th>Status</th><th>Features</th></tr></thead>
       <tbody>${rows || '<tr><td colspan="5">(none)</td></tr>'}</tbody>
     </table>
     ${data.progress ? `<h2>PROGRESS</h2><pre>${escapeHtml(data.progress)}</pre>` : ''}
+  `;
+}
+
+const pct = (v) => (typeof v === 'number' && Number.isFinite(v) ? `${Math.round(v * 100)}%` : '—');
+
+/** Slices tab: the pipeline metric cards already in /api/status (lite share, escalation, stop FAILs, medians, patterns). */
+function metricCards(metrics) {
+  const s = metrics.slices || {};
+  const stop = metrics.stop_fail || {};
+  const codes = Object.entries(stop.by_code || {})
+    .sort((a, b) => b[1] - a[1])
+    .map(([code, n]) => `${escapeHtml(code)}×${escapeHtml(n)}`)
+    .join(', ');
+  const medians = Object.entries(metrics.phase_median_hours || {})
+    .map(([phase, h]) => `${escapeHtml(phase)} ${escapeHtml(h)}h`)
+    .join(' · ');
+  const card = (label, value, detail = '') =>
+    `<div class="card"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong>${detail ? `<small>${detail}</small>` : ''}</div>`;
+  return `<div class="cards">
+    ${card('DONE', `${s.done ?? '—'} / ${s.total ?? '—'}`, `${escapeHtml(s.in_progress ?? 0)} in progress`)}
+    ${card('Lite share (lite_share)', pct(s.lite_share), 'of DONE, never escalated')}
+    ${card('Escalation rate (escalation_rate)', pct(s.escalation_rate))}
+    ${card('Stop FAILs (stop_fail)', stop.episodes ?? 0, codes || 'none')}
+    ${card('Open patterns (open_patterns)', metrics.open_patterns ?? 0)}
+  </div>
+  ${medians ? `<p class="meta">Phase medians (phase_median_hours): ${medians}</p>` : ''}`;
+}
+
+/** Absent or failed source: say so and name the command that produces the data (REQ-004). */
+function missing(model) {
+  const error = model.error ? `<br/>${escapeHtml(model.error)}` : '';
+  return `<p class="meta missing">${escapeHtml(model.hint || 'No data.')}${error}</p>`;
+}
+
+let activationWindow = '30';
+
+/** Insights tab (ui-insights): guidance activation, skill-eval results, cost and tokens. */
+async function renderInsights() {
+  panel.innerHTML = `
+    <section id="ins-activation"><h2>Guidance activation</h2><p class="meta">Loading…</p></section>
+    <section id="ins-eval"><h2>Skill evals</h2><p class="meta">Loading…</p></section>
+    <section id="ins-cost"><h2>Cost and tokens</h2><p class="meta">Loading…</p></section>
+  `;
+  await Promise.all([renderActivation(), renderSkillEval(false), renderCost()]);
+}
+
+async function renderActivation() {
+  const box = panel.querySelector('#ins-activation');
+  if (!box) return;
+  const data = await fetch(`/api/insights/activation?window=${encodeURIComponent(activationWindow)}`).then((r) => r.json());
+  const runtimes = data.runtimes || [];
+  const options = ['7', '30', '90', 'all']
+    .map((w) => `<option value="${w}"${w === activationWindow ? ' selected' : ''}>${w === 'all' ? 'all (tail)' : `${w} days`}</option>`)
+    .join('');
+  const head = runtimes.map((r) => `<th>${escapeHtml(r.runtime)}<br/><small>${escapeHtml(r.measured)}</small></th>`).join('');
+  const rows = (data.items || [])
+    .map((i) => {
+      const cells = runtimes
+        .map((r) => {
+          if (r.measured !== 'observed') return `<td class="muted">${escapeHtml(r.measured)}</td>`;
+          return `<td>${escapeHtml(i.loads?.by_runtime?.[r.runtime] ?? 0)}</td>`;
+        })
+        .join('');
+      const flag = i.never_loaded ? '<span class="flag">never loaded</span>' : escapeHtml(i.loads?.total ?? 0);
+      return `<tr class="${i.never_loaded ? 'never' : ''}">
+        <td><code>${escapeHtml(i.path)}</code></td>
+        <td>${escapeHtml(i.type)}${i.inclusion ? ` · ${escapeHtml(i.inclusion)}` : ''}</td>
+        <td>${flag}</td>${cells}</tr>`;
+    })
+    .join('');
+  const extra = (data.extra || []).length
+    ? `<p class="meta">Loaded but not installed: ${(data.extra || []).map((e) => `<code>${escapeHtml(e.path)}</code>`).join(', ')}</p>`
+    : '';
+  box.innerHTML = `
+    <h2>Guidance activation</h2>
+    <div class="row">
+      <label>Window <select id="act-window">${options}</select></label>
+      <span class="meta">${escapeHtml(data.records_in_window ?? 0)} loads · ${escapeHtml(data.never_loaded ?? 0)} never_loaded · ${escapeHtml(data.tail?.lines_read ?? 0)} span lines read</span>
+    </div>
+    ${data.source === 'present' ? '' : missing(data)}
+    <table>
+      <thead><tr><th>Steering / skill</th><th>Type</th><th>Loads</th>${head}</tr></thead>
+      <tbody>${rows || '<tr><td colspan="3">(nothing installed)</td></tr>'}</tbody>
+    </table>
+    ${extra}
+  `;
+  box.querySelector('#act-window')?.addEventListener('change', (ev) => {
+    activationWindow = ev.target.value;
+    renderActivation();
+  });
+}
+
+async function renderSkillEval(refresh) {
+  const box = panel.querySelector('#ins-eval');
+  if (!box) return;
+  if (refresh) box.innerHTML = '<h2>Skill evals</h2><p class="meta">Running asdd skill-eval…</p>';
+  const data = await fetch(`/api/insights/skill-eval${refresh ? '?refresh=1' : ''}`).then((r) => r.json());
+  const regressed = new Set(data.regressed || []);
+  const rows = (data.skills || [])
+    .flatMap((s) =>
+      (s.cases || []).map((c) => {
+        const isRegressed = regressed.has(`${s.name}/${c.id}`) || c.delta === 'regressed';
+        const state = isRegressed ? '<span class="flag">regressed</span>' : c.ok ? 'pass' : '<span class="flag">fail</span>';
+        return `<tr class="${isRegressed ? 'never' : ''}">
+          <td>${escapeHtml(s.name)}</td><td>${escapeHtml(c.id)}</td><td>${state}</td>
+          <td>${escapeHtml(c.delta ?? '—')}</td><td class="muted">${escapeHtml((c.failures || []).join('; '))}</td></tr>`;
+      }),
+    )
+    .join('');
+  const summary =
+    data.source === 'present'
+      ? `<p class="meta">${escapeHtml(data.passed)}/${escapeHtml(data.total)} pass · ${escapeHtml((data.regressed || []).length)} regressed${
+          data.baseline ? ` vs ${escapeHtml(data.baseline)}` : ''
+        } · run ${escapeHtml(data.generated_at || '')}</p>`
+      : missing(data);
+  box.innerHTML = `
+    <h2>Skill evals</h2>
+    <div class="row"><button type="button" class="primary" id="eval-refresh">Run asdd skill-eval</button></div>
+    ${summary}
+    ${rows ? `<table><thead><tr><th>Skill</th><th>Case</th><th>Result</th><th>Delta</th><th>Failures</th></tr></thead><tbody>${rows}</tbody></table>` : ''}
+  `;
+  box.querySelector('#eval-refresh')?.addEventListener('click', () => renderSkillEval(true));
+}
+
+async function renderCost() {
+  const box = panel.querySelector('#ins-cost');
+  if (!box) return;
+  const data = await fetch('/api/insights/cost').then((r) => r.json());
+  if (data.source !== 'present') {
+    box.innerHTML = `<h2>Cost and tokens</h2>${missing(data)}`;
+    return;
+  }
+  const t = data.totals || {};
+  const num = (v) => (typeof v === 'number' ? v.toLocaleString() : '—');
+  const usd = (v) => (typeof v === 'number' ? `$${v.toFixed(2)}` : 'unknown');
+  const table = (title, rows, key) =>
+    rows.length
+      ? `<h3>${escapeHtml(title)}</h3><table><thead><tr><th>${escapeHtml(key)}</th><th>Input</th><th>Output</th><th>Cache read</th><th>Cache write</th><th>USD</th></tr></thead><tbody>${rows
+          .map(
+            (r) => `<tr><td>${escapeHtml(r[key] ?? '—')}${r.unknown ? ' <span class="flag">unknown</span>' : ''}</td>
+            <td>${escapeHtml(num(r.input_tokens))}</td><td>${escapeHtml(num(r.output_tokens))}</td>
+            <td>${escapeHtml(num(r.cache_read_tokens))}</td><td>${escapeHtml(num(r.cache_write_tokens))}</td>
+            <td>${escapeHtml(usd(r.usd))}</td></tr>`,
+          )
+          .join('')}</tbody></table>`
+      : '';
+  box.innerHTML = `
+    <h2>Cost and tokens</h2>
+    <div class="cards">
+      <div class="card"><span>Input tokens</span><strong>${escapeHtml(num(t.input_tokens))}</strong></div>
+      <div class="card"><span>Output tokens</span><strong>${escapeHtml(num(t.output_tokens))}</strong></div>
+      <div class="card"><span>Cache read / write</span><strong>${escapeHtml(num(t.cache_read_tokens))} / ${escapeHtml(num(t.cache_write_tokens))}</strong></div>
+      <div class="card"><span>USD</span><strong>${escapeHtml(usd(t.usd))}</strong></div>
+    </div>
+    ${(data.unknown_runtimes || []).length ? `<p class="meta">No token data from: ${escapeHtml(data.unknown_runtimes.join(', '))} (shown as unknown, never estimated).</p>` : ''}
+    <p class="meta">Sources: ${escapeHtml((data.sources || []).join(', ') || '—')}</p>
+    ${table('By slice', data.by_slice || [], 'slice_id')}
+    ${table('By phase', data.by_phase || [], 'phase')}
+    ${table('By model', data.by_model || [], 'model')}
+    ${table('By runtime', data.by_runtime || [], 'runtime')}
   `;
 }
 
