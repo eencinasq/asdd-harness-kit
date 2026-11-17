@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:17.015Z",
-  "updated_at": "2026-11-17T01:45:43.704Z",
+  "updated_at": "2026-11-17T01:49:54.508Z",
   "paths": {
     "specs": ".harness/specs/telemetry-emitters",
     "tasks": ".harness/specs/telemetry-emitters/tasks.md",
@@ -34,7 +34,8 @@
       "by": "asdd-validation-agent",
       "at": "2026-11-17T04:30:00Z",
       "evidence": "Re-validation of requirements 1.1.0: gate PASS (QG-VAL-04, PASSED), report .harness/specs/telemetry-emitters/spec-validation-report.md v1.1. BLOCKING 0, HIGH 0. All six v1.0 HIGH findings closed: AMB-001, CON-001, NFR-002 and NFR-003 resolved in the spec; TRC-001 (AR-3 rotation, rollup, H-* output) explicitly deferred; RSK-001/AP-7 overridden (Option B); the Verify-on-Stop own-crash part of NFR-002 deferred as KPI-1. The MEDIUM findings are resolved except TRC-002 (OI-7, ruled MEDIUM non-blocking: may go to Design, PO answer needed before Task Planning, recommended: WARN-only check in validators/telemetry.mjs) and DOM-001..006 (Domain phase required, QG-DMN-02). New findings: GOV-001 MEDIUM (the PO/TL decisions closing HIGH findings are recorded only in agent-authored artifacts; a human-authored TL session is recommended before Design); AMB-009 LOW (REQ-007: no command_label for an override-allowed command, command-gate.mjs:85-87,117); AMB-010 LOW (REQ-019 criterion 7 baseline); TRC-006 LOW (REQ-018: no Cursor non-guidance latency class). Code citations re-checked at f41a3ff: the cited files are unchanged since 1b1fbae; the lazy-import precedent is now check-invariants.mjs:108-114. No schema change. Validation confidence 0.86. Uncertainty factors (QG-DEC-10): (1) the PO/TL decisions were relayed by the orchestrator and not human-authored (GOV-001); (2) the A-01/A-02 payload shapes and hook exit-code semantics are unverified (RSK-004, OI-6); (3) OI-7 is open. Next: @asdd-domain-agent.",
-      "concerns": []
+      "concerns": [],
+      "acknowledged_by": "eencinas"
     },
     "domain": {
       "status": "PASS",
@@ -53,7 +54,8 @@
         "D-2: ACT-002 resolution narrows REQ-007 'cursor otherwise' to 'cli' for non-Cursor-shaped payloads; needs REQ-007 errata or TL acknowledgement",
         "D-4: generated copies not named in intent (vendored command-gate/sync-state copies, .harness/config/versions.json) need PO confirmation as generated-only",
         "GOV-001: relayed PO/TL decisions still lack a human-authored override session"
-      ]
+      ],
+      "acknowledged_by": "eencinas"
     },
     "task_planning": {
       "status": "WARN",
@@ -66,7 +68,8 @@
         "D-3: TASK-002 Cursor fixture capture needs the human; recommendation ship only with a live-capture fixture, else Cursor is hookless",
         "D-4: generated-only copies (tools/*/src/harness/*, cli/versions.json, .agents/agents/_runtime-template.md, .harness/state/telemetry/*, .harness/config/versions.json) are regenerated per wave (TASK-005/008/009/011) to keep npm test green, and again in TASK-014; human confirmation needed",
         "GOV-001: relayed PO/TL decisions still lack a human-authored override session"
-      ]
+      ],
+      "acknowledged_by": "eencinas"
     }
   },
   "active_features": [],
@@ -143,6 +146,30 @@
       "event": "phase_completed",
       "phase": "task_planning",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:49:35.950Z",
+      "agent": "human",
+      "human": "eencinas",
+      "event": "override",
+      "phase": "validation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:49:35.951Z",
+      "agent": "human",
+      "human": "eencinas",
+      "event": "override",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:49:54.479Z",
+      "agent": "human",
+      "human": "eencinas",
+      "event": "override",
+      "phase": "task_planning",
+      "feature_id": null
     }
   ],
   "contributors": [
@@ -153,6 +180,7 @@
     "asdd-validation-agent",
     "asdd-domain-agent",
     "asdd-design-agent",
-    "asdd-task-planning-agent"
+    "asdd-task-planning-agent",
+    "eencinas"
   ]
 }
