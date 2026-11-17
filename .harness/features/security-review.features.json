@@ -32,7 +32,7 @@
       "id": "TASK-002",
       "title": "Reconnaissance and findings validation",
       "user_visible_behavior": "Recon picks checklists from repo files; findings are validated by the vendored validator plus repo evidence.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 2,
       "owner": "claude-sec",
       "req_ids": [
@@ -45,7 +45,7 @@
       "verification": [
         "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm test"
       ],
-      "evidence": "",
+      "evidence": "GREEN: recon.spec.ts 3/3 (surfaces + checklists from files and per-format manifest parsing), findings.spec.ts 4/4 (vendored validator via createRequire; sorted by fingerprint; trace order and validation plan enforced; evidence file must exist inside the repo and line in range). typecheck OK, lint exit 0, pnpm test 236/236.",
       "scope_paths": [
         "tools/spec-drift/src/security/recon.ts",
         "tools/spec-drift/src/security/recon.spec.ts",
