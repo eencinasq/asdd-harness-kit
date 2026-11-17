@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-13T02:23:40.083Z",
-  "updated_at": "2026-11-17T15:42:39.485Z",
+  "updated_at": "2026-11-17T15:43:16.403Z",
   "paths": {
     "specs": ".harness/specs/asdd-roadmap",
     "tasks": ".harness/specs/asdd-roadmap/tasks.md",
@@ -39,22 +39,22 @@
     "implementation": {
       "status": "PASS",
       "by": "eencinas",
-      "at": "2026-11-17T12:42:48.000Z",
-      "evidence": "P6.1–P6.6 hecho; G23–G28 Hecho.",
+      "at": "2026-11-17T15:43:16.000Z",
+      "evidence": "P5.1/P5.4/P5.7 hecho; P7 security-review; G15/G17 Hecho; G29.",
       "concerns": []
     },
     "qa": {
       "status": "PASS",
       "by": "eencinas",
-      "at": "2026-11-17T12:42:48.000Z",
-      "evidence": "28 gap rows; ≥9 P headings.",
+      "at": "2026-11-17T15:43:16.000Z",
+      "evidence": "29 gap rows.",
       "concerns": []
     },
     "knowledge": {
       "status": "PASS",
       "by": "eencinas",
-      "at": "2026-11-17T12:42:48.000Z",
-      "evidence": "P6 closed: tracker binding, read-only PO agent + readonly gate, grounded shaping, intake, cloud setup.",
+      "at": "2026-11-17T15:43:16.000Z",
+      "evidence": "First amend closed without a manual DONE checkpoint (amend-close).",
       "concerns": []
     }
   },
@@ -356,6 +356,54 @@
       "human": "eencinas",
       "event": "checkpoint",
       "phase": null,
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:42:45.933Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
       "feature_id": null
     }
   ],
