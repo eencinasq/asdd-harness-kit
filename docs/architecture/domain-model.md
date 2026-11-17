@@ -55,6 +55,8 @@ The boundary rule: anything in Distribution that describes the kit itself never 
 | **Activation record** | A **sub-type of Span**, not a separate entity: `kind:"tool"`, `writer:"runtime-hook"`, written by `asdd observe` when a Runtime hook host reports one load of a Guidance document | `attributes.target_path` (canonical repo-relative path), `runtime` (claude/cursor), `attributes.tool_name`, runtime session id and agent id (only when the payload carries them; keys: Design OI-4), `slice_id`/`phase` (only when unambiguous) | is a Span; refers to one Guidance document by canonical path (`.harness/steering/…` or `.agents/skills/<name>/…`, aliases normalized); caused by one *Guidance load observed* event; read by the Profile report | REQ-013…REQ-017, REQ-021; DOM-003 |
 | **Profile report** | The read model printed by `asdd profile` (`--slice`, `--bottlenecks`, `--json`); computed in memory per run, never persisted | phase durations (from Phase markers), p50/p95 `duration_ms` per span `kind`, activation table per phase (one column per configured runtime, Activation state legend), `bottleneck_score` per surface, unattributed-span count | reads Sessions (phase events), the Tail of Spans, Guidance documents (expected steering by tags, installed skills), the project's runtimes; writes nothing | REQ-020…REQ-023; DOM-004 |
 
+> **Superseded by D-3 (2026-11-17):** Cursor is hookless for guidance loads, so `asdd observe` writes Activation records with `runtime` `claude` only; `asdd observe cursor` answers allow and records nothing, no Cursor load hook is installed, and the Profile report shows Cursor loads as `unknown`. The `runtime (claude/cursor)` attribute above stays valid for the schema. See `cli/test/fixtures/telemetry/cursor/README.md` and requirements 1.1.1 errata (QA-F-002).
+
 ### Actor
 
 | Actor | Definition | Relationships | Source |
@@ -74,6 +76,7 @@ The boundary rule: anything in Distribution that describes the kit itself never 
 ### Domain event (telemetry, not a session event)
 
 - **Guidance load observed**: a Runtime hook host reports a read of a steering file, or a read or invocation of a skill installed under `.agents/skills/`. Effect: `asdd observe` appends at most one Activation record. It is **not** one of the nine session events listed under Domain Events above, and it creates no Session file (v2.md DOM-003, the forging rule). Source: REQ-006, REQ-013, REQ-014; DOM-007.
+  > **Superseded by D-3 (2026-11-17):** REQ-014 (requirements 1.1.1 errata) now states that a Cursor read produces no Activation record; only Claude Code is a Runtime hook host for this event. See `cli/test/fixtures/telemetry/cursor/README.md`.
 
 ### Invariants
 

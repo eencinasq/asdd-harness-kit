@@ -441,6 +441,9 @@ These are CLI and hook interfaces; there is no HTTP surface.
 - (c) `project.json` `runtimes` contains `claude` (or `cursor`) and `.claude/settings.json` `PostToolUse`
   (`.cursor/hooks.json` `beforeReadFile`) has no observe entry.
 
+> **Superseded by D-3 (2026-11-17):** Cursor is hookless for guidance loads, so the Cursor half of (c) is dropped;
+> TEL-W3 (c) checks only `claude` / `PostToolUse`. See [`cli/test/fixtures/telemetry/cursor/README.md`](../../../cli/test/fixtures/telemetry/cursor/README.md) and requirements 1.1.1 errata (QA-F-002).
+
 Each WARN names the fix (`asdd install .`).
 
 ## 9. Non-Functional Design
@@ -459,6 +462,11 @@ Each WARN names the fix (`asdd install .`).
 | Check exit unchanged (REQ-019, AMB-010) | Guarded import, WARN-only ctx | `validators/telemetry.test.mjs` + a check run: valid stream, malformed lines, no location, throwing validator, throwing lib → same exit code; the failure adds no output |
 | Observe always allows (REQ-018) | Two-layer fail-open | `telemetry-observe.test.mjs` → every fixture × 4 states; invalid JSON, empty, unknown event, missing argv, throwing lib |
 | Installed hook fail-open when asdd is absent (REQ-025) | Shell wrapper | `cli/test/install.sh` → run the installed Cursor and Claude observe commands with `PATH` without asdd → exit 0, Cursor prints the allow JSON |
+
+> **Superseded by D-3 (2026-11-17):** the Cursor parts of the rows above (installed Cursor observe command, Cursor
+> fixtures) and the two Cursor `beforeReadFile` latency classes below do not apply: no Cursor load hook is installed,
+> and `asdd observe cursor` answers `{"permission":"allow"}` and records nothing. See [`cli/test/fixtures/telemetry/cursor/README.md`](../../../cli/test/fixtures/telemetry/cursor/README.md) and requirements 1.1.1 errata
+> (QA-F-002).
 
 **Latency proof.**
 - **REQ-003.** `telemetry-lib.test.mjs` performs ≥1,000 emits of spans between 300 B and 4,096 B against a writable
@@ -759,6 +767,9 @@ code.
 
   This narrows REQ-007's "cursor otherwise" for payloads that are neither shape. The spec agent should record it as
   REQ-007 1.1.1 errata (§14 D-2).
+
+  > **D-2 recorded (2026-11-17):** requirements 1.1.1 errata amends REQ-007 c2 to this rule (`cli` for a direct CLI
+  > call), so the §4.3 "§5 rule (ACT-002)" runtime entry and REQ-007 now agree (QA-F-001).
 - **NFR-001.** Kept, and tightened by the added-time p99 ≤ 50 ms test (§9).
 - **AMB-010.** Baseline = the same exit code as with the validator working, and no output added by the failure (§9).
 - **TRC-006.** Fifth latency class: Cursor non-guidance (§9).
@@ -771,6 +782,11 @@ But labeling CI runs `cursor` would put false runtime columns in the profile (TE
 ## 12. Load detection per runtime (MH-03)
 
 ### 12.1 Summary table
+
+> **Superseded by D-3 (2026-11-17):** the **Cursor** row below is not shipped. Cursor is hookless for guidance loads:
+> no `beforeReadFile` hook is installed, `asdd observe cursor` answers `{"permission":"allow"}` and records nothing,
+> and the profile shows Cursor loads as `unknown` (never `not observed`). See [`cli/test/fixtures/telemetry/cursor/README.md`](../../../cli/test/fixtures/telemetry/cursor/README.md) and requirements 1.1.1 errata
+> (QA-F-002).
 
 Status column: **V** = verified in the repo; **U** = vendor-documented and UNVERIFIED until the §12.5 fixtures land.
 
@@ -791,6 +807,9 @@ Status column: **V** = verified in the repo; **U** = vendor-documented and UNVER
   without a tool call, are computed when the report runs, and get no span (Q-9).
 
 ### 12.2 Hook entries
+
+> **Superseded by D-3 (2026-11-17):** the Cursor entries below (project Cursor command, kit-self Cursor equivalent,
+> `.cursor/hooks.json` `beforeReadFile`) are not installed; only the Claude entries ship. See [`cli/test/fixtures/telemetry/cursor/README.md`](../../../cli/test/fixtures/telemetry/cursor/README.md).
 
 New helper in `phases.mjs`: `observeCommand(ctx, runtime)`. Its replies are fixed strings in the shell, so they do not
 depend on asdd.

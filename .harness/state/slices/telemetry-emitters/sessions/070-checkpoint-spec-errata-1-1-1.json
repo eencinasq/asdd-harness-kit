@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "asdd-spec-agent",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "phase": "qa",
+  "session_id": "sess-telemetry-emitters-070",
+  "timestamp": "2026-11-17T14:39:00.000Z",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "note": "spec errata 1.1.1 (QA-F-001/002): requirements.md 1.1.0 -> 1.1.1 amends REQ-007 c2 (D-2: direct CLI gate call -> runtime cli) and, for D-3 (Cursor hookless, session 054), REQ-014 c1, REQ-021 c4, REQ-024 c1 Cursor item, REQ-025 c4 (plus REQ-014/REQ-025 descriptions). REQ ids and all other criteria unchanged. Design §8(c), §9, §11 ACT-002, §12.1, §12.2 and domain-model Telemetry section get additive superseded notes pointing to cli/test/fixtures/telemetry/cursor/README.md. Approved by PO/TL eencinas 2026-11-17 (\"approve recommendations\")."
+}

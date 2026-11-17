@@ -3,7 +3,7 @@
 **Author:** asdd-spec-agent
 **Model/Tool:** claude-opus-5-5 (Claude Code sub-agent)
 
-Spec version: 1.1.0
+Spec version: 1.1.1
 Status: READY
 Scope: ad-hoc (P5 roadmap, gap G15) / no scope ID (must_have: MH-01…MH-05)
 Governance Mode: TECH-LEAD-REVIEW (raised from PEER-REVIEW-ONLY by validation, §11)
@@ -19,7 +19,7 @@ Uncertainty Factors:
 3. Open items OI-1…OI-7 (end of file) are delegated to Design or noted for the PO. None changes a MUST outcome or the
    schema.
 
-Last updated: 2026-11-16
+Last updated: 2026-11-17
 Owner: Tech Lead (squad; PO decisions by eencinas, 2026-11-16)
 
 **Sources:** [`capability.md`](capability.md) (B-01…B-09, PO decision 2026-11-16 on Q-1…Q-15),
@@ -30,6 +30,20 @@ Owner: Tech Lead (squad; PO decisions by eencinas, 2026-11-16)
 **Glossary:** [`glossary.md`](glossary.md). **Anti-pattern gate:** [`anti-patterns.md`](anti-patterns.md).
 
 ## Changelog
+
+### 1.1.1 (2026-11-17): errata for recorded decisions D-2 and D-3
+
+Applies QA findings QA-F-001 and QA-F-002 (`spec-coverage-report.md`), approved by the PO/TL ("approve
+recommendations", eencinas, 2026-11-17). The errata only aligns the text with decisions already recorded; no REQ id is
+added, removed or renumbered, and every other criterion is unchanged.
+
+- **D-2 (ACT-002, `tasks.md` Working assumptions):** REQ-007 c2: a direct CLI gate call (payload neither Claude- nor
+  Cursor-shaped) gets `runtime` `cli`, not `cursor`.
+- **D-3 (PO/TL eencinas, 2026-11-17, session 054; outcome in `cli/test/fixtures/telemetry/cursor/README.md`):** Cursor
+  is hookless for guidance loads. `asdd observe cursor` answers allow and records nothing, no Cursor load hook is
+  installed, and the profile shows Cursor loads as `unknown`. Amended: REQ-014 c1 (and its description and actor),
+  REQ-021 c4, REQ-024 c1 (Cursor load-hook item), REQ-025 c4 (and its description). To ship a Cursor load hook later,
+  a `live-capture` fixture reopens D-3 and needs a new spec revision.
 
 ### 1.1.0 (2026-11-16): validation revision
 
@@ -260,7 +274,9 @@ gate's own duration, the runtime, and a label from a closed set.
   exactly one span with `kind:"command"` and `process_name:"command-gate"` for that invocation.
 - When the command gate emits its span, the span shall carry the verdict (`allow` or `deny`), `duration_ms` measured
   from reading the payload to writing the verdict, `runtime` `claude` when the payload's `hook_event_name` is
-  `PreToolUse` and `cursor` otherwise, and an `attributes.command_label`.
+  `PreToolUse`, `cursor` when the payload is Cursor-shaped (a top-level `command` field or `hook_event_name`
+  `beforeShellExecution`), and `cli` otherwise (a direct CLI call; D-2, errata 1.1.1), and an
+  `attributes.command_label`.
 - When the command gate sets `attributes.command_label`, the value shall come from this closed set:
   - the gate's dangerous-pattern label for a denied command (the value `deniedLabel` returns);
   - `allowlist` for a command that matches an allow-list pattern;
@@ -450,15 +466,15 @@ Q-13; assumptions A-01, A-05; validation AMB-004
 
 **Category:** FEATURE
 **Source:** MH-03
-**Description:** When Cursor reports a read of a guidance path, `asdd observe` emits one activation record with the
-same shape and `runtime:"cursor"`.
-**Actor:** Runtime hook host (Cursor `beforeReadFile`)
+**Description:** Cursor is hookless for guidance loads (D-3, 2026-11-17; errata 1.1.1): `asdd observe cursor` answers
+allow and records nothing, and Cursor loads are `unknown` in the profile report. (1.1.0 text: "When Cursor reports a
+read of a guidance path, `asdd observe` emits one activation record with the same shape and `runtime:"cursor"`.")
+**Actor:** Runtime hook host (Cursor; no load hook is installed under D-3)
 
 **Acceptance Criteria (EARS):**
-- When Cursor invokes `asdd observe` with a `beforeReadFile` payload whose file path is a guidance path under
-  REQ-015's filter, `asdd observe` shall emit exactly one span with `kind:"tool"`, `writer:"runtime-hook"`,
-  `runtime:"cursor"`, `attributes.trace_source:"self"`, the repo-relative `attributes.target_path`, and the payload's
-  `conversation_id` as the runtime session id attribute when the payload carries one (REQ-016).
+- When `asdd observe` is invoked with the runtime `cursor`, `asdd observe` shall emit no span for any payload,
+  including a `beforeReadFile` payload whose file path is a guidance path under REQ-015's filter, because Cursor is
+  hookless for guidance loads (D-3, errata 1.1.1).
 - When Cursor invokes `asdd observe` with a `beforeReadFile` payload, `asdd observe` shall answer with an allow
   decision for every payload, including payloads for non-guidance files.
 
@@ -466,7 +482,7 @@ same shape and `runtime:"cursor"`.
 **Non-Functional Classification:** OBSERVABILITY
 **Priority:** MUST
 **Traceability:** capability.md B-06, MH-03 evidence table (Cursor row); intent MH-03; PO decisions Q-1, Q-13;
-assumption A-02
+assumption A-02; decision D-3 (session 054, `cli/test/fixtures/telemetry/cursor/README.md`)
 
 ### REQ-015: Only guidance paths are recorded, normalized to their canonical path
 
@@ -667,7 +683,8 @@ legend that separates `not observed`, `unknown`, and `configured, not observed`;
 - When `asdd profile` renders a phase table, it shall show one column per runtime listed in
   `.harness/config/project.json` → `runtimes`. Design confirms the key.
 - When an expected steering file or an installed skill has no activation record for a phase, the profile report shall
-  show it as `not observed` in the column of a runtime with load hooks (`claude`, `cursor`).
+  show it as `not observed` in the column of a runtime with load hooks (`claude`) and as `unknown` in the `cursor`
+  column, because Cursor is hookless for guidance loads (D-3, errata 1.1.1).
 - When a configured runtime has no load hooks (Devin, OpenCode, Kimi, Junie, Kiro), the profile report shall show
   `unknown` in that runtime's column for every row.
 - When the report runs, the profile report shall list as `configured, not observed` the files that enter context
@@ -760,8 +777,8 @@ rows together.
   - every new `*.test.mjs` in the `npm test` script;
   - `cli/scaffold/state/telemetry/**` with one `HARNESS_FILES` row;
   - the `spans.jsonl` and rollup lines in the kit `.gitignore` and in `ensureGitignore`;
-  - the Claude Code `PostToolUse` (matcher `Read|Skill`) and Cursor `beforeReadFile` load hooks in the installer, the
-    runtime recipes, `.claude/settings.json`, and `.cursor/hooks.json`;
+  - the Claude Code `PostToolUse` (matcher `Read|Skill`) load hook in the installer, the runtime recipes, and
+    `.claude/settings.json`, and no Cursor `beforeReadFile` load hook (D-3, errata 1.1.1);
   - the regenerated `tools/*/src/harness/telemetry-lib.mjs` copies;
   - restamped versions;
   - the README command rows.
@@ -784,8 +801,8 @@ rows together.
 **Category:** MODULE
 **Source:** MH-05
 **Description:** Installing or upgrading the kit provisions the telemetry location with the shipped contract files and
-adds the gitignore lines. It wires load hooks only for the selected Claude Code and Cursor runtimes, and those hooks
-stay fail-open even when `asdd` cannot be resolved.
+adds the gitignore lines. It wires a load hook only for the selected Claude Code runtime (Cursor is hookless under
+D-3, errata 1.1.1), and that hook stays fail-open even when `asdd` cannot be resolved.
 **Actor:** Adopting engineer (runs `asdd install`)
 
 **Acceptance Criteria (EARS):**
@@ -795,8 +812,8 @@ stay fail-open even when `asdd` cannot be resolved.
   also after a second install run.
 - Where the adopting engineer selects the Claude Code runtime, the installer shall wire the `PostToolUse` load hook
   (matcher `Read|Skill`) running `asdd observe`.
-- Where the adopting engineer selects the Cursor runtime, the installer shall wire the `beforeReadFile` load hook
-  running `asdd observe`, under REQ-018's `failClosed` rule.
+- Where the adopting engineer selects the Cursor runtime, the installer shall wire no `beforeReadFile` load hook,
+  because Cursor is hookless for guidance loads (D-3, errata 1.1.1).
 - Where the adopting engineer selects only runtimes without hooks (Devin, OpenCode, Kimi, Junie, Kiro), the installer
   shall wire no load hook.
 - If `asdd` cannot be resolved in the installed project (no `node_modules/.bin/asdd` and no `asdd` on the `PATH`), then
