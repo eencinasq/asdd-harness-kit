@@ -441,18 +441,6 @@ export async function startUiServer(opts = {}) {
         return;
       }
 
-      // Optional static reuse of built spec-drift dashboards (read-only).
-      if (path.startsWith('/vendor/spec-drift/')) {
-        const dist = join(root, 'tools/spec-drift/dist');
-        const file = safeJoin(dist, path.slice('/vendor/spec-drift'.length));
-        if (!file) {
-          send(res, 403, 'forbidden\n', { 'content-type': 'text/plain; charset=utf-8' });
-          return;
-        }
-        serveFile(res, file);
-        return;
-      }
-
       send(res, 404, 'not found\n', { 'content-type': 'text/plain; charset=utf-8' });
     };
 

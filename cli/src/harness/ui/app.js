@@ -90,7 +90,7 @@ async function renderDrift() {
   panel.innerHTML = `
     <p class="meta">drift_level=${escapeHtml(data.summary?.drift_level)} · base=${escapeHtml(data.summary?.base)}</p>
     <ul>${list || '<li>(no findings)</li>'}</ul>
-    <p class="meta"><a href="/vendor/spec-drift/audit-dashboard.html">Open spec-drift audit dashboard (static)</a></p>
+    <p class="meta">Same checks as <code>asdd drift</code>. The spec-drift dashboards are MCP Apps: open them from an MCP host (Cursor, Claude) through the <code>spec-drift</code> server.</p>
   `;
 }
 

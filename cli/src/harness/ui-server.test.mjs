@@ -312,3 +312,16 @@ test('REQ-003 /events SSE fires when .harness/state/ changes', async () => {
     rmSync(tmp, { recursive: true, force: true });
   }
 });
+
+test('ui-drift-dead-link REQ-001 REQ-002: no link or route to the host-only spec-drift MCP App', async () => {
+  const app = readFileSync(join(HERE, 'ui/app.js'), 'utf8');
+  assert.doesNotMatch(app, /\/vendor\/spec-drift\//, 'the MCP App waits forever outside an MCP host');
+  const { startUiServer } = await import('./ui-server.mjs');
+  const handle = await startUiServer({ root: ROOT, port: 0 });
+  try {
+    const res = await fetch(`http://127.0.0.1:${handle.address.port}/vendor/spec-drift/audit-dashboard.html`);
+    assert.equal(res.status, 404);
+  } finally {
+    await handle.close();
+  }
+});
