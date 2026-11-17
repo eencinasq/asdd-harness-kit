@@ -199,3 +199,32 @@ test('TASK-006 REQ-009 ordering: the payload is written before the telemetry lib
     }
   }
 });
+
+test('cost-metrics REQ-001: a Claude Stop records the transcript usage on its single hook span; other runtimes do not', () => {
+  const root = project('writable', 'pass');
+  try {
+    cpSync(join(HERE, 'cost-lib.mjs'), join(root, '.harness/cli/src/harness/cost-lib.mjs'));
+    const transcript = join(root, 'transcript.jsonl');
+    const msg = (id, model, input, output) =>
+      `${JSON.stringify({ type: 'assistant', sessionId: 'sess-1', message: { id, model, usage: { input_tokens: input, output_tokens: output, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } } })}\n`;
+    writeFileSync(transcript, msg('m1', 'claude-opus-5-5', 100, 10) + msg('m1', 'claude-opus-5-5', 100, 10) + msg('m2', 'claude-opus-5-5', 5, 1));
+    const out = run(root, JSON.stringify({ hook_event_name: 'Stop', session_id: 'sess-1', transcript_path: transcript }), {});
+    assert.equal(out.stdout, '{}\n');
+    assert.equal(out.status, 0);
+    const all = spans(root);
+    assert.equal(all.length, 1, 'still one span');
+    assert.deepEqual(all[0].attributes.usage, {
+      session_id: 'sess-1',
+      models: { 'claude-opus-5-5': { input_tokens: 105, output_tokens: 11, cache_read_tokens: 0, cache_write_tokens: 0, messages: 2 } },
+    });
+    assert.deepEqual(validateSpan(all[0], SCHEMA), []);
+    writeFileSync(join(root, STREAM), '');
+    run(root, JSON.stringify({ hook_event_name: 'stop', status: 'completed', transcript_path: transcript }), {});
+    assert.equal(Object.hasOwn(spans(root)[0].attributes, 'usage'), false, 'Cursor: no usage, never estimated');
+    writeFileSync(join(root, STREAM), '');
+    run(root, JSON.stringify({ hook_event_name: 'Stop', session_id: 'sess-1', transcript_path: join(root, 'missing.jsonl') }), {});
+    assert.equal(Object.hasOwn(spans(root)[0].attributes, 'usage'), false, 'unreadable transcript: span without usage');
+  } finally {
+    cleanup(root);
+  }
+});

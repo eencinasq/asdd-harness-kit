@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "cost-metrics",
+  "concerns": [],
+  "timestamp": "2026-11-17T15:29:57.000Z",
+  "session_id": "sess-cost-metrics-003",
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "design.md: usage attribute on the Stop hook span (open attribute bag, no schema change), cumulative snapshots with delta attribution, project-owned price table, unknown runtimes; metrics.cost contract."
+}
