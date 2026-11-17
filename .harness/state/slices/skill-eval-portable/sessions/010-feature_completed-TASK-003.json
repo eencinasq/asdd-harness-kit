@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "skill-eval-portable",
+  "concerns": [],
+  "timestamp": "2026-11-17T17:50:45.000Z",
+  "session_id": "sess-skill-eval-portable-010",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "scope_paths": [
+    "package.json",
+    "cli/test/install.sh",
+    "README.md",
+    "cli/README.md"
+  ],
+  "evidence": "2026-11-17: npm package ships cli/eval/skills (8 fixtures + README); install.sh asserts the fixtures ship, none hard-codes the kit CLI, and asdd skill-eval passes in the installed app (install.sh exit 0). Manual packed install: /tmp app via prefix bin asdd → skill-eval total 8/8 pass; a project fixture .harness/eval/skills/asdd-status/status-json.json overrides the shipped case (source: project). npm test 430/430."
+}

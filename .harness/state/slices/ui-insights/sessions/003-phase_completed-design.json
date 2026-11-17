@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ui-insights",
+  "concerns": [],
+  "timestamp": "2026-11-17T15:29:15.000Z",
+  "session_id": "sess-ui-insights-003",
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "design.md: ui-server-insights.mjs models, three GET endpoints, Insights tab; cost contract shared with cost-metrics; no domain terms; no ADR."
+}

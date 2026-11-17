@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-068",
+  "timestamp": "2026-11-17T14:40:19.349Z",
+  "phase": "implementation",
+  "feature_id": "TASK-012",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/telemetry-observe.mjs",
+    "cli/src/harness/telemetry-observe.test.mjs"
+  ],
+  "evidence": "Re-verified after the TASK-010 UNCOV-001 fix (guarded dynamic import of telemetry-lib in cli/src/harness/telemetry-observe.mjs; 2 REQ-002 c7 tests appended) (DRIFT-02; sessions 066/068), TASK-010 passing first: node --test cli/src/harness/telemetry-observe.test.mjs -> tests 36 pass 36 fail 0 (4 runs; the 8 TASK-012 tests unchanged and passing; Cursor guidance p99 0.001 ms, non-guidance 0.000 ms, n=200); new REQ-002 c7 tests also pin observe cursor -> {\"permission\":\"allow\"}\\n, exit 0, no stderr, no span with telemetry-lib throwing or deleted; node --test cli/src/harness/validators/telemetry.test.mjs cli/src/harness/harness-profile.test.mjs -> 29/29; npm test exit 0 (374/374); kit vendor --check exit 0; kit self --check exit 0; HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0."
+}

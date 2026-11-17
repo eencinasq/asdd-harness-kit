@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-security-review-020",
+  "timestamp": "2026-11-17T15:04:45.000Z",
+  "agent": "claude-sec",
+  "human": "eencinas",
+  "slice_id": "security-review",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "RED: grep -q security_audit_start tools/spec-drift/README.md fails; root README does not mention analyze_security.",
+  "concerns": [],
+  "feature_id": "TASK-007",
+  "scope_paths": [
+    "tools/spec-drift/README.md",
+    "README.md"
+  ]
+}

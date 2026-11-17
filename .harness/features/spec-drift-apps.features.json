@@ -42,7 +42,7 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "npm test 136/136 (after review-quality extended learning-lib.mjs: review metrics ingestion, review_quality; vendored copies refreshed).",
+      "evidence": "re-verified 2026-11-16T20:49:13 (DRIFT-02): npm test exit 0 (210 tests) after learn-eval-gate learning-lib/validator changes",
       "scope_paths": [
         "cli/src/harness/learning-lib.mjs",
         "cli/src/harness/validators/learning.mjs",
@@ -51,7 +51,7 @@
         "tools/jev-gate/src/harness/learning-lib.mjs",
         "tools/knowledge/src/harness/learning-lib.mjs"
       ],
-      "evidence_hash": "4d5ae60c99f8945af73ffb3ac3d8fbc13235f26beff07d0136a60356b8a141fa"
+      "evidence_hash": "acccb64128a168ceb71db19a820ab95c34d6892d0ff7f5fb7c7dca9ae63f5052"
     },
     {
       "id": "TASK-003",

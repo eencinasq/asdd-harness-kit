@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-roadmap-024",
+  "timestamp": "2026-11-17T03:02:35.493Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "Add P6 (evidence-grounded PO shaping via the tracker) and gaps G23–G27.",
+  "amendment_path": ".harness/specs/asdd-roadmap/amendments/2026-11-17T03-02-35-493Z.md",
+  "concerns": []
+}

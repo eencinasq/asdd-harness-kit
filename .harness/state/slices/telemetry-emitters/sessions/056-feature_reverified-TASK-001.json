@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-056",
+  "timestamp": "2026-11-17T12:36:43.359Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/test/fixtures/telemetry/claude/",
+    "cli/test/fixtures/telemetry/README.md"
+  ],
+  "evidence": "Re-verified after the D-3 note in fixtures/telemetry/README.md (DRIFT-02): provenance/parse check OK on 7 Claude fixtures; no absolute repo path under cli/test/fixtures/telemetry/."
+}

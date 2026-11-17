@@ -12,6 +12,8 @@
 			"!src/harness",
 			"!src/pr-review/engine/rules",
 			"!src/pr-review/engine/data",
+			"!src/security/methodology",
+			"!src/security/semgrep",
 			"!pnpm-lock.yaml"
 		]
 	},

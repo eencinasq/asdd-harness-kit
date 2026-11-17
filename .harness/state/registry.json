@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-11-14T04:44:22.751Z",
+  "generated_at": "2026-11-17T17:52:18.472Z",
   "slices": [
     {
       "slice_id": "agents-spec",
@@ -12,7 +12,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.724Z",
+      "last_activity": "2026-11-17T17:52:18.440Z",
       "contributors": [
         "squad",
         "human",
@@ -23,37 +23,57 @@
     {
       "slice_id": "agents-use-scripts",
       "phase": "implementation",
-      "status": "in_progress",
+      "status": "ABANDONED",
       "mode": "escalated",
       "active_features": 0,
       "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.725Z",
+      "last_activity": "2026-11-17T17:52:18.442Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
-        "asdd-lite"
+        "asdd-lite",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "amend-close",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.442Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
       ]
     },
     {
       "slice_id": "asdd-cli",
       "phase": "implementation",
-      "status": "in_progress",
+      "status": "ABANDONED",
       "mode": "escalated",
       "active_features": 0,
       "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.725Z",
+      "last_activity": "2026-11-17T17:52:18.442Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
-        "asdd-lite"
+        "asdd-lite",
+        "claude"
       ]
     },
     {
@@ -66,7 +86,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.726Z",
+      "last_activity": "2026-11-17T17:52:18.443Z",
       "contributors": [
         "squad",
         "human",
@@ -85,7 +105,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.727Z",
+      "last_activity": "2026-11-17T17:52:18.444Z",
       "contributors": [
         "squad",
         "human",
@@ -104,7 +124,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.728Z",
+      "last_activity": "2026-11-17T17:52:18.444Z",
       "contributors": [
         "squad",
         "human",
@@ -123,7 +143,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.728Z",
+      "last_activity": "2026-11-17T17:52:18.445Z",
       "contributors": [
         "squad",
         "human",
@@ -142,7 +162,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.729Z",
+      "last_activity": "2026-11-17T17:52:18.445Z",
       "contributors": [
         "squad",
         "human",
@@ -161,32 +181,142 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.730Z",
+      "last_activity": "2026-11-17T17:52:18.446Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite",
-        "asdd-pipeline"
+        "asdd-pipeline",
+        "claude"
       ]
     },
     {
-      "slice_id": "cli-harness",
-      "phase": "implementation",
-      "status": "in_progress",
+      "slice_id": "asdd-ui",
+      "phase": "knowledge",
+      "status": "DONE",
       "mode": "escalated",
       "active_features": 0,
       "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.733Z",
+      "last_activity": "2026-11-17T17:52:18.447Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "cursor"
+      ]
+    },
+    {
+      "slice_id": "cli-harness",
+      "phase": "implementation",
+      "status": "ABANDONED",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.449Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite",
-        "asdd-pipeline"
+        "asdd-pipeline",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "cost-metrics",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.450Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "docs-p5-wave1",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.450Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "drift-test-env",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.450Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "drift01-harness-logs",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.450Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "drift02-open-slices",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.451Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
       ]
     },
     {
@@ -199,13 +329,67 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.733Z",
+      "last_activity": "2026-11-17T17:52:18.451Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-full",
         "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "full-flow-fixture",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.451Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "grounded-shaping",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.452Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude-p63"
+      ]
+    },
+    {
+      "slice_id": "guidance-proposal-skip",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.452Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
       ]
     },
     {
@@ -218,7 +402,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.734Z",
+      "last_activity": "2026-11-17T17:52:18.452Z",
       "contributors": [
         "squad",
         "human",
@@ -228,21 +412,58 @@
       ]
     },
     {
-      "slice_id": "jev-gate-nest",
-      "phase": "implementation",
-      "status": "in_progress",
+      "slice_id": "intake-fitness-format",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.452Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "intent-intake",
+      "phase": "knowledge",
+      "status": "DONE",
       "mode": "escalated",
       "active_features": 0,
       "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.734Z",
+      "last_activity": "2026-11-17T17:52:18.453Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
-        "asdd-lite"
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "jev-gate-nest",
+      "phase": "implementation",
+      "status": "ABANDONED",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.453Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "asdd-lite",
+        "claude"
       ]
     },
     {
@@ -255,7 +476,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.735Z",
+      "last_activity": "2026-11-17T17:52:18.454Z",
       "contributors": [
         "squad",
         "human",
@@ -281,7 +502,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.736Z",
+      "last_activity": "2026-11-17T17:52:18.455Z",
       "contributors": [
         "squad",
         "human",
@@ -309,7 +530,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.737Z",
+      "last_activity": "2026-11-17T17:52:18.455Z",
       "contributors": [
         "squad",
         "human",
@@ -321,55 +542,147 @@
     {
       "slice_id": "knowledge-nest",
       "phase": "implementation",
-      "status": "in_progress",
+      "status": "ABANDONED",
       "mode": "escalated",
       "active_features": 0,
       "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.737Z",
+      "last_activity": "2026-11-17T17:52:18.456Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
-        "asdd-lite"
+        "asdd-lite",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "learn-eval-gate",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "lite",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.456Z",
+      "contributors": [
+        "squad",
+        "human",
+        "devin"
       ]
     },
     {
       "slice_id": "mcp-standalone",
       "phase": "implementation",
-      "status": "in_progress",
+      "status": "ABANDONED",
       "mode": "escalated",
       "active_features": 0,
       "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.738Z",
+      "last_activity": "2026-11-17T17:52:18.456Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
-        "asdd-lite"
+        "asdd-lite",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "metrics-data-quality",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.456Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
       ]
     },
     {
       "slice_id": "modules-top-level",
       "phase": "implementation",
-      "status": "in_progress",
+      "status": "ABANDONED",
       "mode": "escalated",
       "active_features": 0,
       "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.738Z",
+      "last_activity": "2026-11-17T17:52:18.457Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
-        "asdd-lite"
+        "asdd-lite",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "npm-pack-json",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.457Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "po-readonly-gate",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.457Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "pr-review-group-brief",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.457Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
       ]
     },
     {
@@ -382,7 +695,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.739Z",
+      "last_activity": "2026-11-17T17:52:18.458Z",
       "contributors": [
         "squad",
         "human",
@@ -400,7 +713,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.740Z",
+      "last_activity": "2026-11-17T17:52:18.459Z",
       "contributors": [
         "squad",
         "human",
@@ -418,12 +731,48 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.741Z",
+      "last_activity": "2026-11-17T17:52:18.459Z",
       "contributors": [
         "squad",
         "human",
         "ougarte",
         "devin"
+      ]
+    },
+    {
+      "slice_id": "security-recon-untracked",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.459Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude-recon"
+      ]
+    },
+    {
+      "slice_id": "security-review",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.460Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude-sec"
       ]
     },
     {
@@ -436,13 +785,85 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.741Z",
+      "last_activity": "2026-11-17T17:52:18.460Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
         "asdd-lite",
         "asdd-pipeline"
+      ]
+    },
+    {
+      "slice_id": "shaping-agent",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.461Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude-p62"
+      ]
+    },
+    {
+      "slice_id": "shaping-cloud-setup",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.461Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude-p65"
+      ]
+    },
+    {
+      "slice_id": "skill-eval",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.462Z",
+      "contributors": [
+        "squad",
+        "human",
+        "asdd-lite-agent",
+        "devin"
+      ]
+    },
+    {
+      "slice_id": "skill-eval-portable",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.462Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
       ]
     },
     {
@@ -455,7 +876,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.742Z",
+      "last_activity": "2026-11-17T17:52:18.463Z",
       "contributors": [
         "squad",
         "human",
@@ -473,7 +894,7 @@
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.744Z",
+      "last_activity": "2026-11-17T17:52:18.464Z",
       "contributors": [
         "squad",
         "human",
@@ -492,7 +913,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.745Z",
+      "last_activity": "2026-11-17T17:52:18.464Z",
       "contributors": [
         "squad",
         "human",
@@ -510,7 +931,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.746Z",
+      "last_activity": "2026-11-17T17:52:18.465Z",
       "contributors": [
         "squad",
         "human",
@@ -528,7 +949,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.747Z",
+      "last_activity": "2026-11-17T17:52:18.466Z",
       "contributors": [
         "squad",
         "human",
@@ -546,7 +967,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.748Z",
+      "last_activity": "2026-11-17T17:52:18.467Z",
       "contributors": [
         "squad",
         "human",
@@ -564,7 +985,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.749Z",
+      "last_activity": "2026-11-17T17:52:18.468Z",
       "contributors": [
         "squad",
         "human",
@@ -575,19 +996,20 @@
     {
       "slice_id": "spec-drift-merge",
       "phase": "implementation",
-      "status": "in_progress",
+      "status": "ABANDONED",
       "mode": "escalated",
       "active_features": 0,
       "escalation_signals": 1,
       "escalation_required": false,
       "escalated_from_lite": true,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.750Z",
+      "last_activity": "2026-11-17T17:52:18.468Z",
       "contributors": [
         "squad",
         "human",
         "eencinas",
-        "asdd-lite"
+        "asdd-lite",
+        "claude"
       ]
     },
     {
@@ -600,7 +1022,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.750Z",
+      "last_activity": "2026-11-17T17:52:18.468Z",
       "contributors": [
         "squad",
         "human",
@@ -619,12 +1041,146 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-14T04:44:22.750Z",
+      "last_activity": "2026-11-17T17:52:18.469Z",
       "contributors": [
         "squad",
         "human",
         "ougarte",
         "devin"
+      ]
+    },
+    {
+      "slice_id": "telemetry-emitters",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "full",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.470Z",
+      "contributors": [
+        "squad",
+        "human",
+        "asdd-discovery-agent",
+        "asdd-spec-agent",
+        "asdd-validation-agent",
+        "asdd-domain-agent",
+        "asdd-design-agent",
+        "asdd-task-planning-agent",
+        "eencinas",
+        "claude",
+        "asdd-qa-agent",
+        "asdd-knowledge-agent"
+      ]
+    },
+    {
+      "slice_id": "tracker-binding",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.470Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude-p61"
+      ]
+    },
+    {
+      "slice_id": "ui-assets-dist",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.471Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "ui-drift-dead-link",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.471Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "ui-gate-decisions",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "escalated",
+      "active_features": 0,
+      "escalation_signals": 1,
+      "escalation_required": false,
+      "escalated_from_lite": true,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.471Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "cursor"
+      ]
+    },
+    {
+      "slice_id": "ui-insights",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "lite",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.472Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
+      ]
+    },
+    {
+      "slice_id": "ui-insights-host-guard",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-17T17:52:18.472Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "claude"
       ]
     }
   ]

@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "author": "eencinas-claude-sep",
+  "week": "2026-W47",
+  "signatures": {
+    "command:rm -rf": {
+      "source": "command",
+      "episodes": [
+        {
+          "at": "2026-11-17T17:44:22.979Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "denied: rm -rf"
+      ]
+    }
+  }
+}

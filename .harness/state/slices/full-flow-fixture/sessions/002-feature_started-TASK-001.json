@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-full-flow-fixture-002",
+  "timestamp": "2026-11-17T15:57:56.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "full-flow-fixture",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/test/full-flow.sh"
+  ],
+  "evidence": "RED: npm run test:full-flow exits 1 on main and on the integration branch — DRIFT-01 test/reorder.test.mjs not mapped by order-flow.",
+  "concerns": []
+}

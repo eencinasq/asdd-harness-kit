@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-036",
+  "timestamp": "2026-11-17T02:51:55.368Z",
+  "phase": "implementation",
+  "feature_id": "TASK-007",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/validators/telemetry.mjs",
+    "cli/src/harness/validators/telemetry.test.mjs",
+    "cli/src/harness/check-invariants.mjs"
+  ],
+  "evidence": "TASK-007 GREEN (REQ-019, REQ-006, REQ-005; ADR-006, OI-5, OI-7, AMB-010). validators/telemetry.mjs: WARN-only, silent without .harness/state/telemetry/; TEL-W1 schema missing/unparseable; TEL-W2 per bad readTail line (not JSON, schema, >4096 B with LF, missing attributes.trace_source) numbered spans.jsonl line N or the OI-5 tail wording; TEL-W3 (a) gitignore lines (b) contract files (c) claude PostToolUse / cursor beforeReadFile observe entry, each naming asdd install .; reads only. check-invariants.mjs: guarded dynamic import, ctx {root, fail->warn, warn}, WARNs collected per run and kept in telemetryWarnings only on success (printed with WARN prefix, never passed to writeSensorSignal). node --test cli/src/harness/validators/telemetry.test.mjs -> exit 0, 11/11 (3 runs). Mutation RED, each reverted: WARN as FAIL -> exit-identity + learning cases fail; WARNs into shared list -> learning-isolation case fails; partial WARNs kept on throw -> AMB-010 case fails; unguarded import -> AMB-010 case fails; whole-file read -> bounded + OI-5 cases fail; no location gate -> absent/OI-7/AMB-010 cases fail; no OI-5 wording -> OI-5 + bounded cases fail; no runtime hook check -> TEL-W3 case fails (fail-not-mapped alone is equivalent: the validator never calls fail, asserted in every unit case). npm test -> exit 0 (226/226); kit vendor --check -> exit 0; HARNESS_DRIFT_BASE=c337df7 asdd check --live -> exit 0; real repo adds 3 expected TEL-W3 WARNs (gitignore lines, claude PostToolUse, cursor beforeReadFile) until TASK-014. Implementation confidence 0.88; uncertainty: D-3 open (cursor TEL-W3 clause is permanent if D-3 = hookless); telemetry.test.mjs not in npm test until TASK-014."
+}

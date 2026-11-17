@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "drift02-open-slices",
+  "source_tasks": ".harness/specs/drift02-open-slices/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "DRIFT-02 checks only in-progress slices (SP-003)",
+      "user_visible_behavior": "Editing a shared file no longer reopens passing features of DONE/PARKED/ABANDONED slices; in-progress slices still reopen, and DRIFT-05 still checks every slice.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/drift-lib.test.mjs",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "node cli/bin/asdd.mjs kit self --check",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-16 (48181a3): drift-lib.test.mjs 18/18 incl. new 'drift02-open-slices REQ-001 REQ-002'; lifecycle.sh OK (DONE slice not reopened, amended slice reopened); kit vendor --check and kit self --check OK; npm test 201/201.",
+      "scope_paths": [
+        "cli/src/harness/drift-lib.mjs",
+        "cli/src/harness/drift-lib.test.mjs",
+        "cli/test/lifecycle.sh",
+        "cli/steering/spec-drift.md"
+      ],
+      "evidence_hash": "327fccf88f655c1bb5185402b0aae82398f67aedfe80c8a1a0104b378b9738c0"
+    }
+  ]
+}

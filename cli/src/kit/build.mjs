@@ -5,17 +5,29 @@
  * Usage:
  *   asdd kit build [--obfuscate] [--check]
  */
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { fingerprint, sources } from './fingerprint.mjs';
+import { assets, fingerprint, sources } from './fingerprint.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const SRC = join(ROOT, 'cli/src');
 const DIST = join(ROOT, 'cli/dist');
 
 const walk = sources;
+
+/** Static assets (asdd ui's html/js/css) are not modules: copy them to the same path under dist/. */
+function copyAssets() {
+  let n = 0;
+  for (const file of assets(SRC)) {
+    const dest = join(DIST, relative(SRC, file));
+    mkdirSync(dirname(dest), { recursive: true });
+    copyFileSync(file, dest);
+    n += 1;
+  }
+  return n;
+}
 
 async function minifyAll(entryPoints) {
   const esbuild = await import('esbuild');
@@ -105,8 +117,9 @@ export async function run(argv = []) {
   mkdirSync(DIST, { recursive: true });
   await minifyAll(entries);
   if (obfuscate) await obfuscateTree();
+  const copied = copyAssets();
   const meta = stampMeta({ obfuscate });
-  console.log(`OK cli/dist (${entries.length} modules, obfuscate=${meta.obfuscate})`);
+  console.log(`OK cli/dist (${entries.length} modules, ${copied} assets, obfuscate=${meta.obfuscate})`);
   return 0;
 }
 

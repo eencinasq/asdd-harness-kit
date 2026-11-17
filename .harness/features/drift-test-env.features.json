@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "drift-test-env",
+  "source_tasks": ".harness/specs/drift-test-env/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Drift tests independent of the caller's environment",
+      "user_visible_behavior": "npm test passes with HARNESS_DRIFT_BASE set.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "HARNESS_DRIFT_BASE=HEAD HARNESS_PR_BRANCH=x HARNESS_PR_BODY=y node --test cli/src/harness/drift-lib.test.mjs",
+        "env -u HARNESS_DRIFT_BASE node --test cli/src/harness/drift-lib.test.mjs"
+      ],
+      "evidence": "GREEN 2026-11-17 (c746099): drift-lib.test.mjs 19/19 with HARNESS_DRIFT_BASE/PR vars set and unset; npm test 427/427 with HARNESS_DRIFT_BASE=HEAD.",
+      "scope_paths": [
+        "cli/src/harness/drift-lib.test.mjs"
+      ],
+      "evidence_hash": "b508d1d0faf5e7a6e846e936c56f5ded2af7c29abc57031833997814aaa90b30"
+    }
+  ]
+}

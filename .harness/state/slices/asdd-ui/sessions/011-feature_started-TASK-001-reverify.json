@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-ui-011",
+  "timestamp": "2026-11-17T00:37:53.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "asdd-ui",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/ui-server.mjs",
+    "cli/src/harness/ui-server.test.mjs",
+    "cli/src/harness/ui",
+    "cli/src/harness/commands.mjs",
+    "docs/knowledge-base/steering-proposals/SP-004.md"
+  ],
+  "evidence": "DRIFT-02 reopen after TASK-002 edited shared ui-server/ui; re-run verification.",
+  "concerns": []
+}

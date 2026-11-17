@@ -46,6 +46,10 @@ What it is **not**:
 | Weekly, or before a release                                    | Tech Lead      | [Health check](#play-j--weekly-health-check)                 |
 | The same failure keeps coming back                             | Tech Lead      | [Learning loop](#play-k--the-same-failure-keeps-coming-back) |
 | You look after several repositories                            | Tech Lead      | [Portfolio](#play-l--several-repositories)                   |
+| A gate is waiting for your decision                            | Tech Lead      | [Decide a gate](#play-m--decide-a-gate-from-the-ui)          |
+| A skill or agent guide must change                             | Maintainer, TL | [Change a skill](#play-n--change-a-skill-safely)             |
+| A PO/PM shapes an idea into a bet and intents                  | PO, PM         | [PO shaping](#play-o--po-or-pm-shapes-into-the-tracker)       |
+| An engineer picks up an Intent from the tracker                | Engineer       | [Intake](#play-p--an-engineer-picks-up-an-intent)            |
 
 **Skip it** for throwaway spikes and experiments outside the product code. **Do not bypass it** by editing generated
 files (`manifest.json`, `registry.json`, `PROGRESS.md`) or session logs by hand: they are regenerated or append-only.
@@ -232,6 +236,61 @@ side by side, use `repos_overview` on the spec-drift server.
 
 ---
 
+### Play M — Decide a gate from the UI
+
+```bash
+asdd ui            # http://127.0.0.1:7474/ — Gates view
+```
+
+The Gates view lists phase gates in `WARN` (completed with concerns or a dissent) that no Tech Lead has acknowledged.
+Read the evidence and concerns, write a note, and decide: the page runs `asdd gate-decide`, which appends an `override`
+session with your name as `decided_by` and syncs. Without the UI: `asdd gate-decide <slice> --phase <phase> --note "…"`.
+The next phase can start once its previous gate is `PASS` or an acknowledged `WARN`.
+
+### Play N — Change a skill safely
+
+1. Before editing `cli/skills/<name>/SKILL.md`, make sure the skill has fixtures under `cli/eval/skills/<name>/`
+   (format: [`cli/eval/skills/README.md`](../cli/eval/skills/README.md)); add one for the behavior you are changing.
+2. After the edit: `asdd skill-eval --skill <name> --baseline HEAD`. A `regressed` fixture means the change broke it.
+3. If the change comes from a steering proposal (`add-guide` or `tighten-guide`), save the run and cite it before the
+   Tech Lead accepts it:
+   `asdd skill-eval --skill <name> --json > eval-results/SP-007.json` and
+   `eval: asdd skill-eval --skill <name> --json => eval-results/SP-007.json` in the proposal (`QG-LEARN-10`).
+
+### Play O — PO or PM shapes into the tracker
+
+The PO/PM shapes and splits the bet; engineers never rewrite an intent by hand. Everything is grounded in what the
+repository already has, and the output lives in the tracker, not in the repository.
+
+1. Once per project, the Tech Lead adds the `tracker` block to `.harness/config/project.json` (Jira, Linear, or GitHub;
+   fields in [`.harness/config/README.md`](../.harness/config/README.md)) and checks it with `asdd check-config`.
+2. Without a local clone, the PO/PM opens the repository in claude.ai/code or the Claude Desktop Code tab; the
+   environment runs [`cloud-setup.sh`](../cli/runtimes/claude/README.md) first (asdd CLI, codegraph index, knowledge
+   index). With a clone, any runtime works.
+3. Work with the **`asdd-shaping-agent`**: it reads code, specs, and past slices and writes only to the tracker.
+   - `shape-up` grounds the idea first: a Reuse / Extend / New table with evidence (`REQ:<slice>/REQ-NNN`,
+     `slice:<id>`, `path:<file>`), and an appetite compared with DONE slices of similar scope.
+   - The pitch, its review, and the bet go to the tracker; the bet records `decided_by`.
+   - `product-delivery` splits the bet into scopes, merges or cuts any scope that duplicates an existing capability,
+     and creates one **Intent item** per fit scope in the canonical format
+     ([`intent-format.md`](../cli/skills/external-trackers/references/intent-format.md)).
+4. Start the PO/PM session with `HARNESS_GATE_MODE=readonly` (cloud: an environment variable; local: in the shell
+   that launches the agent). The shaping agent has no Write or Edit tool, and this mode makes the command gate allow
+   only read commands (file reads, `git log`/`diff`, `asdd status|drift|check|knowledge`, `codegraph`,
+   `asdd intake --dry-run`): redirections, command substitution, and overrides are denied, so the shell cannot
+   write either.
+
+### Play P — An engineer picks up an Intent
+
+1. Read the Intent item with the tracker's MCP (the `external-trackers` skill, Step 5) and save its body to a file.
+2. `asdd intake --from intent.md --ref <item-url> --dry-run` validates the format and re-checks the grounding against
+   today's code; then run it without `--dry-run`. It writes `.harness/specs/<slice>/intent.md` with a `## Source`,
+   creates the slice in the suggested mode (`hotfix`, `lite`, or `full`), and records the item URL.
+3. A grounding ref that no longer resolves stops the intake: ask the PO/PM to re-ground the item, or pass
+   `--accept-stale` to continue and record the stale refs in `## Source`.
+4. Work the slice as usual (Plays B–D). `asdd tracker-sync` and the `external-trackers` skill (Step 4) post progress
+   back to the Intent item: slice created, phases completed, DONE.
+
 ## 5. Working well with it
 
 - **Small slices.** Lite first; escalate on evidence. A slice that needs a page to explain is a scope split.
@@ -270,6 +329,10 @@ side by side, use `repos_overview` on the spec-drift server.
 | Search specs and features          | `asdd knowledge search "<query>"`                      |
 | Trace a requirement                | `asdd knowledge trace req:<slice>:REQ-001`             |
 | Several repositories               | `asdd portfolio`                                       |
+| Decide a pending gate              | `asdd ui` (Gates) · `asdd gate-decide <slice> --phase <p> --note "…"` |
+| Check a skill change               | `asdd skill-eval --skill <name> --baseline HEAD`       |
+| Shape into the tracker (PO/PM)     | `asdd-shaping-agent` · Play O                          |
+| Pick up an Intent                  | `asdd intake --from <file> --ref <url>` · Play P       |
 | Every command                      | `asdd help`                                            |
 
 Something not working? See the [README](../README.md) (install, troubleshooting in each section) and `asdd doctor`.

@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "cost-metrics",
+  "source_tasks": ".harness/specs/cost-metrics/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "cost-lib: transcript usage, snapshot deltas, prices, unknown runtimes",
+      "user_visible_behavior": "Token usage per model is read from a Claude transcript (deduplicated by message id) and aggregated per slice, phase, model and runtime from Stop spans; USD only from the project price table; runtimes without data are unknown.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude-cost",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/cost-lib.test.mjs"
+      ],
+      "evidence": "2026-11-17: node --test cli/src/harness/cost-lib.test.mjs 7/7 (transcript dedup by message id, file guards, 8-model cap, snapshot deltas per slice/phase/model/runtime with reset baseline, USD from the project table with null propagation, empty-data contract, unknown runtimes); registered in npm test.",
+      "scope_paths": [
+        "cli/src/harness/cost-lib.mjs",
+        "cli/src/harness/cost-lib.test.mjs",
+        "package.json"
+      ],
+      "evidence_hash": "a436d0c3749de82843a611c97758a8238241d4d845c42cc9efb0957feef6308b"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Stop hook records Claude transcript usage on its span",
+      "user_visible_behavior": "On a Claude Stop, the single verify-on-stop hook span carries the session's cumulative usage per model; a missing or unreadable transcript changes nothing else.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude-cost",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/src/harness/verify-on-stop.test.mjs"
+      ],
+      "evidence": "2026-11-17: verify-on-stop.test.mjs 5/5 — new 'cost-metrics REQ-001' (Claude Stop span carries usage {session_id, models} deduped by message id, schema-valid, still one span; Cursor and an unreadable transcript add no usage) plus the 4 TASK-006 fail-open/ordering tests unchanged.",
+      "scope_paths": [
+        "cli/src/harness/verify-on-stop.mjs",
+        "cli/src/harness/verify-on-stop.test.mjs"
+      ],
+      "evidence_hash": "cbfb28edf0860bd698d18b758a8bdd76c1449c9ad349ddc45c87bade068a217a"
+    },
+    {
+      "id": "TASK-003",
+      "title": "metrics.cost in status --metrics/--json/--html",
+      "user_visible_behavior": "asdd status --metrics shows tokens and cost per slice, phase, model and runtime (unknown runtimes listed); --json carries metrics.cost; --html and asdd ui show the same.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude-cost",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/src/harness/pipeline-metrics.test.mjs cli/src/harness/pipeline-html.test.mjs",
+        "node cli/bin/asdd.mjs status --metrics --json | node -e \"const m=JSON.parse(require('fs').readFileSync(0,'utf8'));const c=(m.metrics??m).cost;if(!c||!Array.isArray(c.unknown_runtimes)||!('totals' in c))process.exit(1)\"",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "npm test"
+      ],
+      "evidence": "2026-11-17: pipeline-metrics.test.mjs 8/8 + pipeline-html.test.mjs 2/2 (metrics.cost contract keys, delta attribution, USD, unknown runtimes, text lines, escaped HTML cards/table); status --metrics --json carries metrics.cost; kit vendor --check OK; npm test 420/420. Real transcript check: this session's Claude Code transcript parsed to 374 claude-opus-5-5 messages, attribute 200 bytes.",
+      "scope_paths": [
+        "cli/src/harness/pipeline-metrics.mjs",
+        "cli/src/harness/pipeline-metrics.test.mjs",
+        "cli/src/harness/pipeline-html.mjs",
+        "cli/src/harness/pipeline-html.test.mjs",
+        "tools/knowledge/src/harness/pipeline-metrics.mjs",
+        "tools/knowledge/src/harness/cost-lib.mjs"
+      ],
+      "evidence_hash": "e1c79b02817dbf89427db8d3d6732897d056b110a25720d974d02f58a66431d1"
+    }
+  ]
+}

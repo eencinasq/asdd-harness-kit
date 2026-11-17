@@ -1,0 +1,1 @@
+../../.agents/agents/asdd-qa-agent.md

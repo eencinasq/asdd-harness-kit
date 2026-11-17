@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-001",
+  "timestamp": "2026-11-16T21:55:16.986Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "telemetry-emitters",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "full",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

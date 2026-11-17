@@ -198,15 +198,15 @@ export const nextGroupBrief = (progress: ReviewProgress, units: ReviewUnitsView 
 		);
 		rightLinesByPath[file] = lines;
 	}
-	const commentable = active.files.map((f) => `- ${f}: ${lineRanges(rightLinesByPath[f] ?? []) || '(none)'}`);
+	const commentable = active.files.map((f) => `${f} ${lineRanges(rightLinesByPath[f] ?? []) || '(none)'}`).join('; ');
 	const part = active.span ? ` (lines ${active.span.start}-${active.span.end})` : '';
 	return {
 		group: { ...active, ruleMarkdown: units?.groups[active.index]?.ruleMarkdown ?? '' },
 		rightLinesByPath,
 		instruction: [
 			`Review group ${groupRef(active)}${part}: ${active.files.length} file(s). Apply the rules checklist to its diff.`,
-			'Commentable lines (RIGHT side):',
-			...commentable,
+			`Comment only on these lines (RIGHT side): ${commentable}.`,
+			'Read other code with pr_review_read_file / pr_review_search (the PR version, not the local checkout) when the diff is not enough.',
 			`Then call pr_review_submit_findings with groupIndex ${active.index} (an empty findings array if the group is clean).`,
 		].join('\n'),
 	};

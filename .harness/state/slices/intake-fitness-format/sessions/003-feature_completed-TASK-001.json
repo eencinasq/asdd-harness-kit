@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "intake-fitness-format",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:30:21.000Z",
+  "session_id": "sess-intake-fitness-format-003",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/intake-lib.mjs",
+    "cli/src/harness/intake-lib.test.mjs"
+  ],
+  "evidence": "GREEN 2026-11-17 (4fbcdf0): intake-lib.test.mjs 12/12 incl. 'intake-fitness-format REQ-001'; the P6.3 example now passes format validation (stops only on its fictional grounding refs, as designed); asdd check exit 0; npm test 244/244."
+}

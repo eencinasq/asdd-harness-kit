@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-060",
+  "timestamp": "2026-11-17T12:40:30.525Z",
+  "phase": "implementation",
+  "feature_id": "TASK-012",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/telemetry-observe.mjs",
+    "cli/src/harness/telemetry-observe.test.mjs",
+    "cli/src/harness/validators/telemetry.mjs",
+    "cli/src/harness/validators/telemetry.test.mjs"
+  ],
+  "evidence": "D-3 = hookless (session 054; cli/test/fixtures/telemetry/cursor/README.md). Handler unchanged (no test required a change): observe cursor = {\"permission\":\"allow\"}\\n, exit 0, no span; PAYLOAD_KEYS has no cursor entry. RED: session 057 (mutation RED on telemetry-observe.test.mjs: tests 8 pass 6 fail 2, exit 1, reverted; validator RED: tests 12 pass 10 fail 2, exit 1). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs -> tests 34 pass 34 fail 0 (TASK-012 tests: D-3 hookless README/no fixture/no cursor keys; every input to observe cursor x 4 telemetry states -> allow, exit 0, zero lines; no stdin; no lib step and no fs call; TRC-006 latency Cursor guidance p99 0.001 ms and Cursor non-guidance p99 0.000 ms, n=200, budget 50 ms); node --test cli/src/harness/validators/telemetry.test.mjs -> tests 12 pass 12 fail 0 (TEL-W3 load-hook check is Claude only; no cursor TEL-W3 line for a configured cursor runtime); node --test cli/src/harness/harness-profile.test.mjs -> 17/17 (Cursor column unknown without an observe hook, unchanged); focused 63/63 three runs; kit vendor --check exit 0; kit self --check exit 0; npm test exit 0 (235/235); HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0, TEL-W3 runtime cursor WARN gone (remaining TEL-W3: .gitignore, runtime claude, both until TASK-014). TASK-007 and TASK-010 re-verified (DRIFT-02, sessions 058/059)."
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-041",
+  "timestamp": "2026-11-17T12:06:02.097Z",
+  "phase": "implementation",
+  "feature_id": "TASK-009",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/agents/_runtime-template.md",
+    "cli/src/harness/telemetry-lib.test.mjs",
+    ".agents/agents/_runtime-template.md"
+  ],
+  "evidence": "TASK-009 (REQ-011) RED: new case \"REQ-011 runtime template: guidance loads with the read or skill tool; no span instruction\" in cli/src/harness/telemetry-lib.test.mjs -> node --test cli/src/harness/telemetry-lib.test.mjs: # tests 52 # pass 51 # fail 1 (not ok 52: read-tool sentence absent from cli/agents/_runtime-template.md)."
+}

@@ -109,3 +109,22 @@ test('REQ-003 amend refuses non-DONE slices', () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('amend-close REQ-001 REQ-002 an amended slice returns to DONE when knowledge completes again', () => {
+  const amended = [
+    { event_type: 'phase_completed', phase: 'knowledge', timestamp: '2026-01-01T00:00:00Z' },
+    { event_type: 'checkpoint', status: 'in_progress', amend: true, timestamp: '2026-01-02T00:00:00Z' },
+  ];
+  assert.equal(deriveStatus(amended), 'in_progress', 'still open until knowledge completes again');
+  const closed = [
+    ...amended,
+    { event_type: 'feature_started', feature_id: 'TASK-001', timestamp: '2026-01-02T01:00:00Z' },
+    { event_type: 'feature_completed', feature_id: 'TASK-001', timestamp: '2026-01-02T02:00:00Z' },
+    { event_type: 'phase_completed', phase: 'knowledge', timestamp: '2026-01-02T03:00:00Z' },
+  ];
+  assert.equal(deriveStatus(closed), 'DONE');
+  const active = [...amended, { event_type: 'feature_started', feature_id: 'TASK-002', timestamp: '2026-01-02T04:00:00Z' }, { event_type: 'phase_completed', phase: 'knowledge', timestamp: '2026-01-02T05:00:00Z' }];
+  assert.equal(deriveStatus(active), 'in_progress', 'an active feature keeps it open');
+  const parked = [{ event_type: 'checkpoint', status: 'PARKED' }, { event_type: 'phase_completed', phase: 'knowledge' }];
+  assert.equal(deriveStatus(parked), 'PARKED', 'PARKED holds');
+});

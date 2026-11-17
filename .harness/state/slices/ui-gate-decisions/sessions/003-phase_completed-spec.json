@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-gate-decisions-003",
+  "timestamp": "2026-11-17T01:14:45.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "ui-gate-decisions",
+  "event_type": "phase_completed",
+  "phase": "spec",
+  "mode": "lite",
+  "evidence": "Human approved lite spec including REQ-005 Host/Origin; Mapped widened for gate-decide + registration (design).",
+  "concerns": []
+}

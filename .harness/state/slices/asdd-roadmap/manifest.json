@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-13T02:23:40.083Z",
-  "updated_at": "2026-11-14T04:44:22.730Z",
+  "updated_at": "2026-11-17T17:52:18.446Z",
   "paths": {
     "specs": ".harness/specs/asdd-roadmap",
     "tasks": ".harness/specs/asdd-roadmap/tasks.md",
@@ -39,22 +39,22 @@
     "implementation": {
       "status": "PASS",
       "by": "eencinas",
-      "at": "2026-11-14T02:24:13.567Z",
-      "evidence": "TASK-001 re-verified (slice harness-green): docs/ASDD-ROADMAP.md present with its P sections; closes the reopen of sess 010.",
+      "at": "2026-11-17T15:43:16.000Z",
+      "evidence": "P5.1/P5.4/P5.7 hecho; P7 security-review; G15/G17 Hecho; G29.",
       "concerns": []
     },
     "qa": {
       "status": "PASS",
       "by": "eencinas",
-      "at": "2026-11-14T02:24:13.654Z",
-      "evidence": "Verification command passes.",
+      "at": "2026-11-17T15:43:16.000Z",
+      "evidence": "29 gap rows.",
       "concerns": []
     },
     "knowledge": {
       "status": "PASS",
       "by": "eencinas",
-      "at": "2026-11-14T02:24:13.761Z",
-      "evidence": "Roadmap document is the deliverable.",
+      "at": "2026-11-17T15:43:16.000Z",
+      "evidence": "First amend closed without a manual DONE checkpoint (amend-close).",
       "concerns": []
     }
   },
@@ -189,6 +189,222 @@
       "event": "phase_completed",
       "phase": "knowledge",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T21:56:04.368Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T21:56:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-16T21:56:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-16T21:56:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T21:56:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T21:56:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-16T21:57:35.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": null,
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T03:02:35.493Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T03:03:07.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T03:03:07.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T03:03:07.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T03:03:07.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T03:03:07.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T03:03:07.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": null,
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:42:35.621Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:42:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T12:42:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T12:42:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:42:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:42:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T12:42:48.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": null,
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:42:45.933Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:43:16.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
     }
   ],
   "contributors": [
@@ -196,6 +412,7 @@
     "human",
     "eencinas",
     "asdd-lite",
-    "asdd-pipeline"
+    "asdd-pipeline",
+    "claude"
   ]
 }

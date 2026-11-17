@@ -172,12 +172,12 @@
         "node cli/bin/asdd.mjs kit guidance",
         "node --test cli/test/guidance.test.mjs"
       ],
-      "evidence": "asdd kit guidance cutoffs now scans .agents/skills/** (SKILL.md and references) and, in the kit, cli/modules/*/skills/** besides .agents/agents. New test: a cutoff in a core skill, a skill reference, and a module skill fails; '> 1' counts and 'more than 10 FRs' do not. Kit-wide test (REQ-006 + skills-bloom REQ-008) passes now that TASK-002..004 removed the five cutoffs it found. kit guidance PASS; guidance tests 9/9.",
+      "evidence": "asdd kit guidance cutoffs now scans .agents/skills/** (SKILL.md and references) and, in the kit, cli/modules/*/skills/** besides .agents/agents. New test: a cutoff in a core skill, a skill reference, and a module skill fails; '> 1' counts and 'more than 10 FRs' do not. Kit-wide test (REQ-006 + skills-bloom REQ-008) passes now that TASK-002..004 removed the five cutoffs it found. kit guidance PASS; guidance tests 9/9. | Re-verified 2026-11-16 after hotfix guidance-proposal-skip (SKIP_PREFIXES += profiling-proposals/, rules-proposals/): `asdd kit guidance` exit 0; guidance.test.mjs 10/10.",
       "scope_paths": [
         "cli/src/kit/guidance.mjs",
         "cli/test/guidance.test.mjs"
       ],
-      "evidence_hash": "1231dca4876067d43188d78c273ef32bd5d46e5100f72cc5e4643b37c65665a4"
+      "evidence_hash": "b8104e48b71ddbafb48bd26d74bc66c904c141bdce0cf23609b6c2305821fa8b"
     }
   ]
 }

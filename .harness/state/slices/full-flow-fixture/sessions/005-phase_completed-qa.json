@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "full-flow-fixture",
+  "concerns": [],
+  "timestamp": "2026-11-17T16:01:03.000Z",
+  "session_id": "sess-full-flow-fixture-005",
+  "event_type": "phase_completed",
+  "phase": "qa",
+  "evidence": "test:full-flow green."
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-roadmap-017",
+  "timestamp": "2026-11-16T21:56:04.368Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "Add P5 (measure + human surface) and gaps G15–G22 from the 2026-11-16 Eminzo/Tessl analysis.",
+  "amendment_path": ".harness/specs/asdd-roadmap/amendments/2026-11-16T21-56-04-368Z.md",
+  "concerns": []
+}

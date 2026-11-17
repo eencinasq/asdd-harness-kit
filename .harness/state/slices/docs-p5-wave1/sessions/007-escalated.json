@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-docs-p5-wave1-007",
+  "timestamp": "2026-11-17T01:53:00.197Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "docs-p5-wave1",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Documentation spans README.md, cli/ and docs/ by nature (root README, shipped CLI README, playbook, roadmap); no code or domain change.",
+  "concerns": []
+}

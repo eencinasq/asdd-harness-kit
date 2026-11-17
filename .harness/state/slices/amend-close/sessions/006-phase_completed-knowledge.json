@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "amend-close",
+  "concerns": [],
+  "timestamp": "2026-11-17T15:42:39.000Z",
+  "session_id": "sess-amend-close-006",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Amends close on their own from now on; the roadmap amend that follows is the first live check."
+}

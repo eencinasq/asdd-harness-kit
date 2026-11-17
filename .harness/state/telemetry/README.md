@@ -53,3 +53,12 @@ Readout: a `turn` invocation trace containing its gate-emitted `test` child
 trace; an `H-LOOP` detection span (self trace) pointing back at the third
 failure via `trigger_span_id` — flag ≠ firing; append-only (detection never
 annotates the trigger).
+
+## Phase 2 status
+
+Emitters now append to `spans.jsonl` (gitignored, created on first emit), fail-open: the command gate (`command`
+spans), Verify-on-Stop (`hook`), `asdd sync` (`sync` root and children), and `asdd observe` (`tool` spans: guidance
+loads recorded by the Claude Code `PostToolUse` hook, matcher `Read|Skill`). Cursor and the other runtimes have no
+load hook, so their guidance loads show as `unknown`. Launch a session with `HARNESS_SLICE_ID=<slice-id>` to attribute
+spans to a slice. `asdd profile [--slice <id>] [--bottlenecks] [--json]` reads the stream tail (read-only).
+The `slices/<id>/profiling.json` rollup, stream rotation, and the `H-*` heuristic findings are still deferred.

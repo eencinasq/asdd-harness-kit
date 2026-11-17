@@ -6,6 +6,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { costFromSpans, loadPrices, readUsageSpans } from './cost-lib.mjs';
 import { SUMMARIES_DIR } from './learning-lib.mjs';
 import { PHASES, readSessions } from './sync-state.mjs';
 
@@ -55,7 +56,9 @@ export function stopFailCounts(summaryFiles) {
       if (!sig.startsWith('sensor:')) continue;
       const n = Array.isArray(slot.episodes) ? slot.episodes.length : 0;
       episodes += n;
-      const code = sig.slice('sensor:'.length).split(':')[0];
+      // A signature without a check code is a message shape (`sensor:<path>: feature …`): count it as `other`.
+      const head = sig.slice('sensor:'.length).split(':')[0];
+      const code = /^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d+$/.test(head) ? head : 'other';
       byCode[code] = (byCode[code] ?? 0) + n;
     }
   }
@@ -69,6 +72,9 @@ export function stopFailCounts(summaryFiles) {
  * @param {Record<string, object[]>} [opts.sessionsBySlice] sessions per slice_id
  * @param {Array<{ data: object }>} [opts.summaries] learning summary fixtures
  * @param {object[]} [opts.patterns] patterns.json.patterns fixture
+ * @param {object[]} [opts.spans] telemetry span fixtures (cost-metrics); default: the tail of spans.jsonl
+ * @param {object|null} [opts.prices] price table fixture; default: .harness/config/model-prices.json
+ * @param {string[]} [opts.runtimes] configured runtimes; default: project.json `runtimes`
  */
 export function computePipelineMetrics(opts = {}) {
   const root = opts.root ?? process.cwd();
@@ -121,6 +127,13 @@ export function computePipelineMetrics(opts = {}) {
 
   const lite_share = done.length ? liteDone.length / done.length : null;
 
+  // cost-metrics: tokens and USD from Claude Stop usage snapshots; runtimes without a token source are unknown.
+  const runtimes = opts.runtimes ?? readJson(join(root, '.harness/config/project.json'))?.runtimes ?? [];
+  const cost = costFromSpans(opts.spans ?? readUsageSpans(root), {
+    prices: opts.prices === undefined ? loadPrices(root) : opts.prices,
+    runtimes: Array.isArray(runtimes) ? runtimes : [],
+  });
+
   return {
     generated_at: new Date().toISOString(),
     slices: {
@@ -135,6 +148,7 @@ export function computePipelineMetrics(opts = {}) {
     phase_median_hours,
     stop_fail: stop,
     open_patterns,
+    cost,
   };
 }
 
@@ -159,6 +173,31 @@ export function formatPipelineMetrics(m) {
     lines.push('  phase medians  — (need phase_completed timestamps)');
   }
   lines.push(`  open patterns  ${m.open_patterns}`);
+  if (m.cost) lines.push(...formatCost(m.cost));
   lines.push('');
   return lines.join('\n');
+}
+
+const fmtUsd = (usd) => (usd == null ? 'USD n/a (no price for every model; .harness/config/model-prices.json)' : `$${usd}`);
+const total = (r) => (r.input_tokens ?? 0) + (r.output_tokens ?? 0) + (r.cache_read_tokens ?? 0) + (r.cache_write_tokens ?? 0);
+
+/** Text lines for metrics.cost (cost-metrics REQ-001…003). */
+export function formatCost(cost) {
+  const lines = [];
+  const t = cost.totals;
+  if (!cost.source.length) {
+    lines.push('  tokens         — (no usage recorded yet; Claude Code records it at Stop)');
+  } else {
+    lines.push(`  tokens         in ${t.input_tokens} · out ${t.output_tokens} · cache read ${t.cache_read_tokens} · cache write ${t.cache_write_tokens} · ${fmtUsd(t.usd)}`);
+    const list = (rows, key) => rows.map((r) => `${r[key] ?? '(unattributed)'} ${total(r)}${r.usd == null ? '' : ` ($${r.usd})`}`).join(' · ');
+    lines.push(`                   by model   ${list(cost.by_model, 'model')}`);
+    lines.push(`                   by slice   ${list(cost.by_slice, 'slice_id')}`);
+    lines.push(`                   by phase   ${list(cost.by_phase, 'phase')}`);
+    const known = cost.by_runtime.filter((r) => !r.unknown);
+    lines.push(`                   by runtime ${list(known, 'runtime')}`);
+  }
+  if (cost.unknown_runtimes.length) {
+    lines.push(`  unknown        ${cost.unknown_runtimes.join(', ')} (no token source; not estimated)`);
+  }
+  return lines;
 }

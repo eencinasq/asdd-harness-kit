@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-005",
+  "timestamp": "2026-11-17T02:30:00Z",
+  "agent": "asdd-validation-agent",
+  "slice_id": "telemetry-emitters",
+  "event_type": "phase_completed",
+  "phase": "validation",
+  "mode": "full",
+  "scope_paths": [
+    ".harness/specs/telemetry-emitters/spec-validation-report.md"
+  ],
+  "evidence": "Validation gate WARN (QG-VAL-02, PASSED_WITH_WARNINGS): .harness/specs/telemetry-emitters/spec-validation-report.md v1.0 on requirements 1.0.0 (REQ-001..REQ-025, all MUST). Findings: BLOCKING 0, HIGH 6, MEDIUM 19, LOW 11. No schema change needed (all new keys fit attributes, additionalProperties true). Domain phase REQUIRED: Span, Trace, Activation record, Profile report, Phase marker, Runtime hook host absent from domain-model.md (DOM-001..006, QG-DMN-02). Command gate fail-open/fail-closed pinned and code-verified (REQ-008; command-gate.mjs:145-159). Validation confidence 0.82. Uncertainty factors (QG-DEC-10): (1) Claude PostToolUse / Cursor beforeReadFile exit-code semantics vendor-documented, unverified in repo (NFR-003); (2) AP-7 ruled a violation on the literal skill criterion (>10 FRs, 14 entities) against discovery's behavior count; (3) A-01/A-02 payload shapes unverified (R-3). Next: Tech Lead override or asdd-spec-agent revision, then @asdd-domain-agent.",
+  "concerns": [
+    "AMB-001 (HIGH, REQ-018): asdd observe p99 'added latency per event' has no measurement boundary (in-process vs whole hook process incl. projectAsdd resolver) and no sample size; Q-14 meaning needs PO/TL decision.",
+    "CON-001 (HIGH, REQ-005 vs REQ-010): REQ-005 requires parent_span_id null for all spans of a producer started without HARNESS_TRACE_ID; REQ-010 requires sync child spans parented to the run span. Scope REQ-005 to the root span.",
+    "NFR-002 (HIGH, REQ-009/010/019): telemetry-lib import failure is pinned only for the command gate; verify-on-stop.mjs has static imports and no top-level catch, so a broken import exits non-zero and a Claude Stop hook does not block (AR-1). Verify-on-Stop own-crash fail-closed is pre-existing and needs a human decision.",
+    "NFR-003 (HIGH, REQ-018/REQ-025): load-hook entries via projectAsdd resolver exit 2 when asdd is not resolvable (cli/src/install/phases.mjs:86-87), breaking fail-open for every Read/beforeReadFile.",
+    "TRC-001 (HIGH, AR-3): stream rotation (v2.md:468), profiling.json rollup and H-* findings in --slice output have no REQ and no PO deferral, yet the matrix claims AR-3 covered. PO/TL must add a REQ or record the deferral.",
+    "RSK-001 (HIGH, AP-7): 25 FRs and 14 entities violate the literal AP-7 criterion; AR-5 is registration atomicity and AR-2 expects staged waves, so 'AR-5 forbids a split' does not hold. PO/TL: split (Option A) or override accepting AP-7 (Option B, recommended).",
+    "MEDIUM findings for the spec agent: AMB-002..007, CON-002..004, ACT-001, TRC-002..004 (incl. TRC-003 Mapped files widening needed for cli/test/install.sh, gate/sync/verify tests and hook fixtures); DOM-001..006 for the Domain phase."
+  ]
+}

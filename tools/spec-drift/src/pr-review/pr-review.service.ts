@@ -9,6 +9,7 @@ import { APP_VERSION } from '../app.constants.ts';
 import { FileLock } from '../common/concurrency/file-lock.ts';
 import { KeyedMutex } from '../common/concurrency/keyed-mutex.ts';
 import { mcpRequestContext } from '../common/mcp/mcp-request-context.ts';
+import { prSecurityFindingProblem } from '../security/lens.ts';
 import type { ArchitectureReviewView } from './architecture/architecture.types.ts';
 import { mergeArchitectureComments } from './architecture/architecture-import.ts';
 import {
@@ -507,16 +508,25 @@ export class PrReviewService {
 		});
 		const { unresolved } = anchored;
 		const profile = units?.profile ?? DEFAULT_PROFILE;
-		const resolved = anchored.resolved.map((f) => {
+		const profiled = anchored.resolved.map((f) => {
 			const severity = profiledSeverity(f, profile);
 			return severity && severity !== f.severity ? { ...f, severity } : f;
 		});
+		// security-review REQ-008: a security finding must name a boundary and a file:line, else it is not kept.
+		const securitySkipped = profiled
+			.map((f) => ({ f, problem: prSecurityFindingProblem(f) }))
+			.filter((x): x is { f: (typeof profiled)[number]; problem: string } => x.problem !== null);
+		const resolved = profiled.filter((f) => prSecurityFindingProblem(f) === null);
 		const warnings = [
 			...unresolved.map(
 				(f, i) =>
 					`Unanchored finding skipped (${anchored.reasons[i]}): ${f.path}:${f.startLine || '?'} — ${f.content.slice(0, 80)}. Resubmit it with existingCode quoting the line(s) from the diff.`,
 			),
 			...anchored.notes.map((n) => `Anchor adjusted: ${n}`),
+			...securitySkipped.map(
+				({ f, problem }) =>
+					`Security finding skipped (${problem}): ${f.path}:${f.startLine || '?'} — ${f.content.slice(0, 80)}. Resubmit it with that evidence, or with another category.`,
+			),
 		];
 
 		let progress = await this.ensureProgress(paths, units);

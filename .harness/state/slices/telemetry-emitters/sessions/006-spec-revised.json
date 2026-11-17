@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-006",
+  "timestamp": "2026-11-17T03:30:00Z",
+  "agent": "asdd-spec-agent",
+  "slice_id": "telemetry-emitters",
+  "event_type": "phase_completed",
+  "phase": "spec",
+  "mode": "full",
+  "scope_paths": [
+    ".harness/specs/telemetry-emitters/requirements.md",
+    ".harness/specs/telemetry-emitters/anti-patterns.md"
+  ],
+  "evidence": "Spec revision 1.1.0, spec gate PASS (QG-SPC-04): requirements.md READY, 25 MUST REQs (REQ-001..REQ-025), spec confidence 0.88, anti-pattern score 1.0 (QG-SPC-02). Addresses spec-validation-report.md v1.0 (session 005, WARN). PO decisions on the validation findings were received through the orchestrator ('approve recommendations', eencinas, 2026-11-16) and are recorded by this agent; this is not a human-authored session. HIGH: CON-001 parent_span_id null only on the invocation root span, children reference the run span (REQ-005/REQ-010); NFR-002 telemetry loaded so a load failure is caught, no crashing static import (REQ-002), load-failure/failed-emit clause added to REQ-009, REQ-010, REQ-019; Verify-on-Stop own-crash behaviour OUT of scope by PO decision, recorded as known pre-existing issue KPI-1 for a follow-up; NFR-003 installed load-hook exits 0 with allow when asdd cannot be resolved, asserted in cli/test/install.sh (REQ-025); AMB-001 (PO answer to Q-14) observe p99<=50 ms gated on in-process handler time, >=200 samples per fixture class, whole-process wall time recorded not gated (REQ-018); TRC-001 PO DEFERRAL of AR-3 stream rotation, profiling.json rollup and H-* findings in --slice output, risk accepted because bounded tail reads (500 lines/256 KB) stay safe on an unrotated file, matrix shows AR-3 partial+deferred; RSK-001/AP-7 ACCEPTED BY TL/PO OVERRIDE (Option B, no split; REQ-012 sequences the AR-2 waves), recorded in anti-patterns.md. MEDIUM fixed: CON-002 absent fields omitted (AR-7), profile renders unknown; CON-003 three-state legend; CON-004 exit 3 only with neither spans nor session events; AMB-002 writable stream; AMB-003 closed command_label set (denied label, allowlist, unmatched, empty); AMB-004 uninstalled skill names give no record; AMB-005 surface share defined, hits term 0; ACT-001 attribution env var contract (name stays OI-1); TRC-004 AR-10 pinned for profile; AMB-006 and AMB-007 wording applied. LOW fixed: AMB-008, DUP-001, DOM-008, EARS-001. TRC-003 PO widening of Mapped files reflected in test locations. Noted not applied: TRC-002 (OI-7, needs PO), TRC-005, ACT-002, NFR-001. Uncertainty factors (QG-DEC-10): (1) A-01/A-02 payload shapes and hook exit-code semantics unverified in repo (R-3, RSK-004); (2) six terms absent from domain-model.md (Span, Trace, Activation record, Profile report, Phase marker, Runtime hook host; DOM-001..008); (3) open items OI-1..OI-7. Next: @asdd-validation-agent re-validation (or TL override for validation), then @asdd-domain-agent.",
+  "concerns": []
+}

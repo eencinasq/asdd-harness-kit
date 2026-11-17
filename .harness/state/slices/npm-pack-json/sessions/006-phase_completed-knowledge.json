@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "npm-pack-json",
+  "concerns": [],
+  "timestamp": "2026-11-16T23:26:39.000Z",
+  "session_id": "sess-npm-pack-json-006",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: npm lifecycle scripts write to stdout even with --json; any test parsing npm --json output must pass --ignore-scripts or parse defensively."
+}

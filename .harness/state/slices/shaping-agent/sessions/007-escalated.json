@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-shaping-agent-007",
+  "timestamp": "2026-11-17T12:04:01.893Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "shaping-agent",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "A shipped agent lives in cli/agents/ with its kit-self copy in .agents/agents/ (and the Cursor rendering); two top-level locations by construction, no domain or architecture change.",
+  "concerns": []
+}

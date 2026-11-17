@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-guidance-proposal-skip-001",
+  "timestamp": "2026-11-16T23:27:24.672Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "guidance-proposal-skip",
+  "event_type": "phase_started",
+  "phase": "implementation",
+  "mode": "hotfix",
+  "evidence": "Hotfix slice initialized (feature + evidence path; no Discovery theatre)",
+  "concerns": []
+}

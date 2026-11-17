@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "po-readonly-gate",
+  "source_tasks": ".harness/specs/po-readonly-gate/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Read-only mode in the command gate",
+      "user_visible_behavior": "With HARNESS_GATE_MODE=readonly, only read commands pass the gate; writes, redirections, substitutions and overrides are denied.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/command-gate.test.mjs",
+        "node cli/bin/asdd.mjs kit vendor --check"
+      ],
+      "evidence": "2026-11-17: command-gate.test.mjs 9/9 incl. 3 po-readonly-gate tests (14 reads allowed, 23 write paths denied incl. redirections, sed -i, git commit, node -e, $( ), find -delete, intake without --dry-run; override ignored; hook denies for Claude and allows reads for Cursor); kit vendor --check OK.",
+      "scope_paths": [
+        "cli/src/harness/command-gate.mjs",
+        "cli/src/harness/command-gate.test.mjs"
+      ],
+      "evidence_hash": "bbd664a4e3f20e460c47b8f3be050c550c158e139fcd83f4f1f7b8518b8fc761"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Tell the PO session to use read-only mode",
+      "user_visible_behavior": "The shaping agent, Play O and the Claude runtime README tell the PO/PM session to set HARNESS_GATE_MODE=readonly.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-005"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "grep -q HARNESS_GATE_MODE=readonly cli/agents/asdd-shaping-agent.md && grep -q HARNESS_GATE_MODE=readonly docs/PLAYBOOK.md && grep -q HARNESS_GATE_MODE=readonly cli/runtimes/claude/README.md",
+        "node cli/bin/asdd.mjs kit agents-lint",
+        "npm test"
+      ],
+      "evidence": "2026-11-17: HARNESS_GATE_MODE=readonly in shaping agent, PLAYBOOK Play O (gap note replaced) and Claude runtime README; agents-lint PASS; npm test 252/252.",
+      "scope_paths": [
+        "cli/agents/asdd-shaping-agent.md",
+        "docs/PLAYBOOK.md",
+        "cli/runtimes/claude/README.md"
+      ],
+      "evidence_hash": "fe2d9b0ffe2a006ae0bdc18452b136e75258507d07b47bc9ceed3879e368622b"
+    }
+  ]
+}

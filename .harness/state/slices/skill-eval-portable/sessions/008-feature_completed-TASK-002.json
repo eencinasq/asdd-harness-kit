@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "skill-eval-portable",
+  "concerns": [],
+  "timestamp": "2026-11-17T17:47:38.000Z",
+  "session_id": "sess-skill-eval-portable-008",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/eval/skills"
+  ],
+  "evidence": "2026-11-17: no shipped fixture hard-codes node cli/bin/asdd.mjs or cli/skills/ (grep 0); probes use {asdd}/{skill_dir}; scope-grounding uses knowledge status; codegraph-status requires command:codegraph; kit run 8/8; without codegraph on PATH: 7/7 pass + 1 skipped; README documents placeholders, requires, project fixtures."
+}

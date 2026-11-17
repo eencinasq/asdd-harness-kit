@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "npm-pack-json",
+  "source_tasks": ".harness/specs/npm-pack-json/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "npm pack dry-run JSON parse in install smoke test",
+      "user_visible_behavior": "npm test passes: the package-contents check parses npm pack --dry-run --json without prepack output on stdout.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "bash cli/test/install.sh",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-16: `bash cli/test/install.sh` exit 0 (OK asdd install smoke test); `npm test` exit 0, 195/195 pass. RED before the fix: install.sh:203 JSON.parse threw on prepack stdout.",
+      "scope_paths": [
+        "cli/test/install.sh"
+      ],
+      "evidence_hash": "7fc137bc0b98434d14e2059f561728efe94d1aa518d2b5718ec7d90874de9620"
+    }
+  ]
+}

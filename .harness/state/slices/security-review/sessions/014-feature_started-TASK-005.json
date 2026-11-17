@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-security-review-014",
+  "timestamp": "2026-11-17T14:52:00.000Z",
+  "agent": "claude-sec",
+  "human": "eencinas",
+  "slice_id": "security-review",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "RED: lens.spec.ts fails — lens.ts does not exist; pr_review_submit_findings keeps a security finding with no evidence (existing e2e relies on it).",
+  "concerns": [],
+  "feature_id": "TASK-005",
+  "scope_paths": [
+    "tools/spec-drift/src/security/lens.ts",
+    "tools/spec-drift/src/security/lens.spec.ts",
+    "tools/spec-drift/src/pr-review/pr-review.views.ts",
+    "tools/spec-drift/src/pr-review/pr-review.service.ts",
+    "tools/spec-drift/test/pr-review.e2e-spec.ts"
+  ]
+}

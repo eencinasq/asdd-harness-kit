@@ -12,6 +12,11 @@
  * Usage:
  *   asdd sync
  *   asdd sync --slice <slice-id>
+ *
+ * Telemetry (REQ-010, design §5.5): the CLI run records the learning and knowledge-index steps, then, in a `finally`
+ * after every output is written, appends one root `sync` span and one child span per step through a guarded import of
+ * telemetry-lib.mjs (ADR-001). A telemetry failure never changes stdout, stderr, the exit code, or a generated file.
+ * Only the CLI block emits: the exported functions (used by the MCP servers) never do.
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -155,11 +160,16 @@ export const MANUAL_STATUSES = ['PARKED', 'ABANDONED'];
 
 // The latest checkpoint carrying `status` wins: PARKED/ABANDONED hold until a later
 // checkpoint sets `in_progress` (resume / amend), which returns the slice to active work
-// even after knowledge was completed (DONE).
+// even after knowledge was completed (DONE). That `in_progress` holds only until a later
+// knowledge completion: then the slice is DONE again unless a feature is still active.
 export function deriveStatus(sessions) {
-  const manual = sessions.filter((s) => s.event_type === 'checkpoint' && typeof s.status === 'string').at(-1)?.status;
+  const statusIdx = sessions.findLastIndex((s) => s.event_type === 'checkpoint' && typeof s.status === 'string');
+  const manual = statusIdx >= 0 ? sessions[statusIdx].status : undefined;
   if (MANUAL_STATUSES.includes(manual)) return manual;
-  if (manual === 'in_progress') return 'in_progress';
+  if (manual === 'in_progress') {
+    const closedAgain = sessions.slice(statusIdx + 1).some((s) => s.event_type === 'phase_completed' && s.phase === 'knowledge');
+    if (!closedAgain) return 'in_progress';
+  }
   const activeFeatures = deriveActiveFeatures(sessions);
   if (activeFeatures.length > 0) return 'in_progress';
   const allPhases = sessions.filter((s) => s.event_type === 'phase_completed');
@@ -376,29 +386,83 @@ function syncSlice(sliceId) {
 }
 
 // Knowledge index is a derived projection — regenerate it after every state
-// sync, but never let its failure break the state sync itself.
+// sync, but never let its failure break the state sync itself. Returns the ok flag.
 async function syncKnowledgeIndex() {
   try {
     const { writeKnowledgeIndex } = await import('./sync-knowledge.mjs');
     const meta = await writeKnowledgeIndex(root);
     console.log(`SYNC  knowledge → ${meta.nodes} nodes / ${meta.chunks} chunks`);
+    return true;
   } catch (error) {
     console.warn(`WARN  knowledge index not regenerated: ${error?.message ?? error}`);
+    return false;
   }
 }
 
 // Learning patterns are a derived projection too (QG-LEARN-*); a failure never breaks the sync.
 // Run as a child: learning-lib imports this module, and importing it from inside
 // this module's top-level await would deadlock.
+// Returns null when learn.mjs is absent, else { ok, exitCode } (ok: exit 0 and parseable output).
 function syncLearning() {
   const script = fileURLToPath(new URL('./learn.mjs', import.meta.url));
-  if (!existsSync(script)) return;
+  if (!existsSync(script)) return null;
   const result = spawnSync(process.execPath, [script, '--summary'], { cwd: root, encoding: 'utf8', timeout: 60000 });
+  let parsed = false;
   try {
     const summary = JSON.parse(result.stdout);
     console.log(`SYNC  learning → ${summary.patterns} patterns (${summary.open} open)`);
+    parsed = true;
   } catch {
     console.warn(`WARN  learning patterns not regenerated: ${(result.stderr || result.error?.message || `exit ${result.status}`).trim()}`);
+  }
+  return { ok: parsed && result.status === 0, exitCode: result.status };
+}
+
+/**
+ * The derived projections (learning, then the knowledge index), unchanged in order and output. When `run` is given,
+ * each step that ran is recorded as { name, start, end, ok, attributes } for the run's child spans.
+ */
+async function syncDerived(run) {
+  let start = Date.now();
+  const learning = syncLearning();
+  if (learning && run) {
+    const attributes = typeof learning.exitCode === 'number' ? { exit_code: learning.exitCode } : {};
+    run.steps.push({ name: 'learning', start, end: Date.now(), ok: learning.ok, attributes });
+  }
+  start = Date.now();
+  const knowledge = await syncKnowledgeIndex();
+  if (run) run.steps.push({ name: 'knowledge-index', start, end: Date.now(), ok: knowledge, attributes: {} });
+}
+
+/**
+ * Appends the run's span tree (REQ-010, REQ-005): one child per recorded step via childOf(root), then the root
+ * `sync` span (ERROR when main() threw). Best-effort after every output (ADR-001): a missing or broken lib, a throw,
+ * or emit() returning false is a no-op; nothing is printed and process.exitCode is untouched.
+ */
+async function emitSyncSpans(run, failed) {
+  const tel = await import('./telemetry-lib.mjs').catch(() => null);
+  try {
+    if (!tel) return;
+    const end = Date.now();
+    const runtime = process.env.HARNESS_RUNTIME || 'cli';
+    const { slice_id, phase } = tel.attribute(root);
+    const rootCtx = tel.startTrace();
+    const common = { kind: 'sync', runtime, slice_id, phase, writer: 'sync-state' };
+    for (const step of run.steps) {
+      const span = tel.buildSpan(tel.childOf(rootCtx), {
+        ...common,
+        process_name: `sync-state/${step.name}`,
+        start: step.start,
+        end: step.end,
+        status: step.ok ? 'OK' : 'ERROR',
+        attributes: step.attributes,
+      });
+      tel.emit(span, { root });
+    }
+    const rootSpan = tel.buildSpan(rootCtx, { ...common, process_name: 'sync-state', start: run.start, end, status: failed ? 'ERROR' : 'OK' });
+    tel.emit(rootSpan, { root });
+  } catch {
+    // ignore
   }
 }
 
@@ -447,7 +511,7 @@ export async function stampEvidence(rootDir = root, { only = null } = {}) {
   return changedCount;
 }
 
-async function main() {
+async function main(run = null) {
   const args = process.argv.slice(2);
   const sliceArg = args.indexOf('--slice');
   const targetSlice = sliceArg >= 0 ? args[sliceArg + 1] : null;
@@ -455,8 +519,7 @@ async function main() {
 
   if (!existsSync(slicesDir)) {
     console.warn('WARN  no slices directory found');
-    syncLearning();
-    await syncKnowledgeIndex();
+    await syncDerived(run);
     return;
   }
 
@@ -486,8 +549,7 @@ async function main() {
         console.log(`SYNC  registry → ${registry.slices.length} slices`);
       }
     }
-    syncLearning();
-    await syncKnowledgeIndex();
+    await syncDerived(run);
     return;
   }
 
@@ -502,6 +564,5 @@ async function main() {
   writeJson(join(stateDir, 'registry.json'), registry);
   writeProgress(registry);
   console.log(`SYNC  registry → ${registry.slices.length} slices`);
-  syncLearning();
-  await syncKnowledgeIndex();
+  await syncDerived(run);
 }

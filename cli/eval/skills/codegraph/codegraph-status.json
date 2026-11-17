@@ -1,0 +1,45 @@
+{
+  "id": "codegraph-status",
+  "task": "Check whether the codegraph index exists before exploring code",
+  "expect": "`codegraph --version` and `codegraph status --json` exit 0; the skill still routes structural questions to `codegraph explore` with a Read/Grep fallback",
+  "probes": [
+    {
+      "id": "p1",
+      "run": "codegraph --version",
+      "cwd": "repo"
+    },
+    {
+      "id": "p2",
+      "run": "codegraph status --json",
+      "cwd": "repo"
+    }
+  ],
+  "assertions": [
+    {
+      "type": "exit_code",
+      "probe": "p1",
+      "code": 0
+    },
+    {
+      "type": "exit_code",
+      "probe": "p2",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "p2",
+      "pattern": "projectPath"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "codegraph explore"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "fall back"
+    }
+  ],
+  "requires": [
+    "command:codegraph"
+  ]
+}

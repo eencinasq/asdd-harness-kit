@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "skill-eval-portable",
+  "source_tasks": ".harness/specs/skill-eval-portable/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Placeholders, project fixtures, requires/skipped",
+      "user_visible_behavior": "skill-eval expands {asdd}/{skill_dir}, merges .harness/eval/skills project fixtures, and reports unmet requires as skipped.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude-sep",
+      "req_ids": [
+        "REQ-001",
+        "REQ-003",
+        "REQ-005",
+        "REQ-006"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/skill-eval-lib.test.mjs"
+      ],
+      "evidence": "2026-11-17: skill-eval-lib.test.mjs 15/15 incl. 3 skill-eval-portable tests ({asdd} running CLI + {skill_dir} shell-quoted, project fixtures override by file name, requires -> skipped and all-skipped run is not ok); kit run 8/8.",
+      "scope_paths": [
+        "cli/src/harness/skill-eval-lib.mjs",
+        "cli/src/harness/skill-eval-lib.test.mjs",
+        "cli/src/harness/skill-eval.mjs"
+      ],
+      "evidence_hash": "765992a3a16e07fd4facedffe3e1511528ac283e6bd786fab28124ff5525885f"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Portable shipped fixtures",
+      "user_visible_behavior": "Shipped fixtures use {asdd}/{skill_dir}; codegraph declares requires; kit run passes.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude-sep",
+      "req_ids": [
+        "REQ-001",
+        "REQ-006"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "! grep -rn 'cli/bin/asdd.mjs\\|cli/skills/' cli/eval/skills/*/*.json",
+        "node cli/bin/asdd.mjs skill-eval"
+      ],
+      "evidence": "2026-11-17: no shipped fixture hard-codes node cli/bin/asdd.mjs or cli/skills/ (grep 0); probes use {asdd}/{skill_dir}; scope-grounding uses knowledge status; codegraph-status requires command:codegraph; kit run 8/8; without codegraph on PATH: 7/7 pass + 1 skipped; README documents placeholders, requires, project fixtures.",
+      "scope_paths": [
+        "cli/eval/skills"
+      ],
+      "evidence_hash": "7979feb892db9b993a289badcaf882970c762b095256156e7bdf231850147344"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Ship fixtures; pass in an installed app",
+      "user_visible_behavior": "The npm package ships cli/eval/skills and asdd skill-eval passes in an installed app.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude-sep",
+      "req_ids": [
+        "REQ-002",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "bash cli/test/install.sh",
+        "npm test"
+      ],
+      "evidence": "2026-11-17: npm package ships cli/eval/skills (8 fixtures + README); install.sh asserts the fixtures ship, none hard-codes the kit CLI, and asdd skill-eval passes in the installed app (install.sh exit 0). Manual packed install: /tmp app via prefix bin asdd → skill-eval total 8/8 pass; a project fixture .harness/eval/skills/asdd-status/status-json.json overrides the shipped case (source: project). npm test 430/430.",
+      "scope_paths": [
+        "package.json",
+        "cli/test/install.sh",
+        "README.md",
+        "cli/README.md"
+      ],
+      "evidence_hash": "5a60a19352dff26efc065ef4853ed016c1566ba7020460abf88a15364a0ff6d5"
+    }
+  ]
+}

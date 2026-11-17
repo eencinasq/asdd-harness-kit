@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-tracker-binding-005",
+  "timestamp": "2026-11-17T12:02:47.000Z",
+  "agent": "claude-p61",
+  "human": "eencinas",
+  "slice_id": "tracker-binding",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/tracker-config.mjs",
+    "cli/src/harness/tracker-config.test.mjs",
+    "cli/src/harness/check-project-config.mjs",
+    "cli/scaffold/config/project.schema.json",
+    "cli/scaffold/config/README.md",
+    "package.json"
+  ],
+  "evidence": "RED: node --test cli/src/harness/tracker-config.test.mjs fails — ERR_MODULE_NOT_FOUND tracker-config.mjs (5 tests: valid per type, unknown type, missing fields, project format, check-config subprocess).",
+  "concerns": []
+}

@@ -44,7 +44,7 @@ explain what the generated config contains.
 
 ## Toolsets
 
-`SPEC_DRIFT_TOOLSETS` (comma-separated; all three when unset) loads only the tools, prompts and dashboards of the jobs a
+`SPEC_DRIFT_TOOLSETS` (comma-separated; all four when unset) loads only the tools, prompts and dashboards of the jobs a
 team uses — fewer tools in every model call, fewer wrong picks:
 
 | Toolset    | Loads                                                                                                                                                                                              |
@@ -52,6 +52,7 @@ team uses — fewer tools in every model call, fewer wrong picks:
 | `analysis` | `analyze_*`, `rescan`, `list_rule_packs`, `adr_coverage`, `validate_rules`, `drift_trend`, `analysis_start`, `analysis_job`, `drift_origin`, `repos_overview`; the analysis dashboard; its prompts |
 | `review`   | `pr_review_*`; the PR Review dashboard; `review-pr`                                                                                                                                                |
 | `audit`    | `audit_*`, `verify_*`, `generate_ci_gate`, `learning_report`, `traceability_matrix`; the audit dashboard; `spec://` resources; its prompts                                                         |
+| `security` | `security_audit_start`, `security_audit_checklist`, `security_audit_submit_findings`, `security_audit_status`; the security dashboard                                                              |
 
 The services stay loaded whatever the toolsets (the audit and the PR review use the analysis services). An unknown name
 stops the server with the valid ones.
@@ -73,7 +74,7 @@ nvm install && pnpm install && pnpm build
 
 ## Tools
 
-40 tools (all toolsets). Five are **dashboard-only** (`visibility: ["app"]`): the dashboard calls them, and hosts that
+45 tools (all toolsets). Five are **dashboard-only** (`visibility: ["app"]`): the dashboard calls them, and hosts that
 support MCP Apps visibility hide them from the model.
 
 **Typed results.** Every analysis and harness-audit tool declares an `outputSchema` (zod, in `*.output.ts`), and
@@ -88,6 +89,7 @@ never turns a result into an error; `{ error }` results are tool errors (`isErro
 | `analyze_spec_drift`   | dashboard | Every rule pack; drift grouped by rule / ADR (`mode`, `packs`, `paths`, `severity`)                                       |
 | `analyze_architecture` | dashboard | The `architecture/` set only                                                                                              |
 | `analyze_standards`    | dashboard | The `standards/` set only                                                                                                 |
+| `analyze_security`     | dashboard | The `security/` set; without one (Semgrep), the server's built-in starter pack — see [Security](#security)                |
 | `list_rule_packs`      | text      | Sets and packs discovered under `<repo>/.semgrep/`                                                                        |
 | `rescan`               | app-only  | Re-run from the dashboard                                                                                                 |
 | `adr_coverage`         | text      | Which ADRs a rule enforces (`metadata.adr`): coverage, uncovered ADRs (each with a rule prompt), dangling rule references |
@@ -245,6 +247,31 @@ The dashboard shows it with **Copy as Markdown**; without an index the result is
 
 In Claude Code the prompts are `/mcp__spec-drift__review-pr` and
 `/mcp__spec-drift__spec-drift-report`.
+
+### Security
+
+Security verification based on [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill)
+(MIT; vendored under `src/security/methodology/`, notice in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)). Every
+security tool is read-only on the repository: it never runs project code, installs dependencies, uses the network, or
+writes into the repository.
+
+| Tool                             | Result             | Purpose                                                                                                                                                                                                               |
+| -------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `analyze_security`               | dashboard          | Deterministic baseline, no model: `.semgrep/security/`, or — with no such set on Semgrep — a built-in starter pack (JS/TS and Python injection, DOM XSS, unsafe deserialization, weak hashes, disabled TLS checks)    |
+| `security_audit_start`           | text               | Reconnaissance (languages, surfaces with evidence) → the methodology checklists that apply, a coverage ledger, and the audit prompt (≤ 8 000 characters)                                                              |
+| `security_audit_checklist`       | text               | One page (≤ 6 000 characters) of a checklist: `core`, `reconnaissance`, `attack-classes`, `hunting`, `web-protocol-and-auth`, `ai-and-llm`, …                                                                         |
+| `security_audit_submit_findings` | text               | Findings in the skill's `report-schema.json` format, checked by the skill's own `validate-findings.cjs` plus the repository (files and lines must exist); one invalid finding rejects the submission with every error |
+| `security_audit_status`          | security dashboard | Findings by verdict and severity, checklist coverage, what still needs validation, a page of findings (< 8 KB)                                                                                                        |
+
+**Verdicts.** `needs_validation` (claimed root cause, blockers, validation plan) is the usual result of a source-only
+review; `confirmed` needs a sandboxed reproduction (`execution.observed_result`); `rejected` records a disproved candidate.
+Run state lives in `$XDG_STATE_HOME/spec-drift/security/<project>/run-<N>/`, never in the repository.
+
+**In PR review.** A review group whose files or added lines touch auth, crypto, deserialization, SQL / command / path
+building, HTTP handlers, browser sinks, secrets, CI workflows, dependency manifests, LLM calls or deployment files gets a
+`<security>` block with the matching checklists. A finding with `category: "security"` is kept only when its `evidence`
+names an affected principal or trust boundary and a `file:line`; otherwise it is skipped with a warning. The dashboard
+badges security findings.
 
 ## How a PR review works
 
@@ -647,6 +674,8 @@ src/
 │   ├── domain/                pure: traceability matrix
 │   └── audit-paging.ts        pure: fit results to the MCP App budget, page tokens
 ├── harness/                   GENERATED copies of cli/src/harness libs (drift, semgrep, audit, learning, knowledge store)
+├── security/                  security audit: tools, service (run state outside the repo), recon, findings validation,
+│   │                          PR lens, built-in Semgrep pack (semgrep/), vendored methodology (methodology/, MIT)
 └── pr-review/
     ├── pr-review.tools.ts / .prompts.ts / .service.ts / .schemas.ts / .presenter.ts / .views.ts / .types.ts
     ├── workspace/             review folder, state, artifacts

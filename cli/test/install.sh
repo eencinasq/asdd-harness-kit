@@ -6,6 +6,35 @@ asdd() { node "$ROOT/cli/bin/asdd.mjs" "$@"; }
 # Projects get no copy of the CLI: their hooks run the asdd package through a resolver (devDependency, else global).
 export EXPECT_GATE="$(node --input-type=module -e "import { projectAsdd } from '$ROOT/cli/src/install/phases.mjs'; process.stdout.write(projectAsdd('gate'))")"
 export EXPECT_VERIFY="$(node --input-type=module -e "import { projectAsdd } from '$ROOT/cli/src/install/phases.mjs'; process.stdout.write(projectAsdd('verify'))")"
+# telemetry-emitters REQ-025 (design §12.2): the Claude load hook is fail-open; it never exits 2 like the gate resolver.
+export EXPECT_OBSERVE_CLAUDE='b=node_modules/.bin/asdd; [ -x "$b" ] || b=asdd; command -v "$b" >/dev/null 2>&1 && "$b" observe claude >/dev/null 2>&1; exit 0'
+TEL_IGNORES=(.harness/state/telemetry/spans.jsonl .harness/state/telemetry/slices/)
+# REQ-025: each telemetry gitignore line is in the project's .gitignore exactly once.
+assert_tel_ignores_once() {
+  local n
+  for line in "${TEL_IGNORES[@]}"; do
+    n="$(grep -cxF "$line" "$1/.gitignore" || true)"
+    [[ "$n" == 1 ]] || { echo "$1/.gitignore has $line $n times (expected once)" >&2; exit 1; }
+  done
+}
+# REQ-025 / D-3: the Claude PostToolUse load hook is wired once (matcher Read|Skill, timeout 10, no failClosed).
+assert_claude_observe() {
+  node -e '
+    const s = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+    const entries = (s.hooks?.PostToolUse ?? []).filter((e) => (e.hooks ?? []).some((h) => / observe\b/.test(h.command ?? "")));
+    if (entries.length !== 1) throw new Error(`expected one PostToolUse observe entry, got ${JSON.stringify(s.hooks?.PostToolUse)}`);
+    const [e] = entries;
+    const h = e.hooks.find((x) => / observe\b/.test(x.command));
+    if (e.matcher !== "Read|Skill") throw new Error(`observe matcher ${e.matcher}`);
+    if (h.command !== process.env.EXPECT_OBSERVE_CLAUDE) throw new Error(`observe command ${h.command}`);
+    if (h.type !== "command" || h.timeout !== 10 || "failClosed" in h || "failClosed" in e) throw new Error(`observe entry ${JSON.stringify(e)}`);
+  ' "$1"
+}
+# D-3 = hookless (2026-11-17): no Cursor load hook anywhere; hookless runtimes get none either.
+assert_no_cursor_observe() {
+  [[ -e "$1" ]] || return 0
+  if grep -qE 'beforeReadFile| observe ' "$1"; then echo "$1 wires a Cursor observe hook (D-3 = hookless)" >&2; exit 1; fi
+}
 # True when a hooks JSON file runs exactly this command somewhere.
 hook_has() { node -e 'const f=(v)=>Array.isArray(v)?v.some(f):v&&typeof v==="object"?Object.values(v).some(f):v===process.argv[2]; process.exit(f(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")))?0:1)' "$1" "$2"; }
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/asdd-install-test.XXXXXX")"
@@ -200,12 +229,16 @@ for kit_slice in "$ROOT"/.harness/specs/*/ "$ROOT"/.harness/state/archive/*/; do
   test ! -e "$TMP/existing-app/.harness/state/slices/$name"
   test ! -e "$TMP/existing-app/.harness/features/$name.features.json"
 done
-(cd "$ROOT" && npm pack --dry-run --json 2>/dev/null) | node -e '
+# --ignore-scripts: prepack (npm run build) prints to stdout, which would land before the JSON
+(cd "$ROOT" && npm pack --dry-run --json --ignore-scripts 2>/dev/null) | node -e '
   const files = JSON.parse(require("fs").readFileSync(0, "utf8"))[0].files.map((f) => f.path);
   const kitOnly = /^docs\/(architecture\/domain-model|agent-failure-log|dissent-log)\.md$|^\.harness\/(specs|state\/slices|state\/archive|state\/learning)\/.+\/|^\.harness\/state\/archive\/.+\.json$|^\.harness\/features\/.+\.features\.json$|^\.harness\/state\/registry\.json$|^\.harness\/config\/project\.json$|^\.harness\/audits\/.+\.json$|^docs\/knowledge-base\/steering-proposals\/|^\.harness\/steering\/(product|structure|tech|design-system|domain-layer\.project|quality-gates\.project)\.md$/;
   const leaked = files.filter((f) => kitOnly.test(f));
   if (leaked.length) throw new Error(`npm package ships kit-only files: ${leaked.join(", ")}`);
-  for (const f of ["cli/templates/bindings/product.md", "cli/bin/asdd.mjs", "cli/scaffold/specs/README.md", "cli/steering/session-loop.md", "cli/versions.json"])
+  // telemetry-emitters REQ-024: no span stream and no rollup in the package
+  const data = files.filter((f) => /spans\.jsonl$|profiling\.json$|(^|\/)telemetry\/slices\//.test(f));
+  if (data.length) throw new Error(`npm package ships telemetry data: ${data.join(", ")}`);
+  for (const f of ["cli/templates/bindings/product.md", "cli/bin/asdd.mjs", "cli/scaffold/specs/README.md", "cli/steering/session-loop.md", "cli/versions.json", "cli/scaffold/state/telemetry/telemetry.schema.json", "cli/scaffold/state/telemetry/README.md"])
     if (!files.includes(f)) throw new Error(`npm package misses ${f}`);
   // Everything a project receives ships inside cli/; the kit .harness/ (its slices, state, bindings) never ships.
   // Jev is only the jev-gate MCP server in the kit repo (clone it to use Jev): never in the package
@@ -224,8 +257,29 @@ grep -qx 'tools: Read, Grep, Glob, Bash, Write, Edit, Agent' "$PKG_DIR/app/.clau
 grep -qx 'disallowedTools: Agent' "$PKG_DIR/app/.claude/agents/asdd-e2e-tester.md"
 grep -qx 'maxTurns: 40' "$PKG_DIR/app/.claude/agents/asdd-validation-agent.md"
 test ! -e "$PKG_DIR/app/.harness/cli"
+# ui-assets-dist REQ-003: the package ships the asdd ui static assets in cli/dist (the package has no cli/src)
+for f in index.html app.js styles.css; do
+  test -f "$(find "$PKG_DIR/prefix" -path '*/asdd-harness-kit/cli/dist/harness/ui' -type d | head -1)/$f" || { echo "package misses cli/dist/harness/ui/$f" >&2; exit 1; }
+done
+# skill-eval-portable REQ-002 REQ-004: the package ships the skill-eval fixtures, and they pass in the installed app
+SKILL_EVAL_DIR="$(find "$PKG_DIR/prefix" -path '*/asdd-harness-kit/cli/eval/skills' -type d | head -1)"
+test -n "$SKILL_EVAL_DIR" && ls "$SKILL_EVAL_DIR"/*/*.json >/dev/null || { echo "package misses cli/eval/skills fixtures" >&2; exit 1; }
+if grep -rq 'cli/bin/asdd.mjs' "$SKILL_EVAL_DIR"; then echo "shipped skill-eval fixtures hard-code the kit CLI path" >&2; exit 1; fi
+SKILL_EVAL_OUT="$(cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" asdd skill-eval 2>&1)" || { echo "$SKILL_EVAL_OUT" >&2; echo "asdd skill-eval failed in the installed app" >&2; exit 1; }
+grep -qE 'total [0-9]+/[0-9]+ pass' <<<"$SKILL_EVAL_OUT"
 echo '{"command":"git status"}' | (cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" sh -c "$EXPECT_GATE") | grep -q '"permission": *"allow"'
 (cd "$PKG_DIR/app" && env PATH="$PKG_DIR/prefix/bin:$PATH" asdd check >/dev/null)
+# telemetry-emitters REQ-025: the packaged install gets the telemetry location and a Claude load hook that records a load
+test -f "$PKG_DIR/app/.harness/state/telemetry/telemetry.schema.json"
+# (the gate run above already appended its command span: count tool spans only)
+tool_spans() { node -e 'const fs=require("fs");const p=process.argv[1];process.stdout.write(String(fs.existsSync(p)?fs.readFileSync(p,"utf8").split("\n").filter((l)=>l&&JSON.parse(l).kind==="tool").length:0))' "$1"; }
+[[ "$(tool_spans "$PKG_DIR/app/.harness/state/telemetry/spans.jsonl")" == 0 ]]
+assert_claude_observe "$PKG_DIR/app/.claude/settings.json"
+assert_no_cursor_observe "$PKG_DIR/app/.cursor/hooks.json"
+PKG_APP_REAL="$(cd "$PKG_DIR/app" && pwd -P)"
+OBS_OUT="$(cd "$PKG_DIR/app" && sed "s#\${REPO}#$PKG_APP_REAL#g" "$ROOT/cli/test/fixtures/telemetry/claude/posttooluse-read-steering.json" | node -e 'process.stdout.write(JSON.stringify(JSON.parse(require("fs").readFileSync(0,"utf8")).payload))' | env PATH="$PKG_DIR/prefix/bin:$PATH" sh -c "$EXPECT_OBSERVE_CLAUDE" 2>&1)"
+test -z "$OBS_OUT"
+[[ "$(tool_spans "$PKG_DIR/app/.harness/state/telemetry/spans.jsonl")" == 1 ]] || { echo "the packaged observe hook recorded no tool span" >&2; exit 1; }
 # kit-owned (refresh) files are recorded so spec drift exempts them; project-owned seeds are not
 node -e '
   const m = require(process.argv[1]).managed_files || [];
@@ -244,6 +298,15 @@ test ! -e "$TMP/existing-app/.harness/package-lock.json"
 test ! -e "$TMP/existing-app/.harness/node_modules"
 if grep -qxF '.harness/node_modules' "$TMP/existing-app/.gitignore"; then echo "kit .gitignore line .harness/node_modules kept" >&2; exit 1; fi
 grep -qxF '.harness/knowledge' "$TMP/existing-app/.gitignore"
+# telemetry-emitters REQ-025: the telemetry location gets the shipped contract files and no data file
+TEL="$TMP/existing-app/.harness/state/telemetry"
+cmp -s "$ROOT/cli/scaffold/state/telemetry/telemetry.schema.json" "$TEL/telemetry.schema.json"
+cmp -s "$ROOT/cli/scaffold/state/telemetry/README.md" "$TEL/README.md"
+test ! -e "$TEL/spans.jsonl"
+test ! -e "$TEL/slices"
+assert_tel_ignores_once "$TMP/existing-app"
+assert_no_cursor_observe "$TMP/existing-app/.cursor/hooks.json"
+test ! -e "$TMP/existing-app/.claude/settings.json"
 
 # Shape Up -> Product Delivery integration contract.
 grep -q '^name: shape-up$' "$TMP/existing-app/.agents/skills/shape-up/SKILL.md"
@@ -410,9 +473,14 @@ test ! -e "$TMP/existing-app/tools/spec-drift"
 # Orca was never wired: a fresh install has no capabilities.orca, and an upgrade drops the block older kits seeded
 node -e 'if ("orca" in (require(process.argv[1]).capabilities ?? {})) throw new Error("capabilities.orca still seeded")' "$TMP/existing-app/.harness/config/project.json"
 node -e 'const fs=require("fs");const p=process.argv[1];const d=JSON.parse(fs.readFileSync(p,"utf8"));d.capabilities.orca={enabled:false,experimental:true};fs.writeFileSync(p,JSON.stringify(d,null,2))' "$TMP/existing-app/.harness/config/project.json"
+# REQ-025: a stream the project already has survives a reinstall (copyTree never prunes)
+printf '%s\n' '{"seed":"kept"}' >"$TEL/spans.jsonl"
 # second run keeps binding, does not require --force for create-only, stays hook-idempotent
 asdd install "$TMP/existing-app" --skip-deps >/dev/null
 grep -q 'KEEP ME' "$TMP/existing-app/.harness/steering/product.md"
+grep -qxF '{"seed":"kept"}' "$TEL/spans.jsonl"
+rm -f "$TEL/spans.jsonl"
+assert_tel_ignores_once "$TMP/existing-app"
 node -e 'if ("orca" in (require(process.argv[1]).capabilities ?? {})) throw new Error("upgrade kept the seeded capabilities.orca")' "$TMP/existing-app/.harness/config/project.json"
 GATE_COUNT="$(node -e "const h=JSON.parse(require('fs').readFileSync('$TMP/existing-app/.cursor/hooks.json','utf8')); process.stdout.write(String((h.hooks.beforeShellExecution||[]).filter((e)=>e?.command===process.env.EXPECT_GATE).length))")"
 [[ "$GATE_COUNT" == "1" ]]
@@ -474,6 +542,14 @@ for rt in cursor claude opencode kimi junie devin kiro; do
       test -f "$RTMP/$rt-app/.claude/settings.json"
       hook_has "$RTMP/$rt-app/.claude/settings.json" "$EXPECT_GATE"
       hook_has "$RTMP/$rt-app/.claude/settings.json" "$EXPECT_VERIFY"
+      assert_claude_observe "$RTMP/$rt-app/.claude/settings.json"
+      # REQ-025 / NFR-003: asdd unresolvable → the load hook exits 0 and prints nothing (exit 2 would reach the model)
+      set +e; OBS_OUT="$(cd "$RTMP/$rt-app" && echo '{}' | env PATH="$NODE_DIR:/usr/bin:/bin" sh -c "$EXPECT_OBSERVE_CLAUDE" 2>&1)"; OBS_CODE=$?; set -e
+      [[ "$OBS_CODE" == 0 && -z "$OBS_OUT" ]] || { echo "observe hook without asdd: exit $OBS_CODE, output: $OBS_OUT" >&2; exit 1; }
+      # asdd resolvable: a committed Claude fixture still yields exit 0 and no output
+      APP_REAL="$(cd "$RTMP/$rt-app" && pwd -P)"
+      set +e; OBS_OUT="$(cd "$RTMP/$rt-app" && sed "s#\${REPO}#$APP_REAL#g" "$ROOT/cli/test/fixtures/telemetry/claude/posttooluse-read-steering.json" | node -e 'process.stdout.write(JSON.stringify(JSON.parse(require("fs").readFileSync(0,"utf8")).payload))' | env PATH="$GBIN:$NODE_DIR:/usr/bin:/bin" sh -c "$EXPECT_OBSERVE_CLAUDE" 2>&1)"; OBS_CODE=$?; set -e
+      [[ "$OBS_CODE" == 0 && -z "$OBS_OUT" ]] || { echo "observe hook with asdd: exit $OBS_CODE, output: $OBS_OUT" >&2; exit 1; }
       ;;
     opencode)
       test -L "$RTMP/$rt-app/.opencode/skills"
@@ -504,6 +580,15 @@ for rt in cursor claude opencode kimi junie devin kiro; do
       validate_runtime_mcp "$RTMP/$rt-app" "$rt" ".kiro/settings/mcp.json"
       ;;
   esac
+  # REQ-025: every install provisions the telemetry location without data; only Claude gets a load hook (D-3)
+  test -f "$RTMP/$rt-app/.harness/state/telemetry/telemetry.schema.json"
+  test -f "$RTMP/$rt-app/.harness/state/telemetry/README.md"
+  test ! -e "$RTMP/$rt-app/.harness/state/telemetry/slices"
+  assert_tel_ignores_once "$RTMP/$rt-app"
+  assert_no_cursor_observe "$RTMP/$rt-app/.cursor/hooks.json"
+  if [[ "$rt" != claude ]]; then
+    if grep -rqsE ' observe |PostToolUse' "$RTMP/$rt-app/.claude/settings.json" "$RTMP/$rt-app/opencode.json"; then echo "$rt install wired a load hook" >&2; exit 1; fi
+  fi
 done
 
 # ------------------------------------------------------------------

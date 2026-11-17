@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-amend-close-002",
+  "timestamp": "2026-11-17T15:41:41.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "amend-close",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/sync-state.mjs",
+    "cli/src/harness/amend-slice.test.mjs"
+  ],
+  "evidence": "RED: 'amend-close REQ-001 REQ-002' fails — deriveStatus stays in_progress after knowledge completes post-amend.",
+  "concerns": []
+}

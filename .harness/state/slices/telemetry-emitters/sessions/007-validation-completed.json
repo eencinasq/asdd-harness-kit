@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-007",
+  "timestamp": "2026-11-17T04:30:00Z",
+  "agent": "asdd-validation-agent",
+  "slice_id": "telemetry-emitters",
+  "event_type": "phase_completed",
+  "phase": "validation",
+  "mode": "full",
+  "scope_paths": [
+    ".harness/specs/telemetry-emitters/spec-validation-report.md"
+  ],
+  "evidence": "Re-validation of requirements 1.1.0: gate PASS (QG-VAL-04, PASSED), report .harness/specs/telemetry-emitters/spec-validation-report.md v1.1. BLOCKING 0, HIGH 0. All six v1.0 HIGH findings closed: AMB-001, CON-001, NFR-002 and NFR-003 resolved in the spec; TRC-001 (AR-3 rotation, rollup, H-* output) explicitly deferred; RSK-001/AP-7 overridden (Option B); the Verify-on-Stop own-crash part of NFR-002 deferred as KPI-1. The MEDIUM findings are resolved except TRC-002 (OI-7, ruled MEDIUM non-blocking: may go to Design, PO answer needed before Task Planning, recommended: WARN-only check in validators/telemetry.mjs) and DOM-001..006 (Domain phase required, QG-DMN-02). New findings: GOV-001 MEDIUM (the PO/TL decisions closing HIGH findings are recorded only in agent-authored artifacts; a human-authored TL session is recommended before Design); AMB-009 LOW (REQ-007: no command_label for an override-allowed command, command-gate.mjs:85-87,117); AMB-010 LOW (REQ-019 criterion 7 baseline); TRC-006 LOW (REQ-018: no Cursor non-guidance latency class). Code citations re-checked at f41a3ff: the cited files are unchanged since 1b1fbae; the lazy-import precedent is now check-invariants.mjs:108-114. No schema change. Validation confidence 0.86. Uncertainty factors (QG-DEC-10): (1) the PO/TL decisions were relayed by the orchestrator and not human-authored (GOV-001); (2) the A-01/A-02 payload shapes and hook exit-code semantics are unverified (RSK-004, OI-6); (3) OI-7 is open. Next: @asdd-domain-agent.",
+  "concerns": []
+}

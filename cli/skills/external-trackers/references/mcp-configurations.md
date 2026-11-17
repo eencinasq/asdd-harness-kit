@@ -81,6 +81,17 @@ GitHub has official MCP support via the GitHub MCP server.
 - `create_issue_comment` — sync status
 - `update_issue` — update labels, state
 
+## Reading an Intent item
+
+Intent items (one per scope of a bet pitch, written by the PO/PM) follow [`intent-format.md`](./intent-format.md);
+which tracker holds them is the `tracker` block of `.harness/config/project.json`.
+
+| Tracker | Read the item | Post progress |
+|---|---|---|
+| Jira | `jira_get_issue` | `jira_add_comment` |
+| Linear | `linear_getIssue` | `linear_createIssueComment` |
+| GitHub Issues | `get_issue` | `create_issue_comment` |
+
 ## Manual / No MCP
 
 When no tracker MCP is available, the handoff uses one of:

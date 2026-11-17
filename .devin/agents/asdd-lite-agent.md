@@ -1,0 +1,1 @@
+../../.agents/agents/asdd-lite-agent.md

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "docs-p5-wave1",
+  "concerns": [],
+  "timestamp": "2026-11-17T01:53:10.000Z",
+  "session_id": "sess-docs-p5-wave1-012",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: when a slice changes shipped behavior, its docs task belongs in the same slice; README drift table had contradicted SP-003 since 48181a3."
+}

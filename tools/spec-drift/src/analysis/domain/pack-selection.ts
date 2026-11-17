@@ -10,6 +10,7 @@ export const PACK_ID_PATTERN = /^[a-z0-9][a-z0-9._-]*$/i;
 const SETS_FOR_MODE: Partial<Record<ScanMode, readonly string[]>> = {
 	architecture: ['architecture', 'dependencies'],
 	standards: ['standards'],
+	security: ['security'],
 };
 
 export class UnknownPackError extends Error {

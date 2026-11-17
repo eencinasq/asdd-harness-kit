@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-cost-metrics-001",
+  "timestamp": "2026-11-16T21:55:17.756Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "cost-metrics",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "lite",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

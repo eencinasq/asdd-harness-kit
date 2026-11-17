@@ -2,7 +2,7 @@
   "schema_version": "3.0",
   "slice_id": "cli-harness",
   "phase": "implementation",
-  "status": "in_progress",
+  "status": "ABANDONED",
   "mode": "escalated",
   "escalation_signals": [
     {
@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": true,
   "created_at": "2026-11-10T21:52:25.034Z",
-  "updated_at": "2026-11-14T04:44:22.733Z",
+  "updated_at": "2026-11-17T17:52:18.449Z",
   "paths": {
     "specs": ".harness/specs/cli-harness",
     "tasks": ".harness/specs/cli-harness/tasks.md",
@@ -887,6 +887,14 @@
       "event": "feature_completed",
       "phase": "implementation",
       "feature_id": "TASK-011"
+    },
+    {
+      "timestamp": "2026-11-16T21:55:11.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": null,
+      "feature_id": null
     }
   ],
   "contributors": [
@@ -894,6 +902,7 @@
     "human",
     "eencinas",
     "asdd-lite",
-    "asdd-pipeline"
+    "asdd-pipeline",
+    "claude"
   ]
 }

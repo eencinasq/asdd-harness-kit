@@ -26,6 +26,8 @@ export const HARNESS_FILES = [
   ['.harness/config/models.json', 'cli/scaffold/config/models.json'],
   ['.harness/config/skill-profile-waivers.json', 'cli/scaffold/config/skill-profile-waivers.json'],
   ['.harness/config/steering.registry.json', 'cli/scaffold/config/steering.registry.json'],
+  // The telemetry contract (schema + README); copyTree never prunes, so a project's spans.jsonl stays.
+  ['.harness/state/telemetry', 'cli/scaffold/state/telemetry'],
 ];
 /** READMEs of the project's own folders: written once, then the project's. */
 const FOLDER_READMES = ['specs', 'features', 'state/slices', 'state/archive'];
@@ -88,6 +90,16 @@ export const projectAsdd = (verb) =>
 
 /** The command a target's hooks run for `verb`: the resolver in a project, cli/ in the kit repo. */
 export const asddCommand = (ctx, verb) => (ctx.self ? `node ${KIT_BIN} ${verb}` : projectAsdd(verb));
+
+/**
+ * The load hook (`asdd observe <runtime>`), fail-open unlike the gate resolver: asdd missing, failing, or slow, the
+ * command prints nothing and exits 0 (a Claude Code hook exiting 2 reaches the model). Only Claude Code gets one:
+ * Cursor is hookless for guidance loads (D-3, cli/test/fixtures/telemetry/cursor/README.md).
+ */
+export const observeCommand = (ctx, runtime) =>
+  ctx.self
+    ? `node ${KIT_BIN} observe ${runtime} >/dev/null 2>&1; exit 0`
+    : `b=node_modules/.bin/asdd; [ -x "$b" ] || b=asdd; command -v "$b" >/dev/null 2>&1 && "$b" observe ${runtime} >/dev/null 2>&1; exit 0`;
 
 /** The asdd the installer itself runs on the target (checks, skills index): this kit's, never one the project had. */
 export const installerBin = (ctx) => join(ctx.kit, KIT_BIN);
@@ -169,7 +181,10 @@ export function installHarnessScaffold(ctx) {
   // Examples only: the target's .github/ is never touched
   ctx.copyFile(join(kit, '.github/CODEOWNERS.harness.example'), join(target, '.harness/examples/CODEOWNERS.harness.example'), 'refresh');
   ctx.copyFile(join(kit, '.github/workflows/harness-audit.yml.example'), join(target, '.harness/examples/harness-audit.yml.example'), 'refresh');
-  for (const [dest, src] of HARNESS_FILES) ctx.copyFile(join(kit, src), join(target, dest), 'refresh');
+  for (const [dest, src] of HARNESS_FILES) {
+    if (statSync(join(kit, src)).isDirectory()) ctx.copyTree(join(kit, src), join(target, dest), 'refresh');
+    else ctx.copyFile(join(kit, src), join(target, dest), 'refresh');
+  }
   ctx.copyFile(join(TEMPLATES, 'PROGRESS.md'), join(target, '.harness/PROGRESS.md'), 'create');
   ctx.copyFile(join(TEMPLATES, 'manifest.json'), join(target, '.harness/state/manifest.json'), 'create');
 

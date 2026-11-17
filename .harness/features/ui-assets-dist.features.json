@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "ui-assets-dist",
+  "source_tasks": ".harness/specs/ui-assets-dist/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Ship cli/src static assets in cli/dist",
+      "user_visible_behavior": "asdd ui serves its page from the built CLI and the installed npm package; editing a ui asset marks cli/dist stale.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit build && node cli/bin/asdd.mjs kit build --check",
+        "bash cli/test/install.sh",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-16 (1a473db): build copies 3 assets to cli/dist/harness/ui; kit build --check fails after an asset edit and passes after revert; asdd ui from dist: / 200 text/html, /ui/app.js 200, /ui/styles.css 200; install.sh OK (packed package contains ui assets; RED before: 'package misses cli/dist/harness/ui/index.html'); npm test 201/201.",
+      "scope_paths": [
+        "cli/src/kit/build.mjs",
+        "cli/src/kit/fingerprint.mjs",
+        "cli/test/install.sh"
+      ],
+      "evidence_hash": "fb309c6eeb50b4953ee49b27754bd83ae44569addb9e696ae086f2c3d2694b87"
+    }
+  ]
+}

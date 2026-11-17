@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-052",
+  "timestamp": "2026-11-17T12:28:09.253Z",
+  "phase": "implementation",
+  "feature_id": "TASK-013",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/harness-profile.mjs",
+    "cli/src/harness/harness-profile.test.mjs"
+  ],
+  "evidence": "TASK-013 (REQ-020, REQ-021, REQ-022, REQ-023, REQ-004) RED: cli/src/harness/harness-profile.test.mjs with 17 cases (exit 2 usage / exit 3 no telemetry / sessions-only phase table + no attributed spans line; phase windows, p50/p95 fixture, scores, share unknown, AR-10 topology-only streams, --bottlenecks ranking + tie-break, activation three states + configured rows + legend + missing ids unknown, runtimes not configured, unattributed count, --json shape + not_measured + no null, malformed lines skipped, 500-line and 262,144-byte bounds with cut first line, whole-tree hash before = after on every run, never \"not loaded\", no-network grep + throwing fetch) -> node --test cli/src/harness/harness-profile.test.mjs: # tests 17 # pass 1 # fail 16 (harness-profile.mjs absent)."
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-recon",
+  "human": "eencinas",
+  "slice_id": "security-recon-untracked",
+  "concerns": [],
+  "timestamp": "2026-11-17T17:49:04.000Z",
+  "session_id": "sess-security-recon-untracked-006",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: map the code that does the work — recon.ts is pure; the listing lives in the service. Also: a stray HARNESS_DRIFT_BASE in the shell breaks the DRIFT-07 unit test; run npm test with it unset."
+}

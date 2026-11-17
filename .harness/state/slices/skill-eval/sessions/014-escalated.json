@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-skill-eval-014",
+  "timestamp": "2026-11-17T00:38:49.466Z",
+  "agent": "devin",
+  "human": "devin",
+  "slice_id": "skill-eval",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "E1 fired mechanically: TASK-002 scope_paths include package.json (mandated shared registration file per P5 parallel rules) alongside cli/ sources. Work is complete and verified; escalating to acknowledge the signal per asdd-lite.md.",
+  "concerns": []
+}

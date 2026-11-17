@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-p61",
+  "human": "eencinas",
+  "slice_id": "tracker-binding",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:02:22.000Z",
+  "session_id": "sess-tracker-binding-003",
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "design.md: tracker block shape and per-type required fields; Intent format summary; no domain terms; no ADRs."
+}

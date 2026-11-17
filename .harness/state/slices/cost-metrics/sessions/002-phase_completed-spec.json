@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "cost-metrics",
+  "concerns": [],
+  "timestamp": "2026-11-17T15:29:57.000Z",
+  "session_id": "sess-cost-metrics-002",
+  "event_type": "phase_completed",
+  "phase": "spec",
+  "evidence": "spec.md: REQ-001…004; mapping widened (cost-lib, verify-on-stop, vendored copies); design answer on token sources. Run authorized by the TL ('si', 2026-11-17)."
+}

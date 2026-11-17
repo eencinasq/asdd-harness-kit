@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-078",
+  "timestamp": "2026-11-17T14:53:24.105Z",
+  "phase": "implementation",
+  "feature_id": "TASK-013",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/harness-profile.mjs",
+    "cli/src/harness/harness-profile.test.mjs"
+  ],
+  "evidence": "UNCOV-002 fix (TL decision a): readObserveHooks treats cursor as hookless always (REQ-021 c4 1.1.1, D-3); design §6/§12 superseded notes (QA-F-008). RED in session 077 (tests 17 pass 16 fail 1). GREEN: node --test cli/src/harness/harness-profile.test.mjs -> tests 17 pass 17 fail 0; npm test exit 0 (# tests 374 # pass 374 # fail 0 ); asdd profile --slice telemetry-emitters exit 0."
+}

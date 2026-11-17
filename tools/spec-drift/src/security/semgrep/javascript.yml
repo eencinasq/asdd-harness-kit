@@ -1,0 +1,98 @@
+# Built-in starter security pack for analyze_security (security-review REQ-006). Used only when the analyzed repo has no
+# .semgrep/security/ set. Each rule names the trust boundary it guards; the test file next to it is javascript.js.
+rules:
+  - id: security.js.command-injection
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      A shell command is built from a dynamic value. If that value can come from a request, a file or another untrusted
+      source, it can run arbitrary commands. Pass an argument array to execFile/spawn instead of a shell string.
+    metadata:
+      category: security
+      cwe: 'CWE-78: OS Command Injection'
+      checklist: web-protocol-and-auth
+    patterns:
+      - pattern-either:
+          - pattern: $F(`...${$X}...`, ...)
+          - pattern: $F($A + $B, ...)
+      - metavariable-regex:
+          metavariable: $F
+          regex: ^((child_process|cp|childProcess)\.)?(exec|execSync)$
+
+  - id: security.js.code-injection
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      Code is evaluated from a non-literal value (eval / new Function). Untrusted input reaching it executes as code.
+    metadata:
+      category: security
+      cwe: 'CWE-95: Eval Injection'
+      checklist: attack-classes
+    patterns:
+      - pattern-either:
+          - pattern: eval($X)
+          - pattern: new Function(..., $X)
+      - pattern-not: eval("...")
+      - pattern-not: new Function(..., "...")
+
+  - id: security.js.dom-xss
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      HTML is written into the DOM from a non-literal value. If any part comes from the URL, storage or an API, it is a
+      cross-site scripting sink. Use textContent or escape the value.
+    metadata:
+      category: security
+      cwe: 'CWE-79: Cross-site Scripting'
+      checklist: client-side
+    patterns:
+      - pattern-either:
+          - pattern: $EL.innerHTML = $X
+          - pattern: $EL.outerHTML = $X
+          - pattern: document.write($X)
+      - pattern-not: $EL.innerHTML = "..."
+      - pattern-not: $EL.outerHTML = "..."
+      - pattern-not: document.write("...")
+
+  - id: security.js.sql-injection
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      A SQL query is built with string interpolation. Use parameters ($1, ?) so request data cannot change the query.
+    metadata:
+      category: security
+      cwe: 'CWE-89: SQL Injection'
+      checklist: data-isolation-and-lifecycle
+    pattern-either:
+      - pattern: $DB.query(`...${$X}...`, ...)
+      - pattern: $DB.query("..." + $X, ...)
+      - pattern: $DB.raw(`...${$X}...`, ...)
+
+  - id: security.js.weak-hash
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      MD5 and SHA-1 are broken for security uses (passwords, signatures, integrity). Use SHA-256 or better, and a
+      password hash (argon2, scrypt, bcrypt) for passwords.
+    metadata:
+      category: security
+      cwe: 'CWE-327: Broken or Risky Cryptographic Algorithm'
+      checklist: attack-classes
+    pattern-either:
+      - pattern: $C.createHash("md5")
+      - pattern: $C.createHash("sha1")
+
+  - id: security.js.tls-verification-disabled
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      TLS certificate verification is turned off, so any network attacker can impersonate the server. Remove
+      rejectUnauthorized: false (or NODE_TLS_REJECT_UNAUTHORIZED=0) and trust the right CA instead.
+    metadata:
+      category: security
+      cwe: 'CWE-295: Improper Certificate Validation'
+      checklist: protocols-rpc-and-messaging
+    pattern-either:
+      - pattern: |
+          {..., rejectUnauthorized: false, ...}
+      - pattern: process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"

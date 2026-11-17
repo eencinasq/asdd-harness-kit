@@ -1,0 +1,213 @@
+{
+  "schema_version": "3.0",
+  "slice_id": "ui-gate-decisions",
+  "phase": "knowledge",
+  "status": "DONE",
+  "mode": "escalated",
+  "escalation_signals": [
+    {
+      "type": "E1-scope-spread",
+      "evidence": "scope touches 3 top-level modules: README.md, cli, package.json"
+    }
+  ],
+  "escalation_required": false,
+  "escalated_from_lite": true,
+  "created_at": "2026-11-16T21:55:18.272Z",
+  "updated_at": "2026-11-17T17:52:18.471Z",
+  "paths": {
+    "specs": ".harness/specs/ui-gate-decisions",
+    "tasks": ".harness/specs/ui-gate-decisions/tasks.md",
+    "features": ".harness/features/ui-gate-decisions.features.json"
+  },
+  "gates": {
+    "spec": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T01:14:45.000Z",
+      "evidence": "Human approved lite spec including REQ-005 Host/Origin; Mapped widened for gate-decide + registration (design).",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T01:14:45.000Z",
+      "evidence": "design.md: GET/POST gates APIs, gate-decide CLI writer, Host/Origin helper; Mapped amendment documented.",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T01:14:45.000Z",
+      "evidence": "tasks.md TASK-001…003 + ui-gate-decisions.features.json (owner=cursor).",
+      "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T01:25:42.000Z",
+      "evidence": "All features TASK-001…003 passing; gate-decide + Host/Origin + Gates UI shipped.",
+      "concerns": []
+    },
+    "qa": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T01:25:42.000Z",
+      "evidence": "QA-light: gate-decide+ui-server tests 10/10; npm test 222/222. Host/Origin + decide smoke via unit tests.",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T01:25:42.000Z",
+      "evidence": "Lite note: asdd ui write path decides WARN gates via asdd gate-decide; REQ-005 Host/Origin blocks DNS rebinding/CSRF.",
+      "concerns": []
+    }
+  },
+  "active_features": [],
+  "open_dissents": 0,
+  "source": null,
+  "session_log": [
+    {
+      "timestamp": "2026-11-16T21:55:18.248Z",
+      "agent": "human",
+      "human": "squad",
+      "event": "phase_started",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:10:36.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": "discovery",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:14:45.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:14:45.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:14:45.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:14:45.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:21:40.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T01:22:32.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T01:22:47.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-17T01:23:32.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-17T01:23:32.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T01:23:54.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-17T01:24:53.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-003"
+    },
+    {
+      "timestamp": "2026-11-17T01:25:42.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:25:42.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:25:42.000Z",
+      "agent": "cursor",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T01:25:50.578Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": null,
+      "feature_id": null
+    }
+  ],
+  "contributors": [
+    "squad",
+    "human",
+    "eencinas",
+    "cursor"
+  ]
+}

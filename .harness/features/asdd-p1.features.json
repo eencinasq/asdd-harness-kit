@@ -73,7 +73,7 @@
       "verification": [
         "node --test cli/src/harness/converge-lib.test.mjs"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node --test cli/src/harness/converge-lib.test.mjs` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "cli/src/harness/converge-lib.mjs",
         "cli/src/harness/converge-lib.test.mjs",
@@ -83,7 +83,7 @@
         "package.json",
         "docs/ASDD-ROADMAP.md"
       ],
-      "evidence_hash": "151bf9042e04e56e049881c9c5aa2ec77b5c5ca5b62a768f91127fbf20d7b009"
+      "evidence_hash": "5458c127f896065f443abf597ab9a1dc74db33b0d2fc438e8b36f6fec69317b1"
     }
   ]
 }

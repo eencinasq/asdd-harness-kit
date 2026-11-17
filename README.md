@@ -265,15 +265,19 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 | Command | Purpose |
 |---|---|
 | `asdd status [--metrics\|--json\|--html]` | Active slices, escalation, hill (uphill); pipeline metrics; HTML dashboard |
+| `asdd ui [--port <n>]` | Read-only local harness UI on 127.0.0.1 (slices, pipeline, drift, learning, knowledge) |
+| `asdd gate-decide <slice> --phase <p> --note "…"` | Tech Lead override for a WARN gate (`decided_by` + note via session) |
 | `asdd init-flow` | 15-minute brownfield path: install (if needed), one lite slice, minimal feature, `asdd check` |
 | `asdd slice init <id> [--hotfix\|--full]` | Scaffold a slice (`lite` default; `hotfix` = one stub feature at implementation) |
 | `asdd slice amend <id>` | Reopen a `DONE` slice with an amendments note |
 | `asdd slice escalate <id> --reasons "<triggers>"` | Lite/hotfix → escalated |
 | `asdd converge [--strict] [--json]` | Cheap REQ / test-mention / evidence gate before `passing` |
 | `asdd converge-eval` | Score EARS/converge fixtures under `cli/eval/converge-ears/` |
+| `asdd skill-eval [--skill <name>] [--baseline <ref>]` | Score the shipped skill fixtures plus the project's `.harness/eval/skills/`; `--baseline` diffs against a git ref and fails on regressions |
 | `asdd waves [--slice <id>]` | Parallelism hints from owners, deps, and scopes |
 | `asdd portfolio` | Read-only multi-repo summary (`.harness/config/portfolio.json`) |
 | `asdd tracker-sync [--apply]` | Plan bi-directional tracker sync from handoff + sessions (local receipt with `--apply`) |
+| `asdd intake --from <file\|-> --ref <url> [--accept-stale] [--dry-run]` | Import a tracker Intent item (format: `cli/skills/external-trackers/references/intent-format.md`) as a slice: validates it offline, re-checks its grounding refs, writes `intent.md`, and inits the slice in its suggested mode |
 | `asdd spec-source` | Experimental MUST REQ inventory (requires `capabilities.spec_as_source`) |
 | `asdd sync [--slice <id>]` | Regenerate manifests, registry, and the knowledge index from session logs |
 | `asdd check [--live]` | Harness invariants, including spec drift and converge (`--live` is used by Verify-on-Stop) |
@@ -281,6 +285,8 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 | `asdd audit` | Whole-codebase audit report |
 | `asdd knowledge sync [--embed]` | Rebuild the knowledge index |
 | `asdd learn [--all \| --signatures \| --export \| --propose <LP-id>]` | Learning patterns; signatures in use; lessons for the kit; scaffold a steering proposal |
+| `asdd profile [--slice <id>] [--bottlenecks] [--json]` | Read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation |
+| `asdd observe <claude\|cursor>` | The guidance load hook (fail-open, stdin: hook payload); wired for Claude Code only |
 
 Agent slash skills (call the CLI, do not invent SoT): `asdd-status`, `asdd-next`, `asdd-implement`, `asdd-converge`. All commands are `asdd <command>`: with a devDependency, `npx asdd <command>` (or a global `asdd`, which hands off to it). `asdd help` lists them.
 
@@ -322,6 +328,23 @@ Session close:
 3. The diff contains only mapped product files and the harness records the session loop allows (sessions, features, `PROGRESS.md` row).
 4. The `PROGRESS.md` row matches the per-slice manifest.
 5. Lite slices closing with open escalation signals are rejected — escalate first (`asdd slice escalate`).
+
+**PO → tracker → engineer.** A PO/PM shapes with the read-only `asdd-shaping-agent`, grounded in the code, specs, and past slices, and writes the pitch, the bet, and one Intent item per scope to the tracker named in `project.json` ([Play O](docs/PLAYBOOK.md#play-o--po-or-pm-shapes-into-the-tracker)). An engineer imports an Intent with `asdd intake`, which re-checks its grounding and creates the slice, then works it locally with any agent ([Play P](docs/PLAYBOOK.md#play-p--an-engineer-picks-up-an-intent)).
+
+### Local UI (`asdd ui`)
+
+`asdd ui [--port <n>]` serves a local page on `http://127.0.0.1:7474/` (Node built-ins only, bound to loopback) for people who do not live in the IDE. Its views read the files the CLI already writes, and refresh when `.harness/state/` changes:
+
+| View | Shows |
+|---|---|
+| Slices | `registry.json`, pipeline metrics, `PROGRESS.md` |
+| Pipeline | The `asdd status --html` page |
+| Drift | `DRIFT-*` findings and drift level (set `HARNESS_DRIFT_BASE=<ref>` when the branch is far ahead of the base) |
+| Learning | Patterns and the open ones |
+| Knowledge | Search over the knowledge index |
+| Gates | Phase gates in `WARN` that no Tech Lead has acknowledged |
+
+Everything is read-only except one action: deciding a pending gate. The page posts to `/api/gates/decide`, which runs `asdd gate-decide <slice> --phase <phase> --note "…"`; that command appends an `override` session with `decided_by` from `HARNESS_AUTHOR` or `git config user.name`, then syncs. The server never writes sessions itself, refuses the request (403) unless `Host` is the loopback address and `Origin` (or `Referer`) is the page itself, and refuses a slice or phase with no pending `WARN` gate. The same command works from a terminal.
 
 ### Project binding
 
@@ -492,15 +515,15 @@ All three share one library (`drift-lib.mjs`, `audit-lib.mjs` in `cli/src/harnes
 | ID | When | Detects | Result |
 |---|---|---|---|
 | `DRIFT-01` | A slice is editing | A changed product file not covered by the slice's mapped files | FAIL |
-| `DRIFT-02` | Always | A `passing` feature whose `scope_paths` files changed after its verification (`evidence_hash`) | FAIL; the feature returns to `in_progress` |
+| `DRIFT-02` | A slice is `in_progress` | A `passing` feature whose `scope_paths` files changed after its verification (`evidence_hash`) | FAIL; the feature returns to `in_progress` |
 | `DRIFT-03` | Phase `qa` or later | A MUST requirement with no feature listing it in `req_ids` | FAIL |
 | `DRIFT-04` | Phase `qa` or later | A requirement ID that no test file mentions | WARN |
 | `DRIFT-05` | Always | A `passing` feature's `scope_paths` entry that does not exist (a glob passes when one file matches) | FAIL |
 | `DRIFT-06` | Always | A feature without `scope_paths`, or `passing` without `evidence` | WARN; FAIL with `drift.contract: "fail"` in `project.json` |
 | `DRIFT-07` | CI on a pull request | Product files changed, but the PR names no slice (branch `slice/<id>/…` or `Slice: <id>` in the body) | FAIL |
 
-- **Mapped files** are the paths named in `intent.md`, `design.md`, `tasks.md`, or `spec.md`, the `scope_paths` of in-progress features, and test files (per the `Test file globs` binding) that name a REQ of the slice. Harness records and files the installer manages are exempt, so a kit upgrade is not drift.
-- **`DRIFT-02`** recomputes the hash of the files `scope_paths` cover and compares it with `evidence_hash`, recorded by `asdd sync` when the feature became `passing`. No commit is needed, and it works without git.
+- **Mapped files** are the paths named in `intent.md`, `design.md`, `tasks.md`, or `spec.md`, the `scope_paths` of in-progress features, and test files (per the `Test file globs` binding) that name a REQ of the slice. Harness records and files the installer manages are exempt, so a kit upgrade is not drift. So are the append-only logs `docs/agent-failure-log.md` and `docs/dissent-log.md`, which any slice writes at session close; every other file under `docs/` must be mapped.
+- **`DRIFT-02`** recomputes the hash of the files `scope_paths` cover and compares it with `evidence_hash`, recorded by `asdd sync` when the feature became `passing`. No commit is needed, and it works without git. Features of `DONE`, `PARKED`, and `ABANDONED` slices keep their historical evidence: a later slice that edits a shared file (`package.json`, `README.md`, `commands.mjs`) does not reopen them. `asdd slice amend` makes a slice `in_progress` again, and its stale features reopen then.
 - **`DRIFT-04`** matches requirement IDs as literal tokens (`REQ-001`) in test names or comments, so tagging tests with the REQ they verify is enforced.
 - **Spec compliance** = MUST requirements with an implementing feature *and* a test mention, divided by all MUST requirements in scope. **Drift level** is `blocking` (any FAIL), `warning` (only WARNs), or `clean`. Any numeric cutoff belongs in `quality-gates.md` as an EARS rule — never in CI YAML, the server, or the dashboard.
 - The check never judges whether code *satisfies* an EARS criterion; that is semantic and belongs to the auditor.
@@ -540,7 +563,7 @@ The inferential pass is the `codebase-audit` skill: for the top hotspots it trac
 
 ### MCP server `spec-drift`
 
-The audit tools are a feature module of the `spec-drift` MCP server ([`tools/spec-drift/`](tools/spec-drift/README.md), NestJS), which also hosts Semgrep architecture analysis and GitHub PR review. It is separate from `knowledge`: knowledge is process memory, spec-drift is governance. Every audit tool is read-only, returns JSON text, and runs the checks of the asdd CLI (vendored into the server, so it needs no scripts at runtime) on the repo at `HARNESS_ROOT` (default: the working directory). The server lives only in this kit (`asdd install` does not copy `tools/`); build it once with `pnpm install && pnpm build` there (Node ≥ 24.22.1) when you want chat MCP. Projects use `asdd drift`, `asdd audit`, and `asdd check` instead.
+The audit tools are a feature module of the `spec-drift` MCP server ([`tools/spec-drift/`](tools/spec-drift/README.md), NestJS), which also hosts Semgrep architecture analysis, GitHub PR review, and a security verification based on [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill): `analyze_security` (a deterministic static baseline), the `security_audit_*` tools (methodology-driven audit whose findings must prove a trust boundary with source evidence), and a security lens in PR review. It is separate from `knowledge`: knowledge is process memory, spec-drift is governance. Every audit tool is read-only, returns JSON text, and runs the checks of the asdd CLI (vendored into the server, so it needs no scripts at runtime) on the repo at `HARNESS_ROOT` (default: the working directory). The server lives only in this kit (`asdd install` does not copy `tools/`); build it once with `pnpm install && pnpm build` there (Node ≥ 24.22.1) when you want chat MCP. Projects use `asdd drift`, `asdd audit`, and `asdd check` instead.
 
 | Tool | Does |
 |---|---|
@@ -642,12 +665,15 @@ applied_commit: 3f2c1ab     # must change the control file (checked with git)
 | A proposal is malformed (unknown pattern, missing control file, unfilled success, decided without `decided_by`, applied without `applied_commit`) | FAIL |
 | `applied_commit` is not a commit, or does not change the `control` file | FAIL |
 | A slice completes Knowledge while a pattern it contributed to is `open` | FAIL |
+| A proposal with `change: add-guide` or `tighten-guide` is `accepted` or `applied` without an `eval:` result from `asdd skill-eval --json` showing `ok: true` (`QG-LEARN-10`) | FAIL |
 
 **In review.** `audit_diff` returns a `learning` block — open patterns, marked `relevant` when they are about a changed area or a linked slice — and the `pr-review` prompt turns relevant ones into advisory comments. It never blocks a PR.
 
 **Back to the kit.** `asdd learn --export --out lessons.md` writes the verified and ineffective proposals on kit-owned controls, with generic fields only (no examples, slice names, proposal text, or commands), and prints the `gh issue create` command to send it to the kit. Nothing is sent automatically.
 
-Rules: `QG-LEARN-01`…`09` in [`quality-gates.md`](.harness/steering/quality-gates.md). See open patterns with `asdd status`, `asdd learn`, `asdd knowledge patterns`, or the `knowledge_patterns` MCP tool.
+**Evaluating skills.** `asdd skill-eval` runs deterministic fixtures per skill (`cli/eval/skills/<skill>/*.json`, shipped in the package, plus the project's `.harness/eval/skills/<skill>/*.json`, which add or override cases: shell probes plus assertions on exit codes, stdout, files, and the skill text; no LLM judge). It works the same in the kit and in an installed project; a case whose `requires` the machine lacks (e.g. `codegraph`) is skipped, not failed. `--baseline <ref>` re-scores each fixture against the skill body at that git ref and exits non-zero on a regression. A guide-changing proposal records its run in frontmatter, `eval: asdd skill-eval --skill <name> --json => <result-ref>`, before the Tech Lead accepts it. Fixture format: [`cli/eval/skills/README.md`](cli/eval/skills/README.md).
+
+Rules: `QG-LEARN-01`…`10` in [`quality-gates.md`](.harness/steering/quality-gates.md) and [`quality-gates.learn.md`](.harness/steering/quality-gates.learn.md). See open patterns with `asdd status`, `asdd learn`, `asdd knowledge patterns`, or the `knowledge_patterns` MCP tool.
 
 ---
 

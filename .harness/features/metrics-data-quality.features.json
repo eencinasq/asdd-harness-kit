@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "metrics-data-quality",
+  "source_tasks": ".harness/specs/metrics-data-quality/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Clean stop-FAIL codes and the Active Slices table",
+      "user_visible_behavior": "asdd status --metrics lists only check codes plus 'other'; the Active Slices table hides ABANDONED slices (with a count) and aligns long ids.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/pipeline-metrics.test.mjs",
+        "! node cli/bin/asdd.mjs status | grep -qE 'ABANDONED +[0-9]+ ' && node cli/bin/asdd.mjs status | grep -qE 'ABANDONED slice\\(s\\) hidden'",
+        "! node cli/bin/asdd.mjs status --metrics | grep -q '<path>'",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-16 (1a4c0c0): pipeline-metrics.test.mjs 6/6 incl. 'metrics-data-quality REQ-001'; status --metrics by code = DRIFT-01×9, DRIFT-02×5, other×5, QG-LEARN-04×2 (no '<path>'); status hides 8 ABANDONED rows with a count (verification fails on the previous code); kit vendor --check OK; asdd check exit 0; npm test 223/223.",
+      "scope_paths": [
+        "cli/src/harness/pipeline-metrics.mjs",
+        "cli/src/harness/pipeline-metrics.test.mjs",
+        "cli/src/harness/harness-status.mjs"
+      ],
+      "evidence_hash": "a3ec34af721d34c87e162eb9076842f11f9c0682138edb61dbea3bb40cc5c911"
+    }
+  ]
+}

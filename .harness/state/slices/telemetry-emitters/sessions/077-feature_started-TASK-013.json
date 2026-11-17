@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-077",
+  "timestamp": "2026-11-17T14:52:22.399Z",
+  "phase": "implementation",
+  "feature_id": "TASK-013",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/harness-profile.mjs",
+    "cli/src/harness/harness-profile.test.mjs"
+  ],
+  "evidence": "Reopen TASK-013 for QA UNCOV-002 (TL decision a, 2026-11-17): REQ-021 c4 (1.1.1, D-3) requires the cursor column to be unknown, but readObserveHooks marked cursor hooked when .cursor/hooks.json holds a beforeReadFile observe entry. RED: flipped test \"REQ-021 c4 (1.1.1, D-3): a hand-added cursor observe entry still shows cursor as unknown\" -> # tests 17 # pass 16 # fail 1 "
+}

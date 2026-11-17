@@ -6,19 +6,36 @@
  * known upfront to be cross-cutting/architectural. Pass --hotfix for a ≤1-file
  * bugfix (starts at implementation with one stub feature; no Discovery theatre).
  *
- * Usage: asdd slice init <slice-id> [--full | --hotfix]
+ * --source-json '<object>' adds a `source` block (tracker provenance; asdd intake, external-trackers) to the 001 session.
+ *
+ * Usage: asdd slice init <slice-id> [--full | --hotfix] [--source-json '<json object>']
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.cwd();
 const args = process.argv.slice(2);
-const sliceId = args.find((a) => !a.startsWith('-'));
+const sourceAt = args.indexOf('--source-json');
+const sourceJson = sourceAt >= 0 ? args[sourceAt + 1] : undefined;
+const sliceId = args.find((a, i) => !a.startsWith('-') && !(sourceAt >= 0 && i === sourceAt + 1));
 const fullMode = args.includes('--full');
 const hotfixMode = args.includes('--hotfix');
 
+let source;
+if (sourceAt >= 0) {
+  try {
+    source = JSON.parse(sourceJson ?? '');
+  } catch {
+    source = undefined;
+  }
+  if (!source || typeof source !== 'object' || Array.isArray(source)) {
+    console.error('FAIL  --source-json must be a JSON object');
+    process.exit(1);
+  }
+}
+
 if (!sliceId || sliceId.startsWith('-')) {
-  console.error('Usage: asdd slice init <slice-id> [--full | --hotfix]');
+  console.error("Usage: asdd slice init <slice-id> [--full | --hotfix] [--source-json '<json object>']");
   process.exit(1);
 }
 
@@ -71,6 +88,7 @@ const initialSession = {
     ? 'Hotfix slice initialized (feature + evidence path; no Discovery theatre)'
     : 'Slice initialized',
   concerns: [],
+  ...(source ? { source } : {}),
 };
 writeFileSync(join(sessionsDir, '001-initial.json'), `${JSON.stringify(initialSession, null, 2)}\n`);
 console.log(`CREATE .harness/state/slices/${sliceId}/sessions/001-initial.json`);

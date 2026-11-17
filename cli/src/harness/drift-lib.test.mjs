@@ -8,6 +8,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { evidenceHash, globToRegExp, linkedSlices, readBinding, runDrift, specPaths } from './drift-lib.mjs';
 
+// Tests must not depend on the shell that runs them (sessions set HARNESS_DRIFT_BASE per SP-004).
+for (const name of ['HARNESS_DRIFT_BASE', 'HARNESS_PR_BRANCH', 'HARNESS_PR_BODY']) delete process.env[name];
+
 const here = dirname(fileURLToPath(import.meta.url));
 
 function write(root, rel, content) {
@@ -64,6 +67,19 @@ test('REQ-004 DRIFT-01: unmapped changed product file fails, mapped and exempt f
     assert.deepEqual(f[0].paths, ['src/rogue.js']);
     assert.equal(f[0].severity, 'fail');
     assert.equal(res.summary.drift_level, 'blocking');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('drift01-harness-logs REQ-001 REQ-002 DRIFT-01: append-only harness logs are exempt, other docs are not', () => {
+  const root = fixture();
+  try {
+    write(root, 'docs/agent-failure-log.md', '- failure entry\n');
+    write(root, 'docs/dissent-log.md', '- dissent entry\n');
+    assert.deepEqual(checks(runDrift({ root }), 'DRIFT-01'), [], 'session-close logs are harness records (SP-006)');
+    write(root, 'docs/ROADMAP.md', 'unmapped product doc\n');
+    assert.deepEqual(checks(runDrift({ root }), 'DRIFT-01').map((f) => f.paths[0]), ['docs/ROADMAP.md']);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -149,6 +165,24 @@ test('REQ-005 DRIFT-02: passing feature reopens when its scope files change afte
     write(root, 'src/a.js', 'changed\n');
     f = checks(runDrift({ root }), 'DRIFT-02');
     assert.deepEqual(f[0].paths, ['src']);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('drift02-open-slices REQ-001 REQ-002 DRIFT-02: only in-progress slices reopen; DRIFT-05 checks every slice', () => {
+  const root = fixture();
+  try {
+    const feature = { id: 'F-01', title: 'a', user_visible_behavior: 'a', status: 'passing', priority: 1, verification: ['x'], evidence: 'ok', req_ids: ['REQ-001'], scope_paths: ['src'] };
+    write(root, '.harness/features/s1.features.json', { schema_version: '1.0', slice_id: 's1', source_tasks: 'x', features: [{ ...feature, evidence_hash: evidenceHash(root, ['src']) }] });
+    write(root, 'src/a.js', 'changed by a later slice\n');
+    assert.equal(checks(runDrift({ root }), 'DRIFT-02').length, 1, 'in_progress slice still reopens');
+    for (const status of ['DONE', 'PARKED', 'ABANDONED']) {
+      write(root, '.harness/state/slices/s1/manifest.json', { slice_id: 's1', phase: 'knowledge', status });
+      assert.deepEqual(checks(runDrift({ root }), 'DRIFT-02'), [], `${status} slice holds historical evidence`);
+    }
+    write(root, '.harness/features/s1.features.json', { schema_version: '1.0', slice_id: 's1', source_tasks: 'x', features: [{ ...feature, scope_paths: ['src/gone.js'] }] });
+    assert.equal(checks(runDrift({ root }), 'DRIFT-05').length, 1, 'DRIFT-05 still checks a DONE slice');
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

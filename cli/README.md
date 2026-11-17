@@ -59,7 +59,18 @@ Roadmap P0–P4 shipped these session-facing commands (see [`docs/ASDD-ROADMAP.m
 | `asdd waves [--slice] [--json]` | Parallelism hints from owners + deps + scopes |
 | `asdd portfolio [--json]` | Read-only multi-repo summary (`portfolio.json`) |
 | `asdd tracker-sync [--apply]` | Plan tracker sync from handoff + sessions; `--apply` = local receipt |
+| `asdd intake --from <file\|-> --ref <url> [--accept-stale] [--dry-run]` | Import a tracker Intent item as a slice (offline validation, grounding re-check, `intent.md`, `slice init` in its mode) |
 | `asdd spec-source` | Opt-in MUST REQ inventory (`capabilities.spec_as_source`) |
+
+**PO → tracker → engineer.** A PO/PM shapes with the read-only `asdd-shaping-agent`, grounded in the code, specs, and past slices, and writes the pitch, the bet, and one Intent item per scope to the tracker named in `project.json` ([Play O](../docs/PLAYBOOK.md#play-o--po-or-pm-shapes-into-the-tracker)). An engineer imports an Intent with `asdd intake`, which re-checks its grounding and creates the slice, then works it locally with any agent ([Play P](../docs/PLAYBOOK.md#play-p--an-engineer-picks-up-an-intent)).
+
+Roadmap P5 added:
+
+| Command | Purpose |
+|---|---|
+| `asdd ui [--port <n>]` | Local page on 127.0.0.1 (default port 7474): slices, pipeline, drift, learning, knowledge, pending gates; read-only except deciding a gate |
+| `asdd gate-decide <slice> --phase <p> --note "…"` | Tech Lead acknowledges a `WARN` gate: appends an `override` session (`decided_by` from `HARNESS_AUTHOR` or git) and syncs |
+| `asdd skill-eval [--skill <name>] [--baseline <ref>] [--json]` | Run the shipped skill fixtures plus `.harness/eval/skills/` (project cases add or override); `--baseline` fails on a regression against the skill at that ref (QG-LEARN-10 evidence) |
 
 Also: `check`, `verify`, `gate`, `drift`, `check-config`, `skills-index`, `sync`, `repair`,
 `knowledge sync|search|trace|slice|status|patterns`, `learn`, `audit`, `triage`.

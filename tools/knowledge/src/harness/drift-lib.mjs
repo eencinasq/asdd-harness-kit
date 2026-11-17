@@ -24,6 +24,9 @@ export const EXEMPT_PREFIXES = [
   '.harness/audits',
   '.harness/progress',
   '.harness/PROGRESS.md',
+  // Append-only harness logs any slice writes at session close (SP-006); other docs/ files stay mapped.
+  'docs/agent-failure-log.md',
+  'docs/dissent-log.md',
 ];
 
 const SPEC_DOCS = ['intent.md', 'design.md', 'tasks.md', 'spec.md'];
@@ -376,6 +379,8 @@ export function runDrift(opts) {
         }));
       }
     }
+    // DONE/PARKED/ABANDONED slices hold historical evidence (SP-003); amending one makes it in_progress again.
+    if (s.status !== 'in_progress') continue;
     // Not stamped yet (marked passing since the last asdd sync): nothing to compare.
     const recorded = String(f.evidence_hash ?? '');
     if (!EVIDENCE_HASH_RE.test(recorded) || scopes.length === 0) continue;

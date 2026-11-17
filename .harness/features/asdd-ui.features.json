@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "asdd-ui",
+  "source_tasks": ".harness/specs/asdd-ui/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Local asdd ui server (bind + read-only)",
+      "user_visible_behavior": "asdd ui [--port <n>] serves on 127.0.0.1 with Node builtins only; non-GET methods return 405 and nothing writes to the repo.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "cursor",
+      "req_ids": [
+        "REQ-001",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/ui-server.test.mjs"
+      ],
+      "evidence": "Final ship verify: node --test cli/src/harness/ui-server.test.mjs → 5/5; asdd ui registered; HARNESS_DRIFT_BASE=1b1fbae.",
+      "scope_paths": [
+        "cli/src/harness/ui-server.mjs",
+        "cli/src/harness/ui-server.test.mjs",
+        "cli/src/harness/ui",
+        "cli/src/harness/commands.mjs",
+        "docs/knowledge-base/steering-proposals/SP-004.md"
+      ],
+      "evidence_hash": "80eeefde45aa3398a62cb59b112651a49b1711eb890dbb5b3b901f96119eee6a"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Aggregate read views in the UI shell",
+      "user_visible_behavior": "The UI shows slices/PROGRESS, the pipeline view, spec-drift results, open learning patterns, and knowledge search.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "cursor",
+      "req_ids": [
+        "REQ-002"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/src/harness/ui-server.test.mjs"
+      ],
+      "evidence": "Final ship verify: node --test cli/src/harness/ui-server.test.mjs → 5/5; asdd ui registered; HARNESS_DRIFT_BASE=1b1fbae.",
+      "scope_paths": [
+        "cli/src/harness/ui-server.mjs",
+        "cli/src/harness/ui-server.test.mjs",
+        "cli/src/harness/ui"
+      ],
+      "evidence_hash": "fb2945901974eeb08bc99e0723c2556ee8720de250fb38730dcd7df706f05f34"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Live refresh on state changes + ship registration",
+      "user_visible_behavior": "When files under .harness/state/ change, the open UI refreshes without a manual reload; asdd ui is registered in help/tests/README.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "cursor",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "node --test cli/src/harness/ui-server.test.mjs"
+      ],
+      "evidence": "Final ship verify: node --test cli/src/harness/ui-server.test.mjs → 5/5; asdd ui registered; HARNESS_DRIFT_BASE=1b1fbae.",
+      "scope_paths": [
+        "cli/src/harness/ui-server.mjs",
+        "cli/src/harness/ui-server.test.mjs",
+        "cli/src/harness/ui",
+        "cli/src/harness/commands.mjs",
+        "package.json",
+        "cli/versions.json",
+        "README.md"
+      ],
+      "evidence_hash": "45b450360530dc8a2a7b9937f8a22d1bfcabf8b6c0ff1d6f0dee473d1387da05"
+    }
+  ]
+}

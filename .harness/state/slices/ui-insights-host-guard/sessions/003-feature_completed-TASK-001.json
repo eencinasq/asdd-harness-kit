@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ui-insights-host-guard",
+  "concerns": [],
+  "timestamp": "2026-11-17T15:36:30.000Z",
+  "session_id": "sess-ui-insights-host-guard-003",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/ui-server.mjs",
+    "cli/src/harness/ui-server.test.mjs"
+  ],
+  "evidence": "GREEN 2026-11-17 (25e29d8): ui-server.test.mjs 15/15 incl. 'ui-insights-host-guard REQ-001' (Host evil.example → 403, no run; loopback → 200, one run); npm test 415/415."
+}

@@ -5,6 +5,7 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { validateTrackerConfig } from './tracker-config.mjs';
 
 const root = process.cwd();
 const configPath = '.harness/config/project.json';
@@ -52,6 +53,9 @@ if (config) {
 		} else if (config.stop.mode !== undefined && !['fail_closed', 'advisory'].includes(config.stop.mode)) {
 			errors.push(`${configPath}.stop.mode must be "fail_closed" or "advisory"`);
 		}
+	}
+	if (config.tracker !== undefined) {
+		for (const error of validateTrackerConfig(config.tracker)) errors.push(`${configPath}.${error}`);
 	}
 	if (config.capabilities?.spec_as_source !== undefined && typeof config.capabilities.spec_as_source !== 'boolean') {
 		errors.push(`${configPath}.capabilities.spec_as_source must be a boolean`);

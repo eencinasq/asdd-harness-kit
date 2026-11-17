@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { mcpRequestContext } from '../common/mcp/mcp-request-context.ts';
 import type { Env } from '../config/env.schema.ts';
+import { securityPacks } from '../security/builtin-pack.ts';
 import {
 	type AdrCoverageResult,
 	type Finding,
@@ -505,6 +506,10 @@ export class AnalysisService {
 
 	/** Packs to scan; null when the mode's rule set does not exist and no pack was named (no rules, not bad input). */
 	private selectPacks(options: ScanOptions, available: readonly RulePack[]): RulePack[] | null {
+		// security-review REQ-006: the repo's security set, else the built-in starter pack on Semgrep.
+		if (options.mode === 'security' && !options.packs?.length) {
+			return securityPacks(available, this.analyzer.engine.id);
+		}
 		try {
 			return packsForMode(options.mode, available, options.packs, this.analyzer.engine.rulesDir);
 		} catch (error) {

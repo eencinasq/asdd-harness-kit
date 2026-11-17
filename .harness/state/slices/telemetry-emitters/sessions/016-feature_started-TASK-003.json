@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-016",
+  "timestamp": "2026-11-17T02:00:28.477Z",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/telemetry-lib.mjs",
+    "cli/src/harness/telemetry-lib.test.mjs"
+  ],
+  "evidence": "Start TASK-003 (REQ-001..006, REQ-022). RED: wrote cli/src/harness/telemetry-lib.test.mjs (31 cases covering every TASK-003 TDD case). Run 1 `node --test cli/src/harness/telemetry-lib.test.mjs` with no lib -> exit 1, 1 file-level failure (ERR_MODULE_NOT_FOUND telemetry-lib.mjs). Run 2 with an exports-only stub (constants + functions throwing not implemented) -> exit 1, tests 31, pass 2 (constants, schema sha256 = 14ffba1c...), fail 29 (all emit/startTrace/childOf/buildSpan/validateSpan/readTail/no-network/state-isolation cases fail for the expected reason: not implemented / no import specifiers)."
+}

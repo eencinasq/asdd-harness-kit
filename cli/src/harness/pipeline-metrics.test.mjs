@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { computePipelineMetrics, phaseDurationsHours, stopFailCounts } from './pipeline-metrics.mjs';
+import { computePipelineMetrics, formatPipelineMetrics, phaseDurationsHours, stopFailCounts } from './pipeline-metrics.mjs';
 
 const t0 = '2026-11-01T10:00:00.000Z';
 const t1 = '2026-11-01T12:00:00.000Z'; // +2h
@@ -35,6 +35,22 @@ test('stopFailCounts: counts sensor: episodes by DRIFT code', () => {
   ]);
   assert.equal(episodes, 3);
   assert.deepEqual(by_code, { 'DRIFT-01': 2, 'DRIFT-02': 1 });
+});
+
+test('metrics-data-quality REQ-001 stopFailCounts: uncoded sensor signatures count under other', () => {
+  const { episodes, by_code } = stopFailCounts([
+    {
+      data: {
+        signatures: {
+          'sensor:QG-LEARN-04': { episodes: [{ at: t0 }] },
+          'sensor:<path>: feature TASK-N missing user_visible_behavior': { episodes: [{ at: t0 }, { at: t1 }] },
+          'sensor:lite slice "*" cannot complete with open escalation signals (EN-scope-spread)': { episodes: [{ at: t0 }] },
+        },
+      },
+    },
+  ]);
+  assert.equal(episodes, 4);
+  assert.deepEqual(by_code, { 'QG-LEARN-04': 1, other: 3 });
 });
 
 test('REQ-002 green lite DONE: lite_share 1, escalation_rate 0', () => {
@@ -107,4 +123,40 @@ test('REQ-002 escalated lite raises escalation_rate and lowers lite_share', () =
   assert.equal(m.slices.lite_share, 0.5);
   assert.equal(m.slices.escalated, 1);
   assert.equal(m.slices.escalation_rate, 0.5);
+});
+
+const usageSpan = (end, slice, phase, models) => ({
+  kind: 'hook',
+  runtime: 'claude',
+  slice_id: slice,
+  phase,
+  end_time_iso: end,
+  attributes: { outcome: 'pass', usage: { session_id: 's1', models } },
+});
+const tok = (input, output) => ({ input_tokens: input, output_tokens: output, cache_read_tokens: 0, cache_write_tokens: 0, messages: 1 });
+
+test('cost-metrics REQ-001 REQ-002 REQ-004 metrics.cost: per slice, phase, model and runtime in the JSON contract', () => {
+  const m = computePipelineMetrics({
+    slices: [],
+    summaries: [],
+    patterns: [],
+    spans: [usageSpan(t0, 'a', 'spec', { opus: tok(100, 10) }), usageSpan(t1, 'a', 'design', { opus: tok(150, 20) })],
+    prices: { models: { opus: { input: 1, output: 10, cache_read: 0, cache_write: 0 } } },
+    runtimes: ['claude', 'cursor'],
+  });
+  assert.deepEqual(Object.keys(m.cost), ['source', 'totals', 'by_slice', 'by_phase', 'by_model', 'by_runtime', 'unknown_runtimes']);
+  assert.deepEqual(m.cost.totals, { input_tokens: 150, output_tokens: 20, cache_read_tokens: 0, cache_write_tokens: 0, usd: 0.00035 });
+  assert.deepEqual(m.cost.by_phase.map((r) => [r.phase, r.input_tokens]), [['spec', 100], ['design', 50]]);
+  assert.deepEqual(m.cost.unknown_runtimes, ['cursor']);
+  const text = formatPipelineMetrics(m);
+  assert.match(text, /tokens\s+in 150 · out 20 · cache read 0 · cache write 0 · \$0\.00035/);
+  assert.match(text, /by model\s+opus 170/);
+  assert.match(text, /unknown\s+cursor \(no token source; not estimated\)/);
+});
+
+test('cost-metrics REQ-003 metrics.cost without usage data: zero totals, null usd, unknown runtimes listed', () => {
+  const m = computePipelineMetrics({ slices: [], summaries: [], patterns: [], spans: [], runtimes: ['cursor', 'claude'] });
+  assert.deepEqual(m.cost.totals, { input_tokens: 0, output_tokens: 0, cache_read_tokens: 0, cache_write_tokens: 0, usd: null });
+  assert.deepEqual(m.cost.unknown_runtimes, ['cursor']);
+  assert.match(formatPipelineMetrics(m), /tokens\s+— \(no usage recorded yet; Claude Code records it at Stop\)/);
 });

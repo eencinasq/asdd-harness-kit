@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "ui-insights-host-guard",
+  "source_tasks": ".harness/specs/ui-insights-host-guard/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Loopback Host before asdd ui runs skill-eval",
+      "user_visible_behavior": "/api/insights/skill-eval answers 403 to a foreign Host and starts no process.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/ui-server.test.mjs",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-17 (25e29d8): ui-server.test.mjs 15/15 incl. 'ui-insights-host-guard REQ-001' (Host evil.example → 403, no run; loopback → 200, one run); npm test 415/415.",
+      "scope_paths": [
+        "cli/src/harness/ui-server.mjs",
+        "cli/src/harness/ui-server.test.mjs"
+      ],
+      "evidence_hash": "dce3729da085220dde7fc2706b6c0d4a060bb5aca42e8565f34826418e9b0468"
+    }
+  ]
+}

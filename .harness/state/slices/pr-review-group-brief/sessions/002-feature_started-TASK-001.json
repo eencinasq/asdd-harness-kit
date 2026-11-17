@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-group-brief-002",
+  "timestamp": "2026-11-17T15:44:33.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "pr-review-group-brief",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "tools/spec-drift/src/pr-review/coverage/coverage.ts"
+  ],
+  "evidence": "RED: spec-drift e2e 140/141 — 'each group brings its own diff…' fails on the read-file hint and the one-line ranges (also on base 08c3e8a).",
+  "concerns": []
+}

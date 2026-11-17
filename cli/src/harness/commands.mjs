@@ -21,6 +21,10 @@ export const HARNESS_COMMANDS = {
     script: 'converge-eval.mjs',
     help: 'score EARS/converge fixtures under cli/eval/converge-ears [--json] [--cases <dir>]',
   },
+  'skill-eval': {
+    script: 'skill-eval.mjs',
+    help: 'score skill fixtures under cli/eval/skills [--skill <name>] [--baseline <ref>] [--json]',
+  },
   waves: {
     script: 'waves.mjs',
     help: 'parallelism hints from feature owners/deps/scopes [--slice <id>] [--json]',
@@ -32,6 +36,10 @@ export const HARNESS_COMMANDS = {
   'tracker-sync': {
     script: 'tracker-sync.mjs',
     help: 'plan bi-directional tracker sync from handoff+sessions [--slice <id>] [--json] [--apply]',
+  },
+  intake: {
+    script: 'intake.mjs',
+    help: 'import a tracker Intent item as a slice: intake --from <file|-> --ref <url> [--accept-stale] [--dry-run] [--json]',
   },
   'spec-source': {
     script: 'spec-source.mjs',
@@ -63,6 +71,13 @@ export const HARNESS_COMMANDS = {
   learn: { script: 'learn.mjs', help: 'learning patterns [--all|--json|--summary|--signatures|--export|--propose <LP-id>]' },
   audit: { script: 'audit-codebase.mjs', help: 'codebase audit [--json] [--no-write] [--hotspots N] [--since 90.days]' },
   triage: { script: 'audit-triage.mjs', help: 'TL triage: triage <finding-id> --dismiss --reason "…" | --confirm | --clear | --list' },
+  ui: { script: 'ui-server.mjs', help: 'read-only local harness UI on 127.0.0.1 [--port <n>]' },
+  'gate-decide': {
+    script: 'gate-decide.mjs',
+    help: 'Tech Lead override for a WARN gate: gate-decide <slice> --phase <phase> --note "…"',
+  },
+  profile: { script: 'harness-profile.mjs', help: 'read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation [--slice <id>] [--bottlenecks] [--json]' },
+  observe: { script: 'telemetry-observe.mjs', help: 'the load hook (fail-open): records a steering/skill load as an activation record (stdin: hook payload) <claude|cursor>' },
 };
 
 /**

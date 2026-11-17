@@ -1,0 +1,46 @@
+{
+  "id": "next-selects-ready-feature",
+  "task": "Pick the next dependency-ready feature for the active slice",
+  "expect": "`asdd status --json` reports slice state and `.harness/features/` exists; the skill still documents priority + depends_on selection and lite seriality",
+  "probes": [
+    {
+      "id": "p1",
+      "run": "{asdd} status --json",
+      "cwd": "repo"
+    },
+    {
+      "id": "p2",
+      "run": "test -d .harness/features",
+      "cwd": "repo"
+    }
+  ],
+  "assertions": [
+    {
+      "type": "exit_code",
+      "probe": "p1",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "p1",
+      "pattern": "\"slices\""
+    },
+    {
+      "type": "exit_code",
+      "probe": "p2",
+      "code": 0
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "priority"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "depends_on"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "in_progress"
+    }
+  ]
+}

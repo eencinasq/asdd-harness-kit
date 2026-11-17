@@ -239,6 +239,7 @@ const renderCoverage = (view: PrReviewView): void => {
 						(f) => `<li${f.verdict === 'rejected' ? ' class="is-rejected"' : ''}>
 							<div class="item-head">
 								<span class="badge">${escapeHtml(f.severity ?? 'medium')}</span>
+								${f.category === 'security' ? '<span class="badge tone-danger" title="Security finding: evidence names a boundary and a file:line">🔒 Security</span>' : ''}
 								${f.verdict ? verdictBadgeOf(f.verdict) : ''}
 								${f.confidence !== undefined ? `<span class="subtle">confidence ${f.confidence}</span>` : ''}
 								<code class="item-path">${escapeHtml(f.path)}:${lineRange(f.startLine, f.endLine)}</code>

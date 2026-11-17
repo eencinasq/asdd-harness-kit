@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "intent-intake",
+  "source_tasks": ".harness/specs/intent-intake/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Parse, validate, and re-check Intent items",
+      "user_visible_behavior": "An Intent item that breaks intent-format.md is rejected with every missing key/heading named; grounding refs are resolved against the repo.",
+      "req_ids": [
+        "REQ-001",
+        "REQ-003"
+      ],
+      "scope_paths": [
+        "cli/src/harness/intake-lib.mjs",
+        "cli/src/harness/intake-lib.test.mjs"
+      ],
+      "verification": [
+        "node --test --test-skip-pattern=\"asdd intake|--from|validator\" cli/src/harness/intake-lib.test.mjs"
+      ],
+      "depends_on": [],
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude-p64",
+      "evidence": "GREEN: 7/7 library tests (parse, REQ-001 errors by name, block/fitness/grounding rules incl. path containment, unknown-key warnings, REQ-003 ref resolution, intent.md rendering, groundingFindings) via the verification command.",
+      "evidence_hash": "2fd565ee23171210136ee12ce348e7642e914bd4bf6bbf3bd1d357692e7738f0"
+    },
+    {
+      "id": "TASK-002",
+      "title": "asdd intake CLI and slice provenance",
+      "user_visible_behavior": "asdd intake --from item.md --ref <url> creates the slice in the suggested mode with intent.md and a source block, offline; stale refs stop it unless --accept-stale.",
+      "req_ids": [
+        "REQ-002",
+        "REQ-003"
+      ],
+      "scope_paths": [
+        "cli/src/harness/intake.mjs",
+        "cli/src/harness/init-slice.mjs",
+        "cli/src/harness/init-slice.test.mjs",
+        "cli/src/harness/intake-lib.test.mjs",
+        "cli/src/harness/commands.mjs"
+      ],
+      "verification": [
+        "node --test --test-skip-pattern=\"validator\" cli/src/harness/intake-lib.test.mjs",
+        "node --test cli/src/harness/init-slice.test.mjs"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude-p64",
+      "evidence": "GREEN: intake-lib.test.mjs 10/10 without the validator test (CLI: full-mode slice + intent.md + 001 source block; duplicate refused; invalid item names missing keys and writes nothing; stale refs stop intake, --accept-stale records them, --dry-run --json writes nothing; --from rejects URLs); init-slice.test.mjs 5/5 incl. --source-json; asdd help lists intake.",
+      "evidence_hash": "8153862ccf2ed52bcdab8f087014e95096484cada27d24fe6bb137853259a8b1"
+    },
+    {
+      "id": "TASK-003",
+      "title": "intent-evidence validator and severity binding",
+      "user_visible_behavior": "asdd check reports in-progress intents whose grounding refs do not resolve: WARN by default, FAIL with drift.intent_evidence: fail.",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "scope_paths": [
+        "cli/src/harness/validators/intent-evidence.mjs",
+        "cli/src/harness/check-invariants.mjs",
+        "cli/src/harness/intake-lib.test.mjs",
+        "cli/scaffold/config/project.schema.json",
+        "cli/scaffold/config/README.md"
+      ],
+      "verification": [
+        "node --test cli/src/harness/intake-lib.test.mjs",
+        "node cli/bin/asdd.mjs check-config",
+        "node cli/bin/asdd.mjs kit self --check"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "status": "passing",
+      "priority": 3,
+      "owner": "claude-p64",
+      "evidence": "GREEN: intake-lib.test.mjs 11/11 incl. validator (silent when refs resolve; WARN INTENT-EVIDENCE when a path disappears; FAIL with drift.intent_evidence: fail; DONE slice not reported); wired in check-invariants; schema + config README document drift.intent_evidence; check-config PASS; kit self --check OK.",
+      "evidence_hash": "c24759401b4a4d9a7037fe05ccfd8a48266ab299186bc5a6d8988ff7b4e08fbb"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Registration, docs, and the external-trackers intake flow",
+      "user_visible_behavior": "asdd help, both READMEs, and the external-trackers skill describe intake; npm test runs the intake tests.",
+      "req_ids": [
+        "REQ-005"
+      ],
+      "scope_paths": [
+        "package.json",
+        "README.md",
+        "cli/README.md",
+        "cli/skills/external-trackers/SKILL.md",
+        "cli/steering/skills.md"
+      ],
+      "verification": [
+        "grep -q intake-lib.test.mjs package.json && grep -q 'asdd intake' README.md && grep -q 'asdd intake' cli/README.md && grep -q 'asdd intake' cli/skills/external-trackers/SKILL.md",
+        "node cli/bin/asdd.mjs kit skills-lint --only external-trackers",
+        "npm test"
+      ],
+      "depends_on": [
+        "TASK-002",
+        "TASK-003"
+      ],
+      "status": "passing",
+      "priority": 4,
+      "owner": "claude-p64",
+      "evidence": "GREEN: package.json runs intake-lib.test.mjs; README.md and cli/README.md list asdd intake; external-trackers SKILL Step 5 (intake), verification item 4, HALT on rejected/stale items, handoff to the first phase; skills-lint external-trackers PASS; kit self --check OK; kit guidance PASS (always-loaded 35892 B); npm test 243/243; HARNESS_DRIFT_BASE=bbc1496 check --live exit 0.",
+      "evidence_hash": "50cc211d3eacedb065e47028289fb201cd717c136bb2afeeccbf836a41ec9b0b"
+    }
+  ]
+}

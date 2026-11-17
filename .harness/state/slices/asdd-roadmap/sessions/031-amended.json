@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-roadmap-031",
+  "timestamp": "2026-11-17T12:42:35.621Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "Mark P6.1–P6.5 done, add P6.6 po-readonly-gate and G28.",
+  "amendment_path": ".harness/specs/asdd-roadmap/amendments/2026-11-17T12-42-35-621Z.md",
+  "concerns": []
+}

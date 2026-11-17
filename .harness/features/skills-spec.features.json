@@ -166,7 +166,7 @@
         "node --test cli/test/skills-lint.test.mjs",
         "npm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance && node --test cli/test/skills-lint.test.mjs && npm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
       "scope_paths": [
         "cli/src/kit/skills-lint.mjs",
         "cli/src/main.mjs",
@@ -175,7 +175,7 @@
         "cli/test/install.sh",
         "cli/README.md"
       ],
-      "evidence_hash": "e1f8344287c768f51c4b2d89cd71c930a179ffbb7bfaa05937417346c911a11c"
+      "evidence_hash": "ebe0e93d8166e5199578bf75ecd037b26f35792347aaac4c53aa004ee6bba357"
     }
   ]
 }

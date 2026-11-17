@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-security-review-001",
+  "timestamp": "2026-11-17T14:39:53.721Z",
+  "agent": "human",
+  "human": "squad",
+  "slice_id": "security-review",
+  "event_type": "phase_started",
+  "phase": "discovery",
+  "mode": "full",
+  "evidence": "Slice initialized",
+  "concerns": []
+}

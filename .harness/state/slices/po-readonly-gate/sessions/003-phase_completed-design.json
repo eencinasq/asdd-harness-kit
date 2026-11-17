@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "po-readonly-gate",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:39:41.000Z",
+  "session_id": "sess-po-readonly-gate-003",
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "design.md: allowlist mode in command-gate.mjs, env HARNESS_GATE_MODE; no domain terms; no ADR."
+}

@@ -16,6 +16,7 @@ import { type Env, validateEnv } from './config/env.schema.ts';
 import { toolsetEnabled } from './config/toolsets.ts';
 import { HealthModule } from './health/health.module.ts';
 import { PrReviewModule } from './pr-review/pr-review.module.ts';
+import { SecurityModule } from './security/security.module.ts';
 
 const LOCAL_NAMES = ['localhost', '127.0.0.1', '[::1]'];
 
@@ -28,6 +29,8 @@ const serverInstructions = (): string =>
 			'Interactive GitHub PR review: pr_review_start, then pr_review_submit_findings once per group until coverage is complete, then pr_review_status for the human to edit in the dashboard.',
 		toolsetEnabled('audit') &&
 			'Harness governance (asdd-harness-kit at HARNESS_ROOT): audit_diff, verify_architecture_rules, verify_spec_compliance, audit_report, audit_finding and generate_ci_gate are read-only.',
+		toolsetEnabled('security') &&
+			'Security audit (cloudflare/security-audit-skill methodology): security_audit_start, then security_audit_checklist and security_audit_submit_findings per checklist, then security_audit_status; read-only on the repository, no code execution or network.',
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -63,6 +66,7 @@ const serverInstructions = (): string =>
 		AnalysisModule.forRoot(parseEngine(process.env[ENGINE_ENV]) === 'codeql' ? { engine: CodeqlEngineModule } : {}),
 		PrReviewModule,
 		AuditModule,
+		SecurityModule,
 	],
 	providers: [
 		// Order matters: the request context must wrap error handling and the handler.

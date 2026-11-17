@@ -15,10 +15,19 @@ export function* sources(dir) {
   }
 }
 
-/** sha256 over every source's relative path and content, in path order. */
+/** Every static asset under `dir` (e.g. harness/ui/*.html, .js, .css): non-.mjs files, tests excluded. Copied as is. */
+export function* assets(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) yield* assets(path);
+    else if (entry.isFile() && !entry.name.endsWith('.mjs') && !isTest(entry.name) && entry.name !== '.DS_Store') yield path;
+  }
+}
+
+/** sha256 over every source's and asset's relative path and content, in path order. */
 export function fingerprint(dir) {
   const hash = createHash('sha256');
-  for (const file of [...sources(dir)].sort()) {
+  for (const file of [...sources(dir), ...assets(dir)].sort()) {
     hash.update(relative(dir, file));
     hash.update('\0');
     hash.update(readFileSync(file));

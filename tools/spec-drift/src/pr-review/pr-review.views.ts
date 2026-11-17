@@ -1,5 +1,6 @@
 /** Pure mappers from internal review state to the `PrReviewView` sent to the model and dashboard. */
 
+import { securityBlock, securityLens } from '../security/lens.ts';
 import { diffForFiles } from './context/review-context.ts';
 import { type GroupProgress, nextGroupBrief, type ReviewProgress } from './coverage/coverage.ts';
 import { formatRulesBlock, type prepareReview } from './engine/index.ts';
@@ -104,6 +105,9 @@ export const withNextGroup = (
 	// Deterministic hints first: what the repo's own rules found in these files.
 	const hints = staticAnalysisHints(view, brief.group);
 	const hintsBlock = hints ? `\n\n${hints}` : '';
+	// Security lens (security-review REQ-007): the methodology checklists for the security surfaces this group touches.
+	const security = securityBlock(securityLens(brief.group.files, groupDiff));
+	const securityPart = security ? `\n\n${security}` : '';
 	const diffBlock = groupDiff ? `\n\n${groupDiff}` : '';
 	return {
 		...view,
@@ -112,7 +116,7 @@ export const withNextGroup = (
 			label: brief.group.label,
 			files: brief.group.files,
 			rightLinesByPath: brief.rightLinesByPath,
-			instruction: `${brief.instruction}${ticketBlock}${ruleBlock}${hintsBlock}${diffBlock}`,
+			instruction: `${brief.instruction}${ticketBlock}${ruleBlock}${securityPart}${hintsBlock}${diffBlock}`,
 			ruleDocId: brief.group.ruleDocId,
 			rulePattern: brief.group.rulePattern,
 			ruleMarkdown: brief.group.ruleMarkdown,

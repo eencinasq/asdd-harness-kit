@@ -1,0 +1,28 @@
+{
+  "id": "status-json",
+  "task": "Report pipeline health as JSON for a dashboard",
+  "expect": "`asdd status --json` exits 0 and prints a JSON document with a slices summary",
+  "probes": [
+    {
+      "id": "p1",
+      "run": "{asdd} status --json",
+      "cwd": "repo"
+    }
+  ],
+  "assertions": [
+    {
+      "type": "exit_code",
+      "probe": "p1",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "p1",
+      "pattern": "\"slices\""
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "asdd status"
+    }
+  ]
+}

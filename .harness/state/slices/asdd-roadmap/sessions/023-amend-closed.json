@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-roadmap-023",
+  "timestamp": "2026-11-16T21:57:35.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "asdd-roadmap",
+  "event_type": "checkpoint",
+  "status": "DONE",
+  "note": "Close the 2026-11-16 amend: knowledge completed (sess-asdd-roadmap-022). Needed because the amend checkpoint (status in_progress) otherwise pins the slice open.",
+  "evidence": "TASK-001 passing; asdd check exit 0.",
+  "concerns": []
+}

@@ -24,7 +24,7 @@ The kit is a set of scripts and documents, not a layered application. Its "domai
 | Domain model / entities | `docs/architecture/domain-model.md`; slice, session, feature, pattern, proposal |
 | Use cases / domain services | `cli/src/harness/*-lib.mjs` (drift, audit, learning, knowledge) |
 | Ports | file formats: `.harness/state/**`, `.harness/features/*.features.json`, `feature.schema.json` |
-| Adapters | runtime hooks, MCP servers (`.agents/mcp/`), installer |
+| Adapters | runtime hooks, MCP servers (`tools/*`, configured in `.agents/mcp/`; they load vendored copies of the `*-lib.mjs` files), installer |
 | Delivery (HTTP/UI/CLI) | the asdd CLI (`cli/`; projects run the asdd-harness-kit package, a devDependency or global, never a copy) |
 
 ## Layer flow
@@ -35,9 +35,9 @@ The kit is a set of scripts and documents, not a layered application. Its "domai
 
 **Gate command:** `npm test` (non-zero exit = not passing)
 
-**Semgrep rules:** `…`
+**Semgrep rules:** `…` (none committed: the architecture check generates a temporary config from the boundaries below)
 
-**CI / lint:** `.github/workflows/harness-invariants.yml`
+**CI / lint:** `.github/workflows/harness-invariants.yml`; `asdd kit skills-lint`, `asdd kit agents-lint`; Biome in `tools/*`
 
 ## Semgrep boundaries
 

@@ -16,3 +16,5 @@ build/
 .harness/knowledge
 .harness/state/learning/signals
 .env.local
+.harness/state/telemetry/spans.jsonl
+.harness/state/telemetry/slices/

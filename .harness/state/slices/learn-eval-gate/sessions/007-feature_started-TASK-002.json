@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-learn-eval-gate-007",
+  "timestamp": "2026-11-16T20:47:34.162",
+  "agent": "devin",
+  "human": "squad",
+  "slice_id": "learn-eval-gate",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-002",
+  "evidence": "RED: `node --test cli/src/harness/learning-lib.test.mjs` \u2192 QG-LEARN-10 test fails, no FAIL emitted (validator does not call proposalEvalFinding yet).",
+  "scope_paths": [
+    "cli/src/harness/validators/learning.mjs",
+    "cli/src/harness/learning-lib.test.mjs"
+  ],
+  "concerns": []
+}

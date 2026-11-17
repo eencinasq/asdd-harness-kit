@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-npm-pack-json-002",
+  "timestamp": "2026-11-16T23:25:32.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "npm-pack-json",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": ["cli/test/install.sh"],
+  "evidence": "RED: npm test exit 1 — install.sh:203 JSON.parse fails on 'OK cli/dist (84 modules, obfuscate=false)' from prepack (reproduced with: npm pack --dry-run --json 2>/dev/null | head -1).",
+  "concerns": []
+}

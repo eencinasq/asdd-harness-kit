@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "learn-eval-gate",
+  "source_tasks": ".harness/specs/learn-eval-gate/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "proposalEvalFinding: eval field parse + result resolution in learning-lib",
+      "user_visible_behavior": "asdd check can verify that accepted/applied add-guide or tighten-guide steering proposals carry a skill-eval result reference.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "scope_paths": [
+        "cli/src/harness/learning-lib.mjs",
+        "cli/src/harness/learning-lib.test.mjs"
+      ],
+      "verification": [
+        "node --test cli/src/harness/learning-lib.test.mjs"
+      ],
+      "evidence": "re-verified 2026-11-16T20:48:49 (DRIFT-02): node --test cli/src/harness/learning-lib.test.mjs → 24/24 pass after TASK-002 wiring",
+      "notes": "RED first: failing test recorded in feature_started session evidence.",
+      "evidence_hash": "18c96247466892a84ce3583f3e985d0f7795a8e2a081a5728eba90c35f934299"
+    },
+    {
+      "id": "TASK-002",
+      "title": "QG-LEARN-10 wiring in validators/learning.mjs",
+      "user_visible_behavior": "asdd check FAILs (QG-LEARN-10) when a guide-changing proposal is accepted or applied without a passing skill-eval result.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "scope_paths": [
+        "cli/src/harness/validators/learning.mjs",
+        "cli/src/harness/learning-lib.test.mjs"
+      ],
+      "verification": [
+        "node --test cli/src/harness/learning-lib.test.mjs",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "evidence": "RED in sess-learn-eval-gate-007. GREEN: learning-lib.test.mjs 24/24 incl. QG-LEARN-10 validator test; check --live exit 0; npm test 210/210; kit vendor refreshed tools/*/src/harness/learning-lib.mjs.",
+      "notes": "",
+      "evidence_hash": "57193ee4e0c4e25d8b08adb2f14340a9e2a3ff09006edf483e81e4a3bfde360a"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Template + quality-gates.learn.md + kit self/versions",
+      "user_visible_behavior": "The steering-proposal template documents the eval field and quality-gates.learn.md specifies QG-LEARN-10; installed copies stay in sync via asdd kit self.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "scope_paths": [
+        "cli/steering/quality-gates.learn.md",
+        "cli/steering/templates/steering-proposal.md",
+        "cli/versions.json"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs kit self --check",
+        "npm test"
+      ],
+      "evidence": "kit self refreshed .harness copies (installed-versions.json hashes updated); npm test exit 0 incl. kit self --check; kit versions timestamp-only → restored.",
+      "notes": "",
+      "evidence_hash": "64d23de16e250c0685ca272b9df949d56fbfadb67316d71144f5aa37ba533149"
+    }
+  ]
+}

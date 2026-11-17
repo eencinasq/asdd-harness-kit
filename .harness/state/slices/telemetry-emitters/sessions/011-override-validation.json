@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-011",
+  "timestamp": "2026-11-17T01:49:35.950Z",
+  "agent": "human",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "event_type": "override",
+  "phase": "validation",
+  "note": "Tech Lead confirms the decisions relayed in sessions 003/006/007 (GOV-001): AP-7 accepted, no split (REQ-012 sequences the AR-2 waves); AR-3 rotation, profiling.json rollup and H-* findings in --slice deferred; Q-14 budget = in-process handler time, >=200 samples per fixture class, gated at p99 <=50 ms, whole-process time recorded not gated; Verify-on-Stop own-crash behaviour out of scope (KPI-1, follow-up); mapped files widened (discovery Q-1/Q-5/Q-6, validation TRC-003); OI-7: add the AR-5 missing-registration WARN in validators/telemetry.mjs, active only when .harness/state/telemetry/ exists.",
+  "evidence": "TL decision in chat, 2026-11-16"
+}

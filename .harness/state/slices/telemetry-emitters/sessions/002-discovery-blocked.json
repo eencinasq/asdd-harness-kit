@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-002",
+  "timestamp": "2026-11-16T23:59:00Z",
+  "agent": "asdd-discovery-agent",
+  "slice_id": "telemetry-emitters",
+  "event_type": "phase_blocked",
+  "phase": "discovery",
+  "mode": "full",
+  "evidence": "capability.md drafted (DRAFT — AWAITING CLARIFICATION). Discovery confidence 0.78 (< 0.85 → QG-DIS-01 BLOCK); anti-pattern score 0.875 (no CRITICAL unresolved; 1 HIGH unclear AP-4 bounded-tail N). Uncertainty factors: Claude/Cursor load-hook payloads vendor-documented but unverified in repo (A-01/A-02); no self-report write path (Q-2); hook-load slice/phase attribution undecided (Q-3); pre-execution gate cannot observe command duration vs v2 D-3/AR-9 (Q-4); vendored closures of command-gate/sync-state and scaffold/registration files outside Mapped files (Q-5/Q-6/Q-7); 7 new domain terms. Schema expresses all must-haves unchanged. glossary.md/anti-patterns.md inlined in capability.md per orchestrator write constraint. Codegraph unavailable (no .codegraph/ index); knowledge search used. Next: PO answers Q-1..Q-15, then asdd-spec-agent.",
+  "concerns": [
+    "Q-1 load-observing hooks (Claude PostToolUse / Cursor beforeReadFile) vs self-report only; hook config sources not mapped",
+    "Q-2 no write path for self-reported turn/activation spans (asdd profile is read-only)",
+    "Q-3 slice/phase attribution of hook-observed loads",
+    "Q-4 command gate is pre-execution: no duration/exit/test counts for kind:test spans",
+    "Q-5 telemetry-lib import pulls tools/*/src/harness vendored copies outside Mapped files",
+    "Q-6 MH-05 registration differs from v2 (files[] has no .harness/**; CLI not copied); schema needs cli/scaffold source",
+    "Q-10 bounded-tail/rotation numbers and their home (code vs quality-gates.md)",
+    "Q-11 --bottlenecks / H-* detection: in-memory only vs appended detection spans and learning signals"
+  ]
+}

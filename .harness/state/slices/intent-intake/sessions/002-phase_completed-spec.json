@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "intent-intake",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:09:44.000Z",
+  "session_id": "sess-intent-intake-002",
+  "event_type": "phase_completed",
+  "phase": "spec",
+  "evidence": "spec.md: intent + REQ-001…005; mapping extended with init-slice (--source-json provenance) and the schema (drift.intent_evidence)."
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-insights-host-guard-002",
+  "timestamp": "2026-11-17T15:35:42.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ui-insights-host-guard",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/ui-server.mjs",
+    "cli/src/harness/ui-server.test.mjs"
+  ],
+  "evidence": "RED: 'ui-insights-host-guard REQ-001' gets 200 for Host evil.example (DNS rebinding could trigger skill-eval runs).",
+  "concerns": []
+}

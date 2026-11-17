@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-intake-fitness-format-002",
+  "timestamp": "2026-11-17T12:29:25.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "intake-fitness-format",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/intake-lib.mjs",
+    "cli/src/harness/intake-lib.test.mjs"
+  ],
+  "evidence": "RED: 'intake-fitness-format REQ-001' fails on '- **status:** fit'; the P6.3 PO-mode example is rejected by asdd intake --dry-run ('## Intent fitness: status must be fit').",
+  "concerns": []
+}

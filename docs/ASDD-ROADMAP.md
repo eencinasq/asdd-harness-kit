@@ -14,6 +14,8 @@
 | **P3** | `asdd-p3` | `waves`, `portfolio`, `converge-eval` | P3.3 Windows hooks, P3.4 import Spec Kit/OpenSpec |
 | **P4** | `asdd-p4` | `tracker-sync`, Stop `advisory`, `spec-source` opt-in | P4.2 presets Cencosud |
 | **Shaping** | `egm-shaping` | Intent fitness, Goldfish scope-split, concepts_brief, critique-first, brownfield pack | — |
+| **P5** | `telemetry-emitters`, `skill-eval`, `learn-eval-gate`, `cost-metrics`, `asdd-ui`, `ui-gate-decisions`, `ui-insights` | todas: P5.1–P5.7 (hotfixes `ui-insights-host-guard`, `metrics-data-quality`, `ui-drift-dead-link`) | P5.8–P5.10 según demanda |
+| **P6** | `tracker-binding`, `shaping-agent`, `grounded-shaping`, `intent-intake`, `shaping-cloud-setup`, `po-readonly-gate` | todas (nov 2026); hotfix `intake-fitness-format` | — |
 
 Slices `asdd-p0`…`asdd-p4` están en `DONE` (escalated donde el scope cruzó módulos). El detalle por ítem está en §4.
 `egm-shaping` porta conceptos EGM (Elephant/Goldfish) a `shape-up` / `product-delivery` para intents lite-fit; SoT de build sigue en `.harness/`.
@@ -84,6 +86,21 @@ Nivel SDD ([Böckeler / Thoughtworks](https://martinfowler.com/articles/explorin
 | **G12** | Medición del pipeline | No priorizar proceso | **Hecho** (P0.1 `status --metrics`) |
 | **G13** | Slash/MCP surface débil vs Spec Drift | Claude usa Spec Drift | **Mitigado** (P1.1 skills + P1.2 `pipeline_status`) |
 | **G14** | Slice DONE → evolve sin re-pitch | Mantenimiento a medias | **Hecho** (P2.2 `slice amend`) |
+| **G15** | No se sabe qué steering/skills se cargan de verdad (instalado vs. usado) | Guías muertas o ignoradas sin señal | **Hecho** (P5.1 `telemetry-emitters`: `asdd observe`, `asdd profile`) |
+| **G16** | Skills y agentes sin eval de comportamiento antes/después | Un cambio de guía puede regresar sin que nada lo detecte; el learning loop solo verifica a posteriori | **Hecho** (P5.2 `asdd skill-eval`, P5.3 QG-LEARN-10) |
+| **G17** | Sin costo/tokens por slice, modelo o runtime | No se puede comparar configuraciones ni justificar el proceso | **Hecho** (P5.4 `cost-metrics`: `metrics.cost`, precios en `.harness/config/model-prices.json`) |
+| **G18** | UI dispersa y atada a hosts MCP (límite ~13 KB en Cursor) | TL/PM fuera del IDE no ven el ciclo completo | **Hecho** (P5.5 `asdd ui`) |
+| **G19** | Gates humanos (`decided_by`) solo desde IDE/CLI | Fricción para quien decide; gates retrasados | **Hecho** (P5.6 `asdd gate-decide` + vista Gates) |
+| **G20** | Skills/steering sin versión propia ni distribución entre repos | No hay packs de organización ni inventario de versiones | **Según demanda** (P5.8) |
+| **G21** | Skills/agentes de terceros sin escaneo de seguridad | Prompt injection, comandos peligrosos, exfiltración | **Según demanda** (P5.9) |
+| **G22** | Sin gobierno de organización (steering central, audit log agregado) | Cada repo diverge; sin trazabilidad multi-repo de overrides | **Según demanda** (P5.10) |
+| **G23** | El proyecto no declara su tracker (Jira, Linear, GitHub) | Las skills preguntan o adivinan dónde viven pitches e intents | **Hecho** (P6.1 `tracker-binding`) |
+| **G24** | El PO/PM no tiene un agente de solo lectura sobre el repo | Shaping desde el IDE o con permisos de escritura que no necesita | **Hecho** (P6.2 `shaping-agent`) |
+| **G25** | Pitch e intents no se basan en el código, las specs ni el histórico | Scopes que duplican componentes; appetite sobreestimado | **Hecho** (P6.3 `grounded-shaping`) |
+| **G26** | Nada importa un intent del tracker a la máquina del ingeniero | El ingeniero reescribe el intent a mano; se pierde la trazabilidad | **Hecho** (P6.4 `intent-intake`) |
+| **G27** | El PO sin clon local no tiene las herramientas de grounding | Shaping solo posible con IDE y repo local | **Hecho** (P6.5 `shaping-cloud-setup`) |
+| **G28** | El agente del PO no usa Write/Edit pero su shell podía escribir | El modo PO dependía de que el agente obedeciera | **Hecho** (P6.6 `po-readonly-gate`, `HARNESS_GATE_MODE=readonly`) |
+| **G29** | El servidor `spec-drift` no verifica seguridad | Vulnerabilidades sin revisión; PRs sin lente de seguridad | **Hecho** (P7.1 `security-review`) |
 
 ## 4. Roadmap priorizado
 
@@ -165,6 +182,61 @@ Escala: **Valor** (alto / medio / bajo) · **Esfuerzo** S (≤ 2 días) / M (≤
 | P4.3 | Stop advisory-only | **hecho** — `stop.mode` / `HARNESS_STOP_MODE=advisory` |
 | P4.4 | Spec-as-source experimental | **hecho** — `asdd spec-source` opt-in (**not** default SoT) |
 
+### P5 — Medir y superficie humana
+
+Origen: análisis del 2026-11-16 frente a Eminzo AI Factory (UI de escritorio sobre un orquestador) y Tessl (gestión del ciclo de vida de skills). Conclusión: el kit no necesita orquestar ni alojar loops; le falta **medir** sus guías y **mostrar** el estado a quien decide los gates.
+
+| ID | Slice | Propuesta | Cubre | Modo | Depende de | Estado |
+|----|-------|-----------|-------|------|------------|--------|
+| P5.1 | `telemetry-emitters` | Fase 2 de `telemetry-contract`: emisores fail-open, spans de activación de steering/skills, `asdd profile` (guardrails AR-1…AR-10) | G15 | full | `telemetry-contract` | **hecho** |
+| P5.2 | `skill-eval` | `asdd skill-eval`: fixtures por skill, comparación contra baseline, regresiones | G16 | lite | — | **hecho** — `asdd skill-eval` + `cli/eval/skills/` |
+| P5.3 | `learn-eval-gate` | Propuestas `SP-*` que cambian guías requieren eval adjunta (`QG-LEARN-*`) | G16 | lite | P5.2 | **hecho** — QG-LEARN-10 |
+| P5.4 | `cost-metrics` | Tokens y costo por slice, fase, modelo y runtime en `status --metrics` | G17 | lite | P5.1 | **hecho** |
+| P5.5 | `asdd-ui` | `asdd ui`: servidor local Node sin dependencias, solo lectura, agrega pipeline + spec-drift + learning + knowledge | G18 | lite | — | **hecho** — `asdd ui` |
+| P5.6 | `ui-gate-decisions` | Única escritura de la UI: decidir gates vía comando `asdd` (`decided_by` + nota) | G19 | lite | P5.5 | **hecho** — `asdd gate-decide`, vista Gates (Host/Origin) |
+| P5.7 | `ui-insights` | Paneles de activación, evals y costo | G15–G17 | lite | P5.1, P5.2, P5.4, P5.5 | **hecho** |
+| P5.8 | — | Packs versionados de skills/steering + `asdd fleet` (inventario multi-repo) | G20 | full | — | **según demanda** |
+| P5.9 | — | Escaneo de seguridad de skills/agentes de terceros | G21 | lite | (P5.8 opcional) | **según demanda** |
+| P5.10 | — | Steering de organización no sobrescribible + audit log agregado | G22 | full | P5.8 | **según demanda** |
+
+Hotfixes que salieron del trabajo en paralelo (nov 2026): `npm-pack-json` (test de empaquetado), `guidance-proposal-skip`, `drift02-open-slices` (aplica SP-003/SP-005: DRIFT-02 solo en slices `in_progress`), `ui-assets-dist` (el build copia los assets de `cli/src` a `cli/dist`; `asdd ui` respondía 404 desde el paquete), `drift01-harness-logs` (aplica SP-006: los dos logs append-only de `docs/` quedan exentos de DRIFT-01). Integración: un worktree por agente (Claude, Cursor, Devin) y una rama de integración; ver `HARNESS_DRIFT_BASE` en SP-004.
+
+Olas: **A** (medir) P5.1–P5.4 · **B** (superficie humana) P5.5–P5.7 · **C** (distribuir) P5.8–P5.10, sin slice hasta que haya demanda de compartir skills entre repos u organizaciones.
+
+### P6 — Shaping del PO basado en evidencia
+
+Origen: decisión del 2026-11-17. El PO/PM hace el pitch y el product delivery hasta el intent; todo lo que sale de ese proceso se basa en el código, las specs y las slices que ya existen, para no sobreestimar y reutilizar componentes. La salida (pitch e intents) vive en el tracker del proyecto (Jira, Linear o GitHub); los ingenieros toman cada intent y trabajan con el harness en su máquina, con cualquier agente de código.
+
+```
+PO/PM (Claude Desktop → Code, o claude.ai/code), repo en solo lectura
+  shape-up + grounding        → Pitch en el tracker (betting_state, decided_by)
+  product-delivery + grounding → un ítem Intent por scope (Reutiliza / Extiende / Nuevo con evidencia)
+Ingeniero (su máquina, cualquier agente + harness)
+  asdd intake → intent.md + slice init (modo sugerido) + source; grounding re-verificado contra el código actual
+  pipeline normal → progreso de vuelta al Intent (tracker-sync)
+```
+
+| ID | Slice | Propuesta | Cubre | Modo | Depende de | Estado |
+|----|-------|-----------|-------|------|------------|--------|
+| P6.1 | `tracker-binding` | Bloque `tracker` en `project.json` + formato canónico del Intent por tracker | G23 | lite | — | **hecho** |
+| P6.2 | `shaping-agent` | `asdd-shaping-agent` de solo lectura (sin Write/Edit en el runtime) + MCP de knowledge y del tracker | G24 | lite | — | **hecho** |
+| P6.3 | `grounded-shaping` | Grounding obligatorio en `shape-up` y `product-delivery`; appetite con slices de referencia; modo PO que escribe solo en el tracker | G25 | lite | P6.1 | **hecho** |
+| P6.4 | `intent-intake` | `asdd intake` (offline, valida y crea la slice), intake en `external-trackers`, validador `intent-evidence` | G26 | lite | P6.1 | **hecho** |
+| P6.5 | `shaping-cloud-setup` | Script de setup para claude.ai/code (MCP + codegraph) y plays PO / ingeniero | G27 | lite | P6.1–P6.4 | **hecho** |
+| P6.6 | `po-readonly-gate` | Modo de solo lectura en el command gate (`HARNESS_GATE_MODE=readonly`): allowlist de lecturas; sin redirecciones, sustituciones ni override | G28 | lite | P6.2 | **hecho** |
+
+Paralelismo: P6.1 y P6.2 primero; P6.3 y P6.4 en paralelo tras P6.1; P6.5 al final. Fuera de alcance: chat de shaping dentro de `asdd ui` (cliente ACP) y MCP remoto de grounding para el chat de Claude Desktop — se revisan si P6.5 no basta.
+
+### P7 — Seguridad
+
+Origen: pedido del 2026-11-17. Verificación de seguridad en el servidor `spec-drift` y su MCP App, basada en [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill/tree/main/skills/security-audit) (MIT, vendorizada con aviso en `tools/spec-drift/THIRD_PARTY_NOTICES.md`).
+
+| ID | Slice | Propuesta | Cubre | Modo | Estado |
+|----|-------|-----------|-------|------|--------|
+| P7.1 | `security-review` | Toolset `security` (`security_audit_start`, `_checklist`, `_submit_findings` validado contra el esquema de la skill + `archivo:línea` reales, `_status` con dashboard); `analyze_security` (set `.semgrep/security/` o pack integrado JS/TS + Python); lente de seguridad en PR review | G29 | full | **hecho** |
+
+Reglas heredadas de la skill: sin ejecutar código del objetivo, sin red, sin instalar dependencias, sin artefactos en el repo.
+
 ## 5. Resumen
 
 | Prioridad | Hecho ahora | Queda para 2ª versión |
@@ -174,6 +246,9 @@ Escala: **Valor** (alto / medio / bajo) · **Esfuerzo** S (≤ 2 días) / M (≤
 | **P2** | Hotfix / amend / hill | — |
 | **P3** | Waves, portfolio, converge-eval | Windows hooks, import Spec Kit/OpenSpec |
 | **P4** | Tracker-sync, advisory Stop, spec-source pilot | Presets Cencosud |
+| **P5** | `asdd ui` (gates, insights), `asdd skill-eval` + QG-LEARN-10, telemetría (`observe`, `profile`), costo por slice/modelo | Packs, escaneo de skills, gobierno de organización (según demanda) |
+| **P6** | Tracker, agente PO de solo lectura (+ gate readonly), grounding, intake, setup cloud | Cliente ACP en `asdd ui`, MCP remoto de grounding |
+| **P7** | Auditoría de seguridad, `analyze_security`, lente de seguridad en PR review (`spec-drift`) | — |
 
 ## 6. Fuera de alcance (decisiones vigentes)
 
@@ -182,6 +257,8 @@ Escala: **Valor** (alto / medio / bajo) · **Esfuerzo** S (≤ 2 días) / M (≤
 - Gates Shape Up / Product Delivery siguen siendo **humanos** (`decided_by`); Jev es opinión, no pipeline.
 - No convertirse en SaaS ni en IDE propietario (no competir con Kiro como producto).
 - No abrazar Tessl *spec-as-source* como default (código sigue siendo editable; el piloto es opt-in).
+- No orquestar ni ejecutar agentes (modelo Eminzo) ni alojar loops con créditos (modelo Tessl); los loops programados viven en CI.
+- App de escritorio (Tauri) aparcada: solo si aparecen usuarios fuera del IDE o necesidad multi-repo con notificaciones nativas, empaquetando `asdd ui`.
 
 ## 7. Cómo medir el éxito
 

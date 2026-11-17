@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [
+    "The live Stop hook in this repo now appends hook spans to .harness/state/telemetry/spans.jsonl (not gitignored until TASK-014).",
+    "verify-on-stop.test.mjs is not in npm test until TASK-014 (per tasks.md)."
+  ],
+  "phase": "implementation",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/verify-on-stop.mjs",
+    "cli/src/harness/verify-on-stop.test.mjs"
+  ],
+  "session_id": "sess-telemetry-emitters-034",
+  "timestamp": "2026-11-17T02:39:36.275Z",
+  "feature_id": "TASK-006",
+  "evidence": "TASK-006 passing (REQ-009, REQ-002, REQ-005). GREEN: node --test cli/src/harness/verify-on-stop.test.mjs exit 0, 4/4 (3 runs). Fail-open proofs green: byte-identity of stdout/stderr/exit over 12 exit paths x {location-absent, stream-absent, writable, unwritable} + lib top-level throw / deleted (0 differences); unwritable stream + passing check -> {} / exit 0 / no stderr; payload written before the lib loads. Every exit path goes through finish(outcome, payload, attrs): payload write unchanged, guarded literal import of telemetry-lib.mjs, one kind:hook span inside try, process.exit(0). Messages, timeout, env handling unchanged; scratch comparison HEAD vs new hook 11 payloads x 2 telemetry states 0 differences; live Stop hook (stop_hook_active and full check run) stdout/stderr/exit identical to the HEAD copy. Not vendored (kit vendor --check exit 0). npm test exit 0 (226/226); HARNESS_DRIFT_BASE=c337df7 check --live exit 0. Implementation confidence 0.88; uncertainty factors: top-level await now precedes process.exit (pipe stdout is synchronous on POSIX, unchanged write path); violations_count counts FAIL lines of stdout and stderr split separately (stdout+LF+stderr); slice_id/phase come from attribute() and are null in this repo run."
+}

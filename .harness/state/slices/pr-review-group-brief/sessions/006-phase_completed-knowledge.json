@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "pr-review-group-brief",
+  "concerns": [],
+  "timestamp": "2026-11-17T15:46:34.000Z",
+  "session_id": "sess-pr-review-group-brief-006",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: a broad ignore rule (coverage/) hid a source directory; narrowing it surfaced a stale file. Ignore build outputs by anchored path."
+}

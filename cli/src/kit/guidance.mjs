@@ -34,7 +34,8 @@ const STALE = [
 const SKIP_DIRS = new Set(['node_modules', '.git', '.github', 'tools', 'dist', 'coverage']);
 const SKIP_PREFIXES = [
   '.harness/specs/', '.harness/state/', '.harness/features/', '.harness/audits/', '.harness/knowledge/',
-  'docs/knowledge-base/steering-proposals/', 'docs/architecture/', '.harness/progress/',
+  'docs/knowledge-base/steering-proposals/', 'docs/knowledge-base/profiling-proposals/', 'docs/knowledge-base/rules-proposals/',
+  'docs/architecture/', '.harness/progress/',
 ];
 const SKIP_FILES = new Set([
   'README.md', '.harness/PROGRESS.md',

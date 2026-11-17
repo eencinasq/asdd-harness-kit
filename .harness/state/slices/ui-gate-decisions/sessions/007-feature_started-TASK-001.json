@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-gate-decisions-007",
+  "timestamp": "2026-11-17T01:21:40.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "ui-gate-decisions",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/ui-server.mjs",
+    "cli/src/harness/ui-server.test.mjs"
+  ],
+  "evidence": "RED: REQ-005 Host/Origin tests added; expect fail until guards land.",
+  "concerns": []
+}

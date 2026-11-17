@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "intent-intake",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:15:40.000Z",
+  "session_id": "sess-intent-intake-018",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: keep the CLI offline and let the agent fetch through the tracker MCP; the CLI validates and writes deterministically. Grounding drifts between shaping and pickup, so intake re-checks it and the validator keeps it honest only while the slice is open."
+}
