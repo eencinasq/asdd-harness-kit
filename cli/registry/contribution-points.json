@@ -83,7 +83,7 @@
       "trust": "declarative"
     },
     "adapter": {
-      "schema": "spec-drift-adapter contract {id,description,run({root,sliceId,readBinding})}",
+      "schema": "contract subtypes {spec-drift-adapter:{id,description,run({root,sliceId,readBinding})} read-only; harness-telemetry:{id,description,emit(event)} append-only}; enforced by checkExecutableShape",
       "source_root": "cli/modules/*/adapters",
       "mount": ".agents/mcp/adapters",
       "generator": "self",
@@ -379,7 +379,7 @@
       "merge": {
         "tracked": false,
         "driver": null,
-        "regen": "node .harness/scripts/harness-profile.mjs --slice <id>"
+        "regen": "asdd profile --slice <id>"
       },
       "trust": "derived",
       "ignore_patterns": [
@@ -773,7 +773,7 @@
     },
     "versions": {
       "run": "asdd kit versions",
-      "check": null,
+      "check": "asdd kit versions --check",
       "owns": [
         "version_stamp"
       ]
@@ -789,7 +789,7 @@
     },
     "learn": {
       "run": "asdd learn",
-      "check": null,
+      "check": "asdd learn --check",
       "owns": [
         "learning_summary",
         "derived_singleton"
@@ -797,7 +797,7 @@
     },
     "sync-knowledge": {
       "run": "asdd knowledge sync",
-      "check": null,
+      "check": "asdd knowledge sync --check",
       "owns": [
         "state_derived_read"
       ]
@@ -811,7 +811,7 @@
     },
     "build": {
       "run": "npm run build",
-      "check": "bin stale-dist refusal",
+      "check": "asdd kit build --check",
       "owns": [
         "kit_source"
       ]
@@ -829,7 +829,7 @@
       ]
     },
     "harness-profile": {
-      "run": "node .harness/scripts/harness-profile.mjs --slice <id>",
+      "run": "asdd profile --slice <id>",
       "check": null,
       "owns": [
         "profiling_rollup"
@@ -1018,7 +1018,7 @@
         "sub": {
           "sync": {
             "script": "sync-knowledge.mjs",
-            "help": "rebuild the knowledge index [--status] [--embed] [--backend=jsonl|sqlite|auto]"
+            "help": "rebuild the knowledge index [--status] [--check] [--embed] [--backend=jsonl|sqlite|auto]"
           },
           "search": {
             "script": "knowledge-query.mjs",
@@ -1049,7 +1049,7 @@
       },
       "learn": {
         "script": "learn.mjs",
-        "help": "learning patterns [--all|--json|--summary|--signatures|--export|--propose <LP-id>]"
+        "help": "learning patterns [--all|--json|--summary|--signatures|--check|--export|--propose <LP-id>]"
       },
       "audit": {
         "script": "audit-codebase.mjs",

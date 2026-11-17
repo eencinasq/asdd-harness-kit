@@ -154,37 +154,51 @@ export function mountMap(kit, manifest) {
   return pairs;
 }
 
-// Adapter sources must not write to the repository — the contract is stateless + read-only (D-7). Bound
-// commands the adapter itself invokes (spawnSync/fetch) are its feature, not writes.
+// Adapter sources must not write to the repository — the spec-drift contract is stateless + read-only (D-7).
+// Bound commands the adapter itself invokes (spawnSync/fetch) are its feature, not writes.
 const WRITE_CALL = /\b(?:writeFileSync|appendFileSync|rmSync|mkdirSync|createWriteStream|writeFile|appendFile)\s*\(/;
+// harness-telemetry is append-only: emit() sinks may appendFile*/O_APPEND; every other mutating call fails closed.
+const MUTATING_CALL = /\b(?:writeFileSync|writeFile|rmSync|mkdirSync|createWriteStream|truncateSync|truncate|unlinkSync|unlink|renameSync|rename|copyFileSync|copyFile|cpSync|rmdirSync|rmdir)\s*\(/;
 // The contract requires a literal `export default { … }` so the shape stays statically auditable (D-7).
 const DEFAULT_BLOCK = /export\s+default\s*\{([\s\S]*?)\n\}/;
 
+// Executable contract subtypes (v3 §2.2): literal export shape + filesystem discipline, enforced at validate time.
+const CONTRACT_SHAPES = {
+  'spec-drift-adapter': { entry: 'run', discipline: 'read-only', banned: WRITE_CALL },
+  'harness-telemetry': { entry: 'emit', discipline: 'append-only', banned: MUTATING_CALL },
+};
+
 /**
- * G-13/D-7 shape check: an adapter contribution must literal-export {id, description, run} and stay inside the
- * read-only contract. Runs at validate time (install/module enable), so a malformed executable fails before any
- * copy. Non-literal exports fail closed — adapters are statically auditable by contract.
+ * G-13/D-7 shape check: an adapter contribution must literal-export its contract's {id, description, <entry>}
+ * and stay inside the contract's filesystem discipline. Runs at validate time (install/module enable), so a
+ * malformed executable fails before any copy. Non-literal exports and unknown contract subtypes fail closed.
  */
 export function checkExecutableShape(kit, manifest) {
   const where = `${MODULE_DIR}/${manifest.name}/${MODULE_MANIFEST}`;
   for (const e of manifest.contributes?.adapters ?? []) {
     const src = resolve(join(kit, MODULE_DIR, manifest.name, e.path));
     if (statSync(src).isDirectory()) continue; // dir mounts expand to files; each file is checked via mountMap callers
-    const text = readFileSync(src, 'utf8');
-    if (WRITE_CALL.test(text)) {
-      throw new CliError(`${where}: adapter "${e.path}" calls a filesystem write — the contract is read-only`);
+    const contract = e.contract ?? 'spec-drift-adapter';
+    const shape = CONTRACT_SHAPES[contract];
+    if (!shape) {
+      throw new CliError(`${where}: adapter "${e.path}" declares unknown contract "${contract}" (known: ${Object.keys(CONTRACT_SHAPES).join(', ')})`);
     }
+    const text = readFileSync(src, 'utf8');
+    if (shape.banned.test(text)) {
+      throw new CliError(`${where}: adapter "${e.path}" calls a mutating filesystem call — the ${contract} contract is ${shape.discipline}`);
+    }
+    const want = `{id, description, ${shape.entry}}`;
     const block = DEFAULT_BLOCK.exec(text)?.[1];
     if (!block) {
-      throw new CliError(`${where}: adapter "${e.path}" must literal-export default {id, description, run}`);
+      throw new CliError(`${where}: adapter "${e.path}" must literal-export default ${want}`);
     }
     for (const field of ['id', 'description']) {
       if (!new RegExp(`\\b${field}\\s*:`).test(block)) {
-        throw new CliError(`${where}: adapter "${e.path}" default export missing ${field} (contract: {id, description, run})`);
+        throw new CliError(`${where}: adapter "${e.path}" default export missing ${field} (contract: ${want})`);
       }
     }
-    if (!/\brun\s*[(:]/.test(block)) {
-      throw new CliError(`${where}: adapter "${e.path}" default export missing run (contract: {id, description, run})`);
+    if (!new RegExp(`\\b${shape.entry}\\s*[(:]`).test(block)) {
+      throw new CliError(`${where}: adapter "${e.path}" default export missing ${shape.entry} (contract: ${want})`);
     }
   }
 }

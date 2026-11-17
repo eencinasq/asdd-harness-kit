@@ -15,7 +15,7 @@
       "verification": [
         "node --test cli/test/registry.test.mjs"
       ],
-      "evidence": "26-class contribution-points.json registry + generators + vocabulary landed; module.json x4; manifest loader/validator fail-closed on unregistered type, kit-internal, engines, escape, contract, mount-collision.",
+      "evidence": "re-verified under microkernel-polish: node --test cli/test/registry.test.mjs: 34 pass",
       "scope_paths": [
         "cli/registry/contribution-points.json",
         "cli/modules/bruno/module.json",
@@ -24,7 +24,7 @@
         "cli/modules/web-ui/module.json",
         "cli/src/install/registry.mjs"
       ],
-      "evidence_hash": "d1a04804da77e0c4dd5383aa18d70c4f160f7c76fa20902863dbd76b4bb0f175"
+      "evidence_hash": "48c21c12e16c38734c5929c964eb2a371370633859b97cd3f267d437ae564d8d"
     },
     {
       "id": "TASK-002",
@@ -40,13 +40,13 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "Wave A landed: registry files[] is the enumeration SoT; hardcoded arrays replaced with registry derivations; enableOne manifest-driven (switch deleted).",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass",
       "scope_paths": [
         "cli/registry/contribution-points.json",
         "cli/src/install/phases.mjs",
         "cli/src/install/modules.mjs"
       ],
-      "evidence_hash": "7bda2946217fd7a8ce39ff328703f7c625565d4b9d5e2d79ff8b607a2572c586"
+      "evidence_hash": "9e4f9cbced9c7ebb3c15be0516e7e3a71cedeb04403c840833e741374715cd36"
     },
     {
       "id": "TASK-003",
@@ -62,14 +62,14 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "Wave B landed: ignore/stamp/runtime/retired enumerations derived from registry; runtimes/committed_checks/retired sections added to contribution-points.json.",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass",
       "scope_paths": [
         "cli/registry/contribution-points.json",
         "cli/src/install/ignored.mjs",
         "cli/src/install/options.mjs",
         "cli/src/install/phases.mjs"
       ],
-      "evidence_hash": "9bd1e9d06af7c92c4aa9124661373248cc419e2d8b819637c3cd9c0e891ee8ad"
+      "evidence_hash": "d2b7e5cbebe59280f74c95aff8a5ce5336ccbc02ee567cc99f63050d74b1290d"
     },
     {
       "id": "TASK-004",
@@ -85,14 +85,14 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "Wave C landed: PHASES and SLICE_MODES derive dynamically from registry vocabulary; commands section in registry drives dispatcher tables.",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass",
       "scope_paths": [
         "cli/registry/contribution-points.json",
         "cli/src/harness/sync-state.mjs",
         "cli/src/harness/repair.mjs",
         "cli/src/harness/commands.mjs"
       ],
-      "evidence_hash": "7aea581b030160642f579e9416c285398307b58bccb033a8b3bc97e75c94f7e8"
+      "evidence_hash": "5b492235af44e8046da62906ef474bf6eae4897aa19f92304ff19f59e56e2e43"
     },
     {
       "id": "TASK-005",
@@ -108,14 +108,14 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "Wave D landed: global state/manifest.json retired; readers read generated registry.json; .gitattributes and .gitignore generated from registry attribute_globs and ignore_patterns.",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass",
       "scope_paths": [
         "cli/registry/contribution-points.json",
         "cli/src/install/registry.mjs",
         ".gitattributes",
         ".gitignore"
       ],
-      "evidence_hash": "e764cec5a4cafa4e1a9698c1ca14fe5683f0293ffbdb32f9bf37352c2be741b7"
+      "evidence_hash": "a535b39e59b9c07e4f6131346ff5365eec838b9766229c5f7a78aedc5038b47e"
     },
     {
       "id": "TASK-006",
@@ -132,14 +132,14 @@
         "npm test",
         "node cli/bin/asdd.mjs kit regen --check"
       ],
-      "evidence": "Wave E landed: asdd kit regen umbrella over registry generators; G-13/D-7 checkExecutableShape; AR-3 session naming lint; G-16 source_root invariant enforced fail-closed; DOM-11 profiling citations re-pinned.",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass + asdd kit regen --check: 9/9 generators, 0 skipped, exit 0",
       "scope_paths": [
         "cli/src/kit/regen.mjs",
         "cli/src/install/registry.mjs",
         "cli/registry/contribution-points.json",
         "docs/knowledge-base/profiling-proposals/v2.md"
       ],
-      "evidence_hash": "9a4ab23287e8652b45be472cb673514ae478a08e65fdb8c4505672e73aceab57"
+      "evidence_hash": "7238f26e0e4170d1ee2b433f4c137fae982d4ffb9dbf0f59235ade5711c786e9"
     }
   ]
 }

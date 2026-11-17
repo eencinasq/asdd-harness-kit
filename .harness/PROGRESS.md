@@ -38,7 +38,7 @@
 | learn-eval-gate | lite | knowledge | DONE | 0 |
 | mcp-standalone | escalated | qa | ABANDONED | 0 |
 | metrics-data-quality | hotfix | knowledge | DONE | 0 |
-| microkernel-polish | lite | discovery | in_progress | 0 |
+| microkernel-polish | lite | qa | in_progress | 1 |
 | modules-top-level | escalated | qa | ABANDONED | 0 |
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
 | platform-contract | full | knowledge | DONE | 0 |

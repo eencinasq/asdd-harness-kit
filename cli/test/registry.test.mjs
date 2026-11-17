@@ -49,6 +49,19 @@ test('all four shipped module manifests validate', () => {
   assert.doesNotThrow(() => validateModules(KIT_ROOT, MODULES));
 });
 
+// Wave 1 REQ-001: every generator in the `kit regen` umbrella (all except
+// install/harness-profile, which take their own arguments) carries a runnable
+// check command — `asdd kit regen --check` must never report a skipped check.
+test('every regen-umbrella generator has a runnable check', () => {
+  const r = loadRegistry(KIT_ROOT);
+  const EXCLUDE = new Set(['install', 'harness-profile']); // mirrors cli/src/kit/regen.mjs
+  const RUNNABLE = /^(asdd|npx|node|npm|bash|sh)\b/;
+  for (const [id, g] of Object.entries(r.generators)) {
+    if (EXCLUDE.has(id)) continue;
+    assert.match(g.check ?? '', RUNNABLE, `generator "${id}" has no runnable check`);
+  }
+});
+
 test('http-api mount map expands adapters to openapi.mjs only (test file skipped)', () => {
   const manifest = readManifest(KIT_ROOT, 'http-api');
   const adapters = mountMap(KIT_ROOT, manifest).filter((p) => p.type === 'adapters');
@@ -77,6 +90,14 @@ test('fails closed: unregistered contributes type', withModule({
 
 test('fails closed: kit-internal contributes type (Q-NEW-3)', withModule({
   contributes: { commands: [{ path: 'x.md', mount: '.agents/x.md' }] },
+}, (kit) => {
+  assert.throws(() => readManifest(kit, 'test-mod'), /kit-internal/);
+}));
+
+// Wave 1 REQ-004: phases are permanently kernel-owned (Q-NEW-1) — a consumer phase binds gates,
+// owning agents, and steering-tag allocation; that is a contract change, not a manifest row.
+test('fails closed: kit-internal contributes type (Q-NEW-1: phases)', withModule({
+  contributes: { phases: [{ path: 'x.md', mount: '.agents/x.md' }] },
 }, (kit) => {
   assert.throws(() => readManifest(kit, 'test-mod'), /kit-internal/);
 }));
@@ -252,6 +273,44 @@ test('fails closed: adapter with a filesystem write call', withModule({
 }, (kit) => {
   assert.throws(() => checkExecutableShape(kit, readManifest(kit, 'test-mod')), /read-only/);
 }, { 'x.md': 'import { writeFileSync } from \'node:fs\';\nwriteFileSync(\'/tmp/x\', \'y\');\n' + ADAPTER_OK }));
+
+// Wave 1 REQ-003: harness-telemetry contract subtype — {id, description, emit}, append-only.
+const TELEMETRY_OK = 'export default {\n  id: \'t\',\n  description: \'d\',\n  emit: (e) => e,\n};\n';
+
+test('harness-telemetry adapter: {id,description,emit} + appendFileSync passes', withModule({
+  trust: 'executable',
+  contributes: { adapters: [{ path: 'x.md', mount: '.agents/mcp/adapters/x.mjs', contract: 'harness-telemetry' }] },
+}, (kit) => {
+  assert.doesNotThrow(() => checkExecutableShape(kit, readManifest(kit, 'test-mod')));
+}, { 'x.md': 'import { appendFileSync } from \'node:fs\';\nconst sink = (e) => appendFileSync(\'.harness/state/telemetry/e.jsonl\', JSON.stringify(e) + \'\\n\');\n' + TELEMETRY_OK }));
+
+test('fails closed: telemetry adapter missing emit', withModule({
+  trust: 'executable',
+  contributes: { adapters: [{ path: 'x.md', mount: '.agents/mcp/adapters/x.mjs', contract: 'harness-telemetry' }] },
+}, (kit) => {
+  assert.throws(() => checkExecutableShape(kit, readManifest(kit, 'test-mod')), /missing emit/);
+}, { 'x.md': 'export default {\n  id: \'t\',\n  description: \'d\',\n  run: () => {},\n};\n' }));
+
+test('fails closed: telemetry adapter with a mutating write call', withModule({
+  trust: 'executable',
+  contributes: { adapters: [{ path: 'x.md', mount: '.agents/mcp/adapters/x.mjs', contract: 'harness-telemetry' }] },
+}, (kit) => {
+  assert.throws(() => checkExecutableShape(kit, readManifest(kit, 'test-mod')), /append-only/);
+}, { 'x.md': 'import { writeFileSync } from \'node:fs\';\nwriteFileSync(\'/tmp/x\', \'y\');\n' + TELEMETRY_OK }));
+
+test('fails closed: spec-drift adapter may not append (stays read-only)', withModule({
+  trust: 'executable',
+  contributes: { adapters: [{ path: 'x.md', mount: '.agents/mcp/adapters/x.mjs', contract: 'spec-drift-adapter' }] },
+}, (kit) => {
+  assert.throws(() => checkExecutableShape(kit, readManifest(kit, 'test-mod')), /read-only/);
+}, { 'x.md': 'import { appendFileSync } from \'node:fs\';\nappendFileSync(\'/tmp/x\', \'y\');\n' + ADAPTER_OK }));
+
+test('fails closed: unknown adapter contract subtype', withModule({
+  trust: 'executable',
+  contributes: { adapters: [{ path: 'x.md', mount: '.agents/mcp/adapters/x.mjs', contract: 'run-anything' }] },
+}, (kit) => {
+  assert.throws(() => checkExecutableShape(kit, readManifest(kit, 'test-mod')), /unknown contract/);
+}, { 'x.md': TELEMETRY_OK }));
 
 test('gitattributeLines derives the merge-policy block (D-4/G-5)', async () => {
   const { gitattributeLines } = await import('../src/install/registry.mjs');

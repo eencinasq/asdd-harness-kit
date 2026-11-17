@@ -10,14 +10,14 @@
  * version per release means every kit-owned file is refreshed on upgrade —
  * nothing stays stale because a per-file bump was missed.
  */
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync, writeFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 import { registryFiles } from '../install/registry.mjs';
 
 /** The kit checkout this CLI belongs to. */
-const root = join(import.meta.dirname, '../../..');
-const outPath = join(root, 'cli/versions.json');
+const KIT = join(import.meta.dirname, '../../..');
 
 function readJson(p) {
   if (!existsSync(p)) return null;
@@ -28,7 +28,7 @@ function readJson(p) {
   }
 }
 
-function getKitVersion() {
+function getKitVersion(root = KIT) {
   const pkg = readJson(join(root, 'package.json'));
   return pkg?.version || '2.0.0';
 }
@@ -45,9 +45,9 @@ function* walk(dir) {
   }
 }
 
-function collectArtifacts() {
+function collectArtifacts(root = KIT) {
   const artifacts = {};
-  const version = getKitVersion();
+  const version = getKitVersion(root);
   const record = (rel) => {
     if (/\.(test|spec)\./.test(rel)) return; // kit tests are not installed into clients
     const p = join(root, rel);
@@ -117,7 +117,7 @@ function collectArtifacts() {
 const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
 
 /** Set the project version in package.json and the root of package-lock.json. */
-function setProjectVersion(version) {
+function setProjectVersion(version, root = KIT) {
   const pkgPath = join(root, 'package.json');
   const pkg = readJson(pkgPath);
   pkg.version = version;
@@ -131,8 +131,57 @@ function setProjectVersion(version) {
   }
 }
 
-/** `asdd kit versions [bump <version>]` */
+/**
+ * Non-mutating freshness check (`asdd kit versions --check`): recomputes the
+ * artifact set and kit version, then verifies cli/versions.json and the
+ * self-installed .harness/config/versions.json against it. Returns problems[].
+ */
+export function checkVersions(root = KIT) {
+  const problems = [];
+  const wantVersion = getKitVersion(root);
+  const wantArtifacts = collectArtifacts(root);
+  const docPath = join(root, 'cli/versions.json');
+  const installedPath = join(root, '.harness/config/versions.json');
+  const doc = readJson(docPath);
+  if (!doc) {
+    problems.push(`missing cli/versions.json — run asdd kit versions`);
+  } else {
+    if (doc.kit_version !== wantVersion) {
+      problems.push(`cli/versions.json kit_version ${doc.kit_version} != package.json ${wantVersion}`);
+    }
+    const have = doc.artifacts ?? {};
+    for (const rel of Object.keys(wantArtifacts)) {
+      if (!(rel in have)) problems.push(`cli/versions.json missing artifact ${rel}`);
+      else if (have[rel] !== wantVersion) problems.push(`cli/versions.json ${rel} pinned at ${have[rel]} != ${wantVersion}`);
+    }
+    for (const rel of Object.keys(have)) {
+      if (!(rel in wantArtifacts)) problems.push(`cli/versions.json lists removed artifact ${rel}`);
+    }
+  }
+  if (existsSync(installedPath)) {
+    const digest = (p) => createHash('sha256').update(readFileSync(p)).digest('hex');
+    if (!existsSync(docPath) || digest(installedPath) !== digest(docPath)) {
+      problems.push(`installed copy .harness/config/versions.json differs from cli/versions.json — run asdd kit self`);
+    }
+  } else {
+    problems.push(`missing installed copy .harness/config/versions.json — run asdd kit self`);
+  }
+  return problems;
+}
+
+/** `asdd kit versions [bump <version>] [--check]` */
 export function run(args = []) {
+  const outPath = join(KIT, 'cli/versions.json');
+
+  if (args.includes('--check')) {
+    const problems = checkVersions();
+    if (problems.length) {
+      for (const p of problems) console.error(`FAIL  ${p}`);
+      return 1;
+    }
+    console.log(`OK    cli/versions.json — ${Object.keys(collectArtifacts()).length} artifacts @ ${getKitVersion()}`);
+    return 0;
+  }
 
   if (args[0] === 'bump') {
     const version = args[1];
@@ -143,7 +192,7 @@ export function run(args = []) {
     setProjectVersion(version);
     console.log(`BUMP  project → ${version}`);
   } else if (args.length) {
-    console.error('Usage: asdd kit versions [bump <version>]');
+    console.error('Usage: asdd kit versions [bump <version>] [--check]');
     return 1;
   }
 
@@ -156,6 +205,6 @@ export function run(args = []) {
     artifacts,
   };
   writeFileSync(outPath, `${JSON.stringify(doc, null, 2)}\n`);
-  console.log(`WRITE ${relative(root, outPath)} — ${Object.keys(artifacts).length} artifacts @ ${kitVersion}`);
+  console.log(`WRITE ${relative(KIT, outPath)} — ${Object.keys(artifacts).length} artifacts @ ${kitVersion}`);
   return 0;
 }

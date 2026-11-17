@@ -1,0 +1,14 @@
+{
+ "schema_version": "1.0",
+ "session_id": "sess-microkernel-polish-002",
+ "timestamp": "2026-11-17T14:05:00.000Z",
+ "agent": "asdd-pipeline",
+ "human": "eencinas",
+ "slice_id": "microkernel-polish",
+ "event_type": "feature_started",
+ "phase": "implementation",
+ "feature_id": "TASK-001",
+ "evidence": "Wave 1 Task 1.1 — runnable --check coverage across all 9 kit regen generators (spec.md REQ-001/REQ-002).",
+ "scope_paths": ["cli/src/kit/versions.mjs","cli/src/harness/learn.mjs","cli/src/harness/sync-knowledge.mjs","cli/src/main.mjs","cli/registry/contribution-points.json","cli/test/versions.test.mjs"],
+ "concerns": []
+}

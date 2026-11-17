@@ -17,7 +17,7 @@
       "verification": [
         "npm test && node cli/bin/asdd.mjs kit guidance && cd tools/knowledge && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && node cli/bin/asdd.mjs kit guidance && cd tools/knowledge && pnpm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass + asdd kit guidance PASS (v2.md:88 stale MCP row fixed to CLI names) + tools/knowledge pnpm test: 8 pass",
       "scope_paths": [
         "cli/skills/asdd-converge/SKILL.md",
         "cli/skills/asdd-implement/SKILL.md",
@@ -30,7 +30,7 @@
         "cli/versions.json",
         "tools/knowledge/test/knowledge.e2e-spec.ts"
       ],
-      "evidence_hash": "c6781d7757338d9cf445c06e3d9997514925fc5c4111975eec91c6b3270e7204"
+      "evidence_hash": "09ef565c6a892ca93920378949223e526e25434aa4115b1afa35d6130b38f7c2"
     }
   ]
 }

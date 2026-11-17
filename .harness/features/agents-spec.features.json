@@ -136,7 +136,7 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit agents-lint && npm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "re-verified under microkernel-polish: asdd kit agents-lint: 14 agents PASS + npm test: 234 pass",
       "scope_paths": [
         "cli/src/kit/agents-lint.mjs",
         "cli/src/main.mjs",
@@ -145,7 +145,7 @@
         "cli/README.md",
         "cli/versions.json"
       ],
-      "evidence_hash": "214f0e9f6a7e66d1a99084c722f6ee6ecebd1139eaa8938d7575889cdd6ea1cc"
+      "evidence_hash": "3daec60ccf3b27666399073b959a5723d479a2d933cce11a48c26f6e6fc98eaa"
     }
   ]
 }

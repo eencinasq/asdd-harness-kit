@@ -186,7 +186,7 @@
         "npm test",
         "cd tools/knowledge && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/knowledge && pnpm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass + tools/knowledge pnpm test: 8 pass",
       "scope_paths": [
         "cli/src/harness/knowledge-store-sqlite.mjs",
         "cli/src/harness/knowledge-query.mjs",
@@ -208,7 +208,7 @@
         "tools/knowledge/README.md",
         "tools/spec-drift/src/audit/harness-libs.ts"
       ],
-      "evidence_hash": "3d1ef91bab5b5fb849f08bd232be4058f96e163db86644e76b59c6ddae61206d"
+      "evidence_hash": "7181de27044b6ad762af5dbf5c1719f4cea08f96b3d327edc8bd8c0cbcd05eac"
     },
     {
       "id": "TASK-009",
@@ -225,7 +225,7 @@
         "npm test",
         "cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-stamped after vendoring proposals to docs/knowledge-base/steering-proposals/external/ (verifications green: npm test 195/195, install.sh, kit versions).",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass + tools/jev-gate pnpm typecheck+lint+test: 14 pass",
       "scope_paths": [
         "cli/src/install/**",
         "cli/src/harness/commands.mjs",
@@ -253,7 +253,7 @@
         ".github/workflows/harness-invariants.yml",
         ".harness/steering/structure.md"
       ],
-      "evidence_hash": "c03514e6a44bf5bad4a65a4cdb9e60bc176b31413179b77f4580fd99605f7b6b"
+      "evidence_hash": "4df271e65ac565be87cdcdbfc472f3fa07098f0b010a26045140e0ecc252e08b"
     },
     {
       "id": "TASK-010",
@@ -283,7 +283,7 @@
       "id": "TASK-011",
       "title": "The CLI as a Node package only",
       "user_visible_behavior": "Projects get no copy of the CLI: asdd is installed once per machine (npm i -g, or npm pack from the repo) or as a devDependency; hooks find it and fail closed without it.",
-      "status": "passing",
+      "status": "blocked",
       "priority": 11,
       "owner": "claude",
       "req_ids": [
@@ -296,7 +296,7 @@
         "npm test",
         "cd tools/spec-drift && pnpm typecheck && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/spec-drift && pnpm typecheck && pnpm test` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/spec-drift && pnpm typecheck && pnpm test` exits 0. | reopened by microkernel-polish: scope file(s) changed under DRIFT-02; pending re-verification | DRIFT-02 reopen: scope changed under microkernel-polish; re-run verification to restore passing",
       "scope_paths": [
         "cli/src/pin.mjs",
         "cli/src/main.mjs",
@@ -326,8 +326,7 @@
         "README.md",
         "package.json"
       ],
-      "notes": "Re-verification blocked: tools/spec-drift suite fails — src/coverage/coverage.ts is imported by 6+ files but absent on main (pre-existing defect, not rebase-related). Set in_progress per DRIFT-02.",
-      "evidence_hash": "1164330f3e150713b6a63dc74721c8f5281c4c5025d8d52a7e3ab81e7b9e385d"
+      "notes": "Re-verification blocked: tools/spec-drift suite fails — src/coverage/coverage.ts is imported by 6+ files but absent on main (pre-existing defect, not rebase-related). Set in_progress per DRIFT-02."
     }
   ]
 }
