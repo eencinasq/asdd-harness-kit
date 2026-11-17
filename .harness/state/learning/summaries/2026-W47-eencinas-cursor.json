@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0",
+  "author": "eencinas-cursor",
+  "week": "2026-W47",
+  "signatures": {
+    "sensor:DRIFT-01:docs": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:28:33.442Z",
+          "slice_id": "asdd-ui",
+          "last_at": "2026-11-17T00:35:46.524Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 docs/ASDD-ROADMAP.md changed but is not mapped by asdd-ui (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-004.md changed but is not mapped by asdd-ui (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:28:33.442Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T00:43:54.118Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ]
+    },
+    "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:28:33.442Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T00:43:54.118Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/quality-gates.project.md: coverage keys not reachable via tags (starvation, Phase-2 backlog): validation"
+      ]
+    },
+    "warn:QG-DEC-09": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:28:33.442Z",
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-17T00:43:54.118Z"
+        }
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ]
+    },
+    "sensor:QG-LEARN-04": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:29:04.788Z",
+          "slice_id": "jev-module",
+          "last_at": "2026-11-17T00:33:30.695Z"
+        }
+      ],
+      "examples": [
+        "QG-LEARN-04 slice \"jev-module\" completed Knowledge while pattern LP-06528643 (sensor:DRIFT-01:docs) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+      ]
+    },
+    "sensor:DRIFT-02": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:37:39.883Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T00:43:54.118Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-008 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
+      ]
+    },
+    "sensor:lite slice \"*\" cannot complete with open escalation signals (EN-scope-spread) — ": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T00:43:54.118Z",
+          "slice_id": "asdd-ui"
+        }
+      ],
+      "examples": [
+        "lite slice \"asdd-ui\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate asdd-ui --reasons \"E1-scope-spread\""
+      ]
+    }
+  }
+}

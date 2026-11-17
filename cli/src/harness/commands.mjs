@@ -63,6 +63,7 @@ export const HARNESS_COMMANDS = {
   learn: { script: 'learn.mjs', help: 'learning patterns [--all|--json|--summary|--signatures|--export|--propose <LP-id>]' },
   audit: { script: 'audit-codebase.mjs', help: 'codebase audit [--json] [--no-write] [--hotspots N] [--since 90.days]' },
   triage: { script: 'audit-triage.mjs', help: 'TL triage: triage <finding-id> --dismiss --reason "…" | --confirm | --clear | --list' },
+  ui: { script: 'ui-server.mjs', help: 'read-only local harness UI on 127.0.0.1 [--port <n>]' },
 };
 
 /**

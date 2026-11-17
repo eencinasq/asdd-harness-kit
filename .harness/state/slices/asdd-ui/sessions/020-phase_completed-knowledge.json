@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-ui-020",
+  "timestamp": "2026-11-17T00:43:53.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "asdd-ui",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "mode": "lite",
+  "evidence": "Lite knowledge note: local read-only asdd ui aggregates status/pipeline/drift/learn/knowledge with SSE refresh; SP-004 rejected for LP-06528643 (parallel worktrees use HARNESS_DRIFT_BASE).",
+  "concerns": []
+}

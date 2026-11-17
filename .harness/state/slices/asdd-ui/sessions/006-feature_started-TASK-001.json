@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-ui-006",
+  "timestamp": "2026-11-17T00:30:26.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "asdd-ui",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/ui-server.mjs",
+    "cli/src/harness/ui-server.test.mjs",
+    "cli/src/harness/ui",
+    "cli/src/harness/commands.mjs"
+  ],
+  "evidence": "RED: node --test cli/src/harness/ui-server.test.mjs \u2192 0 pass / 3 fail (ERR_MODULE_NOT_FOUND ui-server.mjs).",
+  "concerns": []
+}

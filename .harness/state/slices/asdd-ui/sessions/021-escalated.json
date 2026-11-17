@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-ui-021",
+  "timestamp": "2026-11-17T00:44:06.299Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "asdd-ui",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Lite registration at slice end touches cli/, package.json, README.md, docs/ (SP-004). Mapped intentionally; escalate to acknowledge E1 rather than absorb.",
+  "concerns": []
+}

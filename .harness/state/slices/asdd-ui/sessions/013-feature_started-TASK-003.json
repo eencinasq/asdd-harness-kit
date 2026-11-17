@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-ui-013",
+  "timestamp": "2026-11-17T00:38:16.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "asdd-ui",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-003",
+  "scope_paths": [
+    "cli/src/harness/ui-server.mjs",
+    "cli/src/harness/ui-server.test.mjs",
+    "cli/src/harness/ui",
+    "cli/src/harness/commands.mjs",
+    "package.json",
+    "cli/versions.json",
+    "README.md"
+  ],
+  "evidence": "RED: REQ-003 SSE test fails (no /events yet).",
+  "concerns": []
+}
