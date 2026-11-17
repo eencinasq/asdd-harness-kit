@@ -5,7 +5,7 @@
   "agent": "devin",
   "human": "squad",
   "slice_id": "learn-eval-gate",
-  "event_type": "feature_verified",
+  "event_type": "feature_completed",
   "phase": "implementation",
   "mode": "lite",
   "feature_id": "TASK-001",

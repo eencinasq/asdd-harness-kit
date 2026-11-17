@@ -578,6 +578,43 @@ export function proposalFindings(root, proposal, patternIds) {
   return out;
 }
 
+const EVAL_CHANGE_TYPES = new Set(['add-guide', 'tighten-guide']);
+const EVAL_STATUSES = new Set(['accepted', 'applied']);
+
+/**
+ * QG-LEARN-10: an accepted or applied guide-changing proposal must carry an `eval` result.
+ * `eval: <command> => <result-ref>`; result-ref is a worktree path or `<git-ref>:<path>` (git show).
+ * The result must be skill-eval JSON with `ok === true`; anything else is a finding.
+ */
+export function proposalEvalFinding(root, proposal) {
+  if (!EVAL_CHANGE_TYPES.has(proposal.change) || !EVAL_STATUSES.has(proposal.status)) return null;
+  const where = proposal.file;
+  const evalField = String(proposal.eval ?? '').trim();
+  if (!evalField) return `${where}: status ${proposal.status} with change ${proposal.change} needs eval (<command> => <result-ref> pointing at a passing asdd skill-eval --json result)`;
+  const sep = evalField.indexOf('=>');
+  const resultRef = (sep >= 0 ? evalField.slice(sep + 2) : evalField).trim();
+  if (!resultRef) return `${where}: eval has no result reference`;
+  let text = null;
+  const direct = join(root, resultRef);
+  if (!resultRef.includes(':') && existsSync(direct)) {
+    try { text = readFileSync(direct, 'utf8'); } catch { text = null; }
+  } else {
+    const colon = resultRef.indexOf(':');
+    if (colon > 0) {
+      const shown = git(root, ['show', `${resultRef.slice(0, colon)}:${resultRef.slice(colon + 1)}`]);
+      if (shown !== null) text = shown;
+    }
+  }
+  if (text === null) return `${where}: eval result ${resultRef} does not resolve to a file or git object`;
+  let result;
+  try { result = JSON.parse(text); } catch { return `${where}: eval result ${resultRef} is not JSON`; }
+  if (result?.ok !== true) {
+    const why = Array.isArray(result?.regressed) && result.regressed.length ? `regressed fixtures: ${result.regressed.join(', ')}` : `eval not ok (failed=${result?.failed ?? '?'})`;
+    return `${where}: eval result ${resultRef} shows a regression — ${why}`;
+  }
+  return null;
+}
+
 const NEXT_FOR_PATTERN = {
   proposed: (p) => `fill ${p.proposals[0]?.file ?? 'the proposal'} and ask the Tech Lead to decide (status accepted or rejected, decided_by)`,
   accepted: (p) => `apply the change to the control, then set status applied with applied_commit in ${p.proposals[0]?.file ?? 'the proposal'}`,

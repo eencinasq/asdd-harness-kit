@@ -225,7 +225,7 @@
         "npm test",
         "cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test"
       ],
-      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
+      "evidence": "re-verified 2026-11-16T20:49:32 (DRIFT-02): npm test exit 0 (210 tests); cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test exit 0",
       "scope_paths": [
         "cli/src/install/**",
         "cli/src/harness/commands.mjs",
@@ -253,7 +253,7 @@
         ".github/workflows/harness-invariants.yml",
         ".harness/steering/structure.md"
       ],
-      "evidence_hash": "54363e7425ff90206707244f72447e9318096fcf7e4a12fea2e40c24a59dadc9"
+      "evidence_hash": "dd2fee6f8f6728f102325abf8371ba4d79b54a3a4d71e8c0971da8fd264e0402"
     },
     {
       "id": "TASK-010",

@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
-import { derivePatterns, loadProposals, proposalFindings } from '../learning-lib.mjs';
+import { derivePatterns, loadProposals, proposalEvalFinding, proposalFindings } from '../learning-lib.mjs';
 import { readSessions } from '../sync-state.mjs';
 
 /** Contract problems of one steering proposal (QG-LEARN-03, QG-LEARN-05): one implementation, in learning-lib. */
@@ -45,6 +45,8 @@ export default function validate(ctx) {
     const commit = appliedCommitFinding(root, p);
     if (commit.fail) fail(`QG-LEARN-05 ${commit.fail}`);
     if (commit.warn) warn(`QG-LEARN-05 ${commit.warn}`);
+    const evalFinding = proposalEvalFinding(root, p);
+    if (evalFinding) fail(`QG-LEARN-10 ${evalFinding}`);
   }
 
   const open = patterns.filter((p) => p.status === 'open');

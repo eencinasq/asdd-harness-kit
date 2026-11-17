@@ -18,7 +18,7 @@
       "verification": [
         "node --test cli/src/harness/init-slice.test.mjs"
       ],
-      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
+      "evidence": "re-verified 2026-11-16T20:48:49 (DRIFT-02): node --test cli/src/harness/init-slice.test.mjs exit 0",
       "scope_paths": [
         "cli/src/harness/init-slice.mjs",
         "cli/src/harness/init-slice.test.mjs",
@@ -28,7 +28,7 @@
         "cli/steering/asdd-lite.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "264a36832bc85db1b4020417d70cd381274a090227e81727008bafdab866d72d"
+      "evidence_hash": "7168ddefc1faa44a5d4429ea0084bc417a03893b23668b268699e6966c6c712a"
     },
     {
       "id": "TASK-002",

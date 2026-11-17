@@ -7,6 +7,10 @@ listed so DRIFT-01 accounts for the stacked-branch diff vs `main`): `docs/ASDD-R
 content), `docs/knowledge-base/steering-proposals/SP-004.md`, `docs/knowledge-base/steering-proposals/SP-005.md`
 (filed by slice skill-eval, DONE).
 
+Generated vendor output of `cli/src/harness/learning-lib.mjs` (refreshed by `asdd kit vendor`, committed with the
+source change): `tools/spec-drift/src/harness/learning-lib.mjs`, `tools/jev-gate/src/harness/learning-lib.mjs`,
+`tools/knowledge/src/harness/learning-lib.mjs`.
+
 - [ ] **TASK-001** — `proposalEvalFinding` in `cli/src/harness/learning-lib.mjs`: parse `eval:` frontmatter
       (`<command> => <result-ref>`), resolve result-ref (worktree path or `git show <ref>:<path>`), assess
       skill-eval JSON (`ok !== true` → finding). RED-first tests in `learning-lib.test.mjs` covering exempt
