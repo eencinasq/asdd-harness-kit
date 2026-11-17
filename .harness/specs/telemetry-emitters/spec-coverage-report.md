@@ -2,13 +2,150 @@
 
 **Author:** asdd-qa-agent
 **Model/Tool:** claude-opus-5-5 (Claude Code sub-agent)
-**Date:** 2026-11-17
-**Inputs:** `requirements.md` 1.1.0 (REQ-001…REQ-025, all MUST), `design.md` (Status READY), `tasks.md`,
-`spec-validation-report.md`, `.harness/features/telemetry-emitters.features.json` (14/14 `passing`), sessions 001…063,
-`docs/architecture/domain-model.md` (Telemetry section), working tree at HEAD `0c7ce84` (clean).
-**Confidence:** 0.88
+**Date:** 2026-11-17 (run 2; run 1 is kept below as history)
+**Inputs:**
+- `requirements.md` 1.1.1 (errata for D-2/D-3, commit `36296f0`; REQ-001…REQ-025, all MUST);
+- `design.md` (READY, with superseded notes);
+- `tasks.md`;
+- features file (14/14 `passing`; TASK-010 reopened and passing again, TASK-012 re-verified);
+- sessions 001…075 (075: TL decisions at checkpoint (c));
+- `docs/architecture/domain-model.md`;
+- working tree at HEAD `c289a66` (clean).
+
+**Confidence:** 0.90
 
 ## Gate Decision
+BLOCKED
+
+`QG-SPEC-06`: EARS criteria coverage for MUST requirements is 128/129, below 100%.
+- **UNCOV-001 is closed.** Its new tests pass, and the scratch probe was re-run (see Run 2 → UNCOV-001 re-verification).
+- **UNCOV-002 is new.** It was exposed by errata 1.1.1. Amended REQ-021 c4 says the `cursor` column of the activation
+  table shows `unknown`. `harness-profile.mjs:146` shows `not observed` instead whenever `.cursor/hooks.json` contains a
+  `beforeReadFile` observe entry. A passing test pins that contradicting behavior (`harness-profile.test.mjs:332`), and
+  a CLI probe in this session confirmed it.
+
+No other BLOCK or WARN criterion applies. Every test passes. No domain-placement finding is open.
+
+## Run 2 (HEAD `c289a66`, requirements 1.1.1)
+
+### Summary
+
+| Metric | Target | Actual | Status |
+|---|---|---|---|
+| Spec-related test pass rate | 100% | 100%. `npm test` exit 0 with 374/374 node tests (the two new REQ-002 c7 tests are #292 and #293). `vendor --check`, `self --check`, `install.sh`, `lifecycle.sh`, `skills-lint` and `agents-lint` all exit 0. The focused slice files on their own: 185/185. | PASS |
+| MUST requirement coverage | 100% | 25/25 | PASS |
+| EARS criteria coverage (MUST) | 100% | 128/129. Errata 1.1.1 rewrote the D-3 criteria instead of dropping them, so all 129 apply. | **BLOCK** (`QG-SPEC-06`, UNCOV-002) |
+| SHOULD / COULD | — | none in the spec | PASS / INFO |
+| Spec coverage (happy + error path) | ≥ 95% | 24/25 (96%; REQ-012 is checked from artifacts) | PASS |
+| `QG-DRIFT-03` | 0 | 0. `asdd drift --slice telemetry-emitters --requirements` returned `PASS spec drift — clean; files 49`. | PASS |
+| Domain placement | no HIGH | no finding. The fix brings `telemetry-observe.mjs` in line with ADR-001; no new layer edge. | PASS |
+
+Latency in this run:
+- REQ-003 emit: p99 0.328 ms.
+- REQ-008 / NFR-001 gate added time: p99 0.352 ms.
+- REQ-018 in-process handler classes: passed.
+
+### UNCOV-001 re-verification (REQ-002 c7): CLOSED
+
+- **Code.** `telemetry-observe.mjs` now loads the library with `await import('./telemetry-lib.mjs').catch(() => null)`
+  inside `try`. `handleObserve` returns the runtime's answer when the library is null.
+- **Tests.** "REQ-002 c7 telemetry-lib throws" and "REQ-002 c7 telemetry-lib deleted" each run on a copy of the
+  harness, for `claude` and `cursor`, with a guidance payload and with invalid JSON. They assert exit 0, the exact
+  answer, empty stderr and no span. Both passed in `npm test` and in the focused run.
+- **QA scratch probe, re-run.** A copy of the observe script was run with a broken library. Results:
+
+| Library | Runtime | Exit | stdout | stderr | Spans |
+|---|---|---|---|---|---|
+| throws on load | `claude` | 0 | empty | 0 bytes | 0 |
+| throws on load | `cursor` | 0 | `{"permission":"allow"}` | 0 bytes | 0 |
+| deleted | `claude` | 0 | empty | 0 bytes | 0 |
+| deleted | `cursor` | 0 | `{"permission":"allow"}` | 0 bytes | 0 |
+| working (control) | `claude` | 0 | empty | — | 1 |
+
+  The control run shows the fix did not disable recording.
+
+### Re-check of the criteria amended by errata 1.1.1
+
+| Criterion (1.1.1) | Pinning test / check | Result |
+|---|---|---|
+| REQ-007 c2: `claude` for `PreToolUse`, `cursor` for a Cursor-shaped payload, `cli` otherwise | `command-gate.test.mjs:160` (`gateRuntime`), `:171` (corpus cases claude/cursor/cli) | PASS |
+| REQ-014 c1: `observe cursor` emits no span for any payload, including a guidance `beforeReadFile` | `telemetry-observe.test.mjs:597` (`cursor-probe-steering` / `-cursor-skill` / `-nonguidance` × 4 telemetry states, zero lines), `:617`, `:627` | PASS |
+| REQ-021 c4: `not observed` in the `claude` column; **`unknown` in the `cursor` column** | `harness-profile.test.mjs:298` pins it for a project with no Cursor observe entry. **`:332` pins the opposite**: with a `beforeReadFile` observe entry the cursor column is `not observed`. | **PARTIAL: UNCOV-002** |
+| REQ-024 c1: Claude `PostToolUse` load hook registered, no Cursor `beforeReadFile` load hook | `install.sh` `assert_claude_observe` / `assert_no_cursor_observe`. `.cursor/hooks.json` and `cli/runtimes/cursor/hooks.json` contain no `observe`/`beforeReadFile` (0 matches). | PASS |
+| REQ-025 c4: a Cursor install wires no `beforeReadFile` load hook | `install.sh` `assert_no_cursor_observe` on every runtime install, the existing-app install and the packaged install | PASS |
+
+Every other criterion is unchanged from 1.1.0. The run-1 mapping (below) still holds at `c289a66`: all tests listed
+there passed again in this run.
+
+### Uncovered Requirements
+
+| ID | Requirement / criterion | Missing coverage | Severity |
+|---|---|---|---|
+| UNCOV-001 | REQ-002 c7 (`asdd observe`) | **Closed** in `c289a66` | — |
+| UNCOV-002 | REQ-021 c4 (amended in 1.1.1) | See the detail below. | MEDIUM impact; gate-blocking under `QG-SPEC-06` |
+
+UNCOV-002 detail:
+- **What the spec and design say.** The criterion is unconditional: the cursor column is `unknown`. The design errata
+  note (`design.md:788`) and `cli/test/fixtures/telemetry/cursor/README.md:10` say the same: "`unknown`, never `not
+  observed`".
+- **What the code does.** `readObserveHooks` (`harness-profile.mjs:142-147`) still marks Cursor as hooked when
+  `.cursor/hooks.json` has a `beforeReadFile` observe entry. This follows the pre-D-3 design rule (§6 line 245, §12
+  line 802). `harness-profile.test.mjs:332` asserts the result: `impl.md  unknown  not observed  unknown`.
+- **QA CLI probe.** In a scratch project, `asdd profile --slice alpha` showed `core.md  not observed  unknown` with no
+  Cursor entry. After hand-adding a `beforeReadFile` entry that runs `observe cursor`, it showed `core.md  not observed
+  not observed`.
+- **Why it matters.** Under D-3, `observe cursor` never records anything, so in that configuration the profile claims
+  `not observed` for a load the kit cannot see. Domain rule TEL-7 forbids exactly this, and design R-3/D-3 named it as
+  the risk D-3 removes.
+- **Reach.** Only a hand-edited `.cursor/hooks.json`: the installer never writes the entry (REQ-025 c4).
+
+**Action.** Choose one:
+- **(a) Fix it.** The Implementation agent reopens TASK-013:
+  - `readObserveHooks` returns `cursor: false` unconditionally, or the cursor column is forced to `unknown`;
+  - `harness-profile.test.mjs:332` is changed to assert `unknown` with a hand-wired Cursor entry.
+
+  This is a one-line code change plus one test edit.
+- **(b) Amend the spec instead.** The Tech Lead/PO approves an errata 1.1.2 that limits REQ-021 c4 to "when no Cursor
+  observe entry is configured", and accepts the edge case.
+
+QA recommends (a): it matches the D-3 intent recorded in three places.
+
+### Findings
+
+| ID | Severity | Summary | Status / action |
+|---|---|---|---|
+| UNCOV-001 | HIGH | `asdd observe` loaded the library statically | **Closed** (`c289a66`) |
+| UNCOV-002 | MEDIUM (blocks via `QG-SPEC-06`) | The profile shows Cursor as `not observed` when a `beforeReadFile` observe entry is hand-wired; REQ-021 c4 (1.1.1) requires `unknown` | Open. Fix (a) or errata (b), as above. |
+| QA-F-001 | MEDIUM | Spec text did not reflect D-2/D-3 | **Closed** by errata 1.1.1 (`36296f0`, session 070) |
+| QA-F-002 | LOW | Design and domain model still described Cursor wiring | **Closed** by superseded notes (`36296f0`). The residue that causes UNCOV-002 is in finding QA-F-008. |
+| QA-F-003 | MEDIUM (pre-existing) | The command gate exits 1 when its own modules fail to load | **Out of scope** by TL decision (session 075): follow-up slice with KPI-1. Not a gap here. |
+| QA-F-004…006 | LOW | Test hardening | **Skipped** by TL decision (session 075) |
+| QA-F-007 | INFO | `telemetry-observe.mjs` imports the library at module load, before it writes its answer. ADR-001's wording is "after its own output". The fail-open outcome is the same, and the new tests prove the answer is unchanged. The import time falls outside the REQ-018 in-process measurement, which Q-14 allows. | No action needed; recorded for the Knowledge phase. |
+| QA-F-008 | LOW | Design §6 (line 245) and §12 "not observed" rule (line 802) still make the cursor `not observed` state conditional on the hook entry. They have no superseded note, which is the root of UNCOV-002. | Add a superseded note with the UNCOV-002 fix. |
+
+### Recommendation
+
+**Redirect to `asdd-implementation-agent`** for UNCOV-002 option (a): reopen TASK-013, then re-run this gate. If the
+TL/PO prefers option (b), the Spec agent issues errata 1.1.2 instead. Once UNCOV-002 is closed, no other open item
+blocks this gate: QA-F-003 and QA-F-004…006 are dispositioned by TL in session 075.
+
+### Tools and commands used (run 2)
+
+- `npm test`: exit 0, 374/374, plus the shell and lint stages.
+- `node --test` on the 8 slice-related files: 185/185.
+- `HARNESS_DRIFT_BASE=c337df7 asdd drift --slice telemetry-emitters --requirements`: clean.
+- `git show` of `c289a66`, `36296f0` and `9a0dba2`.
+- The scratch probes for UNCOV-001 (re-run) and UNCOV-002 (CLI profile with and without a Cursor observe entry).
+
+Codegraph was not used: the repository has no `.codegraph/` index.
+
+---
+
+## History: run 1 (HEAD `0c7ce84`, requirements 1.1.0)
+
+Kept as recorded, with headings demoted. Inputs for run 1: sessions 001…063; `requirements.md` 1.1.0.
+
+### Gate decision (run 1)
 BLOCKED
 
 `QG-SPEC-06`: EARS criteria coverage for MUST requirements is 126/127, below 100%. The one open criterion,
@@ -17,7 +154,7 @@ BLOCKED
 exit 1 (UNCOV-001, verified by a probe in this session). No other BLOCK or WARN criterion applies. No HIGH
 domain-placement finding is open (`QG-DOM-06`).
 
-## Summary
+### Summary
 
 | Metric | Target | Actual | Status |
 |---|---|---|---|
@@ -44,7 +181,7 @@ verifier it names is the Task Planning review. QA re-ran those checks in this se
 They count as covered on that basis. If the Tech Lead requires an automated test for process criteria, record it as a
 `QG-SPEC-08` reading, not a BLOCK.
 
-## Requirement coverage
+### Requirement coverage
 
 Test files used in the table (`cli/src/harness/` prefix omitted):
 
@@ -93,7 +230,7 @@ The number after a short name is the test's line number.
 D-1 (uninstall, in scope) is pinned by `life:123`. After uninstall, `.claude/settings.json` is removed and `.gitignore`
 returns to `dist/\n.env.local\n`, so the observe entry and both telemetry ignore lines are taken out.
 
-## Uncovered Requirements
+### Uncovered Requirements
 
 | ID | Requirement / criterion | Missing coverage | Severity |
 |---|---|---|---|
@@ -122,7 +259,7 @@ UNCOV-001 detail:
 Alternative: a Tech Lead waiver that accepts the hook wrapper as the fail-open layer, recorded as a spec errata to
 REQ-002 c7.
 
-## Findings
+### Findings
 
 | ID | Severity | Summary | Suggested action |
 |---|---|---|---|
@@ -151,7 +288,7 @@ Weaker tests for QA-F-005:
 - REQ-010 c3: the learn stub exits 3 *and* prints non-JSON, so "exit 0 + unparseable → ERROR" is not isolated. The
   code (`sync-state.mjs:413`, `ok: parsed && status === 0`) is correct.
 
-## Domain Placement Findings
+### Domain Placement Findings
 
 None. `Active findings: none` in the binding, so only `domain-layer.md` and its project binding apply.
 
@@ -167,19 +304,19 @@ Checked on the slice diff (`c337df7..HEAD`, 48 product files):
 The six new terms are in `docs/architecture/domain-model.md` §Telemetry: Span, Activation record, Profile report,
 Trace, Phase marker, Runtime hook host. UNCOV-001 is a TEL-4 behavior gap, not a layer violation.
 
-## Code Review Notes
+### Code Review Notes
 
 The slice has no `code-review-report.md`, so there are no CRITICAL/HIGH review findings to carry. QA-F-003 is
 pre-existing and is handed to a follow-up, not to Refactor.
 
-## Recorded decisions applied as scope (not gaps)
+### Recorded decisions applied as scope (not gaps)
 
 AP-7 override (no split); AR-3 rotation, `profiling.json` rollup, and H-* findings deferred (TRC-001); test spans and
 turn/subagent spans deferred (Q-4, Q-2); D-1 uninstall in scope (pinned by life:123); D-2 runtime `cli` for direct gate
 calls; D-3 Cursor hookless (session 054); KPI-1 out of scope; Q-14 latency is in-process handler time; OI-7 TEL-W3
 handled in val:215/252/285.
 
-## Recommendation
+### Recommendation
 
 **Redirect to `asdd-implementation-agent`** for UNCOV-001: reopen TASK-010, add the guarded import and the load-failure
 test, then re-run this gate.
@@ -190,7 +327,7 @@ In parallel, the Tech Lead decides on:
 
 The LOW findings are optional.
 
-## Tools and commands used
+### Tools and commands used
 
 - `npm test` (exit 0; 372/372 node tests plus `install.sh`, `lifecycle.sh`, `vendor --check`, `self --check`, lints).
 - `node --test` on the 8 slice-related files (183/183).
