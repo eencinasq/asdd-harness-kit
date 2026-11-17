@@ -60,7 +60,7 @@
         "cli/steering/templates",
         "cli/scaffold/config/models.json"
       ],
-      "evidence_hash": "c93a0e8a29948329de231c96ede950979bac27b3e75c66fe07c0760bd8180283"
+      "evidence_hash": "45740a0beb24797755d9d7e27bc12aabd00c355f33349c8b333509cd6a47830c"
     },
     {
       "id": "TASK-003",
@@ -145,7 +145,7 @@
         "cli/README.md",
         "cli/versions.json"
       ],
-      "evidence_hash": "3daec60ccf3b27666399073b959a5723d479a2d933cce11a48c26f6e6fc98eaa"
+      "evidence_hash": "2fb636b1b9db9d74cc6d964084874c75496c4746a39026387a74df0ca4cba8f3"
     }
   ]
 }

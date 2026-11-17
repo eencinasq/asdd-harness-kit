@@ -69,7 +69,7 @@
 | steering-conformance | lite | qa | in_progress | 1 |
 | telemetry-contract | lite | knowledge | DONE | 0 |
 | telemetry-emitters | full | knowledge | DONE | 0 |
-| telemetry-phase2 | lite | discovery | in_progress | 0 |
+| telemetry-phase2 | lite | qa | in_progress | 1 |
 | tracker-binding | escalated | knowledge | DONE | 0 |
 | ui-assets-dist | hotfix | knowledge | DONE | 0 |
 | ui-drift-dead-link | hotfix | knowledge | DONE | 0 |

@@ -1079,9 +1079,17 @@
         "script": "harness-profile.mjs",
         "help": "read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation [--slice <id>] [--bottlenecks] [--json]"
       },
+      "profiling": {
+        "script": "profile.mjs",
+        "help": "per-slice profile report: phase durations, H-* findings, bottleneck scores [--slice <id>|--bottlenecks|--json]"
+      },
       "observe": {
         "script": "telemetry-observe.mjs",
         "help": "the load hook (fail-open): records a steering/skill load as an activation record (stdin: hook payload) <claude|cursor>"
+      },
+      "span": {
+        "script": "emit-span.mjs",
+        "help": "append one telemetry span (stdin JSON) — the agent dispatch seam"
       }
     },
     "kit": {

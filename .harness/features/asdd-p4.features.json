@@ -53,7 +53,7 @@
         ".harness/config/project.schema.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "618ef8f46e20cbdde5113bbbe84fdc36dd778b259ee498c6f08b0912f3c69468"
+      "evidence_hash": "a174d934e1fbf7a16081c616ae65342f1ae6cd7a01df9f871aa2d8873b2cb726"
     },
     {
       "id": "TASK-003",
@@ -84,7 +84,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "87d08a199c5fbf7d6ec38145ff6f7a4ea2aeab914ccfd4014896f72b4d8985fe"
+      "evidence_hash": "39dccc9896178174b787e435af753613a200efd64df2e336b441c5d60ab446d3"
     }
   ]
 }

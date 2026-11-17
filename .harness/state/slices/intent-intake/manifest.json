@@ -12,8 +12,8 @@
   ],
   "escalation_required": false,
   "escalated_from_lite": true,
-  "created_at": "2026-11-18T03:22:13.403Z",
-  "updated_at": "2026-11-18T03:22:13.403Z",
+  "created_at": "2026-11-18T03:22:19.548Z",
+  "updated_at": "2026-11-18T03:22:19.548Z",
   "paths": {
     "specs": ".harness/specs/intent-intake",
     "tasks": ".harness/specs/intent-intake/tasks.md",

@@ -23,6 +23,7 @@ This file is the **same ASDD role as** the corresponding `.agents/agents/asdd-*-
    - Read generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice.
    - At the end of every significant action (phase complete, feature start, dissent, override), **write a session file** to `.harness/state/slices/<slice-id>/sessions/`. Session files are append-only — never edit an existing session.
    - After writing sessions, run `asdd sync --slice <slice-id>` to regenerate the manifest and registry.
+   - Telemetry (fail-open, profiling v2 D-8): append a `turn`/`subagent` span at significant actions — `echo '<span json>' | asdd span` — with `steering_load`/`session_write` events where measurable; mint/propagate `HARNESS_TRACE_ID`/`HARNESS_SPAN_ID` per invocation. Telemetry never gates work: silence on failure is correct.
    - For implementation, also update features per `.harness/steering/session-loop.md`.
    - Gates are PASS / WARN / BLOCK per phase (`quality-gates.md`). Check the preceding phase gate before starting (`QG-DEC-09`). Confidence scores stay per phase in session `evidence`; never combine them across phases (`QG-DEC-10`).
 7. **Handoff:** Do not assume the next agent auto-runs. End with an explicit `@asdd-*-agent` recommendation when ready. Pipeline hooks may chain via the runtime's subagent tool.

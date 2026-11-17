@@ -24,7 +24,7 @@
         "cli/modules/web-ui/module.json",
         "cli/src/install/registry.mjs"
       ],
-      "evidence_hash": "48c21c12e16c38734c5929c964eb2a371370633859b97cd3f267d437ae564d8d"
+      "evidence_hash": "a373f05b7ffb0084a38ca6e075d8e7b254d64c77b2354272c16c3a7ecf3aa066"
     },
     {
       "id": "TASK-002",
@@ -46,7 +46,7 @@
         "cli/src/install/phases.mjs",
         "cli/src/install/modules.mjs"
       ],
-      "evidence_hash": "9e4f9cbced9c7ebb3c15be0516e7e3a71cedeb04403c840833e741374715cd36"
+      "evidence_hash": "4f6cb050b450bd09edb15b852b135c10caacb3ea81e42c9f3b6b5d8c071a4965"
     },
     {
       "id": "TASK-003",
@@ -69,7 +69,7 @@
         "cli/src/install/options.mjs",
         "cli/src/install/phases.mjs"
       ],
-      "evidence_hash": "d2b7e5cbebe59280f74c95aff8a5ce5336ccbc02ee567cc99f63050d74b1290d"
+      "evidence_hash": "55100d020e23ba35a6041f606eb1ddbd1e4366002f88e280cd72397dfcbd6658"
     },
     {
       "id": "TASK-004",
@@ -92,7 +92,7 @@
         "cli/src/harness/repair.mjs",
         "cli/src/harness/commands.mjs"
       ],
-      "evidence_hash": "5b492235af44e8046da62906ef474bf6eae4897aa19f92304ff19f59e56e2e43"
+      "evidence_hash": "cc2068f7e80be0ebd70ef27ec8226c9baffbfa9bd2c0be28f4e7f9514fa9c65e"
     },
     {
       "id": "TASK-005",
@@ -115,7 +115,7 @@
         ".gitattributes",
         ".gitignore"
       ],
-      "evidence_hash": "a535b39e59b9c07e4f6131346ff5365eec838b9766229c5f7a78aedc5038b47e"
+      "evidence_hash": "2ef5d51b3a4bba7f41a18daeae7cfdcec1e6a707a0f8ed9dbc3e9916518a34ef"
     },
     {
       "id": "TASK-006",
@@ -139,7 +139,7 @@
         "cli/registry/contribution-points.json",
         "docs/knowledge-base/profiling-proposals/v2.md"
       ],
-      "evidence_hash": "7238f26e0e4170d1ee2b433f4c137fae982d4ffb9dbf0f59235ade5711c786e9"
+      "evidence_hash": "7126b18f2628e5ee6e993c34f84ca31c61f6fec5b51297f80b59224d06243523"
     }
   ]
 }

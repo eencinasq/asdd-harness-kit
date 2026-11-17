@@ -28,7 +28,7 @@
         "cli/steering/asdd-lite.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "ae24d87dd65a95be0b0cf2b7ee692e19f359612e1b90f07cbe8a3949a771dcaf"
+      "evidence_hash": "0d4e972ce51643f5fa27e77dba837abb59e6c200f55d5b2d8feac87a32346970"
     },
     {
       "id": "TASK-002",
@@ -55,7 +55,7 @@
         "cli/README.md"
       ],
       "hill": "downhill",
-      "evidence_hash": "81c3f9f06468239e0734c5a9c0e419546826e057c8251f6b41ea2ca0109be6fe"
+      "evidence_hash": "2d4c1718c933435930c0e8f59caf8b259dff01bdb9af3937ffdca1fd383a6197"
     },
     {
       "id": "TASK-003",
@@ -85,7 +85,7 @@
         "package.json"
       ],
       "hill": "downhill",
-      "evidence_hash": "f0552e258646a471d8384104d44c6483597a7bdfd22f827687da55f5cfb117dc"
+      "evidence_hash": "80fa0a37f80446b63b6405f188a95cb2403ca054a09514b19614950b035689b6"
     }
   ]
 }

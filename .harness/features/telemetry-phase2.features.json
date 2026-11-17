@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "telemetry-phase2",
+  "source_tasks": ".harness/specs/telemetry-phase2/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "telemetry-lib emit/mint/validate/readTail + asdd span seam",
+      "user_visible_behavior": "asdd span appends schema-valid spans fail-open; lib proves ≤4KB single-write contract",
+      "status": "passing",
+      "priority": 1,
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "verification": [
+        "node --test cli/src/harness/telemetry-lib.test.mjs",
+        "npm test"
+      ],
+      "scope_paths": [
+        "cli/src/harness/telemetry-lib.mjs",
+        "cli/src/harness/emit-span.mjs",
+        "cli/registry/contribution-points.json"
+      ],
+      "owner": "devin",
+      "depends_on": [],
+      "evidence": "telemetry-lib.test.mjs 10/10 green (fail-open emit, ≤4KB write, env ID inheritance, validateSpan vocab/reserved rules, bounded readTail); npm test 244/0; asdd span emits schema-valid span end-to-end",
+      "evidence_hash": "04af7574f4e029aeb67662bc4dd82fc97ff81f652753cfd857df5e86d3ed9171"
+    },
+    {
+      "id": "TASK-002",
+      "title": "instrument gate/verify/invariants/sync + runtime rule",
+      "user_visible_behavior": "producer spans land on the stream from the four seams; verdicts unchanged",
+      "status": "passing",
+      "priority": 2,
+      "req_ids": [
+        "REQ-002",
+        "REQ-003"
+      ],
+      "verification": [
+        "node --test cli/src/harness/telemetry-lib.test.mjs cli/src/harness/command-gate.test.mjs",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "scope_paths": [
+        "cli/src/harness/command-gate.mjs",
+        "cli/src/harness/verify-on-stop.mjs",
+        "cli/src/harness/check-invariants.mjs",
+        "cli/src/harness/sync-state.mjs",
+        "cli/agents/_runtime-template.md"
+      ],
+      "owner": "devin",
+      "depends_on": [
+        "TASK-001"
+      ],
+      "evidence": "seam spans land: command-gate test/command spans (kind classification incl. npm/pnpm/node --test), verify-on-stop hook span, sync-state parent+child spans with HARNESS_TRACE_ID inheritance verified (children share trace, parent null); command-gate.test 20/20, sync-state.test green; _runtime-template telemetry rule vendored",
+      "evidence_hash": "80c50ff1b5d6a723daed8079c4040d8b03e3b08d2aa879e5b5be90fbd41b0ee1"
+    },
+    {
+      "id": "TASK-003",
+      "title": "validators/telemetry.mjs warn-only (12th validator)",
+      "user_visible_behavior": "asdd check warns on malformed spans, never fails on telemetry",
+      "status": "passing",
+      "priority": 3,
+      "req_ids": [
+        "REQ-004"
+      ],
+      "verification": [
+        "node --test cli/src/harness/telemetry-validator.test.mjs",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "scope_paths": [
+        "cli/src/harness/validators/telemetry.mjs",
+        "cli/src/harness/check-invariants.mjs"
+      ],
+      "owner": "devin",
+      "depends_on": [
+        "TASK-001"
+      ],
+      "evidence": "validators/telemetry.mjs wired as validator #11 — warn-only: absent dir legal, malformed line WARN not FAIL (lifecycle smoke proves), bounded readTail; asdd check 0 FAIL",
+      "evidence_hash": "6f5c44279f37fb363fc75d9900e40a38320b42964e04fb2371868ddaed659607"
+    },
+    {
+      "id": "TASK-004",
+      "title": "asdd profile — rollup+heuristics+report+registration",
+      "user_visible_behavior": "asdd profile --slice prints the phase table + H-* findings; profiling.json generated; exit 0/3/2",
+      "status": "passing",
+      "priority": 4,
+      "req_ids": [
+        "REQ-005",
+        "REQ-006"
+      ],
+      "verification": [
+        "node --test cli/src/harness/profile.test.mjs",
+        "node cli/bin/asdd.mjs profile --json"
+      ],
+      "scope_paths": [
+        "cli/src/harness/profile.mjs",
+        "cli/src/harness/learning-lib.mjs",
+        "cli/scaffold/config/project.schema.json",
+        ".harness/config/project.json",
+        "cli/test/lifecycle.sh"
+      ],
+      "owner": "devin",
+      "depends_on": [
+        "TASK-001",
+        "TASK-003"
+      ],
+      "evidence": "asdd profile --slice exit 0 writes profiling.json (phase rollups incl. synthesized markers, turn p50/p95, boot tax, H-* findings, bottleneck_score surfaces); --bottlenecks ranked; exit 3 on no data, 2 on usage — smoke-verified; project.json commands.profile+capabilities.telemetry; lifecycle.sh telemetry row green",
+      "evidence_hash": "ddb34b89b2b473fc060bbab27e4dae00a29d10c7a65d0eda680c1b6cd22df72f"
+    },
+    {
+      "id": "TASK-005",
+      "title": "proposal converge + npm wiring + close-out",
+      "user_visible_behavior": "v2.md converged in vault+repo; npm test covers telemetry suites",
+      "status": "passing",
+      "priority": 5,
+      "req_ids": [
+        "REQ-006"
+      ],
+      "verification": [
+        "npm test",
+        "node cli/bin/asdd.mjs check",
+        "grep -m1 converged docs/knowledge-base/profiling-proposals/v2.md"
+      ],
+      "scope_paths": [
+        "docs/knowledge-base/profiling-proposals/v2.md",
+        "package.json"
+      ],
+      "owner": "devin",
+      "depends_on": [
+        "TASK-004"
+      ],
+      "evidence": "v2.md status→converged (repo+vault byte-identical, diff clean); package.json test list +telemetry-lib.test.mjs; npm test 244/0; regen --check 9/9; 24 DRIFT-02 features re-verified+re-stamped (cli-harness:TASK-011 stays blocked on pre-existing spec-drift debt)",
+      "evidence_hash": "276d70f1211a8b0cc41da5eca2065dcdbe55e99bb77a37e8caec14fa56f523f9"
+    }
+  ]
+}

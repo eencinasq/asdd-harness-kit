@@ -5,9 +5,9 @@
  * profile model (phaseMarkers, percentile, surfaceScores, activationRows, profileModel; design §4.5–§4.6).
  * Imports only node: built-ins (REQ-004) and never sync-state.mjs (cycle rule). Writes only .harness/state/telemetry/spans.jsonl (REQ-006).
  */
-import fs from 'node:fs';
+import fs, { existsSync, openSync, closeSync, writeSync, readSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { isAbsolute, join, relative, sep } from 'node:path';
-import { randomBytes } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 
 export const TELEMETRY_DIR = '.harness/state/telemetry';
 export const STREAM_FILE = 'spans.jsonl';
@@ -95,13 +95,23 @@ export function buildSpan(ctx, fields = {}) {
 export function emit(span, { root = process.cwd() } = {}) {
   try {
     if (!span || typeof span !== 'object' || Array.isArray(span)) return false;
-    if (FORBIDDEN_KINDS.has(span.kind)) return false;
+    // REQ-005: reserved kinds are evaluator-synthesized; producers may not emit them. Carve-outs: the
+    // synthesizers themselves (rollup/heuristic-evaluator writers, synthesized trace_source), and the
+    // gate-seam test classifier (kind 'test' is a producer observation when test_runner identifies the runner).
     const attrs = span.attributes;
-    if (attrs && typeof attrs === 'object' && RESERVED_ATTRIBUTES.some((k) => Object.hasOwn(attrs, k))) return false;
-    const json = JSON.stringify(span);
+    const synth = span.writer === 'heuristic-evaluator' || span.writer === 'rollup' || attrs?.trace_source === 'synthesized';
+    const producerTest = span.kind === 'test' && typeof attrs?.test_runner === 'string';
+    if (FORBIDDEN_KINDS.has(span.kind) && !synth && !producerTest) return false;
+    if (builtinSpanProblems(span).length) return false;
+    let json = JSON.stringify(span);
     if (typeof json !== 'string') return false;
-    const buf = Buffer.from(`${json}\n`, 'utf8');
-    if (buf.length > MAX_LINE_BYTES) return false;
+    let buf = Buffer.from(`${json}\n`, 'utf8');
+    if (buf.length > MAX_LINE_BYTES) {
+      // Oversize by events: retry once with the payload dropped (minted-span contract).
+      const { events, ...rest } = span;
+      buf = Buffer.from(`${JSON.stringify({ ...rest, events: [] })}\n`, 'utf8');
+      if (buf.length > MAX_LINE_BYTES) return false;
+    }
     // 'a' creates spans.jsonl when the directory exists; a missing directory fails with ENOENT.
     const fd = fs.openSync(join(root, TELEMETRY_DIR, STREAM_FILE), 'a');
     try {
@@ -179,6 +189,7 @@ function check(value, schema, path, errors) {
 
 /** Validates obj against the schema object (read from telemetry.schema.json); returns error strings. */
 export function validateSpan(obj, schema) {
+  if (schema === undefined) return builtinSpanProblems(obj);
   const errors = [];
   try {
     check(obj, schema, '$', errors);
@@ -193,7 +204,7 @@ export function validateSpan(obj, schema) {
  * after byte 0, its first byte is only the "preceding byte": if it is not LF the cut first line is dropped.
  * Returns the last TAIL_MAX_LINES lines, numbered from 1 within the tail; total = complete lines in the window.
  */
-export function readTail(root) {
+export function readTail(root, { maxLines = TAIL_MAX_LINES, maxBytes = TAIL_MAX_BYTES } = {}) {
   const empty = { lines: [], fromStart: true, total: 0 };
   let fd;
   try {
@@ -203,7 +214,7 @@ export function readTail(root) {
   }
   try {
     const size = fs.fstatSync(fd).size;
-    const length = Math.min(size, TAIL_MAX_BYTES);
+    const length = Math.min(size, maxBytes);
     const start = size - length;
     const buf = Buffer.alloc(length);
     const got = fs.readSync(fd, buf, 0, length, start);
@@ -218,7 +229,7 @@ export function readTail(root) {
     }
     const all = text.split('\n');
     if (all.at(-1) === '') all.pop();
-    const kept = all.slice(-TAIL_MAX_LINES);
+    const kept = all.slice(-maxLines);
     return {
       lines: kept.map((line, i) => ({ n: i + 1, text: line })),
       fromStart: start === 0 && kept.length === all.length,
@@ -589,4 +600,144 @@ export function profileModel({ sliceId, spans, sessions, steering, skills, runti
     legend: ACTIVATION_LEGEND,
     not_measured: [...NOT_MEASURED],
   };
+}
+
+
+// --- minted-span contract (telemetry-phase2): mintSpan, emitSpan, builtin checks, phase synthesis,
+// --- H-* evaluator, detection spans, command timing. Shares the stream contract above.
+
+export const SPANS_FILE = STREAM_FILE;
+export const TAIL_LINES = TAIL_MAX_LINES;
+export const TAIL_BYTES = TAIL_MAX_BYTES;
+export const SCHEMA_VERSION = '1.0';
+
+const KINDS = new Set(['phase', 'turn', 'command', 'test', 'sensor', 'hook', 'sync', 'subagent', 'tool']);
+const SPAN_PHASES = new Set(['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'refactor', 'knowledge']);
+const STATUSES = new Set(['OK', 'ERROR', 'TIMEOUT']);
+const RESERVED_ATTRS = new Set(RESERVED_ATTRIBUTES);
+const TOP_KEYS = new Set([
+  'schema_version', 'trace_id', 'span_id', 'parent_span_id', 'kind', 'slice_id', 'phase',
+  'process_name', 'runtime', 'start_time_iso', 'end_time_iso', 'duration_ms',
+  'status', 'attributes', 'events', 'writer',
+]);
+const HEX_TRACE = TRACE_ID_RE;
+const HEX_SPAN = SPAN_ID_RE;
+const SLICE_ID = SLICE_ID_RE;
+const hash = (s, n) => createHash('sha256').update(s).digest('hex').slice(0, n);
+
+export const spansPath = (root) => join(root, TELEMETRY_DIR, SPANS_FILE);
+
+/**
+ * Fill a producer span's ids and timestamps. Env-inherited
+ * HARNESS_TRACE_ID ⇒ child of that invocation (trace_source:"env");
+ * absent ⇒ self-minted root (trace_source:"self").
+ */
+export function mintSpan(partial = {}, { env = process.env } = {}) {
+  const envTrace = typeof env.HARNESS_TRACE_ID === 'string' && HEX_TRACE.test(env.HARNESS_TRACE_ID) ? env.HARNESS_TRACE_ID : null;
+  const envSpan = typeof env.HARNESS_SPAN_ID === 'string' && HEX_SPAN.test(env.HARNESS_SPAN_ID) ? env.HARNESS_SPAN_ID : null;
+  const attributes = { trace_source: envTrace ? 'env' : 'self', ...(partial.attributes ?? {}) };
+  const span = {
+    schema_version: SCHEMA_VERSION,
+    trace_id: envTrace ?? hex(16),
+    span_id: hex(8),
+    parent_span_id: envTrace ? envSpan : null,
+    status: 'OK',
+    duration_ms: 0,
+    events: [],
+    ...partial,
+    attributes,
+  };
+  return span;
+}
+
+/** Light structural check mirroring telemetry.schema.json — returns a problem list ([] = valid). */
+
+
+/** Light structural check mirroring telemetry.schema.json — returns a problem list ([] = valid). */
+function builtinSpanProblems(span) {
+  const problems = [];
+  if (!span || typeof span !== 'object' || Array.isArray(span)) return ['span is not an object'];
+  for (const k of ['schema_version', 'trace_id', 'span_id', 'kind', 'process_name', 'start_time_iso', 'end_time_iso', 'duration_ms', 'status']) {
+    if (!(k in span)) problems.push(`missing required key ${k}`);
+  }
+  for (const k of Object.keys(span)) if (!TOP_KEYS.has(k)) problems.push(`unknown top-level key ${k}`);
+  if (span.schema_version !== SCHEMA_VERSION) problems.push(`schema_version must be "${SCHEMA_VERSION}"`);
+  if (typeof span.trace_id === 'string' && !HEX_TRACE.test(span.trace_id)) problems.push('trace_id must be hex 16-32');
+  if (typeof span.span_id === 'string' && !HEX_SPAN.test(span.span_id)) problems.push('span_id must be hex 8-16');
+  if (span.parent_span_id !== undefined && span.parent_span_id !== null && (typeof span.parent_span_id !== 'string' || !HEX_SPAN.test(span.parent_span_id))) problems.push('parent_span_id must be hex 8-16 or null');
+  if (span.kind !== undefined && !KINDS.has(span.kind)) problems.push(`unknown kind "${span.kind}"`);
+  if (span.slice_id !== undefined && span.slice_id !== null && (typeof span.slice_id !== 'string' || !SLICE_ID.test(span.slice_id))) problems.push('slice_id must match ^[a-z0-9_-]+$ or be null');
+  if (span.phase !== undefined && span.phase !== null && !SPAN_PHASES.has(span.phase)) problems.push(`unknown phase "${span.phase}"`);
+  if (typeof span.process_name === 'string' && span.process_name.length === 0) problems.push('process_name must be non-empty');
+  for (const t of ['start_time_iso', 'end_time_iso']) {
+    if (typeof span[t] === 'string' && Number.isNaN(Date.parse(span[t]))) problems.push(`${t} is not a valid date-time`);
+  }
+  if (typeof span.duration_ms === 'number' && span.duration_ms < 0) problems.push('duration_ms must be >= 0');
+  if (span.status !== undefined && !STATUSES.has(span.status)) problems.push(`unknown status "${span.status}"`);
+  if (span.events !== undefined && !Array.isArray(span.events)) problems.push('events must be an array');
+  const attrs = span.attributes ?? {};
+  if (attrs && typeof attrs === 'object') {
+    // Evaluator-reserved attrs are legal only on evaluator/rollup spans (DOM-006).
+    const evaluator = span.writer === 'heuristic-evaluator';
+    const synthesized = span.writer === 'rollup' || attrs.trace_source === 'synthesized';
+    for (const k of RESERVED_ATTRS) {
+      const allowed = (k === 'source' ? synthesized : evaluator);
+      if (k in attrs && !allowed) problems.push(`producer-set reserved attribute ${k}`);
+    }
+    if (!['env', 'self', 'synthesized'].includes(attrs.trace_source)) problems.push('attributes.trace_source must be env|self|synthesized');
+  }
+  return problems;
+}
+
+/** Emit from inside a library caller — identical contract, root defaulted. */
+export function emitSpan(span, root = process.cwd()) {
+  return emit(span, { root });
+}
+
+/**
+ * Synthesize deterministic `phase` window markers from a slice's session
+ * phase_started/phase_completed pairs (A-6, D-1). span_id/trace_id are content
+ * hashes of (slice_id, phase, window) → re-synthesis yields identical lines.
+ */
+export function synthesizePhaseSpans(root, sliceId) {
+  const out = [];
+  for (const base of ['.harness/state/slices', '.harness/state/archive']) {
+    const dir = join(root, base, sliceId, 'sessions');
+    if (!existsSync(dir)) continue;
+    const events = readdirSync(dir)
+      .filter((n) => n.endsWith('.json'))
+      .map((n) => { try { return JSON.parse(readFileSync(join(dir, n), 'utf8')); } catch { return null; } })
+      .filter((s) => s && (s.event_type === 'phase_started' || s.event_type === 'phase_completed') && s.phase)
+      .sort((a, b) => String(a.timestamp).localeCompare(String(b.timestamp)));
+    const open = new Map();
+    for (const s of events) {
+      if (s.event_type === 'phase_started') { open.set(s.phase, s); continue; }
+      const started = open.get(s.phase);
+      if (!started) continue;
+      open.delete(s.phase);
+      const start = started.timestamp;
+      const end = s.timestamp;
+      const key = `phase|${sliceId}|${s.phase}|${start}|${end}`;
+      const span = {
+        schema_version: SCHEMA_VERSION,
+        trace_id: hash(`trace|${key}`, 32),
+        span_id: hash(`span|${key}`, 16),
+        parent_span_id: null,
+        kind: 'phase',
+        slice_id: sliceId,
+        phase: s.phase,
+        process_name: `asdd-${s.phase}`,
+        runtime: 'cli',
+        start_time_iso: start,
+        end_time_iso: end,
+        duration_ms: Math.max(0, Date.parse(end) - Date.parse(start)),
+        status: 'OK',
+        attributes: { trace_source: 'synthesized', source: 'session_events', ...(s.feature_id ? { feature_id: s.feature_id } : {}) },
+        writer: 'rollup',
+        events: [],
+      };
+      out.push(span);
+    }
+  }
+  return out;
 }

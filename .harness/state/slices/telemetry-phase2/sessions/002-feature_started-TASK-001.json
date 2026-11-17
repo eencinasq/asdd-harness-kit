@@ -1,0 +1,14 @@
+{
+ "schema_version": "1.0",
+ "session_id": "sess-telemetry-phase2-002",
+ "timestamp": "2026-11-17T17:10:00.000Z",
+ "agent": "asdd-pipeline",
+ "human": "eencinas",
+ "slice_id": "telemetry-phase2",
+ "event_type": "feature_started",
+ "phase": "implementation",
+ "feature_id": "TASK-001",
+ "evidence": "Wave 3 Task 3.2 — emit contract per D-3/AR-1: single O_APPEND write, <=4KB/line, fail-open silent, env trace inheritance.",
+ "scope_paths": ["cli/src/harness/telemetry-lib.mjs","cli/src/harness/emit-span.mjs","cli/registry/contribution-points.json"],
+ "concerns": ["E1-scope-spread expected (cli + .harness + docs) — conformance surface, noted advisory"]
+}

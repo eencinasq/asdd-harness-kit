@@ -363,7 +363,7 @@ test('PHASES/SLICE_MODES derive from registry vocabulary (G-3/D-3)', async () =>
 
 test('command tables derive from registry commands (D-9)', async () => {
   const { HARNESS_COMMANDS, KIT_COMMANDS } = await import('../src/harness/commands.mjs');
-  assert.equal(Object.keys(HARNESS_COMMANDS).length, 21);
+  assert.equal(Object.keys(HARNESS_COMMANDS).length, 23);
   assert.equal(Object.keys(KIT_COMMANDS).length, 9);
   // every harness script exists under cli/src/harness
   const scripts = Object.values(HARNESS_COMMANDS).flatMap((e) =>
