@@ -62,6 +62,8 @@ Roadmap P0–P4 shipped these session-facing commands (see [`docs/ASDD-ROADMAP.m
 | `asdd intake --from <file\|-> --ref <url> [--accept-stale] [--dry-run]` | Import a tracker Intent item as a slice (offline validation, grounding re-check, `intent.md`, `slice init` in its mode) |
 | `asdd spec-source` | Opt-in MUST REQ inventory (`capabilities.spec_as_source`) |
 
+**PO → tracker → engineer.** A PO/PM shapes with the read-only `asdd-shaping-agent`, grounded in the code, specs, and past slices, and writes the pitch, the bet, and one Intent item per scope to the tracker named in `project.json` ([Play O](../docs/PLAYBOOK.md#play-o--po-or-pm-shapes-into-the-tracker)). An engineer imports an Intent with `asdd intake`, which re-checks its grounding and creates the slice, then works it locally with any agent ([Play P](../docs/PLAYBOOK.md#play-p--an-engineer-picks-up-an-intent)).
+
 Roadmap P5 added:
 
 | Command | Purpose |
