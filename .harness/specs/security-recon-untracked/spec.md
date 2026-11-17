@@ -7,7 +7,7 @@ not yet committed — the usual case for a local audit before a PR — does not 
 (found in the end-to-end test: `src/api/run.js` was ignored until committed). Include untracked files that are not
 ignored (`git ls-files --cached --others --exclude-standard`), keeping the existing size and count limits.
 
-Mapped: `tools/spec-drift/src/security/recon.ts`, `tools/spec-drift/src/security/recon.spec.ts`
+Mapped: `tools/spec-drift/src/security/security.service.ts` (its file listing feeds `recon()`; `recon.ts` is pure and lists nothing), `tools/spec-drift/src/security/security.service.spec.ts`
 
 ## Requirements
 
