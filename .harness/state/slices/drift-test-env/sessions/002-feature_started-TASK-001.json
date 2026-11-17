@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-drift-test-env-002",
+  "timestamp": "2026-11-17T17:51:22.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "drift-test-env",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/drift-lib.test.mjs"
+  ],
+  "evidence": "RED: with HARNESS_DRIFT_BASE=HEAD npm test is 426/427 — 'REQ-009 DRIFT-07: PR must name an active slice' fails.",
+  "concerns": []
+}
