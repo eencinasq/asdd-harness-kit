@@ -112,3 +112,29 @@ test('security-review REQ-002: the prompt builder names checklists, rules and th
 	assert.match(prompt, /needs_validation/);
 	assert.match(prompt, /core — Core principles and workflow/);
 });
+
+test('security-recon-untracked REQ-001: reconnaissance counts untracked files, never ignored ones', async () => {
+	const dir = mkdtempSync(path.join(tmpdir(), 'sec-recon-untracked-'));
+	const st = mkdtempSync(path.join(tmpdir(), 'sec-recon-untracked-state-'));
+	try {
+		writeFileSync(path.join(dir, '.gitignore'), 'generated/\n');
+		writeFileSync(path.join(dir, 'README.md'), '# app\n');
+		execFileSync('git', ['init', '-q'], { cwd: dir });
+		execFileSync('git', ['add', '-A'], { cwd: dir });
+		// Not committed, not ignored: a new HTTP handler written before the PR.
+		mkdirSync(path.join(dir, 'src/api'), { recursive: true });
+		writeFileSync(path.join(dir, 'src/api/run.js'), 'module.exports = (req, res) => res.send(req.query.x);\n');
+		// Ignored: must never count.
+		mkdirSync(path.join(dir, 'generated'), { recursive: true });
+		writeFileSync(path.join(dir, 'generated/native.c'), 'int main(void) { return 0; }\n');
+		const config = { get: () => 30 } as unknown as ConfigService<Env, true>;
+		const svc = new SecurityAuditService(new ProcessRunner(config), { repoRoot: dir, stateRoot: st });
+		const { run } = await svc.start({});
+		assert.ok(run.recon.surfaces.includes('http-server'), `surfaces: ${run.recon.surfaces.join(', ')}`);
+		assert.equal(run.recon.languages.javascript, 1);
+		assert.equal(run.recon.languages.c, undefined, 'ignored files do not count');
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+		rmSync(st, { recursive: true, force: true });
+	}
+});
