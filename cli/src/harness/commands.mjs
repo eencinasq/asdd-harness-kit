@@ -37,6 +37,10 @@ export const HARNESS_COMMANDS = {
     script: 'tracker-sync.mjs',
     help: 'plan bi-directional tracker sync from handoff+sessions [--slice <id>] [--json] [--apply]',
   },
+  intake: {
+    script: 'intake.mjs',
+    help: 'import a tracker Intent item as a slice: intake --from <file|-> --ref <url> [--accept-stale] [--dry-run] [--json]',
+  },
   'spec-source': {
     script: 'spec-source.mjs',
     help: 'experimental REQ inventory (requires capabilities.spec_as_source) [--slice <id>] [--json]',

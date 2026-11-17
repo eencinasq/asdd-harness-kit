@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-intent-intake-009",
+  "timestamp": "2026-11-17T12:12:43.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "intent-intake",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-003",
+  "scope_paths": [
+    "cli/src/harness/validators/intent-evidence.mjs",
+    "cli/src/harness/check-invariants.mjs",
+    "cli/src/harness/intake-lib.test.mjs",
+    "cli/scaffold/config/project.schema.json",
+    "cli/scaffold/config/README.md"
+  ],
+  "evidence": "RED: intake-lib.test.mjs validator test fails — validators/intent-evidence.mjs does not exist.",
+  "concerns": []
+}

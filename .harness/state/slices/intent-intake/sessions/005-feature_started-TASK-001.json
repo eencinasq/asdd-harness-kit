@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-intent-intake-005",
+  "timestamp": "2026-11-17T12:10:33.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "intent-intake",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/intake-lib.mjs",
+    "cli/src/harness/intake-lib.test.mjs"
+  ],
+  "evidence": "RED: node --test cli/src/harness/intake-lib.test.mjs fails — ERR_MODULE_NOT_FOUND intake-lib.mjs (12 intake tests written first).",
+  "concerns": []
+}

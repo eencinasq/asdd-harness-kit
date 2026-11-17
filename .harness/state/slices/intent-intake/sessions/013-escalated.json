@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-intent-intake-013",
+  "timestamp": "2026-11-17T12:15:23.782Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "intent-intake",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Command registration spans cli/, package.json and README.md by design (commands.mjs, test script, command rows); no new domain terms, no dissent.",
+  "concerns": []
+}

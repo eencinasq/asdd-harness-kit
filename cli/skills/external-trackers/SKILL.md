@@ -1,8 +1,8 @@
 ---
 name: external-trackers
 description: >-
-  Syncs a tracker pitch with the ASDD handoff. Use when an intent cites a tracker item. Do NOT use to split pitches —
-  use product-delivery.
+  Syncs a tracker pitch with the ASDD handoff and imports tracker Intent items as slices. Use when an intent cites a
+  tracker item or an engineer picks up an Intent. Do NOT use to split pitches — use product-delivery.
 metadata:
   tier: leaf
 ---
@@ -17,8 +17,9 @@ reads from or writes to a tracker.
 
 **Operational boundary:** reads tracker items (MCP or a pasted or local snapshot); writes
 `docs/pitches/<pitch-id>/handoff.yaml`, the `source` block of a slice's first session, and — only when sync is enabled —
-comments, ticks, and closes on the tracker items of this pitch. It never writes `intent.md` (that is
-`product-delivery`) and never edits the pitch text in the tracker.
+comments, ticks, and closes on the tracker items of this pitch. It never writes `intent.md` itself: `product-delivery`
+writes it from a pitch, and `asdd intake` writes it from an Intent item (Step 5). It never edits the pitch or the Intent
+text in the tracker.
 
 ## Preconditions
 
@@ -29,7 +30,8 @@ comments, ticks, and closes on the tracker items of this pitch. It never writes 
 
 ## Input / Output Contract
 
-- **Inputs:** `tracker_ref` (`string`, a tracker URL or `source_pitch_id` / `source_scope_id`, required);
+- **Inputs:** `tracker_ref` (`string`, a tracker URL or `source_pitch_id` / `source_scope_id`, or an Intent item key,
+  required);
   `asdd_event` (`enum`, one of the Status sync events below, optional — only for sync).
 - **Outputs:** `handoff` (`yaml`, the Required handoff fields below, written to `docs/pitches/<pitch-id>/handoff.yaml`);
   `session_source` (`json object`, the `source` block of the slice's `001` session); `tracker_update` (a tracker comment
@@ -93,6 +95,19 @@ comments, ticks, and closes on the tracker items of this pitch. It never writes 
 - **Assertion:** reading the item back through the MCP shows the comment or state change; `asdd tracker-sync --json`
   lists the same event set.
 
+### Step 5: Import an Intent item (engineer intake)
+
+- **Action:** for an Intent item (the PO/PM's output; format:
+  [`references/intent-format.md`](./references/intent-format.md)), read it with the tracker's read-back tool, save the
+  body verbatim to a temporary file, and run `asdd intake --from <file> --ref <item-url>` (`--dry-run --json` first to
+  see the plan). It validates the format offline, re-checks every grounding ref against the current code, writes
+  `.harness/specs/<slice_id>/intent.md`, and inits the slice in the item's `mode` with the `source` block of Step 3.
+  Stale refs stop it: ask the PO/PM to re-ground the item, or re-run with `--accept-stale` only when the human agrees
+  (the stale refs are recorded in `## Source`). Never edit the saved body to make it pass.
+- **Target:** `.harness/specs/<slice_id>/intent.md` and the new slice.
+- **Assertion:** `asdd intake` exits 0, and `asdd check` exits 0 (an in-progress slice with unresolvable grounding
+  refs reports `INTENT-EVIDENCE`).
+
 Guardrails: do not reshape (flag `PENDING_DEFINITION`); do not expand scope (ask before starting nice-to-haves); do not
 invent estimates (report progress against the appetite); a no-go is a hard boundary that needs a new pitch and bet.
 
@@ -102,12 +117,15 @@ invent estimates (report progress against the appetite); a no-go is a hard bound
    prints 11 — or the file says `status: handoff_incomplete`.
 2. After Step 3: `asdd check` exits 0.
 3. After Step 4: the MCP read-back of the item shows the update.
-4. Negative check: `git status --porcelain -- .harness/specs` lists no `intent.md` this run wrote.
+4. After Step 5: `asdd intake --from <file> --ref <url>` exits 0, `test -s .harness/specs/<slice_id>/intent.md` exits 0,
+   and the slice's `001` session has a `source.tracker_url` equal to the item URL.
+5. Negative check (outside Step 5): `git status --porcelain -- .harness/specs` lists no `intent.md` this run wrote.
 
 ## Escalation Gate
 
 HALT when a required field is missing (`handoff_incomplete`), when `betting_state` is not `bet`, or when the pitch is
-missing or incomplete: do not create a slice; ask the human. HALT before any tracker write that sync is not enabled for.
+missing or incomplete: do not create a slice; ask the human. HALT when `asdd intake` rejects an Intent item or reports
+stale refs: send the errors to the PO/PM through the tracker; do not fix the item yourself. HALT before any tracker write that sync is not enabled for.
 Escalate as Context → Options → Recommendation → Decision Needed.
 
 ## Handoff & Convergence
@@ -115,3 +133,5 @@ Escalate as Context → Options → Recommendation → Decision Needed.
 - **handoff → `product-delivery`:** when `handoff.yaml` is complete and `betting_state` is `bet`; passes `handoff` as the
   `pitch` input.
 - **redirect → `shape-up`:** when the tracker pitch is not bet or is missing an ingredient.
+- **intake → the slice's first phase:** after Step 5, a `lite` or `hotfix` slice continues with `asdd-lite-agent`; a
+  `full` slice with `asdd-discovery-agent` reading the imported `intent.md`.
