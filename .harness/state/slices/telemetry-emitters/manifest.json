@@ -1,14 +1,14 @@
 {
   "schema_version": "3.0",
   "slice_id": "telemetry-emitters",
-  "phase": "task_planning",
+  "phase": "implementation",
   "status": "in_progress",
   "mode": "full",
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:17.015Z",
-  "updated_at": "2026-11-17T01:32:03.118Z",
+  "updated_at": "2026-11-17T01:45:43.704Z",
   "paths": {
     "specs": ".harness/specs/telemetry-emitters",
     "tasks": ".harness/specs/telemetry-emitters/tasks.md",
@@ -52,6 +52,19 @@
         "D-1: cli/src/uninstall.mjs (KIT_HOOK, KIT_IGNORES) must change or cli/test/install-lifecycle.test.mjs:123-150 fails; outside Mapped files, PO widening needed before Task Planning",
         "D-2: ACT-002 resolution narrows REQ-007 'cursor otherwise' to 'cli' for non-Cursor-shaped payloads; needs REQ-007 errata or TL acknowledgement",
         "D-4: generated copies not named in intent (vendored command-gate/sync-state copies, .harness/config/versions.json) need PO confirmation as generated-only",
+        "GOV-001: relayed PO/TL decisions still lack a human-authored override session"
+      ]
+    },
+    "task_planning": {
+      "status": "WARN",
+      "by": "asdd-task-planning-agent",
+      "at": "2026-11-17T07:30:00Z",
+      "evidence": "Task Planning Readiness Gate PASS (QG-TPL-01): task planning confidence 0.85 >= 0.85, design.md v1.0.0 READY. Artifacts: .harness/specs/telemetry-emitters/tasks.md v1.0.0 (14 tasks, 11 waves) and .harness/features/telemetry-emitters.features.json (14 features, all not_started, owner claude, non-empty scope_paths, same-wave scopes disjoint). All 25 REQs covered (Requirements Coverage table). REQ-012 AR-2 chain: TASK-004 library -> TASK-005 command gate -> TASK-006 Verify-on-Stop -> TASK-007 validator + check-invariants wiring -> TASK-008 sync -> TASK-009 runtime template; fixture capture TASK-001 (Claude, live in this runtime) and TASK-002 (Cursor, human-dependent, D-3 outcome ship|hookless) precede the payload parsers TASK-010/TASK-012. Design section 9 fail-open/fail-closed proofs mapped to tasks (gate crash still denies + ERROR span, verdict byte-identity x 4 states x load failure, Verify-on-Stop unchanged, sync byte-identity, check exit unchanged, observe always allows, installed hook fail-open). Every behavioral task is RED first; the implementation agent records RED in the feature_started evidence (mutation RED for proof tests). Registration (AR-5) is one final task TASK-014 including uninstall.mjs, hooks, scaffold, README, package.json test entries, commands.mjs append-only, kit vendor/versions/self, and the MCP build check with Node 24.22.3. Working assumptions applied, not yet human-confirmed (checkpoint b): D-1 uninstall.mjs in scope, D-2 runtime cli for direct gate calls, D-4 generated-only copies; D-3 handled by a hookless default in TASK-010 and a conditional TASK-012. Uncertainty factors (QG-DEC-10): (1) Cursor fixtures need the human (D-3); (2) npm test runs kit vendor --check and kit self --check, so REQ-012 per-wave green forces kit vendor in TASK-005/008/011 and kit self in TASK-009, not only in landing R; (3) TASK-014 exceeds the 3-file task limit by AR-5/REQ-024 design; (4) D-1, D-2, D-4 and GOV-001 unconfirmed; (5) the live Claude capture may need a session restart for the temporary hook. Knowledge: asdd knowledge search found no scope collision; other in_progress slices (cost-metrics, ui-gate-decisions, ui-insights) have no non-passing feature scopes. Codegraph: no .codegraph index in this repo, skipped. Next: human checkpoint b (GOV-001 override session acknowledging D-1, D-2, D-4, and the per-wave generator runs), then @asdd-implementation-agent starting with Wave 0.",
+      "concerns": [
+        "D-1: cli/src/uninstall.mjs placed in TASK-014 as a working assumption; needs human widening of Mapped files at checkpoint b",
+        "D-2: TASK-005 labels direct CLI gate calls runtime cli (ACT-002); REQ-007 errata or TL acknowledgement pending",
+        "D-3: TASK-002 Cursor fixture capture needs the human; recommendation ship only with a live-capture fixture, else Cursor is hookless",
+        "D-4: generated-only copies (tools/*/src/harness/*, cli/versions.json, .agents/agents/_runtime-template.md, .harness/state/telemetry/*, .harness/config/versions.json) are regenerated per wave (TASK-005/008/009/011) to keep npm test green, and again in TASK-014; human confirmation needed",
         "GOV-001: relayed PO/TL decisions still lack a human-authored override session"
       ]
     }
@@ -123,6 +136,13 @@
       "event": "phase_completed",
       "phase": "design",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T07:30:00Z",
+      "agent": "asdd-task-planning-agent",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
     }
   ],
   "contributors": [
@@ -132,6 +152,7 @@
     "asdd-spec-agent",
     "asdd-validation-agent",
     "asdd-domain-agent",
-    "asdd-design-agent"
+    "asdd-design-agent",
+    "asdd-task-planning-agent"
   ]
 }
