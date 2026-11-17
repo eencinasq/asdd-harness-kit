@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "po-readonly-gate",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:42:17.000Z",
+  "session_id": "sess-po-readonly-gate-014",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: restrict an agent at every layer it can act through — tool list (Write/Edit) and shell (command gate allowlist)."
+}

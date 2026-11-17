@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "po-readonly-gate",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:39:41.000Z",
+  "session_id": "sess-po-readonly-gate-005",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/command-gate.mjs",
+    "cli/src/harness/command-gate.test.mjs"
+  ],
+  "evidence": "RED: the 3 po-readonly-gate tests fail (isReadonlyMode/readonlyVerdict not exported)."
+}

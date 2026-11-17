@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-po-readonly-gate-009",
+  "timestamp": "2026-11-17T12:42:17.340Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "po-readonly-gate",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Gate code lives in cli/, the PO instructions in docs/PLAYBOOK.md; no new domain terms, no dissent.",
+  "concerns": []
+}

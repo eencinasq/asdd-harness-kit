@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "po-readonly-gate",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:41:31.000Z",
+  "session_id": "sess-po-readonly-gate-007",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/agents/asdd-shaping-agent.md",
+    "docs/PLAYBOOK.md",
+    "cli/runtimes/claude/README.md"
+  ],
+  "evidence": "RED: no HARNESS_GATE_MODE=readonly in the shaping agent, Play O or the Claude runtime README (Play O still states the gap)."
+}
