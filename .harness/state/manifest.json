@@ -506,6 +506,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/drift-test-env/manifest.json",
       "features": ".harness/features/drift-test-env.features.json"
+    },
+    {
+      "slice_id": "claude-hook-cwd",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/claude-hook-cwd/manifest.json",
+      "features": ".harness/features/claude-hook-cwd.features.json"
     }
   ]
 }
