@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "slice_id": "telemetry-emitters",
-  "phase": "implementation",
+  "phase": "knowledge",
   "status": "in_progress",
   "mode": "full",
   "escalation_signals": [
@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:17.015Z",
-  "updated_at": "2026-11-17T14:53:24.150Z",
+  "updated_at": "2026-11-17T14:54:52.707Z",
   "paths": {
     "specs": ".harness/specs/telemetry-emitters",
     "tasks": ".harness/specs/telemetry-emitters/tasks.md",
@@ -77,14 +77,11 @@
       "acknowledged_by": "eencinas"
     },
     "qa": {
-      "status": "BLOCK",
+      "status": "PASS",
       "by": "eencinas",
-      "at": "2026-11-17T14:44:12.000Z",
-      "evidence": "Spec Coverage Gate re-run at c289a66 vs requirements 1.1.1: BLOCK (QG-SPEC-06), EARS 128/129, MUST 25/25, pass rate 100% (npm test exit 0, 374/374 + install.sh, lifecycle.sh, vendor/self --check; focused slice files 185/185), spec coverage 24/25, drift --requirements clean, no domain-placement finding. UNCOV-001 closed (new REQ-002 c7 tests pass; QA scratch probe: throws/deleted lib -> claude/cursor exit 0, normal answer, no stderr, no span). UNCOV-002 open, confirmed by CLI probe. Redirect to asdd-implementation-agent (reopen TASK-013) or errata 1.1.2. Report: .harness/specs/telemetry-emitters/spec-coverage-report.md",
-      "concerns": [
-        "UNCOV-002 REQ-021 c4 (1.1.1): asdd profile shows cursor 'not observed' when .cursor/hooks.json has a beforeReadFile observe entry (harness-profile.mjs:142-147; pinned by harness-profile.test.mjs:332); spec requires 'unknown'",
-        "QA-F-008 design §6 line 245 / §12 line 802 lack a D-3 superseded note (root of UNCOV-002)"
-      ]
+      "at": "2026-11-17T14:54:52.000Z",
+      "evidence": "Spec Coverage Gate run 3 at 21ea57e vs requirements 1.1.1: PASSED. Pass rate 100% (npm test exit 0, 374/374 + install.sh, lifecycle.sh, vendor/self --check, lints; focused slice files 185/185); MUST 25/25; EARS 129/129; spec coverage 24/25 (96%, no WARN); drift --requirements clean; no domain-placement finding. UNCOV-002 closed (CLI probe: hand-added cursor beforeReadFile observe entry -> cursor column unknown; renamed REQ-021 c4 test passes); QA-F-008 closed (design.md:253, :805 superseded notes). Open by TL decision (session 075): QA-F-003 + KPI-1 follow-up slice; QA-F-004..006 skipped. Handoff: asdd-knowledge-agent. Report: .harness/specs/telemetry-emitters/spec-coverage-report.md",
+      "concerns": []
     }
   },
   "active_features": [],
@@ -609,6 +606,14 @@
       "event": "feature_completed",
       "phase": "implementation",
       "feature_id": "TASK-013"
+    },
+    {
+      "timestamp": "2026-11-17T14:54:52.000Z",
+      "agent": "asdd-qa-agent",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
     }
   ],
   "contributors": [

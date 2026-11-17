@@ -2,19 +2,132 @@
 
 **Author:** asdd-qa-agent
 **Model/Tool:** claude-opus-5-5 (Claude Code sub-agent)
-**Date:** 2026-11-17 (run 2; run 1 is kept below as history)
+**Date:** 2026-11-17 (run 3; runs 1 and 2 are kept below as history)
 **Inputs:**
-- `requirements.md` 1.1.1 (errata for D-2/D-3, commit `36296f0`; REQ-001…REQ-025, all MUST);
-- `design.md` (READY, with superseded notes);
+- `requirements.md` 1.1.1 (REQ-001…REQ-025, all MUST);
+- `design.md` (READY, with D-3 superseded notes including §6/§12 from UNCOV-002);
 - `tasks.md`;
-- features file (14/14 `passing`; TASK-010 reopened and passing again, TASK-012 re-verified);
-- sessions 001…075 (075: TL decisions at checkpoint (c));
+- features file (14/14 `passing`; TASK-013 reopened and passing again, sessions 077/078);
+- sessions 001…078;
 - `docs/architecture/domain-model.md`;
-- working tree at HEAD `c289a66` (clean).
+- working tree at HEAD `21ea57e` (clean).
 
-**Confidence:** 0.90
+**Confidence:** 0.92
 
 ## Gate Decision
+PASSED
+
+No BLOCK criterion of `QG-SPEC-03`…`QG-SPEC-06` applies:
+- tests ran and pass 100%;
+- MUST coverage is 25/25;
+- EARS coverage is 129/129.
+
+No WARN applies either:
+- `QG-SPEC-07`: there are no SHOULD requirements;
+- `QG-SPEC-08`: spec coverage is 24/25 = 96%, which is ≥ 95%.
+
+`QG-DRIFT-03` is clean, and no HIGH domain-placement finding is open (`QG-DOM-06`). UNCOV-001 (run 2) and UNCOV-002 (this
+run) are closed.
+
+## Run 3 (HEAD `21ea57e`, requirements 1.1.1)
+
+### Summary
+
+| Metric | Target | Actual | Status |
+|---|---|---|---|
+| Spec-related test pass rate | 100% | 100%. `npm test` exit 0 with 374/374 node tests. `vendor --check`, `self --check`, `install.sh`, `lifecycle.sh`, `skills-lint` and `agents-lint` all exit 0. The focused slice files on their own: 185/185. | PASS |
+| MUST requirement coverage | 100% | 25/25 | PASS |
+| EARS criteria coverage (MUST) | 100% | 129/129 | PASS |
+| SHOULD / COULD | — | none in the spec | PASS / INFO |
+| Spec coverage (happy + error path) | ≥ 95% | 24/25 (96%; REQ-012 is checked from artifacts, see the run-1 note) | PASS |
+| `QG-DRIFT-03` | 0 | 0. `asdd drift --slice telemetry-emitters --requirements` returned `PASS spec drift — clean; files 49`. | PASS |
+| Domain placement | no HIGH | no finding. The change is confined to the delivery-side reader `harness-profile.mjs`, with no new import. | PASS |
+
+Latency in this run:
+- REQ-003 emit: p99 0.458 ms.
+- REQ-008 / NFR-001 gate added time: p99 0.348 ms.
+- REQ-018 handler classes: passed.
+
+### UNCOV-002 re-verification (REQ-021 c4, 1.1.1): CLOSED
+
+- **Code.** `readObserveHooks` (`cli/src/harness/harness-profile.mjs`) now returns `cursor: false` unconditionally.
+  `claude` is still detected from the `PostToolUse` observe entry.
+- **Test.** `harness-profile.test.mjs` "REQ-021 c4 (1.1.1, D-3): a hand-added cursor observe entry still shows cursor as
+  unknown…" (#88 in `npm test`) asserts `impl.md  unknown  unknown  unknown` and that no `impl.md` row before the
+  legend shows `not observed` for cursor. The default-project case stays pinned by the "REQ-021: expected steering per
+  phase…" test. The test was RED 16/17 before the fix and GREEN 17/17 after (sessions 077/078). Both pass in this run.
+- **QA CLI probe, re-run through `node cli/bin/asdd.mjs profile --slice alpha`** on a scratch project with runtimes
+  `claude,cursor`, a Claude observe hook, and one attributed span:
+
+| `.cursor/hooks.json` | `core.md` row (claude, cursor) |
+|---|---|
+| no observe entry | `not observed`, `unknown` |
+| hand-added `beforeReadFile` → `observe cursor` | `not observed`, `unknown` |
+
+  In run 2 the second row was `not observed`, `not observed`.
+
+### QA-F-008: CLOSED
+
+`design.md:253` (§6 cell values) and `design.md:805` (§12 activation states) now carry "Superseded by D-3 (2026-11-17,
+UNCOV-002)". Both notes say `not observed` applies to `claude` only and the `cursor` column is always `unknown`. This
+matches REQ-021 c4 (1.1.1), domain-model TEL-7, and `cli/test/fixtures/telemetry/cursor/README.md:10`.
+
+### Regression check
+
+- All REQ tests mapped in run 1 and the errata re-check of run 2 pass at `21ea57e`. The full suite is 374/374, the
+  same count as run 2: the fix renamed one test and added none.
+- The fix commit touches only:
+  - `harness-profile.mjs` and `harness-profile.test.mjs`;
+  - `design.md`;
+  - slice state (features, manifest, sessions 077/078, learning summary).
+
+  No other producer or test changed.
+- The other REQ-021 criteria still pass in the profile tests:
+  - three-state legend (c8);
+  - `configured, not observed` rows, including the Cursor `alwaysApply` rule row (c6);
+  - `runtimes not configured` fallback (c3);
+  - unattributed count (c10);
+  - no `not loaded` (c9).
+
+### Uncovered Requirements
+
+None. UNCOV-001 was closed in `c289a66` and UNCOV-002 in `21ea57e`.
+
+### Findings (open after run 3)
+
+| ID | Severity | Status |
+|---|---|---|
+| QA-F-003 | MEDIUM (pre-existing) | Out of scope by TL decision (session 075): follow-up slice with KPI-1. |
+| QA-F-004…006 | LOW | Skipped by TL decision (session 075). |
+| QA-F-007 | INFO | No action needed (observe imports the lib at module load; the answer is unchanged). |
+
+No CRITICAL or HIGH finding is open. The slice has no `code-review-report.md` to carry findings from.
+
+### Recommendation
+
+PROCEED: hand off to `asdd-knowledge-agent` with this report. There is no Refactor handoff, because no CRITICAL or HIGH
+structural finding is open.
+
+No QA waiver or WARN acknowledgement is needed (`QG-GATE-04` does not apply). For the record:
+- The REQ-012 artifact-based coverage reading (run 1 note) stands.
+- Governance mode is TECH-LEAD-REVIEW, so the TL reviews the slice as usual.
+
+### Tools and commands used (run 3)
+
+- `npm test`: exit 0, 374/374, plus the shell and lint stages.
+- `node --test` on the 8 slice-related files: 185/185.
+- `HARNESS_DRIFT_BASE=c337df7 asdd drift --slice telemetry-emitters --requirements`: clean.
+- `git show 21ea57e`.
+- CLI probe: `asdd profile --slice alpha` with and without a hand-added Cursor observe entry.
+- `grep` of the `design.md` superseded notes.
+
+Codegraph was not used: the repository has no `.codegraph/` index.
+
+---
+
+## History: run 2 (HEAD `c289a66`, requirements 1.1.1)
+
+### Gate decision (run 2)
 BLOCKED
 
 `QG-SPEC-06`: EARS criteria coverage for MUST requirements is 128/129, below 100%.
@@ -26,7 +139,6 @@ BLOCKED
 
 No other BLOCK or WARN criterion applies. Every test passes. No domain-placement finding is open.
 
-## Run 2 (HEAD `c289a66`, requirements 1.1.1)
 
 ### Summary
 
@@ -139,7 +251,6 @@ blocks this gate: QA-F-003 and QA-F-004…006 are dispositioned by TL in session
 
 Codegraph was not used: the repository has no `.codegraph/` index.
 
----
 
 ## History: run 1 (HEAD `0c7ce84`, requirements 1.1.0)
 
