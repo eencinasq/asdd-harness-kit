@@ -46,6 +46,8 @@ What it is **not**:
 | Weekly, or before a release                                    | Tech Lead      | [Health check](#play-j--weekly-health-check)                 |
 | The same failure keeps coming back                             | Tech Lead      | [Learning loop](#play-k--the-same-failure-keeps-coming-back) |
 | You look after several repositories                            | Tech Lead      | [Portfolio](#play-l--several-repositories)                   |
+| A gate is waiting for your decision                            | Tech Lead      | [Decide a gate](#play-m--decide-a-gate-from-the-ui)          |
+| A skill or agent guide must change                             | Maintainer, TL | [Change a skill](#play-n--change-a-skill-safely)             |
 
 **Skip it** for throwaway spikes and experiments outside the product code. **Do not bypass it** by editing generated
 files (`manifest.json`, `registry.json`, `PROGRESS.md`) or session logs by hand: they are regenerated or append-only.
@@ -232,6 +234,27 @@ side by side, use `repos_overview` on the spec-drift server.
 
 ---
 
+### Play M — Decide a gate from the UI
+
+```bash
+asdd ui            # http://127.0.0.1:7474/ — Gates view
+```
+
+The Gates view lists phase gates in `WARN` (completed with concerns or a dissent) that no Tech Lead has acknowledged.
+Read the evidence and concerns, write a note, and decide: the page runs `asdd gate-decide`, which appends an `override`
+session with your name as `decided_by` and syncs. Without the UI: `asdd gate-decide <slice> --phase <phase> --note "…"`.
+The next phase can start once its previous gate is `PASS` or an acknowledged `WARN`.
+
+### Play N — Change a skill safely
+
+1. Before editing `cli/skills/<name>/SKILL.md`, make sure the skill has fixtures under `cli/eval/skills/<name>/`
+   (format: [`cli/eval/skills/README.md`](../cli/eval/skills/README.md)); add one for the behavior you are changing.
+2. After the edit: `asdd skill-eval --skill <name> --baseline HEAD`. A `regressed` fixture means the change broke it.
+3. If the change comes from a steering proposal (`add-guide` or `tighten-guide`), save the run and cite it before the
+   Tech Lead accepts it:
+   `asdd skill-eval --skill <name> --json > eval-results/SP-007.json` and
+   `eval: asdd skill-eval --skill <name> --json => eval-results/SP-007.json` in the proposal (`QG-LEARN-10`).
+
 ## 5. Working well with it
 
 - **Small slices.** Lite first; escalate on evidence. A slice that needs a page to explain is a scope split.
@@ -270,6 +293,8 @@ side by side, use `repos_overview` on the spec-drift server.
 | Search specs and features          | `asdd knowledge search "<query>"`                      |
 | Trace a requirement                | `asdd knowledge trace req:<slice>:REQ-001`             |
 | Several repositories               | `asdd portfolio`                                       |
+| Decide a pending gate              | `asdd ui` (Gates) · `asdd gate-decide <slice> --phase <p> --note "…"` |
+| Check a skill change               | `asdd skill-eval --skill <name> --baseline HEAD`       |
 | Every command                      | `asdd help`                                            |
 
 Something not working? See the [README](../README.md) (install, troubleshooting in each section) and `asdd doctor`.

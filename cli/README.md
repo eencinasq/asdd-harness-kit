@@ -61,6 +61,14 @@ Roadmap P0–P4 shipped these session-facing commands (see [`docs/ASDD-ROADMAP.m
 | `asdd tracker-sync [--apply]` | Plan tracker sync from handoff + sessions; `--apply` = local receipt |
 | `asdd spec-source` | Opt-in MUST REQ inventory (`capabilities.spec_as_source`) |
 
+Roadmap P5 added:
+
+| Command | Purpose |
+|---|---|
+| `asdd ui [--port <n>]` | Local page on 127.0.0.1 (default port 7474): slices, pipeline, drift, learning, knowledge, pending gates; read-only except deciding a gate |
+| `asdd gate-decide <slice> --phase <p> --note "…"` | Tech Lead acknowledges a `WARN` gate: appends an `override` session (`decided_by` from `HARNESS_AUTHOR` or git) and syncs |
+| `asdd skill-eval [--skill <name>] [--baseline <ref>] [--json]` | Run `cli/eval/skills/` fixtures; `--baseline` fails on a regression against the skill at that ref (QG-LEARN-10 evidence) |
+
 Also: `check`, `verify`, `gate`, `drift`, `check-config`, `skills-index`, `sync`, `repair`,
 `knowledge sync|search|trace|slice|status|patterns`, `learn`, `audit`, `triage`.
 

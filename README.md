@@ -326,6 +326,21 @@ Session close:
 4. The `PROGRESS.md` row matches the per-slice manifest.
 5. Lite slices closing with open escalation signals are rejected — escalate first (`asdd slice escalate`).
 
+### Local UI (`asdd ui`)
+
+`asdd ui [--port <n>]` serves a local page on `http://127.0.0.1:7474/` (Node built-ins only, bound to loopback) for people who do not live in the IDE. Its views read the files the CLI already writes, and refresh when `.harness/state/` changes:
+
+| View | Shows |
+|---|---|
+| Slices | `registry.json`, pipeline metrics, `PROGRESS.md` |
+| Pipeline | The `asdd status --html` page |
+| Drift | `DRIFT-*` findings and drift level (set `HARNESS_DRIFT_BASE=<ref>` when the branch is far ahead of the base) |
+| Learning | Patterns and the open ones |
+| Knowledge | Search over the knowledge index |
+| Gates | Phase gates in `WARN` that no Tech Lead has acknowledged |
+
+Everything is read-only except one action: deciding a pending gate. The page posts to `/api/gates/decide`, which runs `asdd gate-decide <slice> --phase <phase> --note "…"`; that command appends an `override` session with `decided_by` from `HARNESS_AUTHOR` or `git config user.name`, then syncs. The server never writes sessions itself, refuses the request (403) unless `Host` is the loopback address and `Origin` (or `Referer`) is the page itself, and refuses a slice or phase with no pending `WARN` gate. The same command works from a terminal.
+
 ### Project binding
 
 `quality-gates.project.md` is a stub until Discovery. An unfilled test command, failure-log path, or `Active findings: unfilled` blocks the gate that needs it. The agent does not invent a substitute. Example finding rows are inactive. Set `Active findings: none` or replace them with this project's rows.
@@ -495,15 +510,15 @@ All three share one library (`drift-lib.mjs`, `audit-lib.mjs` in `cli/src/harnes
 | ID | When | Detects | Result |
 |---|---|---|---|
 | `DRIFT-01` | A slice is editing | A changed product file not covered by the slice's mapped files | FAIL |
-| `DRIFT-02` | Always | A `passing` feature whose `scope_paths` files changed after its verification (`evidence_hash`) | FAIL; the feature returns to `in_progress` |
+| `DRIFT-02` | A slice is `in_progress` | A `passing` feature whose `scope_paths` files changed after its verification (`evidence_hash`) | FAIL; the feature returns to `in_progress` |
 | `DRIFT-03` | Phase `qa` or later | A MUST requirement with no feature listing it in `req_ids` | FAIL |
 | `DRIFT-04` | Phase `qa` or later | A requirement ID that no test file mentions | WARN |
 | `DRIFT-05` | Always | A `passing` feature's `scope_paths` entry that does not exist (a glob passes when one file matches) | FAIL |
 | `DRIFT-06` | Always | A feature without `scope_paths`, or `passing` without `evidence` | WARN; FAIL with `drift.contract: "fail"` in `project.json` |
 | `DRIFT-07` | CI on a pull request | Product files changed, but the PR names no slice (branch `slice/<id>/…` or `Slice: <id>` in the body) | FAIL |
 
-- **Mapped files** are the paths named in `intent.md`, `design.md`, `tasks.md`, or `spec.md`, the `scope_paths` of in-progress features, and test files (per the `Test file globs` binding) that name a REQ of the slice. Harness records and files the installer manages are exempt, so a kit upgrade is not drift.
-- **`DRIFT-02`** recomputes the hash of the files `scope_paths` cover and compares it with `evidence_hash`, recorded by `asdd sync` when the feature became `passing`. No commit is needed, and it works without git.
+- **Mapped files** are the paths named in `intent.md`, `design.md`, `tasks.md`, or `spec.md`, the `scope_paths` of in-progress features, and test files (per the `Test file globs` binding) that name a REQ of the slice. Harness records and files the installer manages are exempt, so a kit upgrade is not drift. So are the append-only logs `docs/agent-failure-log.md` and `docs/dissent-log.md`, which any slice writes at session close; every other file under `docs/` must be mapped.
+- **`DRIFT-02`** recomputes the hash of the files `scope_paths` cover and compares it with `evidence_hash`, recorded by `asdd sync` when the feature became `passing`. No commit is needed, and it works without git. Features of `DONE`, `PARKED`, and `ABANDONED` slices keep their historical evidence: a later slice that edits a shared file (`package.json`, `README.md`, `commands.mjs`) does not reopen them. `asdd slice amend` makes a slice `in_progress` again, and its stale features reopen then.
 - **`DRIFT-04`** matches requirement IDs as literal tokens (`REQ-001`) in test names or comments, so tagging tests with the REQ they verify is enforced.
 - **Spec compliance** = MUST requirements with an implementing feature *and* a test mention, divided by all MUST requirements in scope. **Drift level** is `blocking` (any FAIL), `warning` (only WARNs), or `clean`. Any numeric cutoff belongs in `quality-gates.md` as an EARS rule — never in CI YAML, the server, or the dashboard.
 - The check never judges whether code *satisfies* an EARS criterion; that is semantic and belongs to the auditor.
@@ -645,12 +660,15 @@ applied_commit: 3f2c1ab     # must change the control file (checked with git)
 | A proposal is malformed (unknown pattern, missing control file, unfilled success, decided without `decided_by`, applied without `applied_commit`) | FAIL |
 | `applied_commit` is not a commit, or does not change the `control` file | FAIL |
 | A slice completes Knowledge while a pattern it contributed to is `open` | FAIL |
+| A proposal with `change: add-guide` or `tighten-guide` is `accepted` or `applied` without an `eval:` result from `asdd skill-eval --json` showing `ok: true` (`QG-LEARN-10`) | FAIL |
 
 **In review.** `audit_diff` returns a `learning` block — open patterns, marked `relevant` when they are about a changed area or a linked slice — and the `pr-review` prompt turns relevant ones into advisory comments. It never blocks a PR.
 
 **Back to the kit.** `asdd learn --export --out lessons.md` writes the verified and ineffective proposals on kit-owned controls, with generic fields only (no examples, slice names, proposal text, or commands), and prints the `gh issue create` command to send it to the kit. Nothing is sent automatically.
 
-Rules: `QG-LEARN-01`…`09` in [`quality-gates.md`](.harness/steering/quality-gates.md). See open patterns with `asdd status`, `asdd learn`, `asdd knowledge patterns`, or the `knowledge_patterns` MCP tool.
+**Evaluating skills.** `asdd skill-eval` runs deterministic fixtures per skill (`cli/eval/skills/<skill>/*.json`: shell probes plus assertions on exit codes, stdout, files, and the skill text; no LLM judge). `--baseline <ref>` re-scores each fixture against the skill body at that git ref and exits non-zero on a regression. A guide-changing proposal records its run in frontmatter, `eval: asdd skill-eval --skill <name> --json => <result-ref>`, before the Tech Lead accepts it. Fixture format: [`cli/eval/skills/README.md`](cli/eval/skills/README.md).
+
+Rules: `QG-LEARN-01`…`10` in [`quality-gates.md`](.harness/steering/quality-gates.md) and [`quality-gates.learn.md`](.harness/steering/quality-gates.learn.md). See open patterns with `asdd status`, `asdd learn`, `asdd knowledge patterns`, or the `knowledge_patterns` MCP tool.
 
 ---
 
