@@ -20,6 +20,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read|Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node cli/bin/asdd.mjs observe claude >/dev/null 2>&1; exit 0",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

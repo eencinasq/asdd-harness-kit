@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-009",
+  "timestamp": "2026-11-17T06:30:00Z",
+  "agent": "asdd-design-agent",
+  "slice_id": "telemetry-emitters",
+  "event_type": "phase_completed",
+  "phase": "design",
+  "mode": "full",
+  "scope_paths": [
+    ".harness/specs/telemetry-emitters/design.md"
+  ],
+  "evidence": "Design gate QG-DES-01 criteria met: design confidence 0.86 >= 0.85, requirements 1.1.0 READY, validation v1.1 PASSED. Artifact .harness/specs/telemetry-emitters/design.md v1.0.0 (Status READY): 14 sections; all 25 REQs traced to component and test (section 10); 6 Mermaid sequence diagrams (structurally checked; no offline mermaid parser available); ADR-001..ADR-007 inline per structure.md:56 (ADR index: decisions live in slice designs). Decisions: telemetry-lib.mjs domain service (dependency-free) + separate telemetry-observe.mjs adapter (ADR-003); guarded dynamic import after producer output (ADR-001); per-runtime native load hooks with fail-open shell wrapper owning the reply (ADR-002); parser reads only fixture-proven payload keys, fixture capture is task T0 (ADR-004); phase windows by disjoint segments, diverge from pipeline-metrics.mjs:29-44 (ADR-005); validator WARN-only and excluded from learning signals, AR-5 registration WARN TEL-W3 (ADR-006, OI-7). OIs: OI-1 HARNESS_SLICE_ID; OI-2 no H-* evaluation, hits=0, no weight constants; OI-3 omit + not_measured list; OI-4 attributes verdict, outcome, runtime_session_id, agent_id; OI-5 tail-relative numbering stated in the WARN; OI-6 claude no stdout exit 0, cursor {\"permission\":\"allow\"} exit 0, wrapper-owned. Low findings: AMB-009 label override; ACT-002 runtime cli for non-Cursor-shaped payloads; NFR-001 added-time p99<=50 ms test; AMB-010 baseline; TRC-006 fifth latency class. R-1: MCP rebuild needed for build health only, verification steps listed. Mapped files narrowed (section 13). Uncertainty factors (QG-DEC-10): (1) A-01/A-02 payload shapes and hook exit semantics unverified (fixtures first); (2) cli/src/uninstall.mjs must change but is outside Mapped files (D-1); (3) GOV-001 human-authored TL session still missing. Codegraph: no .codegraph index; code anchors checked by targeted reads. Next: TL override session acknowledging concerns, then @asdd-task-planning-agent.",
+  "concerns": [
+    "D-1: cli/src/uninstall.mjs (KIT_HOOK, KIT_IGNORES) must change or cli/test/install-lifecycle.test.mjs:123-150 fails; outside Mapped files, PO widening needed before Task Planning",
+    "D-2: ACT-002 resolution narrows REQ-007 'cursor otherwise' to 'cli' for non-Cursor-shaped payloads; needs REQ-007 errata or TL acknowledgement",
+    "D-4: generated copies not named in intent (vendored command-gate/sync-state copies, .harness/config/versions.json) need PO confirmation as generated-only",
+    "GOV-001: relayed PO/TL decisions still lack a human-authored override session"
+  ]
+}

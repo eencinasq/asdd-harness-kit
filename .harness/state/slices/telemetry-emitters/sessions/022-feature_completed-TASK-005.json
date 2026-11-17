@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [
+    "Load-time crash of command-gate.mjs (syntax error) exits 1 with empty stdout; Claude Code treats non-2 exit as non-blocking, so the Bash call proceeds (pre-existing, not covered by REQ-008 runtime-crash path). Cursor hooks.json has failClosed:true.",
+    ".harness/state/telemetry/spans.jsonl is now created by the live gate hook in this repo and is not gitignored until TASK-014."
+  ],
+  "phase": "implementation",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/command-gate.mjs",
+    "cli/src/harness/command-gate.test.mjs",
+    "tools/jev-gate/src/harness/command-gate.mjs",
+    "tools/jev-gate/src/harness/telemetry-lib.mjs"
+  ],
+  "session_id": "sess-telemetry-emitters-022",
+  "timestamp": "2026-11-17T02:26:52.039Z",
+  "feature_id": "TASK-005",
+  "evidence": "TASK-005 passing (REQ-007, REQ-008, REQ-002, REQ-004, REQ-005). GREEN: node --test cli/src/harness/command-gate.test.mjs exit 0, 15/15 (3 runs). Proof (a) fail-closed and (b) byte-identical verdict green; (c) no span from checkCommandSafety; (d) NFR-001 added-time p99 0.23-0.36 ms over 550 samples. kit vendor --check exit 0; npm test exit 0 (226/226); HARNESS_DRIFT_BASE=c337df7 check --live exit 0. jev-gate build + test (Node 24.22.3) exit 0, 14/14. Added commandLabel, gateRuntime, runHook seam ({readInput, write, safety, root, state}), runHookCli(deps); emit via literal guarded import after the verdict write; ERROR span after the deny write. Implementation confidence 0.85; uncertainty factors: runHook seam adds root/state beyond the design triple (test isolation, error-path context); ERROR span carries verdict deny; attribute() reads registry on every gate call (inside the measured added segment, p99 < 1 ms)."
+}

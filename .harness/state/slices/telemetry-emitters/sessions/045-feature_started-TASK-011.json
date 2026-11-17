@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-045",
+  "timestamp": "2026-11-17T12:12:01.304Z",
+  "phase": "implementation",
+  "feature_id": "TASK-011",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/telemetry-lib.mjs",
+    "cli/src/harness/telemetry-lib.test.mjs",
+    "tools/jev-gate/src/harness/telemetry-lib.mjs",
+    "tools/knowledge/src/harness/telemetry-lib.mjs",
+    "tools/spec-drift/src/harness/telemetry-lib.mjs"
+  ],
+  "evidence": "TASK-011 (REQ-020, REQ-021) RED: 18 new profile-model cases in cli/src/harness/telemetry-lib.test.mjs (segment windows over an amended unsorted slice, open phase, nearest-rank p50/p95 fixture, surface scores incl. float trap and share unknown, activation states claude/cursor/hookless and missing ids, legend, AR-10 topology-only streams + Proxy no-read, never not loaded, REQ-022 no fs/clock calls, OI-2 no H-* weights) -> node --test cli/src/harness/telemetry-lib.test.mjs: # tests 70 # pass 53 # fail 17 (exports phaseMarkers/percentile/surfaceScores/activationRows/profileModel/ACTIVATION_LEGEND absent; the OI-2 source guard already passes)."
+}

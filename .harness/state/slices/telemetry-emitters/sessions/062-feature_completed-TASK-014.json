@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [
+    "Design 8(c)/12/13 still describe Cursor beforeReadFile wiring; implemented per D-3 = hookless (session 054), so no Cursor load hook ships (design text not changed by implementation)."
+  ],
+  "session_id": "sess-telemetry-emitters-062",
+  "timestamp": "2026-11-17T12:51:01.106Z",
+  "phase": "implementation",
+  "feature_id": "TASK-014",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/commands.mjs",
+    "package.json",
+    "README.md",
+    ".gitignore",
+    "cli/src/install/phases.mjs",
+    "cli/src/install/runtimes.mjs",
+    "cli/src/install/index.mjs",
+    "cli/src/uninstall.mjs",
+    "cli/runtimes/cursor/hooks.json",
+    "cli/runtimes/claude/README.md",
+    ".claude/settings.json",
+    ".cursor/hooks.json",
+    "cli/scaffold/state/telemetry/",
+    "cli/test/install.sh",
+    ".harness/state/telemetry/",
+    "cli/versions.json",
+    ".harness/config/versions.json",
+    "tools/jev-gate/src/harness/",
+    "tools/knowledge/src/harness/",
+    "tools/spec-drift/src/harness/"
+  ],
+  "evidence": "AR-5 landing on D-3 = hookless (session 054): only Claude Code gets the load hook (PostToolUse matcher Read|Skill, timeout 10, no failClosed), fail-open wrapper; no Cursor beforeReadFile entry in cli/runtimes/cursor/hooks.json, .cursor/hooks.json, or the installer. D-1: uninstall.mjs KIT_HOOK matches the observe commands, KIT_IGNORES gains the two telemetry lines. RED: session 061 (bash cli/test/install.sh exit 1: npm package misses cli/scaffold/state/telemetry/telemetry.schema.json) and node --test cli/test/install-lifecycle.test.mjs before the uninstall change: pass 7 fail 1 (.claude/settings.json should be gone). GREEN: bash cli/test/install.sh -> OK asdd install smoke test, exit 0; node --test cli/test/install-lifecycle.test.mjs -> pass 8 fail 0; node cli/bin/asdd.mjs kit vendor --check -> OK, exit 0; node cli/bin/asdd.mjs kit self --check -> OK, exit 0; npm test -> exit 0 (node --test: tests 372 pass 372 fail 0, incl. telemetry-lib, telemetry-observe, harness-profile, validators/telemetry, verify-on-stop test files); npm pack --dry-run 2>&1 | grep -c spans.jsonl | grep -qx 0 -> exit 0 (ships cli/scaffold/state/telemetry/{README.md,telemetry.schema.json}, no spans.jsonl/profiling.json); node cli/bin/asdd.mjs profile --slice telemetry-emitters -> exit 0; echo {} | node cli/bin/asdd.mjs observe claude -> no output, exit 0; HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live -> PASS harness invariants, exit 0, TEL-W3 WARNs gone; HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs drift --slice telemetry-emitters -> PASS, exit 0. MCP build check (R-1, Node 24.22.3): pnpm install --frozen-lockfile/build/test exit 0 for jev-gate (14/14), knowledge (8/8), spec-drift (226/226); grep -c telemetry-lib dist/server/main.js: jev-gate 2, knowledge 0, spec-drift 0. Live hook: the exact .claude/settings.json command piped the committed posttooluse-read-steering fixture (${REPO} substituted) -> exit 0, no output, one tool span; a real Read afterwards recorded a tool span and nothing reached the model. Schema sha256 14ffba1c44513a5d32a106d3345ba6ee62361009d26f446c4c6471e9e0853a1c unchanged. Implementation confidence: 0.85. Uncertainty factors: (1) the live Claude hook relies on runtime settings reload behaviour observed in this session only; (2) knowledge/spec-drift bundles tree-shake telemetry-lib (0 refs), only jev-gate bundles it."
+}

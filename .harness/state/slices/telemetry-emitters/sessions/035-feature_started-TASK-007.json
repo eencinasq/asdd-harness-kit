@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-035",
+  "timestamp": "2026-11-17T02:49:38.364Z",
+  "phase": "implementation",
+  "feature_id": "TASK-007",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/validators/telemetry.mjs",
+    "cli/src/harness/validators/telemetry.test.mjs",
+    "cli/src/harness/check-invariants.mjs"
+  ],
+  "evidence": "Start TASK-007 (REQ-019, REQ-006, REQ-005; ADR-006, OI-5, OI-7, AMB-010). RED: new cli/src/harness/validators/telemetry.test.mjs (11 cases) written before any implementation: absent location silent (validator + no file created); TEL-W1 schema missing/unparseable; TEL-W2 per bad line (not JSON, schema, >4096 B, missing trace_source) with \"spans.jsonl line N\"; OI-5 tail-relative wording when the 500-line bound applies; bounded read of a 10 MB stream (spied fs.readSync <= TAIL_MAX_BYTES, no whole-file read); TEL-W3 (a) gitignore, (b) contract files, (c) claude PostToolUse / cursor beforeReadFile observe entry, each naming asdd install .; TEL-W3 inactive without location; REQ-006 validator writes nothing; check-invariants wiring on a harness copy with neutral validators: exit code identical across absent/valid/malformed/unregistered/unwritable for pass and fail baselines, and lib throw/deleted + validator throw/deleted/call-throw leave stdout/stderr equal to the working run minus its WARN TEL- lines; check --live with telemetry WARNs writes no learning signal and no span; control case (shared WARN is recorded). Module missing -> file fails to load (ERR_MODULE_NOT_FOUND). With a no-op validators/telemetry.mjs placeholder and unchanged check-invariants.mjs: node --test cli/src/harness/validators/telemetry.test.mjs -> exit 1, tests 11, pass 3 (absent-silent, OI-7 inactive, control), fail 8."
+}

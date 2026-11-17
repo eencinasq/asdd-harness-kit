@@ -7,7 +7,7 @@ import { c, log, warn } from '../ui.mjs';
 import { RENDERERS, parseAgent } from './agent-frontmatter.mjs';
 import { isSymlink } from './context.mjs';
 import { list, RUNTIMES } from './options.mjs';
-import { asddCommand, KIT_BIN, LEGACY_PROJECT_BIN } from './phases.mjs';
+import { asddCommand, KIT_BIN, LEGACY_PROJECT_BIN, observeCommand } from './phases.mjs';
 
 /** Hook commands for this install target: the asdd resolver in a project, cli/ in the kit repo. */
 const hookCmds = (ctx) => {
@@ -25,6 +25,8 @@ const hookCmds = (ctx) => {
 const runsAsdd = (cmd, verb) => new RegExp(`(asdd(\\.mjs)?|exec "\\$b") ${verb}\\b`).test(String(cmd ?? ''));
 const isVerifyCmd = (cmd) => runsAsdd(cmd, 'verify') || /node \.harness\/scripts\/verify-on-stop\.mjs/.test(String(cmd ?? ''));
 const isGateCmd = (cmd) => runsAsdd(cmd, 'gate') || /node \.harness\/scripts\/(jev-)?command-gate\.mjs/.test(String(cmd ?? ''));
+/** The load hook (design §12.2): the project resolver ("$b") or the kit's cli/ running `observe`. */
+const isObserveCmd = (cmd) => /(asdd(\.mjs)?|"\$b") observe\b/.test(String(cmd ?? ''));
 
 /** Rewrite a pre-CLI kit command onto this target's asdd bin. */
 function upgradeHookCommand(command, verifyCmd, gateCmd) {
@@ -164,7 +166,7 @@ function installClaudeHooks(ctx) {
   const { verify, gate } = hookCmds(ctx);
   const dest = join(ctx.target, '.claude/settings.json');
   if (ctx.dryRun) {
-    log(`${c.dim('HOOK')}  ${dest} PreToolUse(Bash) → command-gate, Stop → verify-on-stop`);
+    log(`${c.dim('HOOK')}  ${dest} PreToolUse(Bash) → command-gate, Stop → verify-on-stop, PostToolUse(Read|Skill) → observe`);
     return;
   }
   mkdirSync(join(ctx.target, '.claude'), { recursive: true });
@@ -190,6 +192,13 @@ function installClaudeHooks(ctx) {
       stopList.push({ hooks: [{ type: 'command', command: verify }] });
       data.hooks.Stop = stopList;
       log(`MERGE ${dest} (Stop → verify-on-stop)`);
+    }
+    // The guidance load hook (telemetry): fail-open, no failClosed (REQ-018). Cursor gets none (D-3, hookless).
+    const postList = Array.isArray(data.hooks.PostToolUse) ? data.hooks.PostToolUse : [];
+    if (!postList.some((e) => (e?.hooks ?? []).some((h) => isObserveCmd(h?.command)))) {
+      postList.push({ matcher: 'Read|Skill', hooks: [{ type: 'command', command: observeCommand(ctx, 'claude'), timeout: 10 }] });
+      data.hooks.PostToolUse = postList;
+      log(`MERGE ${dest} (PostToolUse/Read|Skill → observe)`);
     }
   });
 }

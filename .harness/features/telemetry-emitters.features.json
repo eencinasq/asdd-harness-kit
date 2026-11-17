@@ -2,5 +2,472 @@
   "schema_version": "1.0",
   "slice_id": "telemetry-emitters",
   "source_tasks": ".harness/specs/telemetry-emitters/tasks.md",
-  "features": []
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Capture Claude Code PostToolUse hook payload fixtures with provenance",
+      "user_visible_behavior": "Committed Claude Code PostToolUse fixtures (Read/Skill cases) each carry a complete provenance object with method live-capture and no absolute repo path; the README records redaction and the hook exit/timeout reaction.",
+      "status": "passing",
+      "priority": 1,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/test/fixtures/telemetry/claude/",
+        "cli/test/fixtures/telemetry/README.md"
+      ],
+      "depends_on": [],
+      "req_ids": [
+        "REQ-012",
+        "REQ-013",
+        "REQ-016",
+        "REQ-018"
+      ],
+      "verification": [
+        "node -e \"const fs=require('fs'),p='cli/test/fixtures/telemetry/claude/';const fx=fs.readdirSync(p).filter(f=>f.endsWith('.json'));if(!fx.length)process.exit(1);for(const f of fx){const j=JSON.parse(fs.readFileSync(p+f,'utf8'));for(const k of ['runtime','runtime_version','captured_at','captured_by','method'])if(!j.provenance||!j.provenance[k])throw new Error(f+' '+k);if(!j.payload)throw new Error(f)}\"",
+        "! grep -rn \"$(pwd)\" cli/test/fixtures/telemetry/claude/"
+      ],
+      "notes": "Wave 0 (T0). Live capture in the running Claude Code session; capture hook never committed. Data task, no RED.",
+      "evidence": "Re-verified after the D-3 note in fixtures/telemetry/README.md (DRIFT-02): provenance/parse check OK on 7 Claude fixtures; no absolute repo path under cli/test/fixtures/telemetry/.",
+      "evidence_hash": "622defb8b6d63f3c85eab77711c8341ab982a249756d2149d9a3ee6a8ad386c0"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Obtain Cursor beforeReadFile fixtures or record the D-3 hookless outcome",
+      "user_visible_behavior": "The Cursor fixture README states exactly one D-3 outcome (ship or hookless); every committed Cursor fixture has provenance method live-capture or vendor-doc.",
+      "status": "passing",
+      "priority": 2,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/test/fixtures/telemetry/cursor/"
+      ],
+      "depends_on": [],
+      "req_ids": [
+        "REQ-012",
+        "REQ-014",
+        "REQ-016",
+        "REQ-018"
+      ],
+      "verification": [
+        "test -f cli/test/fixtures/telemetry/cursor/README.md && grep -Eq \"D-3 outcome: (ship|hookless)\" cli/test/fixtures/telemetry/cursor/README.md",
+        "node -e \"const fs=require('fs'),p='cli/test/fixtures/telemetry/cursor/';for(const f of fs.readdirSync(p).filter(f=>f.endsWith('.json'))){const j=JSON.parse(fs.readFileSync(p+f,'utf8'));if(!['live-capture','vendor-doc'].includes(j.provenance&&j.provenance.method))throw new Error(f)}\""
+      ],
+      "notes": "Wave 0 (T0). HUMAN-DEPENDENT: Cursor live capture needs the human; vendor-doc fixture marked unverified. Recommendation: ship only with live-capture. Data task, no RED.",
+      "evidence": "D-3 outcome recorded (PO decision 2026-11-17, session 054): Cursor hookless. cli/test/fixtures/telemetry/cursor/README.md documents it; no payload fixture committed (none live-captured; vendor-doc fixtures are not proof per ADR-004). fixtures/telemetry/README.md updated.",
+      "evidence_hash": "840d8ed3adbc375e169a6cde71d0b32b76c3ff81e24638280dd71c2eb7498ce7"
+    },
+    {
+      "id": "TASK-003",
+      "title": "telemetry-lib.mjs span core: ids, buildSpan, fail-open emit, validateSpan, readTail",
+      "user_visible_behavior": "emit appends exactly one schema-valid line per call, never throws or writes output, returns false on every failure case, p99 <= 50 ms over 1,000 emits; readTail reads at most 256 KB.",
+      "status": "passing",
+      "priority": 3,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/telemetry-lib.mjs",
+        "cli/src/harness/telemetry-lib.test.mjs"
+      ],
+      "depends_on": [],
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005",
+        "REQ-006",
+        "REQ-022"
+      ],
+      "verification": [
+        "node --test cli/src/harness/telemetry-lib.test.mjs",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 1 (AR-2 W1). RED first; record RED in feature_started evidence. Schema sha256 pinned (14ffba1c...).",
+      "evidence": "Re-verified after TASK-011 extended the shared telemetry-lib.mjs/telemetry-lib.test.mjs (DRIFT-02): node --test cli/src/harness/telemetry-lib.test.mjs -> tests 70 pass 70 fail 0; kit vendor --check exit 0; kit self --check exit 0; npm test exit 0 (tests 235 pass 235 fail 0); HARNESS_DRIFT_BASE=c337df7 check --live exit 0 (only WARNs: TEL-W3, QG-LEARN-03, QG-DEC-09, steering tags).",
+      "evidence_hash": "cfa9b3b906d6d63bfd9d813f160ecc0c75b9ffd30f36a8fdb7b566acd934b74d"
+    },
+    {
+      "id": "TASK-004",
+      "title": "telemetry-lib.mjs policy: attribute(), guidanceTarget(), skillTarget()",
+      "user_visible_behavior": "Spans are attributed to a slice and phase only when unambiguous (env HARNESS_SLICE_ID or exactly one in_progress slice); only guidance paths normalize to a canonical repo-relative path.",
+      "status": "passing",
+      "priority": 4,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/telemetry-lib.mjs",
+        "cli/src/harness/telemetry-lib.test.mjs"
+      ],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "req_ids": [
+        "REQ-015",
+        "REQ-017",
+        "REQ-004",
+        "REQ-006"
+      ],
+      "verification": [
+        "node --test cli/src/harness/telemetry-lib.test.mjs",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 2 (AR-2 W1, completes the library wave). RED first.",
+      "evidence": "Re-verified after TASK-011 extended the shared telemetry-lib.mjs/telemetry-lib.test.mjs (DRIFT-02): node --test cli/src/harness/telemetry-lib.test.mjs -> tests 70 pass 70 fail 0 (REQ-015 table and REQ-017 matrix unchanged and passing); kit vendor --check exit 0; kit self --check exit 0; npm test exit 0 (tests 235 pass 235 fail 0); HARNESS_DRIFT_BASE=c337df7 check --live exit 0 (only WARNs: TEL-W3, QG-LEARN-03, QG-DEC-09, steering tags).",
+      "evidence_hash": "cfa9b3b906d6d63bfd9d813f160ecc0c75b9ffd30f36a8fdb7b566acd934b74d"
+    },
+    {
+      "id": "TASK-005",
+      "title": "Command gate emits one command span after the verdict and stays fail-closed",
+      "user_visible_behavior": "Each gate hook call writes the unchanged verdict, then one command span with verdict and command_label; a gate crash still denies and adds one ERROR span; checkCommandSafety emits nothing.",
+      "status": "passing",
+      "priority": 5,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/command-gate.mjs",
+        "cli/src/harness/command-gate.test.mjs",
+        "tools/jev-gate/src/harness/command-gate.mjs",
+        "tools/jev-gate/src/harness/telemetry-lib.mjs"
+      ],
+      "depends_on": [
+        "TASK-004"
+      ],
+      "req_ids": [
+        "REQ-007",
+        "REQ-008",
+        "REQ-002",
+        "REQ-004",
+        "REQ-005"
+      ],
+      "verification": [
+        "node --test cli/src/harness/command-gate.test.mjs",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 3 (AR-2 W2). RED first; proof tests via mutation RED. D-2 assumption: runtime cli for non-Claude/Cursor payloads. tools/** generated by kit vendor only (D-4).",
+      "evidence": "Re-verified after TASK-011 regenerated the vendored tools/jev-gate/src/harness/telemetry-lib.mjs via kit vendor (DRIFT-02): node --test cli/src/harness/command-gate.test.mjs -> tests 16 pass 16 fail 0; kit vendor --check exit 0; kit self --check exit 0; npm test exit 0 (tests 235 pass 235 fail 0); HARNESS_DRIFT_BASE=c337df7 check --live exit 0 (only WARNs: TEL-W3, QG-LEARN-03, QG-DEC-09, steering tags).",
+      "evidence_hash": "3a5e87820bf7075a3fff6594edd8841de22f31a25f6310e36ce733df1cef3949"
+    },
+    {
+      "id": "TASK-006",
+      "title": "Verify-on-Stop emits one hook span per exit path through finish()",
+      "user_visible_behavior": "Every Verify-on-Stop outcome (pass, block, advisory, guard-skip, could-not-run) writes byte-identical output and exit, then one hook span; telemetry failure changes nothing.",
+      "status": "passing",
+      "priority": 6,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/verify-on-stop.mjs",
+        "cli/src/harness/verify-on-stop.test.mjs"
+      ],
+      "depends_on": [
+        "TASK-005"
+      ],
+      "req_ids": [
+        "REQ-009",
+        "REQ-002",
+        "REQ-005"
+      ],
+      "verification": [
+        "node --test cli/src/harness/verify-on-stop.test.mjs",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 4 (AR-2 W3). RED first (new test file). KPI-1 out of scope.",
+      "evidence": "node --test cli/src/harness/verify-on-stop.test.mjs -> exit 0, 4/4 (3 runs); npm test -> exit 0 (226/226); HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live -> exit 0; kit vendor --check -> exit 0 (verify-on-stop not vendored)",
+      "evidence_hash": "470dec11878810a2331361280e40ebf41c9b2389a3bca4b5b947f6fe5b75c307"
+    },
+    {
+      "id": "TASK-007",
+      "title": "WARN-only validators/telemetry.mjs wired into asdd check, isolated from learning signals",
+      "user_visible_behavior": "asdd check prints TEL-W1/W2/W3 WARNs when the telemetry location exists, never changes its exit code, and never writes telemetry WARNs as learning signals.",
+      "status": "passing",
+      "priority": 7,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/validators/telemetry.mjs",
+        "cli/src/harness/validators/telemetry.test.mjs",
+        "cli/src/harness/check-invariants.mjs"
+      ],
+      "depends_on": [
+        "TASK-006"
+      ],
+      "req_ids": [
+        "REQ-019",
+        "REQ-006",
+        "REQ-005"
+      ],
+      "verification": [
+        "node --test cli/src/harness/validators/telemetry.test.mjs",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 5 (AR-2 W4). RED first. TEL-W3 may WARN on the kit until TASK-014.",
+      "evidence": "node --test cli/src/harness/validators/telemetry.test.mjs -> exit 0, 11/11 (3 runs); verify-on-stop+command-gate+telemetry-lib+learning-lib tests -> 94/94; npm test -> exit 0 (226/226); kit vendor --check -> exit 0 (check-invariants/validators not vendored); HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live -> exit 0 (3 expected TEL-W3 WARNs, none in the learning signal); asdd check vs HEAD check-invariants: same exit 0, diff = the 3 TEL-W3 lines only; drift --slice (base c337df7) PASS | Re-verified after TASK-012 (D-3 hookless, session 054) removed the Cursor beforeReadFile entry from the TEL-W3 load-hook check (LOAD_HOOKS = claude only) and changed/added the cursor TEL-W3 tests (DRIFT-02): node --test cli/src/harness/validators/telemetry.test.mjs -> tests 12 pass 12 fail 0 (3 runs); npm test exit 0 (235/235); kit vendor --check exit 0; HARNESS_DRIFT_BASE=c337df7 check --live: TEL-W3 lines are now .gitignore + runtime claude only (no runtime cursor line).",
+      "evidence_hash": "aa93e9c2eddad0ae116ad6dc0ce90d28552c61420b211ea686cd71bd4b4587e4"
+    },
+    {
+      "id": "TASK-008",
+      "title": "asdd sync emits one root sync span with knowledge and learning child spans",
+      "user_visible_behavior": "Each asdd sync run appends a root sync span and child spans for the knowledge index and learning; stdout, manifests, registry and PROGRESS.md stay byte-identical.",
+      "status": "passing",
+      "priority": 8,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/sync-state.mjs",
+        "cli/src/harness/sync-state.test.mjs",
+        "tools/jev-gate/src/harness/sync-state.mjs",
+        "tools/knowledge/src/harness/sync-state.mjs",
+        "tools/spec-drift/src/harness/sync-state.mjs",
+        "tools/jev-gate/src/harness/telemetry-lib.mjs",
+        "tools/knowledge/src/harness/telemetry-lib.mjs",
+        "tools/spec-drift/src/harness/telemetry-lib.mjs"
+      ],
+      "depends_on": [
+        "TASK-007"
+      ],
+      "req_ids": [
+        "REQ-010",
+        "REQ-002",
+        "REQ-005",
+        "REQ-006"
+      ],
+      "verification": [
+        "node --test cli/src/harness/sync-state.test.mjs",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 6 (AR-2 W5). RED first. tools/** generated by kit vendor only (D-4).",
+      "evidence": "Re-verified after TASK-011 regenerated the vendored tools/{knowledge,spec-drift}/src/harness/telemetry-lib.mjs via kit vendor (DRIFT-02): node --test cli/src/harness/sync-state.test.mjs -> tests 22 pass 22 fail 0; kit vendor --check exit 0; kit self --check exit 0; npm test exit 0 (tests 235 pass 235 fail 0); HARNESS_DRIFT_BASE=c337df7 check --live exit 0 (only WARNs: TEL-W3, QG-LEARN-03, QG-DEC-09, steering tags).",
+      "evidence_hash": "19ebd4f00bc46f089b6d675d2ab81236cdde58825232bf9dc667a904d2f4f4f1"
+    },
+    {
+      "id": "TASK-009",
+      "title": "_runtime-template.md tells agents to load guidance with the read or skill tool",
+      "user_visible_behavior": "The runtime template contains the read-tool loading rule and no span, turn-span, or subagent-span instruction; the .agents copy matches (kit self --check).",
+      "status": "passing",
+      "priority": 9,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/agents/_runtime-template.md",
+        "cli/src/harness/telemetry-lib.test.mjs",
+        ".agents/agents/_runtime-template.md"
+      ],
+      "depends_on": [
+        "TASK-008"
+      ],
+      "req_ids": [
+        "REQ-011"
+      ],
+      "verification": [
+        "node --test cli/src/harness/telemetry-lib.test.mjs",
+        "node cli/bin/asdd.mjs kit self --check",
+        "node cli/bin/asdd.mjs kit agents-lint",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 7 (AR-2 W6). RED first. .agents copy generated by kit self only (D-4).",
+      "evidence": "Re-verified after TASK-011 added cases to the shared telemetry-lib.test.mjs (DRIFT-02): node --test cli/src/harness/telemetry-lib.test.mjs -> tests 70 pass 70 fail 0 (REQ-011 runtime-template case passing); kit agents-lint exit 0; kit vendor --check exit 0; kit self --check exit 0; npm test exit 0 (tests 235 pass 235 fail 0); HARNESS_DRIFT_BASE=c337df7 check --live exit 0 (only WARNs: TEL-W3, QG-LEARN-03, QG-DEC-09, steering tags).",
+      "evidence_hash": "643b7a9a631fabe414dd07a145ad9382ca0a69dd3173866f0c158b9c8472bae9"
+    },
+    {
+      "id": "TASK-010",
+      "title": "telemetry-observe.mjs handler: Claude activation records, fail-open answer",
+      "user_visible_behavior": "A Claude Code Read of a steering or skill file, or a Skill call of an installed skill, appends one Activation record; every payload gets exit 0 and the runtime answer within p99 <= 50 ms; cursor argv answers allow with no span.",
+      "status": "passing",
+      "priority": 10,
+      "area": "telemetry-emitters",
+      "owner": "claude-observe",
+      "scope_paths": [
+        "cli/src/harness/telemetry-observe.mjs",
+        "cli/src/harness/telemetry-observe.test.mjs"
+      ],
+      "depends_on": [
+        "TASK-001",
+        "TASK-004"
+      ],
+      "req_ids": [
+        "REQ-013",
+        "REQ-015",
+        "REQ-016",
+        "REQ-018",
+        "REQ-004",
+        "REQ-005",
+        "REQ-006"
+      ],
+      "verification": [
+        "node --test cli/src/harness/telemetry-observe.test.mjs",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 8. RED first. PAYLOAD_KEYS limited to keys present in committed fixtures (ADR-004).",
+      "evidence": "TDD: RED in session 031 (missing module, then exports-only stub: tests 26, pass 5, fail 21). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs -> # tests 26 # pass 26 # fail 0 (3 consecutive runs). In-process handler p99 over 200 samples per class (runs 1/2/3): claude-read-guidance 0.168/0.193/0.091 ms (writable stream), claude-read-nonguidance 0.008/0.008/0.007 ms, claude-skill 0.486/0.173/0.053 ms, cursor-default 0.000 ms; budget 50 ms. Whole-process wall time node telemetry-observe.mjs claude, 20 runs: p50 26.1-27.0 ms, max 29.0-39.1 ms (printed, not gated). npm test exit 0 (226/226; telemetry-observe.test.mjs is not in the npm test list until TASK-014 registration). HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0 (PASS harness invariants; WARN CONVERGE-02 REQ-016/REQ-018 for TASK-010 only because the new test file is untracked: testFiles reads git-tracked files, drift-lib.mjs:261-264). | Re-verified after TASK-012 appended 8 Cursor hookless tests to cli/src/harness/telemetry-observe.test.mjs (handler unchanged) (DRIFT-02): node --test cli/src/harness/telemetry-observe.test.mjs -> tests 34 pass 34 fail 0 (3 runs; the 26 TASK-010 cases unchanged and passing); npm test exit 0 (235/235); kit vendor --check exit 0. | UNCOV-001 fix (REQ-002 c7, ADR-001; sessions 065/067): telemetry-lib.mjs is now loaded by a guarded dynamic import (top-level try { await import(\"./telemetry-lib.mjs\").catch(() => null) }, as in command-gate.mjs/verify-on-stop.mjs); handleObserve returns the runtime answer with no span when the lib is null. RED (session 065): 2 tests \"REQ-002 c7 telemetry-lib throws|deleted: observe claude|cursor answers as normal, exit 0, no stderr, no span\" (temp copy of cli/src/harness, lib replaced by a top-level throw / deleted; claude and cursor x guidance payload and invalid JSON) -> tests 2 pass 0 fail 2 (exit status 1 vs 0). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs -> tests 36 pass 36 fail 0 (3 runs); in-process handler p99 (runs 1/2/3) claude-read-guidance 0.212/0.070/0.189 ms, claude-read-nonguidance 0.011/0.009/0.009 ms, claude-skill 0.189/0.055/0.078 ms, cursor-default 0.000 ms, budget 50 ms; PAYLOAD_KEYS tests unchanged and passing. npm test exit 0 (374/374); kit vendor --check exit 0; live hook: fixture posttooluse-read-steering payload | node cli/bin/asdd.mjs observe claude -> no output, exit 0.",
+      "evidence_hash": "7389db8bfe48a51bc8c19573e865f2c3e190a6e1f64722aed38c752bf262ed5f"
+    },
+    {
+      "id": "TASK-011",
+      "title": "telemetry-lib.mjs profile model: phaseMarkers, percentile, surfaceScores, activationRows, profileModel",
+      "user_visible_behavior": "Phase windows, p50/p95 latencies, bottleneck scores and activation rows are computed deterministically from spans and session phase events, never yielding not loaded.",
+      "status": "passing",
+      "priority": 11,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/telemetry-lib.mjs",
+        "cli/src/harness/telemetry-lib.test.mjs",
+        "tools/jev-gate/src/harness/telemetry-lib.mjs",
+        "tools/knowledge/src/harness/telemetry-lib.mjs",
+        "tools/spec-drift/src/harness/telemetry-lib.mjs"
+      ],
+      "depends_on": [
+        "TASK-004",
+        "TASK-009"
+      ],
+      "req_ids": [
+        "REQ-020",
+        "REQ-021"
+      ],
+      "verification": [
+        "node --test cli/src/harness/telemetry-lib.test.mjs",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 8 (parallel with TASK-010, disjoint scopes). RED first. tools/** generated by kit vendor only.",
+      "evidence": "RED: 18 new profile-model cases -> tests 70 pass 53 fail 17 (session 045). GREEN: node --test cli/src/harness/telemetry-lib.test.mjs -> tests 70 pass 70 fail 0, three consecutive runs; kit vendor wrote only tools/{jev-gate,knowledge,spec-drift}/src/harness/telemetry-lib.mjs; kit vendor --check exit 0; kit self --check exit 0; npm test exit 0 (tests 235 pass 235 fail 0; telemetry-lib.test.mjs is not yet in the npm test list, registration is TASK-014). Pins: REQ-020 phaseMarkers amended/unsorted/open cases, percentile fixture, surfaceScores float trap + share unknown, AR-10 topology-only streams equal + Proxy no-read of trace_id/parent_span_id/span_id, REQ-021 three states + ACTIVATION_LEGEND + never not loaded, REQ-022 no fs/clock calls, OI-2 no heuristic weights; HARNESS_DRIFT_BASE=c337df7 check --live exit 0 (only WARNs: TEL-W3, QG-LEARN-03, QG-DEC-09, steering tags).",
+      "evidence_hash": "cd9e7427ae038223d9ab9b3bb2e28b1be9610f276830dfe392079e3b05d4ed31"
+    },
+    {
+      "id": "TASK-012",
+      "title": "Cursor branch of asdd observe (conditional on the TASK-002 D-3 outcome)",
+      "user_visible_behavior": "With D-3 ship: a Cursor beforeReadFile of a guidance file appends one Activation record with conversation_id; with D-3 hookless: no record. Every Cursor payload gets {\"permission\":\"allow\"} and exit 0.",
+      "status": "passing",
+      "priority": 12,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/telemetry-observe.mjs",
+        "cli/src/harness/telemetry-observe.test.mjs"
+      ],
+      "depends_on": [
+        "TASK-002",
+        "TASK-010"
+      ],
+      "req_ids": [
+        "REQ-014",
+        "REQ-016",
+        "REQ-018",
+        "REQ-004"
+      ],
+      "verification": [
+        "node --test cli/src/harness/telemetry-observe.test.mjs",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 9. Conditional per D-3 (read from cli/test/fixtures/telemetry/cursor/README.md). RED first.",
+      "evidence": "D-3 = hookless (session 054; cli/test/fixtures/telemetry/cursor/README.md). Handler unchanged (no test required a change): observe cursor = {\"permission\":\"allow\"}\\n, exit 0, no span; PAYLOAD_KEYS has no cursor entry. RED: session 057 (mutation RED on telemetry-observe.test.mjs: tests 8 pass 6 fail 2, exit 1, reverted; validator RED: tests 12 pass 10 fail 2, exit 1). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs -> tests 34 pass 34 fail 0 (TASK-012 tests: D-3 hookless README/no fixture/no cursor keys; every input to observe cursor x 4 telemetry states -> allow, exit 0, zero lines; no stdin; no lib step and no fs call; TRC-006 latency Cursor guidance p99 0.001 ms and Cursor non-guidance p99 0.000 ms, n=200, budget 50 ms); node --test cli/src/harness/validators/telemetry.test.mjs -> tests 12 pass 12 fail 0 (TEL-W3 load-hook check is Claude only; no cursor TEL-W3 line for a configured cursor runtime); node --test cli/src/harness/harness-profile.test.mjs -> 17/17 (Cursor column unknown without an observe hook, unchanged); focused 63/63 three runs; kit vendor --check exit 0; kit self --check exit 0; npm test exit 0 (235/235); HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0, TEL-W3 runtime cursor WARN gone (remaining TEL-W3: .gitignore, runtime claude, both until TASK-014). TASK-007 and TASK-010 re-verified (DRIFT-02, sessions 058/059). | Re-verified after the TASK-010 UNCOV-001 fix (guarded dynamic import of telemetry-lib in cli/src/harness/telemetry-observe.mjs; 2 REQ-002 c7 tests appended) (DRIFT-02; sessions 066/068), TASK-010 passing first: node --test cli/src/harness/telemetry-observe.test.mjs -> tests 36 pass 36 fail 0 (4 runs; the 8 TASK-012 tests unchanged and passing; Cursor guidance p99 0.001 ms, non-guidance 0.000 ms, n=200); new REQ-002 c7 tests also pin observe cursor -> {\"permission\":\"allow\"}\\n, exit 0, no stderr, no span with telemetry-lib throwing or deleted; node --test cli/src/harness/validators/telemetry.test.mjs cli/src/harness/harness-profile.test.mjs -> 29/29; npm test exit 0 (374/374); kit vendor --check exit 0; kit self --check exit 0; HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0.",
+      "evidence_hash": "7389db8bfe48a51bc8c19573e865f2c3e190a6e1f64722aed38c752bf262ed5f"
+    },
+    {
+      "id": "TASK-013",
+      "title": "harness-profile.mjs: read-only asdd profile with modes, rendering, and exit codes",
+      "user_visible_behavior": "asdd profile --slice/--bottlenecks/--json prints phase durations, gate/hook/sync latencies, scores and the three-state activation table, exits 0/2/3, and writes nothing.",
+      "status": "passing",
+      "priority": 13,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/harness-profile.mjs",
+        "cli/src/harness/harness-profile.test.mjs"
+      ],
+      "depends_on": [
+        "TASK-011"
+      ],
+      "req_ids": [
+        "REQ-020",
+        "REQ-021",
+        "REQ-022",
+        "REQ-023",
+        "REQ-004"
+      ],
+      "verification": [
+        "node --test cli/src/harness/harness-profile.test.mjs",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "notes": "Wave 9 (parallel with TASK-012, disjoint scopes). RED first.",
+      "evidence": "UNCOV-002 fix (TL decision a): readObserveHooks treats cursor as hookless always (REQ-021 c4 1.1.1, D-3); design §6/§12 superseded notes (QA-F-008). RED in session 077 (tests 17 pass 16 fail 1). GREEN: node --test cli/src/harness/harness-profile.test.mjs -> tests 17 pass 17 fail 0; npm test exit 0 (# tests 374 # pass 374 # fail 0 ); asdd profile --slice telemetry-emitters exit 0.",
+      "evidence_hash": "185917e5b5ba91d04670f7b6a6be79deb57c1faf63e4b1e5dc023d31594af494"
+    },
+    {
+      "id": "TASK-014",
+      "title": "Register every telemetry surface in one landing (AR-5)",
+      "user_visible_behavior": "asdd profile and asdd observe are registered commands; installs provision the telemetry location, gitignore lines and fail-open load hooks; uninstall removes them; npm test runs the five new test files and exits 0; npm pack has no spans.jsonl.",
+      "status": "passing",
+      "priority": 14,
+      "area": "telemetry-emitters",
+      "owner": "claude",
+      "scope_paths": [
+        "cli/src/harness/commands.mjs",
+        "package.json",
+        "README.md",
+        ".gitignore",
+        "cli/src/install/phases.mjs",
+        "cli/src/install/runtimes.mjs",
+        "cli/src/install/index.mjs",
+        "cli/src/uninstall.mjs",
+        "cli/runtimes/cursor/hooks.json",
+        "cli/runtimes/claude/README.md",
+        ".claude/settings.json",
+        ".cursor/hooks.json",
+        "cli/scaffold/state/telemetry/",
+        "cli/test/install.sh",
+        ".harness/state/telemetry/",
+        "cli/versions.json",
+        ".harness/config/versions.json",
+        "tools/jev-gate/src/harness/",
+        "tools/knowledge/src/harness/",
+        "tools/spec-drift/src/harness/"
+      ],
+      "depends_on": [
+        "TASK-003",
+        "TASK-004",
+        "TASK-005",
+        "TASK-006",
+        "TASK-007",
+        "TASK-008",
+        "TASK-009",
+        "TASK-010",
+        "TASK-011",
+        "TASK-012",
+        "TASK-013"
+      ],
+      "req_ids": [
+        "REQ-024",
+        "REQ-025",
+        "REQ-018",
+        "REQ-012"
+      ],
+      "verification": [
+        "bash cli/test/install.sh",
+        "node --test cli/test/install-lifecycle.test.mjs",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "node cli/bin/asdd.mjs kit self --check",
+        "npm test",
+        "npm pack --dry-run 2>&1 | grep -c spans.jsonl | grep -qx 0",
+        "node cli/bin/asdd.mjs check",
+        "MCP build check only if tools/*/src/harness changed: PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm --dir tools/<t> install --frozen-lockfile && pnpm --dir tools/<t> build && pnpm --dir tools/<t> test (t = jev-gate, knowledge, spec-drift)"
+      ],
+      "notes": "Wave 10, single AR-5 landing. Exceeds 3-file limit by design (REQ-024). D-1 assumption: cli/src/uninstall.mjs in scope. Cursor hook wired only if D-3 = ship. Generated files (D-4) via kit vendor/versions/self only.",
+      "evidence": "Re-verified after orchestrator review (README trimmed to the two command-table rows per the shared-file rule; contract README additive \"Phase 2 status\" note kept, schema sha256 unchanged 14ffba1c...): npm test exit 0 (tests 372 pass 372 fail 0, now incl. the slice test files); asdd profile --slice telemetry-emitters exit 0; echo {} | asdd observe claude -> exit 0, no output; npm pack --dry-run ships no telemetry data; check --live exit 0 with HARNESS_DRIFT_BASE=c337df7, TEL-W3 WARNs gone. Cursor: no beforeReadFile hook wired (D-3 hookless).",
+      "evidence_hash": "d9e41dc6daf8b7024384bfc7316d50b88af3ce05b380fd8d93ff76f41e9b2d09"
+    }
+  ]
 }

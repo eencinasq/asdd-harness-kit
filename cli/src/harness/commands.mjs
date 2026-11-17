@@ -76,6 +76,8 @@ export const HARNESS_COMMANDS = {
     script: 'gate-decide.mjs',
     help: 'Tech Lead override for a WARN gate: gate-decide <slice> --phase <phase> --note "…"',
   },
+  profile: { script: 'harness-profile.mjs', help: 'read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation [--slice <id>] [--bottlenecks] [--json]' },
+  observe: { script: 'telemetry-observe.mjs', help: 'the load hook (fail-open): records a steering/skill load as an activation record (stdin: hook payload) <claude|cursor>' },
 };
 
 /**

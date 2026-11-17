@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-012",
+  "timestamp": "2026-11-17T01:49:35.951Z",
+  "agent": "human",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "event_type": "override",
+  "phase": "design",
+  "note": "Tech Lead acknowledges the design gate WARN (session 009): D-1 cli/src/uninstall.mjs added to Mapped files (KIT_HOOK, KIT_IGNORES); D-2 REQ-007 errata accepted: direct CLI gate calls are labelled runtime 'cli'; D-4 vendored command-gate/sync-state copies under tools/*/src/harness/ and .harness/config/versions.json are generated-only (asdd kit vendor/versions/self, never hand-edited); D-3 stands: if captured fixtures show Cursor beforeReadFile does not fire for agent reads or lacks file_path, Cursor is treated as hookless (unknown); GOV-001 closed by this session and the validation override. Also approved 2026-11-16 at checkpoint b: generator runs (kit vendor/kit self) inside waves TASK-005/008/009/011 (generated output only); TASK-014 exceeds the 3-file limit as required by AR-5; D-3: Cursor hook ships only with a live-captured Cursor fixture, otherwise Cursor is hookless (unknown); drift base for this slice is chore/p5-roadmap-runtimes-bindings via HARNESS_DRIFT_BASE.",
+  "evidence": "TL decision in chat, 2026-11-16"
+}

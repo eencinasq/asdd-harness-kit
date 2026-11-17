@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "phase": "implementation",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/telemetry-observe.mjs",
+    "cli/src/harness/telemetry-observe.test.mjs"
+  ],
+  "session_id": "sess-telemetry-emitters-032",
+  "timestamp": "2026-11-17T02:31:24.000Z",
+  "feature_id": "TASK-010",
+  "evidence": "TASK-010 passing (REQ-013, REQ-015, REQ-016, REQ-018, REQ-004, REQ-005, REQ-006). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs exit 0, 26/26 (3 runs, no flakes). Latency p99 (200 samples per class, worst of 3 runs): claude-read-guidance 0.193 ms (writable stream), claude-read-nonguidance 0.008 ms, claude-skill 0.486 ms, cursor-default 0.000 ms (budget 50 ms). Whole-process wall time (20 runs, not gated): p50 26-27 ms, max 39.1 ms. npm test exit 0 (226/226). HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0 (WARN CONVERGE-02 REQ-016/018 for TASK-010 until the untracked test file is committed; drift-lib.mjs:261-264 reads tracked files only). PAYLOAD_KEYS.claude = hook_event_name, tool_name, tool_input.file_path, tool_input.skill, session_id, agent_id (each in a committed fixture). Implementation confidence 0.85; uncertainty factors: session_id gets the same token check as agent_id (^[A-Za-z0-9._:-]+$, <=128), which is stricter than the task text; guidance latency classes use the real emit to a writable temp stream (REQ-018 wording) instead of the in-memory sink the task text names; CLI stdin read is async iteration, not yet exercised through the TASK-014 shell wrapper."
+}

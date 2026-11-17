@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-064",
+  "timestamp": "2026-11-17T12:58:35.000Z",
+  "agent": "asdd-qa-agent",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [
+    "UNCOV-001 REQ-002 c7: asdd observe statically imports telemetry-lib; lib load failure exits 1 (no test)",
+    "QA-F-001 requirements.md 1.1.0 not amended for D-2/D-3 (errata 1.1.1 needs TL ack)",
+    "QA-F-003 pre-existing: command-gate module-load crash exits 1 on Claude Code (follow-up with KPI-1)"
+  ],
+  "event_type": "phase_blocked",
+  "phase": "qa",
+  "evidence": "Spec Coverage Gate BLOCK (QG-SPEC-06): EARS 126/127 applicable (2 superseded by D-3); MUST 25/25; pass rate 100% (npm test exit 0, 372/372 + install.sh, lifecycle.sh, vendor/self --check; focused slice files 183/183); spec coverage 24/25; drift --requirements clean; no domain-placement finding. UNCOV-001 probe: telemetry-observe.mjs:14 static import -> exit 1 with throwing/deleted lib. Redirect to asdd-implementation-agent (reopen TASK-010). Report: .harness/specs/telemetry-emitters/spec-coverage-report.md"
+}

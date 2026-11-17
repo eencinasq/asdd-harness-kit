@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-telemetry-emitters-055",
+  "timestamp": "2026-11-17T12:36:31.393Z",
+  "feature_id": "TASK-002",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/test/fixtures/telemetry/cursor/"
+  ],
+  "evidence": "D-3 outcome recorded (PO decision 2026-11-17, session 054): Cursor hookless. cli/test/fixtures/telemetry/cursor/README.md documents it; no payload fixture committed (none live-captured; vendor-doc fixtures are not proof per ADR-004). fixtures/telemetry/README.md updated."
+}

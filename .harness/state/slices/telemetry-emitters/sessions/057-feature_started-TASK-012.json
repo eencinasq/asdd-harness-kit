@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-057",
+  "timestamp": "2026-11-17T12:38:58.038Z",
+  "phase": "implementation",
+  "feature_id": "TASK-012",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/telemetry-observe.mjs",
+    "cli/src/harness/telemetry-observe.test.mjs",
+    "cli/src/harness/validators/telemetry.mjs",
+    "cli/src/harness/validators/telemetry.test.mjs"
+  ],
+  "evidence": "TASK-012 (REQ-014, REQ-016, REQ-018, REQ-004) on the D-3 = hookless branch (session 054; cli/test/fixtures/telemetry/cursor/README.md). Scope widened by the D-3 decision to the TASK-007 validator files for the TEL-W3 Cursor load-hook check. RED (a) proof tests, mutation RED: 8 TASK-012 tests added to cli/src/harness/telemetry-observe.test.mjs (hookless README + no Cursor fixture + no cursor PAYLOAD_KEYS; every input x 4 telemetry states -> allow, exit 0, zero lines; no stdin; no lib step / no fs call; TRC-006 latency Cursor guidance + non-guidance n=200 p99<=50 ms) pass on the TASK-010 handler; with the cursor early return (`if (runtime !== \"claude\") return`) deleted: node --test --test-name-pattern=TASK-012 cli/src/harness/telemetry-observe.test.mjs -> tests 8 pass 6 fail 2 (not ok: every input ... zero lines under writable; cursor calls no library step and no filesystem function), exit 1; mutation reverted. RED (b) validator: cli/src/harness/validators/telemetry.test.mjs case (c) cursor configured without beforeReadFile -> 0 TEL-W3 (was 1) and new test \"TASK-007/TASK-012 D-3 hookless: a configured cursor runtime never yields a cursor TEL-W3 line\" -> node --test cli/src/harness/validators/telemetry.test.mjs: tests 12 pass 10 fail 2, exit 1."
+}

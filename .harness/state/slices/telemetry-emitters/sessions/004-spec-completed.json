@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-004",
+  "timestamp": "2026-11-17T01:30:00Z",
+  "agent": "asdd-spec-agent",
+  "slice_id": "telemetry-emitters",
+  "event_type": "phase_completed",
+  "phase": "spec",
+  "mode": "full",
+  "scope_paths": [
+    ".harness/specs/telemetry-emitters/requirements.md",
+    ".harness/specs/telemetry-emitters/anti-patterns.md"
+  ],
+  "evidence": "Spec gate PASS (QG-SPC-04): requirements.md READY, spec version 1.0.0, 25 MUST requirements REQ-001..REQ-025 (EARS; every criterion starts When/If/While/Where), traced to all capability behaviors B-01..B-09, MH-01..MH-05 and guardrails AR-1, AR-2, AR-3, AR-5, AR-7, AR-10 (AR-4/6/8/9 not applicable by PO decision Q-4/Q-11 or deferred subject). Spec confidence 0.87. Anti-pattern score 1.0 (anti-patterns.md, QG-SPC-02: no unresolved finding; AP-7 25 REQs judged not a violation because capability has 9 behaviors/7 entities and AR-5 forbids a split, flagged for Validation). No schema change: undeclared keys (verdict, outcome, runtime session id, agent id) live in the attributes bag. Uncertainty factors (QG-DEC-10): (1) A-01/A-02 hook payload shapes unverified in repo, mitigated by REQ-016 (absent field -> unknown, no path -> no record) and REQ-018 (captured fixtures, R-3); (2) terms Span, Activation record, Profile report, Phase marker, Trace and actor Runtime hook host absent from domain-model.md, for the Domain phase (QG-DMN-02); (3) open items OI-1 attribution env var name, OI-2 H-SURGE/H-STALL/H-PHANTOM evaluation and severity weights, OI-3 --json absent-dimension form, OI-4 attribute key names, OI-5 validator line numbering under the byte bound, OI-6 per-runtime allow answer of asdd observe; carried risks R-1, R-5. Next: @asdd-validation-agent.",
+  "concerns": []
+}

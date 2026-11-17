@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-037",
+  "timestamp": "2026-11-17T03:03:46.466Z",
+  "phase": "implementation",
+  "feature_id": "TASK-008",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/sync-state.mjs",
+    "cli/src/harness/sync-state.test.mjs",
+    "tools/jev-gate/src/harness/sync-state.mjs",
+    "tools/knowledge/src/harness/sync-state.mjs",
+    "tools/spec-drift/src/harness/sync-state.mjs",
+    "tools/jev-gate/src/harness/telemetry-lib.mjs",
+    "tools/knowledge/src/harness/telemetry-lib.mjs",
+    "tools/spec-drift/src/harness/telemetry-lib.mjs"
+  ],
+  "evidence": "Start TASK-008 (REQ-010, REQ-002, REQ-005, REQ-006; design §4.3, §5.5, ADR-001). RED: 8 new TASK-008 cases appended to cli/src/harness/sync-state.test.mjs before any change to sync-state.mjs, on temp fixture projects (harness copy, one full slice, a passing feature, pinned input mtimes, frozen-clock preload): span tree (root parent null, 2 children parent=root span_id, same trace_id/trace_source, validateSpan, root covers children, full and --slice); HARNESS_RUNTIME runtime; learn.mjs absent -> no learning child, failing learn -> ERROR child exit_code 3; knowledge stub throws -> ERROR knowledge child, OK root; main() throws (manifest.json is a directory) -> one ERROR root, same stdout/stderr/exit as a run without the lib; byte-identity matrix (stdout, stderr, exit, every generated file sha256) over location-absent/stream-absent/writable/unwritable x lib working + writable x lib throw/deleted vs a no-telemetry baseline, full and --slice; REQ-006 only the stream changes on a second run; module import emits nothing. node --test cli/src/harness/sync-state.test.mjs on unchanged sync-state.mjs -> tests 22, pass 15, fail 7 (all 7 fail on missing spans: 0 !== 3 / 0 !== 1; byte-identity holds on the unchanged code, so its RED is by mutation after GREEN)."
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-075",
+  "timestamp": "2026-11-17T14:37:25.502Z",
+  "phase": "qa",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "note": "Checkpoint (c) decisions (TL eencinas, chat 2026-11-17, \"approve recommendations\"): (1) UNCOV-001 fixed by reopening TASK-010 (guarded import in telemetry-observe.mjs); (2) QA-F-001/002 spec errata 1.1.1 + superseded notes in design and domain model; (3) QA-F-003 (command gate exits 1 on its own module-load failure, not fail-closed on Claude Code) and KPI-1 (Verify-on-Stop own crash does not block) go to a follow-up slice, not this one; (4) LP-e9c4ddb0 (blocked:phase:qa) rejected as the gate working; (5) QA-F-004..006 test hardening skipped."
+}

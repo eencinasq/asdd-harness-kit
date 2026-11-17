@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-082",
+  "timestamp": "2026-11-17T15:03:55.458Z",
+  "phase": "knowledge",
+  "event_type": "checkpoint",
+  "status": "DONE",
+  "note": "TL decision (chat 2026-11-17, option 1): close the slice. Supersedes the status:in_progress mistakenly carried by checkpoints 030/054/070/075 (MAN-07 reserves checkpoint status for park/abandon/resume); knowledge phase_completed in session 081."
+}

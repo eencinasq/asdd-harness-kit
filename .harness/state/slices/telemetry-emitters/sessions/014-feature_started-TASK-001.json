@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-014",
+  "timestamp": "2026-11-17T01:50:56.815Z",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/test/fixtures/telemetry/claude/",
+    "cli/test/fixtures/telemetry/README.md"
+  ],
+  "evidence": "Start TASK-001 (REQ-012, REQ-013, REQ-016, REQ-018). Data task, no RED (tasks.md TDD: not behavioral). Live capture via temporary uncommitted PostToolUse Read|Skill hook in .claude/settings.local.json (globally gitignored), writing to the session scratchpad; first capture confirms A-01 for Read: session_id, hook_event_name, tool_name, tool_input.file_path present."
+}

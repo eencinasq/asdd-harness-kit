@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-telemetry-emitters-003",
+  "timestamp": "2026-11-17T00:30:00Z",
+  "agent": "asdd-discovery-agent",
+  "slice_id": "telemetry-emitters",
+  "event_type": "phase_completed",
+  "phase": "discovery",
+  "mode": "full",
+  "evidence": "Discovery gate PASS (QG-DIS-04): confidence 0.87, anti-pattern score 1.0 (anti-patterns.md; AP-4 bounded-tail resolved by 500 lines/256 KB constants). PO decisions on Q-1..Q-15 ('approve recommendations', eencinas, 2026-11-16) received through the orchestrator and recorded by this agent (not a human-authored session): Q-1 fail-open load hooks (Claude PostToolUse Read|Skill, Cursor beforeReadFile) via new hook-only command `asdd observe`; Q-2 no self-report path (hookless runtimes = unknown; runtime-template turn/subagent spans deferred); Q-3a unambiguous attribution only; Q-4a gate verdict spans only, test spans deferred; Q-5 vendored tools/*/src/harness/telemetry-lib.mjs copies allowed (generated only); Q-6 MH-05 narrowed + cli/scaffold/state/telemetry/** mapped; Q-7 project.json/lifecycle row dropped; Q-8 shell reads unknown; Q-9 configured-not-observed computed at read time; Q-10 tail 500 lines/256 KB code constants; Q-11 --bottlenecks in-memory; Q-12 tokens out of scope; Q-13 per runtime-session, agent id when present; Q-14 load hook p99<=50 ms fail-open; Q-15 no per-validator spans; A-01..A-10 accepted. intent.md Mapped files widened (dated line). Residual uncertainty: A-01/A-02 hook payload shapes unverified in repo (captured fixtures in Design, R-3); MCP server rebuild need after vendoring (R-1); PO-approved MH-02 runtime-template emitter reduction (R-7); 7 new domain terms for the Domain phase (glossary.md). Artifacts: capability.md, glossary.md, anti-patterns.md. Next: @asdd-spec-agent.",
+  "concerns": []
+}

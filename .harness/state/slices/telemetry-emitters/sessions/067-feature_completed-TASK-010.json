@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-067",
+  "timestamp": "2026-11-17T14:40:03.376Z",
+  "phase": "implementation",
+  "feature_id": "TASK-010",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/telemetry-observe.mjs",
+    "cli/src/harness/telemetry-observe.test.mjs"
+  ],
+  "evidence": "UNCOV-001 fix (REQ-002 c7, ADR-001; sessions 065/067): telemetry-lib.mjs is now loaded by a guarded dynamic import (top-level try { await import(\"./telemetry-lib.mjs\").catch(() => null) }, as in command-gate.mjs/verify-on-stop.mjs); handleObserve returns the runtime answer with no span when the lib is null. RED (session 065): 2 tests \"REQ-002 c7 telemetry-lib throws|deleted: observe claude|cursor answers as normal, exit 0, no stderr, no span\" (temp copy of cli/src/harness, lib replaced by a top-level throw / deleted; claude and cursor x guidance payload and invalid JSON) -> tests 2 pass 0 fail 2 (exit status 1 vs 0). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs -> tests 36 pass 36 fail 0 (3 runs); in-process handler p99 (runs 1/2/3) claude-read-guidance 0.212/0.070/0.189 ms, claude-read-nonguidance 0.011/0.009/0.009 ms, claude-skill 0.189/0.055/0.078 ms, cursor-default 0.000 ms, budget 50 ms; PAYLOAD_KEYS tests unchanged and passing. npm test exit 0 (374/374); kit vendor --check exit 0; live hook: fixture posttooluse-read-steering payload | node cli/bin/asdd.mjs observe claude -> no output, exit 0."
+}

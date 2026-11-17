@@ -1,0 +1,37 @@
+{
+  "provenance": {
+    "runtime": "claude-code",
+    "runtime_version": "2.1.283",
+    "captured_at": "2026-11-17",
+    "captured_by": "claude (telemetry-emitters TASK-001, live session)",
+    "method": "live-capture"
+  },
+  "payload": {
+    "session_id": "00000000-0000-4000-8000-000000000001",
+    "transcript_path": "${HOME}/.claude/projects/<redacted>/<session>.jsonl",
+    "cwd": "${REPO}",
+    "scratchpad_dir": "${SCRATCHPAD}",
+    "prompt_id": "00000000-0000-4000-8000-0000000000a2",
+    "permission_mode": "auto",
+    "agent_id": "a0000000000000009",
+    "agent_type": "Explore",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "${REPO}/.harness/steering/manifest.md",
+      "limit": 3
+    },
+    "tool_response": {
+      "type": "text",
+      "file": {
+        "filePath": "${REPO}/.harness/steering/manifest.md",
+        "content": "<redacted file content>",
+        "numLines": 3,
+        "startLine": 1,
+        "totalLines": 88
+      }
+    },
+    "tool_use_id": "toolu_redacted_0a",
+    "duration_ms": 2
+  }
+}

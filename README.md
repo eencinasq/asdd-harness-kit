@@ -285,6 +285,8 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 | `asdd audit` | Whole-codebase audit report |
 | `asdd knowledge sync [--embed]` | Rebuild the knowledge index |
 | `asdd learn [--all \| --signatures \| --export \| --propose <LP-id>]` | Learning patterns; signatures in use; lessons for the kit; scaffold a steering proposal |
+| `asdd profile [--slice <id>] [--bottlenecks] [--json]` | Read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation |
+| `asdd observe <claude\|cursor>` | The guidance load hook (fail-open, stdin: hook payload); wired for Claude Code only |
 
 Agent slash skills (call the CLI, do not invent SoT): `asdd-status`, `asdd-next`, `asdd-implement`, `asdd-converge`. All commands are `asdd <command>`: with a devDependency, `npx asdd <command>` (or a global `asdd`, which hands off to it). `asdd help` lists them.
 

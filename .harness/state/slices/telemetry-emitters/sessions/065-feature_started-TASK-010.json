@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-065",
+  "timestamp": "2026-11-17T14:38:20.409Z",
+  "phase": "implementation",
+  "feature_id": "TASK-010",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/telemetry-observe.mjs",
+    "cli/src/harness/telemetry-observe.test.mjs"
+  ],
+  "evidence": "TASK-010 reopened for QA finding UNCOV-001 (spec-coverage-report.md, session 064): cli/src/harness/telemetry-observe.mjs:14 imported telemetry-lib.mjs statically, so a lib that throws on load or is deleted made observe claude|cursor exit 1 with a stack trace; REQ-002 c7 + ADR-001 require a guarded dynamic import. RED: 2 tests appended to cli/src/harness/telemetry-observe.test.mjs (\"REQ-002 c7 telemetry-lib throws: ...\" and \"REQ-002 c7 telemetry-lib deleted: ...\"; temp copy of cli/src/harness with telemetry-lib.mjs replaced by a top-level throw / deleted; claude and cursor x guidance payload and invalid JSON -> exit 0, exact answer, empty stderr, no span). node --test --test-name-pattern=\"REQ-002 c7\" cli/src/harness/telemetry-observe.test.mjs -> tests 2 pass 0 fail 2 (status expected 0, actual 1)."
+}
