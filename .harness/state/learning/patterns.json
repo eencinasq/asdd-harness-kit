@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T15:36:30.369Z",
+  "generated_at": "2026-11-17T15:36:39.669Z",
   "threshold": 3,
   "summary": {
     "patterns": 40,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 42,
+      "occurrences": 43,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -34,6 +34,7 @@
         "asdd-p4",
         "asdd-ui",
         "cli-harness",
+        "cost-metrics",
         "docs-p5-wave1",
         "drift-consistency",
         "egm-shaping",
@@ -262,7 +263,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 283
+          "quiet_sessions": 298
         }
       ]
     },

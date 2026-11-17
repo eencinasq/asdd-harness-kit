@@ -15,7 +15,7 @@
 | asdd-roadmap | lite | knowledge | DONE | 0 |
 | asdd-ui | escalated | knowledge | DONE | 0 |
 | cli-harness | escalated | implementation | ABANDONED | 0 |
-| cost-metrics | lite | discovery | in_progress | 0 |
+| cost-metrics | escalated | knowledge | DONE | 0 |
 | docs-p5-wave1 | escalated | knowledge | DONE | 0 |
 | drift01-harness-logs | hotfix | knowledge | DONE | 0 |
 | drift02-open-slices | hotfix | knowledge | DONE | 0 |
