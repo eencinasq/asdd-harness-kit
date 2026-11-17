@@ -16,6 +16,7 @@
 | asdd-ui | escalated | knowledge | DONE | 0 |
 | cli-harness | escalated | implementation | ABANDONED | 0 |
 | cost-metrics | lite | discovery | in_progress | 0 |
+| drift01-harness-logs | hotfix | knowledge | DONE | 0 |
 | drift02-open-slices | hotfix | knowledge | DONE | 0 |
 | egm-shaping | full | knowledge | DONE | 0 |
 | guidance-proposal-skip | hotfix | knowledge | DONE | 0 |

@@ -354,6 +354,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/ui-assets-dist/manifest.json",
       "features": ".harness/features/ui-assets-dist.features.json"
+    },
+    {
+      "slice_id": "drift01-harness-logs",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/drift01-harness-logs/manifest.json",
+      "features": ".harness/features/drift01-harness-logs.features.json"
     }
   ]
 }
