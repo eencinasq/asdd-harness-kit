@@ -124,6 +124,158 @@ test('REQ-002 aggregate APIs: status, pipeline, drift, learn, knowledge', async 
   }
 });
 
+test('REQ-001 GET /api/gates lists pending WARN gates with concerns and drift', async () => {
+  const { startUiServer } = await import('./ui-server.mjs');
+  const tmp = mkdtempSync(join(tmpdir(), 'asdd-ui-gates-'));
+  try {
+    mkdirSync(join(tmp, '.harness/state/slices/demo/sessions'), { recursive: true });
+    writeFileSync(
+      join(tmp, '.harness/state/registry.json'),
+      JSON.stringify({
+        slices: [{ slice_id: 'demo', phase: 'implementation', status: 'in_progress', mode: 'full' }],
+      }),
+    );
+    writeFileSync(
+      join(tmp, '.harness/state/slices/demo/manifest.json'),
+      JSON.stringify({
+        slice_id: 'demo',
+        phase: 'implementation',
+        status: 'in_progress',
+        gates: {
+          spec: { status: 'WARN', concerns: ['vague REQ'], decided_at: null },
+          design: { status: 'PASS' },
+        },
+      }),
+    );
+    writeFileSync(
+      join(tmp, '.harness/state/slices/demo/sessions/001.json'),
+      JSON.stringify({
+        event_type: 'phase_completed',
+        phase: 'spec',
+        concerns: ['vague REQ'],
+        evidence: 'spec done with WARN',
+      }),
+    );
+    const handle = await startUiServer({ root: tmp, port: 0 });
+    try {
+      const res = await fetch(`http://127.0.0.1:${handle.address.port}/api/gates`);
+      assert.equal(res.status, 200);
+      const data = await res.json();
+      assert.ok(Array.isArray(data.pending));
+      assert.ok(data.pending.some((g) => g.slice_id === 'demo' && g.phase === 'spec'));
+      const hit = data.pending.find((g) => g.slice_id === 'demo' && g.phase === 'spec');
+      assert.ok(hit.concerns?.length || hit.evidence);
+      assert.ok('drift' in hit || hit.drift_level !== undefined || hit.drift);
+      const appJs = readFileSync(join(HERE, 'ui/app.js'), 'utf8');
+      assert.match(appJs, /\/api\/gates/);
+      assert.match(appJs, /gates/i);
+    } finally {
+      await handle.close();
+    }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('REQ-005 POST /api/gates/decide rejects bad Host or Origin (DNS rebinding / CSRF)', async () => {
+  const { startUiServer } = await import('./ui-server.mjs');
+  const { request } = await import('node:http');
+  const handle = await startUiServer({ root: ROOT, port: 0 });
+  const port = handle.address.port;
+  const post = (headers) =>
+    new Promise((resolve, reject) => {
+      const req = request(
+        {
+          host: '127.0.0.1',
+          port,
+          path: '/api/gates/decide',
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'content-length': 2, ...headers },
+        },
+        (res) => {
+          let body = '';
+          res.on('data', (c) => (body += c));
+          res.on('end', () => resolve({ status: res.statusCode, body }));
+        },
+      );
+      req.on('error', reject);
+      req.end('{}');
+    });
+  try {
+    const badHost = await post({ host: 'evil.example', origin: `http://127.0.0.1:${port}` });
+    assert.equal(badHost.status, 403);
+
+    const badOrigin = await post({
+      host: `127.0.0.1:${port}`,
+      origin: 'http://evil.example',
+    });
+    assert.equal(badOrigin.status, 403);
+
+    const missing = await post({ host: `127.0.0.1:${port}` });
+    assert.equal(missing.status, 403);
+
+    const okHeaders = await post({
+      host: `127.0.0.1:${port}`,
+      origin: `http://127.0.0.1:${port}`,
+    });
+    assert.notEqual(okHeaders.status, 403);
+  } finally {
+    await handle.close();
+  }
+});
+
+test('REQ-002 REQ-004 POST /api/gates/decide spawns asdd and surfaces non-zero output', async () => {
+  const { startUiServer } = await import('./ui-server.mjs');
+  const { request } = await import('node:http');
+  let calls = 0;
+  const handle = await startUiServer({
+    root: ROOT,
+    port: 0,
+    decideRunner: async (_root, body) => {
+      calls += 1;
+      if (body.note === 'fail') return { ok: false, error: 'asdd gate-decide exited 1', output: 'FAIL boom' };
+      return { ok: true, output: 'OK override' };
+    },
+  });
+  const port = handle.address.port;
+  const post = (payload) =>
+    new Promise((resolve, reject) => {
+      const body = JSON.stringify(payload);
+      const req = request(
+        {
+          host: '127.0.0.1',
+          port,
+          path: '/api/gates/decide',
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'content-length': Buffer.byteLength(body),
+            host: `127.0.0.1:${port}`,
+            origin: `http://127.0.0.1:${port}`,
+          },
+        },
+        (res) => {
+          let data = '';
+          res.on('data', (c) => (data += c));
+          res.on('end', () => resolve({ status: res.statusCode, body: data }));
+        },
+      );
+      req.on('error', reject);
+      req.end(body);
+    });
+  try {
+    const fail = await post({ slice_id: 'demo', phase: 'spec', note: 'fail' });
+    assert.equal(fail.status, 422);
+    assert.match(fail.body, /FAIL boom/);
+    const ok = await post({ slice_id: 'demo', phase: 'spec', note: 'ok note' });
+    assert.equal(ok.status, 200);
+    assert.match(ok.body, /OK override/);
+    assert.equal(calls, 2);
+  } finally {
+    await handle.close();
+  }
+});
+
 test('REQ-003 /events SSE fires when .harness/state/ changes', async () => {
   const { startUiServer } = await import('./ui-server.mjs');
   const tmp = mkdtempSync(join(tmpdir(), 'asdd-ui-sse-'));

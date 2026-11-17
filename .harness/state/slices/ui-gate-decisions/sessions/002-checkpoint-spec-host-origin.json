@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-gate-decisions-002",
+  "timestamp": "2026-11-17T01:10:36.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "ui-gate-decisions",
+  "event_type": "checkpoint",
+  "phase": "discovery",
+  "mode": "lite",
+  "evidence": "Spec updated with REQ-005: Host + Origin/Referer loopback checks on write endpoint (DNS rebinding / CSRF). Awaiting checkpoint (a) approval.",
+  "concerns": []
+}

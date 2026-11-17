@@ -1,7 +1,7 @@
 /** asdd ui shell — aggregate read views (REQ-002); SSE wired in TASK-003. */
 
 const app = document.getElementById('app');
-const VIEWS = ['slices', 'pipeline', 'drift', 'learning', 'knowledge'];
+const VIEWS = ['slices', 'pipeline', 'drift', 'learning', 'knowledge', 'gates'];
 
 app.innerHTML = `
   <nav class="tabs" role="tablist" aria-label="Views"></nav>
@@ -38,6 +38,7 @@ async function show(id) {
     else if (id === 'drift') await renderDrift();
     else if (id === 'learning') await renderLearn();
     else if (id === 'knowledge') renderKnowledge();
+    else if (id === 'gates') await renderGates();
   } catch (err) {
     panel.innerHTML = `<p class="meta">Error: ${escapeHtml(String(err.message || err))}</p>`;
   }
@@ -113,6 +114,64 @@ async function renderLearn() {
       <tbody>${rows || '<tr><td colspan="4">(none open)</td></tr>'}</tbody>
     </table>
   `;
+}
+
+async function renderGates() {
+  const data = await fetch('/api/gates').then((r) => r.json());
+  const pending = data.pending || [];
+  const rows = pending
+    .map(
+      (g) => `<tr>
+      <td>${escapeHtml(g.slice_id)}</td>
+      <td>${escapeHtml(g.phase)}</td>
+      <td>${escapeHtml(g.status)}</td>
+      <td>${escapeHtml((g.concerns || []).join('; ') || '—')}</td>
+      <td>${escapeHtml(g.drift?.drift_level ?? g.drift_level ?? '—')}</td>
+      <td>
+        <button type="button" class="primary decide" data-slice="${escapeHtml(g.slice_id)}" data-phase="${escapeHtml(g.phase)}">Decide</button>
+      </td>
+    </tr>`,
+    )
+    .join('');
+  panel.innerHTML = `
+    <p class="meta">Pending WARN gates (no acknowledged_by) · ${escapeHtml(data.generated_at || '')}</p>
+    <table>
+      <thead><tr><th>Slice</th><th>Phase</th><th>Status</th><th>Concerns</th><th>Drift</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6">(none pending)</td></tr>'}</tbody>
+    </table>
+    <div id="decide-box" class="meta"></div>
+  `;
+  for (const btn of panel.querySelectorAll('button.decide')) {
+    btn.addEventListener('click', () => openDecide(btn.dataset.slice, btn.dataset.phase));
+  }
+}
+
+function openDecide(sliceId, phase) {
+  const box = panel.querySelector('#decide-box');
+  if (!box) return;
+  box.innerHTML = `
+    <form id="decide-form" class="row">
+      <strong>${escapeHtml(sliceId)} / ${escapeHtml(phase)}</strong>
+      <input type="text" name="note" placeholder="Mandatory note…" required style="flex:1 1 12rem" />
+      <button class="primary" type="submit">Submit decision</button>
+    </form>
+    <pre id="decide-out"></pre>
+  `;
+  const form = box.querySelector('#decide-form');
+  const out = box.querySelector('#decide-out');
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const note = String(new FormData(form).get('note') || '').trim();
+    out.textContent = 'Submitting…';
+    const res = await fetch('/api/gates/decide', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ slice_id: sliceId, phase, note }),
+    });
+    const data = await res.json().catch(() => ({}));
+    out.textContent = JSON.stringify({ status: res.status, ...data }, null, 2);
+    if (data.ok) show('gates');
+  });
 }
 
 function renderKnowledge() {
