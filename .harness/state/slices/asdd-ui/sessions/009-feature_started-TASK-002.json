@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-asdd-ui-009",
+  "timestamp": "2026-11-17T00:36:36.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "asdd-ui",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/src/harness/ui-server.mjs",
+    "cli/src/harness/ui-server.test.mjs",
+    "cli/src/harness/ui"
+  ],
+  "evidence": "RED: node --test ui-server.test.mjs \u2014 REQ-002 aggregate APIs test fails (404 / missing routes).",
+  "concerns": []
+}
