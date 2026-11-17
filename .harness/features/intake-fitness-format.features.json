@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "intake-fitness-format",
+  "source_tasks": ".harness/specs/intake-fitness-format/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Accept the template fitness bullet in asdd intake",
+      "user_visible_behavior": "asdd intake accepts '- **status:** fit' as written by the intent template and the PO-mode example.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/intake-lib.test.mjs",
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-17 (4fbcdf0): intake-lib.test.mjs 12/12 incl. 'intake-fitness-format REQ-001'; the P6.3 example now passes format validation (stops only on its fictional grounding refs, as designed); asdd check exit 0; npm test 244/244.",
+      "scope_paths": [
+        "cli/src/harness/intake-lib.mjs",
+        "cli/src/harness/intake-lib.test.mjs"
+      ],
+      "evidence_hash": "2142db043cce2b0e96ab1356fe2bc6c994e41d3b5b6d73f16ba19e862054a251"
+    }
+  ]
+}
