@@ -59,6 +59,7 @@ Roadmap P0–P4 shipped these session-facing commands (see [`docs/ASDD-ROADMAP.m
 | `asdd waves [--slice] [--json]` | Parallelism hints from owners + deps + scopes |
 | `asdd portfolio [--json]` | Read-only multi-repo summary (`portfolio.json`) |
 | `asdd tracker-sync [--apply]` | Plan tracker sync from handoff + sessions; `--apply` = local receipt |
+| `asdd intake --from <file\|-> --ref <url> [--accept-stale] [--dry-run]` | Import a tracker Intent item as a slice (offline validation, grounding re-check, `intent.md`, `slice init` in its mode) |
 | `asdd spec-source` | Opt-in MUST REQ inventory (`capabilities.spec_as_source`) |
 
 Roadmap P5 added:

@@ -17,6 +17,7 @@
  * - Spec drift DRIFT-01 … DRIFT-07 (drift-lib.mjs)
  * - Phase chain QG-DEC-09 (WARN; validators/phase-chain.mjs)
  * - Learning loop QG-LEARN-* (validators/learning.mjs)
+ * - Intent grounding evidence INTENT-EVIDENCE (validators/intent-evidence.mjs; drift.intent_evidence warn|fail)
  * - Orphan slice detection
  * - Registry consistency
  */
@@ -32,6 +33,7 @@ import validateLiteEscalation from './validators/lite-escalation.mjs';
 import validatePhaseChain from './validators/phase-chain.mjs';
 import validateSpecDrift from './validators/spec-drift.mjs';
 import validateLearning from './validators/learning.mjs';
+import validateIntentEvidence from './validators/intent-evidence.mjs';
 
 const root = process.cwd();
 const errors = [];
@@ -77,6 +79,7 @@ validateLiteEscalation(ctx);
 validatePhaseChain(ctx);
 validateSpecDrift(ctx);
 validateLearning(ctx);
+validateIntentEvidence(ctx);
 
 // P1.3: converge FAILs for passing features (short path before session close)
 try {

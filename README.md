@@ -277,6 +277,7 @@ On **Cursor**, `.cursor/hooks.json` runs the command gate on `beforeShellExecuti
 | `asdd waves [--slice <id>]` | Parallelism hints from owners, deps, and scopes |
 | `asdd portfolio` | Read-only multi-repo summary (`.harness/config/portfolio.json`) |
 | `asdd tracker-sync [--apply]` | Plan bi-directional tracker sync from handoff + sessions (local receipt with `--apply`) |
+| `asdd intake --from <file\|-> --ref <url> [--accept-stale] [--dry-run]` | Import a tracker Intent item (format: `cli/skills/external-trackers/references/intent-format.md`) as a slice: validates it offline, re-checks its grounding refs, writes `intent.md`, and inits the slice in its suggested mode |
 | `asdd spec-source` | Experimental MUST REQ inventory (requires `capabilities.spec_as_source`) |
 | `asdd sync [--slice <id>]` | Regenerate manifests, registry, and the knowledge index from session logs |
 | `asdd check [--live]` | Harness invariants, including spec drift and converge (`--live` is used by Verify-on-Stop) |

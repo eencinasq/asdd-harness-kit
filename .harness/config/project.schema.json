@@ -45,7 +45,8 @@
     "drift": {
       "type": "object",
       "properties": {
-        "contract": { "enum": ["warn", "fail"], "description": "Severity of DRIFT-06 (every feature has scope_paths; passing features have evidence)." }
+        "contract": { "enum": ["warn", "fail"], "description": "Severity of DRIFT-06 (every feature has scope_paths; passing features have evidence)." },
+        "intent_evidence": { "enum": ["warn", "fail"], "description": "Severity of INTENT-EVIDENCE: unresolvable grounding refs in an in-progress slice's intent.md (asdd intake)." }
       }
     },
     "tracker": {

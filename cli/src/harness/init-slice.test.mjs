@@ -82,3 +82,20 @@ test('REQ-001 --full and --hotfix are mutually exclusive', () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('intent-intake REQ-002 --source-json adds the provenance block to the 001 session', () => {
+  const root = harnessRoot();
+  try {
+    const source = { tracker_type: 'jira', tracker_url: 'https://acme.atlassian.net/browse/PROD-131', pitch_id: 'PROD-120' };
+    const r = run(root, 'from-tracker', '--source-json', JSON.stringify(source));
+    assert.equal(r.status, 0, r.stderr);
+    const sess = JSON.parse(readFileSync(join(root, '.harness/state/slices/from-tracker/sessions/001-initial.json'), 'utf8'));
+    assert.deepEqual(sess.source, source);
+    assert.equal(sess.mode, 'lite');
+    const bad = run(root, 'other', '--source-json', '[1,2]');
+    assert.notEqual(bad.status, 0);
+    assert.match(bad.stderr, /--source-json must be a JSON object/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
