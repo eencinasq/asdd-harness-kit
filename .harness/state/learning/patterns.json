@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T17:52:13.759Z",
+  "generated_at": "2026-11-17T17:52:18.518Z",
   "threshold": 3,
   "summary": {
     "patterns": 42,
@@ -14,7 +14,7 @@
       "id": "LP-a9dc05fe",
       "signature": "escalation:E1-scope-spread",
       "kind": "escape",
-      "occurrences": 43,
+      "occurrences": 44,
       "threshold": 3,
       "status": "proposed",
       "reopened": false,
@@ -57,6 +57,7 @@
         "shaping-agent",
         "shaping-cloud-setup",
         "skill-eval",
+        "skill-eval-portable",
         "skills-spec",
         "spec-drift-adoption",
         "spec-drift-apps",
@@ -192,12 +193,12 @@
       "id": "LP-eb7bb53b",
       "signature": "command:rm -rf",
       "kind": "escape",
-      "occurrences": 6,
+      "occurrences": 7,
       "threshold": 3,
       "status": "open",
       "reopened": false,
       "first_seen": "2026-11-10T21:37:19.064Z",
-      "last_seen": "2026-11-17T14:55:02.474Z",
+      "last_seen": "2026-11-17T17:44:22.979Z",
       "sources": [
         "command"
       ],
@@ -266,7 +267,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 335
+          "quiet_sessions": 350
         }
       ]
     },

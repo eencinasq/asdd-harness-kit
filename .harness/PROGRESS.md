@@ -49,7 +49,7 @@
 | shaping-agent | escalated | knowledge | DONE | 0 |
 | shaping-cloud-setup | escalated | knowledge | DONE | 0 |
 | skill-eval | escalated | knowledge | DONE | 0 |
-| skill-eval-portable | lite | discovery | in_progress | 0 |
+| skill-eval-portable | escalated | knowledge | DONE | 0 |
 | skills-bloom | lite | knowledge | DONE | 0 |
 | skills-spec | escalated | knowledge | DONE | 0 |
 | spec-drift-adoption | full | knowledge | DONE | 0 |
