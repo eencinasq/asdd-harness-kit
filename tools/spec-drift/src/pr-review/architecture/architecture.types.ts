@@ -24,4 +24,18 @@ export type ArchitectureReviewView = {
 	/** When status is missing-config / empty-config — send to the host agent. */
 	readonly generatePrompt?: string;
 	readonly stderrTail?: string;
+	/**
+	 * The kit's built-in security pack on the PR files (pr-security-baseline REQ-001), when the repo has no `security`
+	 * rule set and the engine is Semgrep. Kept apart from `findings` so `pr_review_import_architecture` indices stay stable.
+	 */
+	readonly builtinSecurity?: BuiltinSecurityScan;
+};
+
+/** Result of the built-in security pack in a PR scan; `error` is a note, never a blocker (REQ-003). */
+export type BuiltinSecurityScan = {
+	readonly status: 'scanned' | 'error';
+	readonly packId: string;
+	readonly findingCount: number;
+	readonly findings: readonly ArchitectureFinding[];
+	readonly message: string;
 };
