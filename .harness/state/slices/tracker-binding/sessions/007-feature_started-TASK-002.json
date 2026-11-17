@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-p61",
+  "human": "eencinas",
+  "slice_id": "tracker-binding",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:03:42.000Z",
+  "session_id": "sess-tracker-binding-007",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/skills/external-trackers/references/intent-format.md",
+    "cli/skills/external-trackers/references/mcp-configurations.md"
+  ],
+  "evidence": "RED: TASK-002 verification fails — cli/skills/external-trackers/references/intent-format.md does not exist; mcp-configurations.md has no pointer to it."
+}

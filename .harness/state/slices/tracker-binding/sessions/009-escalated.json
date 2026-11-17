@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-tracker-binding-009",
+  "timestamp": "2026-11-17T12:05:47.165Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "tracker-binding",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Registering the new test in package.json is the only spread beyond cli/; no domain or architecture change.",
+  "concerns": []
+}

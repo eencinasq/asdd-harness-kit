@@ -9,7 +9,7 @@ identified) validated by `asdd check-config`, and define the canonical Intent fo
 `intent.md` content plus a grounding table (Reuse / Extend / New with evidence refs), suggested mode and slice id,
 and appetite with its reference slices — mapped per tracker type.
 
-Mapped: `cli/scaffold/config/project.schema.json` (source), `.harness/config/project.schema.json` (copy, `asdd kit self`), `cli/scaffold/config/README.md`, `cli/src/harness/check-project-config.mjs`, `cli/skills/external-trackers/references/intent-format.md` (new), `cli/skills/external-trackers/references/mcp-configurations.md`
+Mapped: `cli/scaffold/config/project.schema.json` (source), `.harness/config/project.schema.json` (copy, `asdd kit self`), `cli/scaffold/config/README.md`, `.harness/config/README.md` (copy), `cli/src/harness/check-project-config.mjs`, `cli/src/harness/tracker-config.mjs` (new), `cli/src/harness/tracker-config.test.mjs` (new), `package.json` (`test` script entry), `cli/skills/external-trackers/references/intent-format.md` (new), `cli/skills/external-trackers/references/mcp-configurations.md`, `.agents/skills/external-trackers/references/intent-format.md` and `.agents/skills/external-trackers/references/mcp-configurations.md` (copies, `asdd kit self`), `cli/versions.json` and `.harness/config/versions.json` (regenerated, `asdd kit versions`)
 
 ## Requirements
 
