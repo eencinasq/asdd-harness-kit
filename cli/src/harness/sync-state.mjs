@@ -160,11 +160,16 @@ export const MANUAL_STATUSES = ['PARKED', 'ABANDONED'];
 
 // The latest checkpoint carrying `status` wins: PARKED/ABANDONED hold until a later
 // checkpoint sets `in_progress` (resume / amend), which returns the slice to active work
-// even after knowledge was completed (DONE).
+// even after knowledge was completed (DONE). That `in_progress` holds only until a later
+// knowledge completion: then the slice is DONE again unless a feature is still active.
 export function deriveStatus(sessions) {
-  const manual = sessions.filter((s) => s.event_type === 'checkpoint' && typeof s.status === 'string').at(-1)?.status;
+  const statusIdx = sessions.findLastIndex((s) => s.event_type === 'checkpoint' && typeof s.status === 'string');
+  const manual = statusIdx >= 0 ? sessions[statusIdx].status : undefined;
   if (MANUAL_STATUSES.includes(manual)) return manual;
-  if (manual === 'in_progress') return 'in_progress';
+  if (manual === 'in_progress') {
+    const closedAgain = sessions.slice(statusIdx + 1).some((s) => s.event_type === 'phase_completed' && s.phase === 'knowledge');
+    if (!closedAgain) return 'in_progress';
+  }
   const activeFeatures = deriveActiveFeatures(sessions);
   if (activeFeatures.length > 0) return 'in_progress';
   const allPhases = sessions.filter((s) => s.event_type === 'phase_completed');
