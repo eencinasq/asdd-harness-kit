@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-17T15:44:33.411Z",
-  "updated_at": "2026-11-17T22:04:37.534Z",
+  "updated_at": "2026-11-17T22:08:44.349Z",
   "paths": {
     "specs": ".harness/specs/pr-review-group-brief",
     "tasks": ".harness/specs/pr-review-group-brief/tasks.md",

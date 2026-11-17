@@ -59,6 +59,8 @@ export const createReviewedRepo = (
 		withSemgrep?: boolean;
 		/** Extra files of the base commit (e.g. the repository's `.harness/` data). */
 		baseFiles?: Record<string, string>;
+		/** Extra files the PR commit adds or changes (e.g. a security-relevant handler). */
+		featureFiles?: Record<string, string>;
 	} = {},
 ): ReviewedRepo => {
 	const origin = tmpDir('mcp-origin');
@@ -99,6 +101,7 @@ export const createReviewedRepo = (
 		'src/util.py': ['def add(a, b):', '    return a + b', 'def run(expr):', '    return eval(expr)', ''].join('\n'),
 		'package-lock.json': '{"lockfileVersion": 3, "packages": {}}\n',
 		'src/app.spec.ts': "import { greet } from './app';\n",
+		...options.featureFiles,
 	});
 	git(repo, 'add', '-A');
 	git(repo, 'commit', '-q', '-m', 'feature');
@@ -125,7 +128,13 @@ export const createReviewedRepo = (
 			url: `https://github.com/acme/demo/pull/${PR_NUMBER}`,
 			author: { login: 'octocat' },
 			body: 'Adds a parse helper.\n\nCloses #7',
-			files: ['src/app.ts', 'src/util.py', 'package-lock.json', 'src/app.spec.ts'].map((p) => ({ path: p })),
+			files: [
+				'src/app.ts',
+				'src/util.py',
+				'package-lock.json',
+				'src/app.spec.ts',
+				...Object.keys(options.featureFiles ?? {}),
+			].map((p) => ({ path: p })),
 		}),
 	);
 	// The issue the PR closes (gh issue view 7).

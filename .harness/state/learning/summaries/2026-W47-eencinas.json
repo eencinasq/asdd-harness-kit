@@ -37,12 +37,12 @@
         {
           "at": "2026-11-17T17:43:19.057Z",
           "slice_id": null,
-          "last_at": "2026-11-17T17:44:35.363Z"
+          "last_at": "2026-11-17T18:11:53.703Z"
         },
         {
-          "at": "2026-11-17T21:55:20.859Z",
+          "at": "2026-11-17T21:52:14.894Z",
           "slice_id": null,
-          "last_at": "2026-11-17T22:04:28.473Z"
+          "last_at": "2026-11-17T22:04:49.016Z"
         }
       ],
       "examples": [
@@ -83,12 +83,12 @@
         {
           "at": "2026-11-17T17:43:19.057Z",
           "slice_id": null,
-          "last_at": "2026-11-17T17:44:35.363Z"
+          "last_at": "2026-11-17T18:11:53.703Z"
         },
         {
-          "at": "2026-11-17T21:55:20.859Z",
+          "at": "2026-11-17T21:52:14.894Z",
           "slice_id": null,
-          "last_at": "2026-11-17T22:04:28.473Z"
+          "last_at": "2026-11-17T22:04:49.016Z"
         }
       ],
       "examples": [
@@ -129,12 +129,12 @@
         {
           "at": "2026-11-17T17:43:19.057Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T17:44:35.363Z"
+          "last_at": "2026-11-17T18:11:53.703Z"
         },
         {
-          "at": "2026-11-17T21:55:20.859Z",
+          "at": "2026-11-17T21:52:14.894Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T22:04:28.473Z"
+          "last_at": "2026-11-17T22:04:49.016Z"
         }
       ],
       "examples": [
@@ -227,30 +227,40 @@
         "QG-LEARN-04 slice \"learn-eval-gate\" completed Knowledge while pattern LP-62e561d2 (sensor:DRIFT-01:tools) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
       ]
     },
-    "warn:hotfix slice \"*\": escalation signal EN-scope-spread — scope touches N top-level ": {
-      "source": "warn",
-      "episodes": [
-        {
-          "at": "2026-11-17T22:01:21.112Z",
-          "slice_id": "claude-hook-cwd",
-          "last_at": "2026-11-17T22:04:02.566Z"
-        }
-      ],
-      "examples": [
-        "hotfix slice \"claude-hook-cwd\": escalation signal E1-scope-spread — scope touches 2 top-level modules: .claude, cli"
-      ]
-    },
-    "sensor:hotfix slice \"*\" cannot complete with open escalation signals (EN-scope-spread) ": {
+    "sensor:orphan slice \"*\" has state but is not in global active_slices": {
       "source": "sensor",
       "episodes": [
         {
-          "at": "2026-11-17T22:04:19.933Z",
-          "slice_id": "claude-hook-cwd",
-          "last_at": "2026-11-17T22:04:28.473Z"
+          "at": "2026-11-17T21:52:14.894Z",
+          "slice_id": "pr-security-baseline"
         }
       ],
       "examples": [
-        "hotfix slice \"claude-hook-cwd\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate claude-hook-cwd --reasons \"E1-scope-spread\""
+        "orphan slice \"pr-security-baseline\" has state but is not in global active_slices"
+      ]
+    },
+    "warn:slice \"*\" is in registry.json but not in global active_slices": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T21:52:14.894Z",
+          "slice_id": "pr-security-baseline"
+        }
+      ],
+      "examples": [
+        "slice \"pr-security-baseline\" is in registry.json but not in global active_slices"
+      ]
+    },
+    "warn:features file \"*\" references slice \"*\" not in global manifest": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T21:52:14.894Z",
+          "slice_id": "pr-security-baseline"
+        }
+      ],
+      "examples": [
+        "features file \".harness/features/pr-security-baseline.features.json\" references slice \"pr-security-baseline\" not in global manifest"
       ]
     }
   }

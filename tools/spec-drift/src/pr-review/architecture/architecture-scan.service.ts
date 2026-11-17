@@ -5,7 +5,8 @@ import { packsForMode } from '../../analysis/domain/pack-selection.ts';
 import { isRulesPath } from '../../analysis/domain/rule-readiness.ts';
 import { CODE_ANALYZER, type CodeAnalyzer } from '../../analysis/ports/code-analyzer.port.ts';
 import type { Env } from '../../config/env.schema.ts';
-import type { ArchitectureReviewView } from './architecture.types.ts';
+import { BUILTIN_SECURITY_PACK_ID, securityPacks } from '../../security/builtin-pack.ts';
+import type { ArchitectureFinding, ArchitectureReviewView, BuiltinSecurityScan } from './architecture.types.ts';
 import { buildRulesGeneratePrompt } from './architecture-report.ts';
 
 const EXCLUDES = ['node_modules', 'dist'];
@@ -48,14 +49,93 @@ export class ArchitectureScanService {
 		};
 	}
 
-	async scan(options: {
-		readonly repoRoot: string;
-		readonly project: string;
-		readonly paths?: readonly string[];
-		/** Folder holding the PR's version of `paths` (see GithubService.materializePrFiles). */
-		readonly targetRoot?: string;
-		readonly pr?: number;
-	}): Promise<ArchitectureReviewView> {
+	/** The repo's own rules on the PR files, plus the built-in security pack when the repo has no security set. */
+	async scan(options: ScanOptions): Promise<ArchitectureReviewView> {
+		const view = await this.scanRepoRules(options);
+		const builtinSecurity = await this.scanBuiltinSecurity(options);
+		return builtinSecurity ? { ...view, builtinSecurity } : view;
+	}
+
+	/**
+	 * pr-security-baseline REQ-001…003: the kit's starter security rules on the PR files, only when the engine is Semgrep,
+	 * the repo has no `security` rule set (its own set already runs with the repo rules) and there are code files to
+	 * scan. Never throws: a run that cannot start or fails becomes an `error` note.
+	 */
+	private async scanBuiltinSecurity(options: ScanOptions): Promise<BuiltinSecurityScan | undefined> {
+		const { engine } = this.analyzer;
+		if (engine.id !== 'semgrep') return undefined;
+		const targetPaths = this.codePaths(options);
+		if (!targetPaths) return undefined;
+		let available: Awaited<ReturnType<CodeAnalyzer['listPacks']>> = [];
+		try {
+			available = await this.analyzer.listPacks(options.repoRoot);
+		} catch {
+			// No readable rules folder: the repo certainly has no security set.
+		}
+		const packs = securityPacks(available, engine.id);
+		if (!packs || !packs.every((p) => p.id === BUILTIN_SECURITY_PACK_ID)) return undefined;
+		const base = { packId: BUILTIN_SECURITY_PACK_ID };
+		try {
+			const run = await this.analyzer.run({
+				repoRoot: options.repoRoot,
+				packs,
+				rules: await this.analyzer.loadRules(packs),
+				paths: targetPaths,
+				targetRoot: options.targetRoot,
+				exclude: [...EXCLUDES, engine.rulesDir],
+				timeoutMs: this.timeoutMs,
+			});
+			if (run.status === 'failed') {
+				return {
+					...base,
+					status: 'error',
+					findingCount: 0,
+					findings: [],
+					message: `Built-in security pack: ${engine.name} failed (exit ${run.exitCode}); the review continues without it.`,
+				};
+			}
+			const findings: ArchitectureFinding[] = run.findings.map(
+				({ checkId, path, startLine, endLine, severity, message }) => ({
+					checkId,
+					path,
+					startLine,
+					endLine,
+					severity,
+					message,
+				}),
+			);
+			return {
+				...base,
+				status: 'scanned',
+				findingCount: findings.length,
+				findings: findings.slice(0, MAX_FINDINGS),
+				message: `Built-in security pack: ${findings.length} finding(s) on PR paths (the repository has no \`${engine.rulesDir}/security/\` rules).`,
+			};
+		} catch (error) {
+			const detail = error instanceof Error ? error.message : String(error);
+			const why = detail.includes('ENOENT')
+				? `${engine.name} is not installed (or not on PATH)`
+				: `${engine.name} could not run: ${detail}`;
+			return {
+				...base,
+				status: 'error',
+				findingCount: 0,
+				findings: [],
+				message: `Built-in security pack: ${why}; the review continues without it.`,
+			};
+		}
+	}
+
+	/** Code paths to scan (rules folder excluded); `['.']` without a path list; null when nothing is left to scan. */
+	private codePaths(options: ScanOptions): readonly string[] | null {
+		const { engine } = this.analyzer;
+		if (options.targetRoot !== undefined && !options.paths?.length) return null;
+		const codePaths = options.paths?.filter((p) => !isRulesPath(engine.rulesDir, p));
+		if (options.paths?.length && !codePaths?.length) return null;
+		return codePaths?.length ? codePaths : ['.'];
+	}
+
+	private async scanRepoRules(options: ScanOptions): Promise<ArchitectureReviewView> {
 		const { engine } = this.analyzer;
 		const location = await this.analyzer.inspect(options.repoRoot);
 		const generatePrompt = buildRulesGeneratePrompt({ ...options, engine, guide: this.analyzer.authoringGuide() });
@@ -163,3 +243,12 @@ export class ArchitectureScanService {
 		}
 	}
 }
+
+type ScanOptions = {
+	readonly repoRoot: string;
+	readonly project: string;
+	readonly paths?: readonly string[];
+	/** Folder holding the PR's version of `paths` (see GithubService.materializePrFiles). */
+	readonly targetRoot?: string;
+	readonly pr?: number;
+};

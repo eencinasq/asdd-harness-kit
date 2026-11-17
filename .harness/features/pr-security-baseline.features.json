@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "pr-security-baseline",
+  "source_tasks": ".harness/specs/pr-security-baseline/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Built-in security pack in PR review",
+      "user_visible_behavior": "A PR in a repo without .semgrep/security/ gets built-in security findings as labeled hints in its review groups and report; the review never blocks on it.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude-prsec",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH node --import tsx --test src/pr-review/architecture/architecture-scan.spec.ts",
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH pnpm test:e2e"
+      ],
+      "evidence": "GREEN 2026-11-17 (85fb2bc): architecture-scan.spec.ts 6/6 (runs on snapshot when no security set; also with no rules folder; skipped with a repo security set, on CodeQL, with no scannable files; failure is a note; labeled hints, prompt and report); e2e 142/142 incl. 'pr-security-baseline REQ-001' (exec + req.query in a PR → security.js.command-injection at src/api/run.js:2 in the group hint and the report); spec-drift typecheck, lint, unit 256/256, build OK.",
+      "scope_paths": [
+        "tools/spec-drift/src/pr-review/architecture/architecture-scan.service.ts",
+        "tools/spec-drift/src/pr-review/architecture/architecture.types.ts",
+        "tools/spec-drift/src/pr-review/architecture/architecture-report.ts",
+        "tools/spec-drift/src/pr-review/architecture/architecture-scan.spec.ts",
+        "tools/spec-drift/src/pr-review/pr-review.views.ts",
+        "tools/spec-drift/test/pr-review.e2e-spec.ts",
+        "tools/spec-drift/README.md",
+        "tools/spec-drift/test/fixtures/sandbox.ts"
+      ],
+      "evidence_hash": "80e4966625a74d30dad2bc67da1c00ca2a1987ebd4aac4654ab25f27ee6e79cc"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Security finding locations exist at the PR head",
+      "user_visible_behavior": "A PR security finding citing a file:line that does not exist at the PR head is dropped with a warning naming it.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude-prsec",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH node --import tsx --test src/security/lens.spec.ts",
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH pnpm test && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:$PATH pnpm test:e2e",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-17 (9c4fb30): lens.spec.ts 6/6 incl. evidenceLocations (URLs ignored, ./ normalized, ranges) and locationProblems (missing, past end, outside repo, line 0); e2e 142/142 incl. REQ-004 (run.js:2 kept, run.js:99 and nope.js:1 dropped with named warnings; lifecycle security finding citing a real line still kept); spec-drift typecheck, lint, unit 258/258, build OK; root npm test 430/430.",
+      "scope_paths": [
+        "tools/spec-drift/src/security/lens.ts",
+        "tools/spec-drift/src/security/lens.spec.ts",
+        "tools/spec-drift/src/security/findings.ts",
+        "tools/spec-drift/src/pr-review/pr-review.service.ts",
+        "tools/spec-drift/test/pr-review.e2e-spec.ts",
+        "tools/spec-drift/README.md"
+      ],
+      "evidence_hash": "f1c07cfa3bd952fdf2b4da4c9cec9d91e1851ed578d5e8b64c4a191400a71107"
+    }
+  ]
+}

@@ -70,20 +70,32 @@ export const staticAnalysisHints = (
 	view: Pick<PrReviewView, 'architecture'>,
 	group: Pick<GroupProgress, 'files' | 'span'>,
 ): string => {
-	const findings = (view.architecture?.findings ?? []).filter(
-		(f) =>
-			group.files.includes(f.path) &&
-			(!group.span || (f.startLine >= group.span.start && f.startLine <= group.span.end)),
-	);
-	if (findings.length === 0) return '';
-	return [
+	const inGroup = (f: { readonly path: string; readonly startLine: number }) =>
+		group.files.includes(f.path) && (!group.span || (f.startLine >= group.span.start && f.startLine <= group.span.end));
+	const block = (
+		open: string,
+		findings: readonly { path: string; startLine: number; checkId: string; message: string }[],
+	) =>
+		findings.length === 0
+			? []
+			: [
+					open,
+					...findings
+						.slice(0, MAX_HINTS)
+						.map((f) => `${f.path}:${f.startLine} [${f.checkId}] ${f.message.replace(/\s+/g, ' ').slice(0, 200)}`),
+					...(findings.length > MAX_HINTS ? [`… ${findings.length - MAX_HINTS} more in the Architecture tab`] : []),
+					'</static-analysis>',
+				];
+	const repo = block(
 		`<static-analysis source="${view.architecture?.engine?.name ?? 'semgrep'}" note="the repo's own rules; mention one only if it shows a real problem here">`,
-		...findings
-			.slice(0, MAX_HINTS)
-			.map((f) => `${f.path}:${f.startLine} [${f.checkId}] ${f.message.replace(/\s+/g, ' ').slice(0, 200)}`),
-		...(findings.length > MAX_HINTS ? [`… ${findings.length - MAX_HINTS} more in the Architecture tab`] : []),
-		'</static-analysis>',
-	].join('\n');
+		(view.architecture?.findings ?? []).filter(inGroup),
+	);
+	// pr-security-baseline REQ-001: the kit's starter security rules, when the repo has no security set of its own.
+	const builtin = block(
+		'<static-analysis source="built-in security pack" note="the kit\'s starter security rules (the repo has no security rule set); report one only as a security finding with a trust boundary and file:line evidence">',
+		(view.architecture?.builtinSecurity?.findings ?? []).filter(inGroup),
+	);
+	return [...repo, ...(repo.length && builtin.length ? [''] : []), ...builtin].join('\n');
 };
 
 /** Attach the next group to review (files, rules checklist, instruction), if any. */

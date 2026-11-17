@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-security-baseline-002",
+  "timestamp": "2026-11-17T21:32:55.000Z",
+  "agent": "claude-prsec",
+  "human": "eencinas",
+  "slice_id": "pr-security-baseline",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "tools/spec-drift/src/pr-review/architecture/architecture-scan.service.ts",
+    "tools/spec-drift/src/pr-review/architecture/architecture.types.ts",
+    "tools/spec-drift/src/pr-review/architecture/architecture-report.ts",
+    "tools/spec-drift/src/pr-review/architecture/architecture-scan.spec.ts",
+    "tools/spec-drift/src/pr-review/pr-review.views.ts",
+    "tools/spec-drift/test/pr-review.e2e-spec.ts",
+    "tools/spec-drift/README.md"
+  ],
+  "evidence": "RED: architecture-scan.spec.ts 1/6 — the PR scan never runs the built-in security pack; no builtinSecurity on the view; hints, prompt and report have no built-in section.",
+  "concerns": []
+}

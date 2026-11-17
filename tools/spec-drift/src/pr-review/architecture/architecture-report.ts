@@ -37,10 +37,16 @@ export const architecturePromptSection = (arch: ArchitectureReviewView): string 
 			`## Architecture (${engine.name})`,
 			arch.message,
 			'Ask the human to use **Ask the agent to write rules** (Architecture tab of the PR Review dashboard) (or follow generatePrompt) before treating architecture as covered.',
+			...builtinSecurityLines(arch, false),
 		].join('\n');
 	}
 	if (arch.status === 'error') {
-		return [`## Architecture (${engine.name})`, arch.message, arch.stderrTail ?? ''].join('\n');
+		return [
+			`## Architecture (${engine.name})`,
+			arch.message,
+			arch.stderrTail ?? '',
+			...builtinSecurityLines(arch, false),
+		].join('\n');
 	}
 	const lines = [
 		`## Architecture (${engine.name} — project \`${engine.rulesDir}\`)`,
@@ -57,7 +63,24 @@ export const architecturePromptSection = (arch: ArchitectureReviewView): string 
 			lines.push(`- … and ${arch.findings.length - 40} more (see architecture.json)`);
 		}
 	}
+	lines.push(...builtinSecurityLines(arch, false));
 	return lines.join('\n');
+};
+
+/** pr-security-baseline REQ-001: the built-in security pack's result, as lines for the prompt or the report. */
+const builtinSecurityLines = (arch: ArchitectureReviewView, bold: boolean): string[] => {
+	const b = arch.builtinSecurity;
+	if (!b) return [];
+	const lines = ['', '### Built-in security pack', '', b.message];
+	for (const f of b.findings.slice(0, 40)) {
+		lines.push(
+			bold
+				? `- **[${f.severity}]** \`${f.path}:${f.startLine}\` — ${f.checkId}: ${f.message}`
+				: `- [${f.severity}] \`${f.path}:${f.startLine}\` — ${f.checkId}: ${f.message.slice(0, 160)}`,
+		);
+	}
+	if (b.findings.length > 40) lines.push(`- … and ${b.findings.length - 40} more (see architecture.json)`);
+	return lines;
 };
 
 /** Map analyzer severity (ERROR / WARNING / INFO) → finding severity for PR comments. */
@@ -84,6 +107,7 @@ export const architectureReportSection = (arch: ArchitectureReviewView): string 
 	} else if (arch.status === 'missing-config' || arch.status === 'empty-config') {
 		lines.push(`_No \`${rulesDir}\` rules yet — generate them from the codebase._`);
 	}
+	lines.push(...builtinSecurityLines(arch, true));
 	return lines.join('\n');
 };
 

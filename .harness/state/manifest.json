@@ -4,102 +4,6 @@
   "domain_model_version": "0.0.0",
   "active_slices": [
     {
-      "slice_id": "agents-use-scripts",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/agents-use-scripts/manifest.json",
-      "features": ".harness/features/agents-use-scripts.features.json"
-    },
-    {
-      "slice_id": "asdd-cli",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/asdd-cli/manifest.json",
-      "features": ".harness/features/asdd-cli.features.json"
-    },
-    {
-      "slice_id": "cli-harness",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/cli-harness/manifest.json",
-      "features": ".harness/features/cli-harness.features.json"
-    },
-    {
-      "slice_id": "jev-gate-nest",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/jev-gate-nest/manifest.json",
-      "features": ".harness/features/jev-gate-nest.features.json"
-    },
-    {
-      "slice_id": "jev-module",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/jev-module/manifest.json",
-      "features": ".harness/features/jev-module.features.json"
-    },
-    {
-      "slice_id": "kit-hygiene",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/kit-hygiene/manifest.json",
-      "features": ".harness/features/kit-hygiene.features.json"
-    },
-    {
-      "slice_id": "knowledge-nest",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/knowledge-nest/manifest.json",
-      "features": ".harness/features/knowledge-nest.features.json"
-    },
-    {
-      "slice_id": "mcp-standalone",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/mcp-standalone/manifest.json",
-      "features": ".harness/features/mcp-standalone.features.json"
-    },
-    {
-      "slice_id": "modules-top-level",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/modules-top-level/manifest.json",
-      "features": ".harness/features/modules-top-level.features.json"
-    },
-    {
-      "slice_id": "spec-drift-merge",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/spec-drift-merge/manifest.json",
-      "features": ".harness/features/spec-drift-merge.features.json"
-    },
-    {
-      "slice_id": "skills-bloom",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/skills-bloom/manifest.json",
-      "features": ".harness/features/skills-bloom.features.json"
-    },
-    {
-      "slice_id": "skills-spec",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/skills-spec/manifest.json",
-      "features": ".harness/features/skills-spec.features.json"
-    },
-    {
       "slice_id": "agents-spec",
       "phase": "discovery",
       "status": "in_progress",
@@ -108,68 +12,28 @@
       "features": ".harness/features/agents-spec.features.json"
     },
     {
-      "slice_id": "spec-drift-apps",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/spec-drift-apps/manifest.json",
-      "features": ".harness/features/spec-drift-apps.features.json"
-    },
-    {
-      "slice_id": "sensor-fixes",
+      "slice_id": "agents-use-scripts",
       "phase": "discovery",
       "status": "in_progress",
       "mode": "lite",
-      "manifest": ".harness/state/slices/sensor-fixes/manifest.json",
-      "features": ".harness/features/sensor-fixes.features.json"
+      "manifest": ".harness/state/slices/agents-use-scripts/manifest.json",
+      "features": ".harness/features/agents-use-scripts.features.json"
     },
     {
-      "slice_id": "spec-drift-empty",
-      "phase": "discovery",
+      "slice_id": "amend-close",
+      "phase": "implementation",
       "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/spec-drift-empty/manifest.json",
-      "features": ".harness/features/spec-drift-empty.features.json"
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/amend-close/manifest.json",
+      "features": ".harness/features/amend-close.features.json"
     },
     {
-      "slice_id": "spec-drift-roadmap",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/spec-drift-roadmap/manifest.json",
-      "features": ".harness/features/spec-drift-roadmap.features.json"
-    },
-    {
-      "slice_id": "review-quality",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/review-quality/manifest.json",
-      "features": ".harness/features/review-quality.features.json"
-    },
-    {
-      "slice_id": "rule-coverage",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/rule-coverage/manifest.json",
-      "features": ".harness/features/rule-coverage.features.json"
-    },
-    {
-      "slice_id": "spec-drift-adoption",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/spec-drift-adoption/manifest.json",
-      "features": ".harness/features/spec-drift-adoption.features.json"
-    },
-    {
-      "slice_id": "asdd-roadmap",
+      "slice_id": "asdd-cli",
       "phase": "discovery",
       "status": "in_progress",
       "mode": "lite",
-      "manifest": ".harness/state/slices/asdd-roadmap/manifest.json",
-      "features": ".harness/features/asdd-roadmap.features.json"
+      "manifest": ".harness/state/slices/asdd-cli/manifest.json",
+      "features": ".harness/features/asdd-cli.features.json"
     },
     {
       "slice_id": "asdd-p0",
@@ -212,36 +76,76 @@
       "features": ".harness/features/asdd-p4.features.json"
     },
     {
-      "slice_id": "spec-drift-depth",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/spec-drift-depth/manifest.json",
-      "features": ".harness/features/spec-drift-depth.features.json"
-    },
-    {
-      "slice_id": "spec-drift-demand",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/spec-drift-demand/manifest.json",
-      "features": ".harness/features/spec-drift-demand.features.json"
-    },
-    {
-      "slice_id": "harness-green",
+      "slice_id": "asdd-roadmap",
       "phase": "discovery",
       "status": "in_progress",
       "mode": "lite",
-      "manifest": ".harness/state/slices/harness-green/manifest.json",
-      "features": ".harness/features/harness-green.features.json"
+      "manifest": ".harness/state/slices/asdd-roadmap/manifest.json",
+      "features": ".harness/features/asdd-roadmap.features.json"
     },
     {
-      "slice_id": "kit-playbook",
+      "slice_id": "asdd-ui",
       "phase": "discovery",
       "status": "in_progress",
       "mode": "lite",
-      "manifest": ".harness/state/slices/kit-playbook/manifest.json",
-      "features": ".harness/features/kit-playbook.features.json"
+      "manifest": ".harness/state/slices/asdd-ui/manifest.json",
+      "features": ".harness/features/asdd-ui.features.json"
+    },
+    {
+      "slice_id": "claude-hook-cwd",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/claude-hook-cwd/manifest.json",
+      "features": ".harness/features/claude-hook-cwd.features.json"
+    },
+    {
+      "slice_id": "cli-harness",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/cli-harness/manifest.json",
+      "features": ".harness/features/cli-harness.features.json"
+    },
+    {
+      "slice_id": "cost-metrics",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/cost-metrics/manifest.json",
+      "features": ".harness/features/cost-metrics.features.json"
+    },
+    {
+      "slice_id": "docs-p5-wave1",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/docs-p5-wave1/manifest.json",
+      "features": ".harness/features/docs-p5-wave1.features.json"
+    },
+    {
+      "slice_id": "drift-test-env",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/drift-test-env/manifest.json",
+      "features": ".harness/features/drift-test-env.features.json"
+    },
+    {
+      "slice_id": "drift01-harness-logs",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/drift01-harness-logs/manifest.json",
+      "features": ".harness/features/drift01-harness-logs.features.json"
+    },
+    {
+      "slice_id": "drift02-open-slices",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/drift02-open-slices/manifest.json",
+      "features": ".harness/features/drift02-open-slices.features.json"
     },
     {
       "slice_id": "egm-shaping",
@@ -252,12 +156,308 @@
       "features": ".harness/features/egm-shaping.features.json"
     },
     {
+      "slice_id": "full-flow-fixture",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/full-flow-fixture/manifest.json",
+      "features": ".harness/features/full-flow-fixture.features.json"
+    },
+    {
+      "slice_id": "grounded-shaping",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/grounded-shaping/manifest.json",
+      "features": ".harness/features/grounded-shaping.features.json"
+    },
+    {
+      "slice_id": "guidance-proposal-skip",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/guidance-proposal-skip/manifest.json",
+      "features": ".harness/features/guidance-proposal-skip.features.json"
+    },
+    {
+      "slice_id": "harness-green",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/harness-green/manifest.json",
+      "features": ".harness/features/harness-green.features.json"
+    },
+    {
+      "slice_id": "intake-fitness-format",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/intake-fitness-format/manifest.json",
+      "features": ".harness/features/intake-fitness-format.features.json"
+    },
+    {
+      "slice_id": "intent-intake",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/intent-intake/manifest.json",
+      "features": ".harness/features/intent-intake.features.json"
+    },
+    {
+      "slice_id": "jev-gate-nest",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/jev-gate-nest/manifest.json",
+      "features": ".harness/features/jev-gate-nest.features.json"
+    },
+    {
+      "slice_id": "jev-module",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/jev-module/manifest.json",
+      "features": ".harness/features/jev-module.features.json"
+    },
+    {
+      "slice_id": "kit-hygiene",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/kit-hygiene/manifest.json",
+      "features": ".harness/features/kit-hygiene.features.json"
+    },
+    {
+      "slice_id": "kit-playbook",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/kit-playbook/manifest.json",
+      "features": ".harness/features/kit-playbook.features.json"
+    },
+    {
+      "slice_id": "knowledge-nest",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/knowledge-nest/manifest.json",
+      "features": ".harness/features/knowledge-nest.features.json"
+    },
+    {
+      "slice_id": "learn-eval-gate",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/learn-eval-gate/manifest.json",
+      "features": ".harness/features/learn-eval-gate.features.json"
+    },
+    {
+      "slice_id": "mcp-standalone",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/mcp-standalone/manifest.json",
+      "features": ".harness/features/mcp-standalone.features.json"
+    },
+    {
+      "slice_id": "metrics-data-quality",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/metrics-data-quality/manifest.json",
+      "features": ".harness/features/metrics-data-quality.features.json"
+    },
+    {
+      "slice_id": "modules-top-level",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/modules-top-level/manifest.json",
+      "features": ".harness/features/modules-top-level.features.json"
+    },
+    {
+      "slice_id": "npm-pack-json",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/npm-pack-json/manifest.json",
+      "features": ".harness/features/npm-pack-json.features.json"
+    },
+    {
+      "slice_id": "po-readonly-gate",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/po-readonly-gate/manifest.json",
+      "features": ".harness/features/po-readonly-gate.features.json"
+    },
+    {
+      "slice_id": "pr-review-group-brief",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/pr-review-group-brief/manifest.json",
+      "features": ".harness/features/pr-review-group-brief.features.json"
+    },
+    {
+      "slice_id": "pr-security-baseline",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/pr-security-baseline/manifest.json",
+      "features": ".harness/features/pr-security-baseline.features.json"
+    },
+    {
+      "slice_id": "review-quality",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/review-quality/manifest.json",
+      "features": ".harness/features/review-quality.features.json"
+    },
+    {
+      "slice_id": "rule-coverage",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/rule-coverage/manifest.json",
+      "features": ".harness/features/rule-coverage.features.json"
+    },
+    {
       "slice_id": "rules-landing",
       "phase": "discovery",
       "status": "in_progress",
       "mode": "lite",
       "manifest": ".harness/state/slices/rules-landing/manifest.json",
       "features": ".harness/features/rules-landing.features.json"
+    },
+    {
+      "slice_id": "security-recon-untracked",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/security-recon-untracked/manifest.json",
+      "features": ".harness/features/security-recon-untracked.features.json"
+    },
+    {
+      "slice_id": "security-review",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/security-review/manifest.json",
+      "features": ".harness/features/security-review.features.json"
+    },
+    {
+      "slice_id": "sensor-fixes",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/sensor-fixes/manifest.json",
+      "features": ".harness/features/sensor-fixes.features.json"
+    },
+    {
+      "slice_id": "shaping-agent",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/shaping-agent/manifest.json",
+      "features": ".harness/features/shaping-agent.features.json"
+    },
+    {
+      "slice_id": "shaping-cloud-setup",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/shaping-cloud-setup/manifest.json",
+      "features": ".harness/features/shaping-cloud-setup.features.json"
+    },
+    {
+      "slice_id": "skill-eval",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/skill-eval/manifest.json",
+      "features": ".harness/features/skill-eval.features.json"
+    },
+    {
+      "slice_id": "skill-eval-portable",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/skill-eval-portable/manifest.json",
+      "features": ".harness/features/skill-eval-portable.features.json"
+    },
+    {
+      "slice_id": "skills-bloom",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/skills-bloom/manifest.json",
+      "features": ".harness/features/skills-bloom.features.json"
+    },
+    {
+      "slice_id": "skills-spec",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/skills-spec/manifest.json",
+      "features": ".harness/features/skills-spec.features.json"
+    },
+    {
+      "slice_id": "spec-drift-adoption",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-adoption/manifest.json",
+      "features": ".harness/features/spec-drift-adoption.features.json"
+    },
+    {
+      "slice_id": "spec-drift-apps",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-apps/manifest.json",
+      "features": ".harness/features/spec-drift-apps.features.json"
+    },
+    {
+      "slice_id": "spec-drift-demand",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-demand/manifest.json",
+      "features": ".harness/features/spec-drift-demand.features.json"
+    },
+    {
+      "slice_id": "spec-drift-depth",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-depth/manifest.json",
+      "features": ".harness/features/spec-drift-depth.features.json"
+    },
+    {
+      "slice_id": "spec-drift-empty",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "full",
+      "manifest": ".harness/state/slices/spec-drift-empty/manifest.json",
+      "features": ".harness/features/spec-drift-empty.features.json"
+    },
+    {
+      "slice_id": "spec-drift-merge",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/spec-drift-merge/manifest.json",
+      "features": ".harness/features/spec-drift-merge.features.json"
+    },
+    {
+      "slice_id": "spec-drift-roadmap",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/spec-drift-roadmap/manifest.json",
+      "features": ".harness/features/spec-drift-roadmap.features.json"
     },
     {
       "slice_id": "telemetry-contract",
@@ -276,36 +476,28 @@
       "features": ".harness/features/telemetry-emitters.features.json"
     },
     {
-      "slice_id": "skill-eval",
+      "slice_id": "tracker-binding",
       "phase": "discovery",
       "status": "in_progress",
       "mode": "lite",
-      "manifest": ".harness/state/slices/skill-eval/manifest.json",
-      "features": ".harness/features/skill-eval.features.json"
+      "manifest": ".harness/state/slices/tracker-binding/manifest.json",
+      "features": ".harness/features/tracker-binding.features.json"
     },
     {
-      "slice_id": "learn-eval-gate",
-      "phase": "discovery",
+      "slice_id": "ui-assets-dist",
+      "phase": "implementation",
       "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/learn-eval-gate/manifest.json",
-      "features": ".harness/features/learn-eval-gate.features.json"
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/ui-assets-dist/manifest.json",
+      "features": ".harness/features/ui-assets-dist.features.json"
     },
     {
-      "slice_id": "cost-metrics",
-      "phase": "discovery",
+      "slice_id": "ui-drift-dead-link",
+      "phase": "implementation",
       "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/cost-metrics/manifest.json",
-      "features": ".harness/features/cost-metrics.features.json"
-    },
-    {
-      "slice_id": "asdd-ui",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/asdd-ui/manifest.json",
-      "features": ".harness/features/asdd-ui.features.json"
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/ui-drift-dead-link/manifest.json",
+      "features": ".harness/features/ui-drift-dead-link.features.json"
     },
     {
       "slice_id": "ui-gate-decisions",
@@ -324,196 +516,12 @@
       "features": ".harness/features/ui-insights.features.json"
     },
     {
-      "slice_id": "npm-pack-json",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/npm-pack-json/manifest.json",
-      "features": ".harness/features/npm-pack-json.features.json"
-    },
-    {
-      "slice_id": "guidance-proposal-skip",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/guidance-proposal-skip/manifest.json",
-      "features": ".harness/features/guidance-proposal-skip.features.json"
-    },
-    {
-      "slice_id": "drift02-open-slices",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/drift02-open-slices/manifest.json",
-      "features": ".harness/features/drift02-open-slices.features.json"
-    },
-    {
-      "slice_id": "ui-assets-dist",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/ui-assets-dist/manifest.json",
-      "features": ".harness/features/ui-assets-dist.features.json"
-    },
-    {
-      "slice_id": "drift01-harness-logs",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/drift01-harness-logs/manifest.json",
-      "features": ".harness/features/drift01-harness-logs.features.json"
-    },
-    {
-      "slice_id": "docs-p5-wave1",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/docs-p5-wave1/manifest.json",
-      "features": ".harness/features/docs-p5-wave1.features.json"
-    },
-    {
-      "slice_id": "metrics-data-quality",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/metrics-data-quality/manifest.json",
-      "features": ".harness/features/metrics-data-quality.features.json"
-    },
-    {
-      "slice_id": "ui-drift-dead-link",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/ui-drift-dead-link/manifest.json",
-      "features": ".harness/features/ui-drift-dead-link.features.json"
-    },
-    {
-      "slice_id": "tracker-binding",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/tracker-binding/manifest.json",
-      "features": ".harness/features/tracker-binding.features.json"
-    },
-    {
-      "slice_id": "shaping-agent",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/shaping-agent/manifest.json",
-      "features": ".harness/features/shaping-agent.features.json"
-    },
-    {
-      "slice_id": "grounded-shaping",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/grounded-shaping/manifest.json",
-      "features": ".harness/features/grounded-shaping.features.json"
-    },
-    {
-      "slice_id": "intent-intake",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/intent-intake/manifest.json",
-      "features": ".harness/features/intent-intake.features.json"
-    },
-    {
-      "slice_id": "shaping-cloud-setup",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/shaping-cloud-setup/manifest.json",
-      "features": ".harness/features/shaping-cloud-setup.features.json"
-    },
-    {
-      "slice_id": "intake-fitness-format",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/intake-fitness-format/manifest.json",
-      "features": ".harness/features/intake-fitness-format.features.json"
-    },
-    {
-      "slice_id": "po-readonly-gate",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/po-readonly-gate/manifest.json",
-      "features": ".harness/features/po-readonly-gate.features.json"
-    },
-    {
-      "slice_id": "security-review",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "full",
-      "manifest": ".harness/state/slices/security-review/manifest.json",
-      "features": ".harness/features/security-review.features.json"
-    },
-    {
       "slice_id": "ui-insights-host-guard",
       "phase": "implementation",
       "status": "in_progress",
       "mode": "hotfix",
       "manifest": ".harness/state/slices/ui-insights-host-guard/manifest.json",
       "features": ".harness/features/ui-insights-host-guard.features.json"
-    },
-    {
-      "slice_id": "amend-close",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/amend-close/manifest.json",
-      "features": ".harness/features/amend-close.features.json"
-    },
-    {
-      "slice_id": "pr-review-group-brief",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/pr-review-group-brief/manifest.json",
-      "features": ".harness/features/pr-review-group-brief.features.json"
-    },
-    {
-      "slice_id": "full-flow-fixture",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/full-flow-fixture/manifest.json",
-      "features": ".harness/features/full-flow-fixture.features.json"
-    },
-    {
-      "slice_id": "skill-eval-portable",
-      "phase": "discovery",
-      "status": "in_progress",
-      "mode": "lite",
-      "manifest": ".harness/state/slices/skill-eval-portable/manifest.json",
-      "features": ".harness/features/skill-eval-portable.features.json"
-    },
-    {
-      "slice_id": "security-recon-untracked",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/security-recon-untracked/manifest.json",
-      "features": ".harness/features/security-recon-untracked.features.json"
-    },
-    {
-      "slice_id": "drift-test-env",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/drift-test-env/manifest.json",
-      "features": ".harness/features/drift-test-env.features.json"
-    },
-    {
-      "slice_id": "claude-hook-cwd",
-      "phase": "implementation",
-      "status": "in_progress",
-      "mode": "hotfix",
-      "manifest": ".harness/state/slices/claude-hook-cwd/manifest.json",
-      "features": ".harness/features/claude-hook-cwd.features.json"
     }
   ]
 }

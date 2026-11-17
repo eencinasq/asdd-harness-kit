@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-prsec",
+  "human": "eencinas",
+  "slice_id": "pr-security-baseline",
+  "concerns": [],
+  "timestamp": "2026-11-17T21:44:26.000Z",
+  "session_id": "sess-pr-security-baseline-004",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "tools/spec-drift/src/security/lens.ts",
+    "tools/spec-drift/src/security/lens.spec.ts",
+    "tools/spec-drift/src/security/findings.ts",
+    "tools/spec-drift/src/pr-review/pr-review.service.ts"
+  ],
+  "evidence": "RED: lens.spec.ts fails — evidenceLocations/locationProblems do not exist; a PR security finding citing a nonexistent file:line is kept today."
+}

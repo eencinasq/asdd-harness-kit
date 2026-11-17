@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T22:04:37.592Z",
+  "generated_at": "2026-11-17T22:08:44.487Z",
   "threshold": 3,
   "summary": {
-    "patterns": 44,
+    "patterns": 45,
     "open": 4,
     "in_flight": 2,
     "verified": 1,
@@ -268,7 +268,7 @@
           "declared": "applied",
           "status": "verified",
           "recurrences": 0,
-          "quiet_sessions": 358
+          "quiet_sessions": 366
         }
       ]
     },
@@ -418,7 +418,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-11T04:44:07.820Z",
-      "last_seen": "2026-11-17T21:55:20.859Z",
+      "last_seen": "2026-11-17T21:52:14.894Z",
       "sources": [
         "warn"
       ],
@@ -437,7 +437,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-13T02:25:45.463Z",
-      "last_seen": "2026-11-17T21:55:20.859Z",
+      "last_seen": "2026-11-17T21:52:14.894Z",
       "sources": [
         "warn"
       ],
@@ -569,7 +569,7 @@
       "status": "watching",
       "reopened": false,
       "first_seen": "2026-11-16T22:08:19.015Z",
-      "last_seen": "2026-11-17T21:55:20.859Z",
+      "last_seen": "2026-11-17T21:52:14.894Z",
       "sources": [
         "warn"
       ],
@@ -977,23 +977,23 @@
       "proposals": []
     },
     {
-      "id": "LP-936370d8",
-      "signature": "sensor:hotfix slice \"*\" cannot complete with open escalation signals (EN-scope-spread) ",
+      "id": "LP-4977365f",
+      "signature": "sensor:orphan slice \"*\" has state but is not in global active_slices",
       "kind": "escape",
       "occurrences": 1,
       "threshold": 3,
       "status": "watching",
       "reopened": false,
-      "first_seen": "2026-11-17T22:04:19.933Z",
-      "last_seen": "2026-11-17T22:04:19.933Z",
+      "first_seen": "2026-11-17T21:52:14.894Z",
+      "last_seen": "2026-11-17T21:52:14.894Z",
       "sources": [
         "sensor"
       ],
       "slices": [
-        "claude-hook-cwd"
+        "pr-security-baseline"
       ],
       "examples": [
-        "hotfix slice \"claude-hook-cwd\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate claude-hook-cwd --reasons \"E1-scope-spread\""
+        "orphan slice \"pr-security-baseline\" has state but is not in global active_slices"
       ],
       "proposals": []
     },
@@ -1055,23 +1055,44 @@
       "proposals": []
     },
     {
-      "id": "LP-a7fead7a",
-      "signature": "warn:hotfix slice \"*\": escalation signal EN-scope-spread — scope touches N top-level ",
+      "id": "LP-b2415b7c",
+      "signature": "warn:features file \"*\" references slice \"*\" not in global manifest",
       "kind": "noise",
       "occurrences": 1,
       "threshold": 5,
       "status": "watching",
       "reopened": false,
-      "first_seen": "2026-11-17T22:01:21.112Z",
-      "last_seen": "2026-11-17T22:01:21.112Z",
+      "first_seen": "2026-11-17T21:52:14.894Z",
+      "last_seen": "2026-11-17T21:52:14.894Z",
       "sources": [
         "warn"
       ],
       "slices": [
-        "claude-hook-cwd"
+        "pr-security-baseline"
       ],
       "examples": [
-        "hotfix slice \"claude-hook-cwd\": escalation signal E1-scope-spread — scope touches 2 top-level modules: .claude, cli"
+        "features file \".harness/features/pr-security-baseline.features.json\" references slice \"pr-security-baseline\" not in global manifest"
+      ],
+      "proposals": []
+    },
+    {
+      "id": "LP-be2c7cc9",
+      "signature": "warn:slice \"*\" is in registry.json but not in global active_slices",
+      "kind": "noise",
+      "occurrences": 1,
+      "threshold": 5,
+      "status": "watching",
+      "reopened": false,
+      "first_seen": "2026-11-17T21:52:14.894Z",
+      "last_seen": "2026-11-17T21:52:14.894Z",
+      "sources": [
+        "warn"
+      ],
+      "slices": [
+        "pr-security-baseline"
+      ],
+      "examples": [
+        "slice \"pr-security-baseline\" is in registry.json but not in global active_slices"
       ],
       "proposals": []
     }

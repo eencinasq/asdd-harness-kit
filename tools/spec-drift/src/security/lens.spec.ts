@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { prSecurityFindingProblem, securityBlock, securityLens } from './lens.ts';
+import { evidenceLocations, locationProblems, prSecurityFindingProblem, securityBlock, securityLens } from './lens.ts';
 
 const diff = (file: string, added: readonly string[]): string =>
 	[
@@ -65,4 +65,37 @@ test('security-review REQ-008: a security finding needs a principal/boundary and
 		}),
 		null,
 	);
+});
+
+test('pr-security-baseline REQ-004 evidenceLocations: file:line refs, URLs ignored, ./ normalized', () => {
+	assert.deepEqual(
+		evidenceLocations(
+			'Untrusted req.query.file (./src/api/run.js:2) reaches exec at src/api/run.js:2-3; docs at https://example.com:8080/x and lib/util.py:10.',
+		),
+		[
+			{ file: 'src/api/run.js', line: 2 },
+			{ file: 'lib/util.py', line: 10 },
+		],
+	);
+	assert.deepEqual(evidenceLocations('no location here'), []);
+});
+
+test('pr-security-baseline REQ-004 locationProblems: missing file, line past the end, outside the repo', () => {
+	const contents = new Map<string, string | undefined>([
+		['src/api/run.js', 'line 1\nline 2\n'],
+		['src/gone.js', undefined],
+	]);
+	assert.deepEqual(locationProblems([{ file: 'src/api/run.js', line: 2 }], contents), []);
+	assert.deepEqual(locationProblems([{ file: 'src/api/run.js', line: 99 }], contents), [
+		'src/api/run.js:99 is past the end of the file at the PR head (2 lines)',
+	]);
+	assert.deepEqual(locationProblems([{ file: 'src/gone.js', line: 1 }], contents), [
+		'src/gone.js:1 does not exist at the PR head',
+	]);
+	assert.deepEqual(locationProblems([{ file: '../etc/passwd', line: 1 }], contents), [
+		'../etc/passwd:1 is outside the repository',
+	]);
+	assert.deepEqual(locationProblems([{ file: 'src/api/run.js', line: 0 }], contents), [
+		'src/api/run.js:0 is not a line number',
+	]);
 });
