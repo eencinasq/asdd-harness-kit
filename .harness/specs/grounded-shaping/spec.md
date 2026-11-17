@@ -10,7 +10,7 @@ similar shape for appetite), a Reuse / Extend / New table carried into the pitch
 output is the configured tracker (pitch container + one Intent item per scope) instead of repository files. A scope
 that duplicates an existing capability is merged or cut. Guide change: QG-LEARN-10 requires `skill-eval` evidence.
 
-Mapped: `cli/skills/shape-up/SKILL.md`, `cli/skills/shape-up/references/**`, `cli/skills/product-delivery/SKILL.md`, `cli/skills/product-delivery/references/**`, `cli/eval/skills/shape-up/**`, `cli/eval/skills/product-delivery/**`, `.agents/skills/shape-up/**` and `.agents/skills/product-delivery/**` (copies, `asdd kit self`), `cli/versions.json` (regenerated)
+Mapped: `cli/skills/shape-up/SKILL.md`, `cli/skills/shape-up/references/**`, `cli/skills/product-delivery/SKILL.md`, `cli/skills/product-delivery/references/**`, `cli/eval/skills/shape-up/**`, `cli/eval/skills/product-delivery/**`, `.agents/skills/shape-up/**` and `.agents/skills/product-delivery/**` (copies, `asdd kit self`), `cli/versions.json` (regenerated), `.harness/config/versions.json` and `.harness/config/installed-versions.json` (kit records refreshed by `asdd kit self`)
 
 ## Requirements
 

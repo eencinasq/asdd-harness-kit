@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-grounded-shaping-012",
+  "timestamp": "2026-11-17T12:15:51.000Z",
+  "agent": "claude-p63",
+  "human": "eencinas",
+  "slice_id": "grounded-shaping",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "evidence": "GREEN: kit self --check OK; kit skills-lint PASS (22 skills); kit guidance PASS; skill-eval 8/8; npm test 231/231. grounding.md moved to product-delivery/references (skills-spec REQ-002, checked by cli/test/install.sh, forbids product-delivery linking into shape-up/references); stale managed entry removed from installed-versions.json.",
+  "concerns": [],
+  "feature_id": "TASK-004",
+  "scope_paths": [
+    ".agents/skills/shape-up",
+    ".agents/skills/product-delivery",
+    "cli/versions.json",
+    ".harness/config/versions.json",
+    ".harness/config/installed-versions.json"
+  ]
+}
