@@ -8,7 +8,7 @@ capabilities allow reading, running read-only commands, and MCP (knowledge, trac
 so the rendered runtime agents enforce it (Claude Code: `tools` without `Write`/`Edit`). It mounts `shape-up`,
 `product-delivery`, `codegraph`, and `external-trackers`.
 
-Mapped: `cli/agents/asdd-shaping-agent.md` (new source), `.agents/agents/asdd-shaping-agent.md` (copy, `asdd kit self`), `cli/agents/README.md`, `cli/versions.json` (regenerated)
+Mapped: `cli/agents/asdd-shaping-agent.md` (new source), `.agents/agents/asdd-shaping-agent.md` (copy, `asdd kit self`), `cli/agents/README.md` and `.agents/agents/README.md` (copy), `cli/test/agents-lint.test.mjs` (rendering test for REQ-002, boundary test for REQ-003), `cli/versions.json` (regenerated) and `.harness/config/versions.json` (its copy), `.harness/config/installed-versions.json` (records the new managed copies), `.cursor/agents/asdd-shaping-agent.md` (Cursor rendering written by `asdd kit self`)
 
 ## Requirements
 

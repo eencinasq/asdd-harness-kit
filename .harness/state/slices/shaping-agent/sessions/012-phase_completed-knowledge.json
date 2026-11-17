@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-p62",
+  "human": "eencinas",
+  "slice_id": "shaping-agent",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:04:13.000Z",
+  "session_id": "sess-shaping-agent-012",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: envelope() already projects write_tools:false + deny + mcp_tools:true into a denylist for Claude Code; a new read-only MCP agent needs no renderer change."
+}
