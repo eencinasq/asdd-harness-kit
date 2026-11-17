@@ -7,7 +7,7 @@ measures flow (phases, durations) but not tokens or cost. Roll up token/cost spa
 runtime (P5 roadmap, gap G17). Open question for Design: which runtimes expose token counts to hooks (Claude Code
 transcript, Cursor, OpenCode) — runtimes without them report "unknown", never an estimate.
 
-Mapped: `cli/src/harness/pipeline-metrics.mjs`, `cli/src/harness/harness-status.mjs`, `cli/src/harness/pipeline-html.mjs`
+Mapped: `cli/src/harness/pipeline-metrics.mjs`, `cli/src/harness/pipeline-metrics.test.mjs`, `cli/src/harness/harness-status.mjs`, `cli/src/harness/pipeline-html.mjs`, `cli/src/harness/pipeline-html.test.mjs`
 
 ## Requirements
 

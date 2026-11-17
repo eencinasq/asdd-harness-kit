@@ -6,7 +6,7 @@ Make the measurement slices visible: activation (which steering/skills are loade
 and regressions, and cost per slice/model in `asdd ui` (P5 roadmap, gaps G15–G17). A UI is only worth more than the
 existing HTML when it shows data the CLI scatters.
 
-Mapped: `cli/src/harness/ui/**`, `cli/src/harness/ui-server*.mjs`
+Mapped: `cli/src/harness/ui/**`, `cli/src/harness/ui-server*.mjs` (with `ui-server*.test.mjs`)
 
 ## Requirements
 

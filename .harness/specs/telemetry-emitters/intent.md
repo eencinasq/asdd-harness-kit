@@ -32,6 +32,15 @@ and a read-only `asdd profile` report — landed atomically with installer/publi
 Network I/O; raw command text in spans (labels only); session-event forging (DOM-003); trace topology as detection
 key (AR-10); any UI (that is `ui-insights`).
 
+## Mapped files
+
+Design narrows this list; nothing outside it changes.
+
+- New: `cli/src/harness/telemetry-lib.mjs`, `cli/src/harness/harness-profile.mjs`, `cli/src/harness/validators/telemetry.mjs` (each with its `*.test.mjs`)
+- Emitters: `cli/src/harness/command-gate.mjs`, `cli/src/harness/verify-on-stop.mjs`, `cli/src/harness/sync-state.mjs`, `cli/src/harness/check-invariants.mjs` (validator wiring), `cli/agents/_runtime-template.md` (source; `.agents/agents/_runtime-template.md` is its `asdd kit self` copy)
+- Registration (AR-5, one atomic landing): `cli/src/harness/commands.mjs`, `cli/src/install/**`, `cli/src/kit/versions.mjs`, `cli/versions.json`, `package.json` (`files[]` negations, `test` script), `.gitignore`, `.harness/state/telemetry/**`
+- Docs: `README.md` (command row)
+
 ## Depends on
 
 `telemetry-contract` (DONE). Unblocks: `cost-metrics`, `ui-insights`.

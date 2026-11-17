@@ -7,7 +7,7 @@ spec-drift MCP App views, and knowledge queries are scattered and depend on MCP 
 ~13 KB). Add `asdd ui`: a zero-dependency local Node HTTP server, read-only over `.harness/`, that aggregates those views
 and refreshes on state changes (P5 roadmap, gap G18). Desktop packaging (Tauri) is explicitly out of scope.
 
-Mapped: `cli/src/harness/ui-server*.mjs`, `cli/src/harness/commands.mjs`, `tools/spec-drift/ui/**` (reuse only), `README.md` (command row)
+Mapped: `cli/src/harness/ui-server*.mjs` (with `ui-server*.test.mjs`), `cli/src/harness/ui/**` (static assets), `cli/src/harness/commands.mjs` (one entry), `package.json` (`test` script entry), `cli/versions.json` (regenerated), `README.md` (command row). Read-only reuse: `tools/spec-drift/ui/**`, `cli/src/harness/pipeline-html.mjs` (owned by `cost-metrics`; do not edit)
 
 ## Requirements
 

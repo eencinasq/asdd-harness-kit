@@ -6,7 +6,7 @@ Turn the learning loop from observational to experimental. Today an `SP-*` propo
 (10 quiet sessions). Require guide-changing proposals to carry a `skill-eval` result before they can be accepted, so a
 regression is caught before it ships (P5 roadmap, gap G16).
 
-Mapped: `cli/src/harness/validators/learning.mjs`, `cli/src/harness/learning-lib.mjs`, `.harness/steering/quality-gates.learn.md`, `.harness/steering/templates/steering-proposal.md`
+Mapped: `cli/src/harness/validators/learning.mjs`, `cli/src/harness/learning-lib.mjs`, `cli/src/harness/learning-lib.test.mjs`, `cli/steering/quality-gates.learn.md`, `cli/steering/templates/steering-proposal.md` (sources — edit these, never the copies), `.harness/steering/quality-gates.learn.md` and `.harness/steering/templates/steering-proposal.md` (copies refreshed by `asdd kit self`), `cli/versions.json` (regenerated)
 
 ## Requirements
 

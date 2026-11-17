@@ -7,7 +7,7 @@ decide a shaping/delivery gate or acknowledge a WARN. Add one write path to `asd
 in view, executed through the existing `asdd` command so session invariants (append-only, one writer) hold
 (P5 roadmap, gap G19).
 
-Mapped: `cli/src/harness/ui-server*.mjs`, `cli/src/harness/ui/**`
+Mapped: `cli/src/harness/ui-server*.mjs` (with `ui-server*.test.mjs`), `cli/src/harness/ui/**`
 
 ## Requirements
 
