@@ -58,7 +58,7 @@
       "id": "TASK-003",
       "title": "telemetry-lib.mjs span core: ids, buildSpan, fail-open emit, validateSpan, readTail",
       "user_visible_behavior": "emit appends exactly one schema-valid line per call, never throws or writes output, returns false on every failure case, p99 <= 50 ms over 1,000 emits; readTail reads at most 256 KB.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 3,
       "area": "telemetry-emitters",
       "owner": "claude",
@@ -81,7 +81,9 @@
         "npm test",
         "node cli/bin/asdd.mjs check"
       ],
-      "notes": "Wave 1 (AR-2 W1). RED first; record RED in feature_started evidence. Schema sha256 pinned (14ffba1c...)."
+      "notes": "Wave 1 (AR-2 W1). RED first; record RED in feature_started evidence. Schema sha256 pinned (14ffba1c...).",
+      "evidence": "Verification: `node --test cli/src/harness/telemetry-lib.test.mjs` exit 0, tests 31 pass 31 fail 0 skipped 0 (5 consecutive runs, 0 flakes incl. 20-concurrent-process and latency cases); REQ-003 p99 0.058-0.078 ms over 1,000 emits of 355-4,096 B (max single 0.36 ms; budget 50 ms), each emit grew the stream by exactly its line length. `npm test` exit 0 (217 pass, 0 fail). `HARNESS_DRIFT_BASE=chore/p5-roadmap-runtimes-bindings node cli/bin/asdd.mjs check --live` exit 0 (spec drift clean). RED (session 016): 29/31 failing against an exports-only stub. Schema sha256 14ffba1c... unchanged.",
+      "evidence_hash": "aef4081800771b6f1445d530e4f370f6753e110eae61e70b6babf8e0e89f0709"
     },
     {
       "id": "TASK-004",

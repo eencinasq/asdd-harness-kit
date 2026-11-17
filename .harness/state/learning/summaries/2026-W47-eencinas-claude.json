@@ -14,7 +14,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
-          "last_at": "2026-11-17T01:52:08.874Z"
+          "last_at": "2026-11-17T02:02:08.860Z"
         }
       ],
       "examples": [
@@ -32,7 +32,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
-          "last_at": "2026-11-17T01:52:08.874Z"
+          "last_at": "2026-11-17T02:02:08.860Z"
         }
       ],
       "examples": [
@@ -50,7 +50,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T01:52:08.874Z"
+          "last_at": "2026-11-17T02:02:08.860Z"
         }
       ],
       "examples": [
@@ -63,11 +63,37 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
-          "last_at": "2026-11-17T01:52:08.874Z"
+          "last_at": "2026-11-17T02:02:08.860Z"
         }
       ],
       "examples": [
         "CONVERGE-02 feature TASK-001 lists REQ-016 but no test file mentions it"
+      ]
+    },
+    "sensor:DRIFT-01:cli": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T01:53:15.891Z",
+          "slice_id": "telemetry-emitters",
+          "last_at": "2026-11-17T01:57:29.046Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 cli/eval/skills/asdd-next/next-selects-ready-feature.json changed but is not mapped by telemetry-emitters (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:DRIFT-01:docs": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T01:53:15.891Z",
+          "slice_id": "telemetry-emitters",
+          "last_at": "2026-11-17T01:57:29.046Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-003.md changed but is not mapped by telemetry-emitters (intent/design/tasks/spec or scope_paths)"
       ]
     }
   }
