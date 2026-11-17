@@ -23,6 +23,7 @@
 | grounded-shaping | escalated | knowledge | DONE | 0 |
 | guidance-proposal-skip | hotfix | knowledge | DONE | 0 |
 | harness-green | escalated | knowledge | DONE | 0 |
+| intake-fitness-format | hotfix | knowledge | DONE | 0 |
 | intent-intake | escalated | knowledge | DONE | 0 |
 | jev-gate-nest | escalated | implementation | ABANDONED | 0 |
 | jev-module | full | knowledge | DONE | 0 |

@@ -426,6 +426,14 @@
       "mode": "lite",
       "manifest": ".harness/state/slices/shaping-cloud-setup/manifest.json",
       "features": ".harness/features/shaping-cloud-setup.features.json"
+    },
+    {
+      "slice_id": "intake-fitness-format",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/intake-fitness-format/manifest.json",
+      "features": ".harness/features/intake-fitness-format.features.json"
     }
   ]
 }
