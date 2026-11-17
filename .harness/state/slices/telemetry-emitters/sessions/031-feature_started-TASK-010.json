@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-031",
+  "timestamp": "2026-11-17T02:29:10.000Z",
+  "phase": "implementation",
+  "feature_id": "TASK-010",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/telemetry-observe.mjs",
+    "cli/src/harness/telemetry-observe.test.mjs"
+  ],
+  "evidence": "Start TASK-010 (REQ-013, REQ-015, REQ-016, REQ-018, REQ-004, REQ-005, REQ-006), owner claude-observe, concurrent with TASK-005 (disjoint scope). RED: wrote cli/src/harness/telemetry-observe.test.mjs first (26 tests: PAYLOAD_KEYS-in-fixtures guard and forbidden-key guard; fixture provenance; every Claude fixture x 4 telemetry states via the script file (writable, dir-missing, stream-is-directory, dir-read-only) -> exit 0, empty stdout/stderr; one schema-valid record per guidance fixture with REQ-013 fields; transcript_path/cwd/tool_response/prompt_id/tool_use_id values never in the line; Skill not installed / namespaced -> none; no session_id -> attribute absent; malformed ids omitted; no file_path / no skill / no tool_input -> no record; no multi-key fallback; attribution; self-minted trace; empty/invalid JSON/unknown event/other tools; missing/unknown argv; cursor argv -> allow, no span; throwing lib steps; stdout/stderr/exitCode untouched; non-guidance early exit before any fs call (spied); REQ-006 hash; no-network grep; four latency classes >=200 samples p99<=50 ms; 20-run wall time printed). Run 1 `node --test cli/src/harness/telemetry-observe.test.mjs` -> exit 1, 1 file-level failure (ERR_MODULE_NOT_FOUND telemetry-observe.mjs). Run 2 with exports-only stub (handleObserve throws not implemented, PAYLOAD_KEYS {}) -> exit 1, tests 26, pass 5 (provenance, no-network grep, 3 non-writable fixture states where a no-op script also exits 0), fail 21."
+}

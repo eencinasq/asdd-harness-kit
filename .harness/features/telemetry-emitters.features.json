@@ -271,7 +271,7 @@
       "id": "TASK-010",
       "title": "telemetry-observe.mjs handler: Claude activation records, fail-open answer",
       "user_visible_behavior": "A Claude Code Read of a steering or skill file, or a Skill call of an installed skill, appends one Activation record; every payload gets exit 0 and the runtime answer within p99 <= 50 ms; cursor argv answers allow with no span.",
-      "status": "in_progress",
+      "status": "passing",
       "priority": 10,
       "area": "telemetry-emitters",
       "owner": "claude-observe",
@@ -297,7 +297,9 @@
         "npm test",
         "node cli/bin/asdd.mjs check"
       ],
-      "notes": "Wave 8. RED first. PAYLOAD_KEYS limited to keys present in committed fixtures (ADR-004)."
+      "notes": "Wave 8. RED first. PAYLOAD_KEYS limited to keys present in committed fixtures (ADR-004).",
+      "evidence": "TDD: RED in session 031 (missing module, then exports-only stub: tests 26, pass 5, fail 21). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs -> # tests 26 # pass 26 # fail 0 (3 consecutive runs). In-process handler p99 over 200 samples per class (runs 1/2/3): claude-read-guidance 0.168/0.193/0.091 ms (writable stream), claude-read-nonguidance 0.008/0.008/0.007 ms, claude-skill 0.486/0.173/0.053 ms, cursor-default 0.000 ms; budget 50 ms. Whole-process wall time node telemetry-observe.mjs claude, 20 runs: p50 26.1-27.0 ms, max 29.0-39.1 ms (printed, not gated). npm test exit 0 (226/226; telemetry-observe.test.mjs is not in the npm test list until TASK-014 registration). HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0 (PASS harness invariants; WARN CONVERGE-02 REQ-016/REQ-018 for TASK-010 only because the new test file is untracked: testFiles reads git-tracked files, drift-lib.mjs:261-264).",
+      "evidence_hash": "83ea3996492806c1f49393cd8ba98927d860b65b1da6d9bc228479adbfa4dedd"
     },
     {
       "id": "TASK-011",
