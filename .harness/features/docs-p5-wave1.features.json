@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "docs-p5-wave1",
+  "source_tasks": ".harness/specs/docs-p5-wave1/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Document P5 wave 1; correct DRIFT-01/02 statements",
+      "user_visible_behavior": "A reader finds asdd ui, gate-decide, skill-eval, QG-LEARN-10, and the current DRIFT-01/02 behavior in the README, the shipped CLI README, the playbook, and the roadmap.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "grep -q 'DRIFT-02. | A slice is .in_progress.' README.md && grep -q 'docs/dissent-log.md' README.md && grep -q 'QG-LEARN-10' README.md && grep -q '### Local UI' README.md",
+        "grep -q 'asdd ui' cli/README.md && grep -q 'asdd gate-decide' cli/README.md && grep -q 'asdd skill-eval' cli/README.md",
+        "grep -q 'Play M' docs/PLAYBOOK.md && grep -q 'Play N' docs/PLAYBOOK.md && test -f cli/eval/skills/README.md && grep -q 'skill_contains' cli/eval/skills/README.md",
+        "grep -qE '^\\| P5\\.2 .*\\*\\*hecho\\*\\*' docs/ASDD-ROADMAP.md && grep -qE '^\\| P5\\.6 .*\\*\\*hecho\\*\\*' docs/ASDD-ROADMAP.md",
+        "node cli/bin/asdd.mjs kit guidance"
+      ],
+      "evidence": "2026-11-16: all 5 verification commands exit 0 (README drift/QG-LEARN-10/Local UI; cli/README rows; PLAYBOOK plays M and N + fixture README; roadmap P5.2/P5.3/P5.5/P5.6 hecho; kit guidance PASS). asdd check exit 0 (HARNESS_DRIFT_BASE=HEAD); npm test 222/222.",
+      "scope_paths": [
+        "README.md",
+        "cli/README.md",
+        "docs/PLAYBOOK.md",
+        "docs/ASDD-ROADMAP.md",
+        "cli/eval/skills/README.md"
+      ],
+      "evidence_hash": "064a63974616becd0f2a8266dc012e14f0a987d02a17107c9924b8491951b059"
+    }
+  ]
+}
