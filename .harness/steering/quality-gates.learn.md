@@ -24,6 +24,7 @@ Computational sensor: `asdd learn` (also run by `asdd sync`; the gate runs insid
 - **QG-LEARN-07.** For a `noise` pattern, the proposal shall loosen, tune, or remove the sensor. The agent shall not raise a threshold in an agent prompt instead (`controls.md` precedence 2).
 - **QG-LEARN-08.** A recorded run shall also record its WARN lines, except learning and lite-escalation WARNs, which are signals of their own. When the same WARN signature appears on 5 distinct days, its pattern shall open as `noise`: a WARN that fires every day without action shall be fixed, made a FAIL, or removed.
 - **QG-LEARN-09.** `asdd learn --export` shall include only verified or ineffective proposals on kit-owned controls, and only generic fields (signature, kind, counts, control, change, success, result). Nothing shall be sent upstream automatically.
+- **QG-LEARN-10.** A proposal with `change: add-guide` or `tighten-guide` shall carry an `eval: <command> => <result-ref>` field before it can be `accepted` or `applied`; the referenced `asdd skill-eval --json` result shall show `ok: true` (no failed fixtures, no baseline regressions). Proposals of other `change` kinds, and `proposed`/`rejected` statuses, shall not require eval.
 
 ## Negative space
 
@@ -33,7 +34,7 @@ Computational sensor: `asdd learn` (also run by `asdd sync`; the gate runs insid
 
 ## Enforcement
 
-`asdd learn` + `validators/learning.mjs` record signals and fold runs into weekly summaries on every sync and stop; `asdd check` WARNs on open patterns and FAILs on malformed proposals or Knowledge-phase completion with an open contributed pattern.
+`asdd learn` + `validators/learning.mjs` record signals and fold runs into weekly summaries on every sync and stop; `asdd check` WARNs on open patterns, FAILs on malformed proposals, Knowledge-phase completion with an open contributed pattern, and (`QG-LEARN-10`) guide-changing proposals accepted or applied without a passing skill-eval result.
 
 ## Escalation
 

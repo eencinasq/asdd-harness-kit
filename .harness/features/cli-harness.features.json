@@ -225,7 +225,7 @@
         "npm test",
         "cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test"
       ],
-      "evidence": "re-verified 2026-11-16T20:49:32 (DRIFT-02): npm test exit 0 (210 tests); cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test exit 0",
+      "evidence": "re-verified 2026-11-16T20:50:36 (DRIFT-02): npm test exit 0 (210 tests); tools/jev-gate pnpm typecheck+lint+test exit 0",
       "scope_paths": [
         "cli/src/install/**",
         "cli/src/harness/commands.mjs",
@@ -253,7 +253,7 @@
         ".github/workflows/harness-invariants.yml",
         ".harness/steering/structure.md"
       ],
-      "evidence_hash": "dd2fee6f8f6728f102325abf8371ba4d79b54a3a4d71e8c0971da8fd264e0402"
+      "evidence_hash": "7aae13888e8330c243feff3c854fbcfa2334a9665e8ca2b2c56e1fbf99a99090"
     },
     {
       "id": "TASK-010",

@@ -59,7 +59,7 @@
       "id": "TASK-003",
       "title": "Template + quality-gates.learn.md + kit self/versions",
       "user_visible_behavior": "The steering-proposal template documents the eval field and quality-gates.learn.md specifies QG-LEARN-10; installed copies stay in sync via asdd kit self.",
-      "status": "pending",
+      "status": "passing",
       "priority": 3,
       "owner": "devin",
       "req_ids": [
@@ -77,8 +77,9 @@
         "node cli/bin/asdd.mjs kit self --check",
         "npm test"
       ],
-      "evidence": "",
-      "notes": ""
+      "evidence": "kit self refreshed .harness copies (installed-versions.json hashes updated); npm test exit 0 incl. kit self --check; kit versions timestamp-only → restored.",
+      "notes": "",
+      "evidence_hash": "64d23de16e250c0685ca272b9df949d56fbfadb67316d71144f5aa37ba533149"
     }
   ]
 }

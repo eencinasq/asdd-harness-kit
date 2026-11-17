@@ -5,6 +5,7 @@ status: proposed
 control: <path of the guide or sensor to change, e.g. .harness/steering/session-loop.md>
 change: {{change}}
 success: <measurable criterion, e.g. no recurrence of {{signature}} in the next 10 sessions>
+eval: <required before accepted/applied for add-guide|tighten-guide: command => result-ref, e.g. asdd skill-eval --skill <name> --json => eval-results/SP-001.json>
 decided_by:
 applied_commit:
 applied_at:
@@ -21,6 +22,9 @@ Contract (QG-LEARN-03 … QG-LEARN-06, checked by validators/learning.mjs):
   ineffective if the signature recurs, or verified after the quiet window.
 - change: add-guide | tighten-guide | add-sensor | tighten-sensor | loosen-sensor | remove-sensor | product-code
 - control: an existing file — a row in .harness/steering/controls.md, a script, or product code for product-code.
+- eval (QG-LEARN-10): `eval: <command> => <result-ref>` — required before a proposal with `change: add-guide` or
+  `tighten-guide` can be `accepted` or `applied`. The result-ref is a worktree path or `<git-ref>:<path>` holding
+  `asdd skill-eval --json` output with `ok: true`; a missing, unresolvable, or regressed result FAILs the invariants.
 -->
 
 ## Pattern
