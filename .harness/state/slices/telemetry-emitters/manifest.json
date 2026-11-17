@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:17.015Z",
-  "updated_at": "2026-11-17T12:52:29.384Z",
+  "updated_at": "2026-11-17T12:58:35.141Z",
   "paths": {
     "specs": ".harness/specs/telemetry-emitters",
     "tasks": ".harness/specs/telemetry-emitters/tasks.md",
@@ -75,6 +75,17 @@
         "GOV-001: relayed PO/TL decisions still lack a human-authored override session"
       ],
       "acknowledged_by": "eencinas"
+    },
+    "qa": {
+      "status": "BLOCK",
+      "by": "eencinas",
+      "at": "2026-11-17T12:58:35.000Z",
+      "evidence": "Spec Coverage Gate BLOCK (QG-SPEC-06): EARS 126/127 applicable (2 superseded by D-3); MUST 25/25; pass rate 100% (npm test exit 0, 372/372 + install.sh, lifecycle.sh, vendor/self --check; focused slice files 183/183); spec coverage 24/25; drift --requirements clean; no domain-placement finding. UNCOV-001 probe: telemetry-observe.mjs:14 static import -> exit 1 with throwing/deleted lib. Redirect to asdd-implementation-agent (reopen TASK-010). Report: .harness/specs/telemetry-emitters/spec-coverage-report.md",
+      "concerns": [
+        "UNCOV-001 REQ-002 c7: asdd observe statically imports telemetry-lib; lib load failure exits 1 (no test)",
+        "QA-F-001 requirements.md 1.1.0 not amended for D-2/D-3 (errata 1.1.1 needs TL ack)",
+        "QA-F-003 pre-existing: command-gate module-load crash exits 1 on Claude Code (follow-up with KPI-1)"
+      ]
     }
   },
   "active_features": [],
@@ -519,6 +530,14 @@
       "event": "feature_completed",
       "phase": "implementation",
       "feature_id": "TASK-014"
+    },
+    {
+      "timestamp": "2026-11-17T12:58:35.000Z",
+      "agent": "asdd-qa-agent",
+      "human": "eencinas",
+      "event": "phase_blocked",
+      "phase": "qa",
+      "feature_id": null
     }
   ],
   "contributors": [
@@ -531,6 +550,7 @@
     "asdd-design-agent",
     "asdd-task-planning-agent",
     "eencinas",
-    "claude"
+    "claude",
+    "asdd-qa-agent"
   ]
 }
