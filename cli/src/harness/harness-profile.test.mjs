@@ -329,10 +329,11 @@ test('REQ-021: expected steering per phase, skills, runtime columns, three state
   assert.equal(legend.split('\n').filter((l) => /^\s+-\s/.test(l)).length, 3);
 });
 
-test('REQ-021: cursor observe entry present -> cursor shows not observed; runtimes missing -> "runtimes not configured" and record runtimes as columns', () => {
+test('REQ-021 c4 (1.1.1, D-3): a hand-added cursor observe entry still shows cursor as unknown; runtimes missing -> "runtimes not configured" and record runtimes as columns', () => {
   const hooked = project({ spans: [span({})], hooks: { claude: false, cursor: true } });
   const r = run(hooked, ['--slice', 'alpha']);
-  assert.match(r.stdout, /\.harness\/steering\/impl\.md\s+unknown\s+not observed\s+unknown/);
+  assert.match(r.stdout, /\.harness\/steering\/impl\.md\s+unknown\s+unknown\s+unknown/);
+  assert.equal(/\[?cursor\]?[^\n]*not observed/.test(r.stdout.split('Legend:')[0].split('\n').filter((l) => l.includes('impl.md')).join('\n')), false);
 
   const bare = project({ spans: [activation('.harness/steering/core.md', 'cursor')], runtimes: null });
   const b = run(bare, ['--slice', 'alpha']);

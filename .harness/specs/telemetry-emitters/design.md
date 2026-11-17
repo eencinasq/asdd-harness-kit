@@ -250,6 +250,7 @@ completion. That is a superset, and its only inputs are session phase events.
   - A missing `runtime_session_id` or `agent_id` renders as `unknown`. Records with `slice_id:null` are counted as
     unattributed.
   - The legend has three states. The phrase `not loaded` is never printed (a test greps for it).
+> **Superseded by D-3 (2026-11-17, UNCOV-002):** Cursor is hookless for guidance loads; `not observed` applies to `claude` only, and the `cursor` column is always `unknown` (requirements 1.1.1 REQ-021 c4; see [`cli/test/fixtures/telemetry/cursor/README.md`](../../../cli/test/fixtures/telemetry/cursor/README.md)).
 - **Fixed footer.** "Test thrash (H-BOOT, H-LOOP inputs) is not measured; H-* findings are not reported in this
   version."
 
@@ -801,6 +802,7 @@ Status column: **V** = verified in the repo; **U** = vendor-documented and UNVER
 **Three-state vocabulary as rendered** (REQ-021, TEL-7):
 - `not observed`: the runtime is `claude` or `cursor`, its observe hook entry is present in this project, and the tail
   holds no record for that file in that slice and phase.
+> **Superseded by D-3 (2026-11-17, UNCOV-002):** Cursor is hookless for guidance loads; `not observed` applies to `claude` only, and the `cursor` column is always `unknown` (requirements 1.1.1 REQ-021 c4; see [`cli/test/fixtures/telemetry/cursor/README.md`](../../../cli/test/fixtures/telemetry/cursor/README.md)).
 - `unknown`: a hookless runtime, an observe entry missing from the project's hook config, a shell-mediated load, or a
   missing id value.
 - `configured, not observed`: `CLAUDE.md`, Cursor `alwaysApply: true` rules, and skill descriptions. These enter context

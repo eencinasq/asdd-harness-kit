@@ -138,12 +138,14 @@ function commandsOf(entries) {
   return out;
 }
 
-/** True per runtime when the project's hook config holds the observe entry (design §12.1-§12.2). */
+/**
+ * True per runtime when the project's hook config holds the observe entry (design §12.1-§12.2).
+ * Cursor is hookless for guidance loads (D-3, REQ-021 c4 1.1.1): a hand-added beforeReadFile entry never makes it `not observed`.
+ */
 function readObserveHooks(root) {
   const claude = readJson(join(root, '.claude/settings.json'));
-  const cursor = readJson(join(root, '.cursor/hooks.json'));
   const has = (cfg, event) => isObject(cfg) && isObject(cfg.hooks) && commandsOf(cfg.hooks[event]).some((c) => OBSERVE_CMD_RE.test(c));
-  return { claude: has(claude, 'PostToolUse'), cursor: has(cursor, 'beforeReadFile') };
+  return { claude: has(claude, 'PostToolUse'), cursor: false };
 }
 
 /** Files that enter context without a tool call, computed now (REQ-021, Q-9). */
