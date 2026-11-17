@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-058",
+  "timestamp": "2026-11-17T12:40:18.991Z",
+  "phase": "implementation",
+  "feature_id": "TASK-007",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/validators/telemetry.mjs",
+    "cli/src/harness/validators/telemetry.test.mjs",
+    "cli/src/harness/check-invariants.mjs"
+  ],
+  "evidence": "Re-verified after TASK-012 (D-3 hookless, session 054) removed the Cursor beforeReadFile entry from the TEL-W3 load-hook check (LOAD_HOOKS = claude only) and changed/added the cursor TEL-W3 tests (DRIFT-02): node --test cli/src/harness/validators/telemetry.test.mjs -> tests 12 pass 12 fail 0 (3 runs); npm test exit 0 (235/235); kit vendor --check exit 0; HARNESS_DRIFT_BASE=c337df7 check --live: TEL-W3 lines are now .gitignore + runtime claude only (no runtime cursor line)."
+}

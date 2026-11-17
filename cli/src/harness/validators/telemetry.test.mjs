@@ -220,10 +220,10 @@ test('TASK-007 OI-7 TEL-W3: registration WARNs (a) gitignore, (b) contract files
     ['(b) README missing', (r) => rmSync(join(r, DIR, 'README.md')), 1, /README\.md/],
     ['(c) claude PostToolUse observe missing', (r) => writeFileSync(join(r, '.claude/settings.json'), JSON.stringify({ hooks: { Stop: [] } })), 1, /claude.*\.claude\/settings\.json.*PostToolUse/],
     ['(c) claude settings unparseable', (r) => writeFileSync(join(r, '.claude/settings.json'), '{'), 1, /claude/],
-    ['(c) cursor beforeReadFile observe missing', (r) => {
+    ['(c) cursor configured without a beforeReadFile observe entry → no hook WARN (D-3 hookless)', (r) => {
       writeFileSync(join(r, '.harness/config/project.json'), JSON.stringify({ runtimes: ['claude', 'cursor'] }));
       writeFileSync(join(r, '.cursor/hooks.json'), JSON.stringify({ version: 1, hooks: { stop: [] } }));
-    }, 1, /cursor.*\.cursor\/hooks\.json.*beforeReadFile/],
+    }, 0, null],
     ['(c) runtime not listed → no hook WARN', (r) => {
       writeFileSync(join(r, '.harness/config/project.json'), JSON.stringify({ runtimes: ['devin'] }));
       rmSync(join(r, '.claude/settings.json'));
@@ -246,6 +246,39 @@ test('TASK-007 OI-7 TEL-W3: registration WARNs (a) gitignore, (b) contract files
     } finally {
       cleanup(root);
     }
+  }
+});
+
+test('TASK-007/TASK-012 D-3 hookless: a configured cursor runtime never yields a cursor TEL-W3 line', () => {
+  for (const [name, mutate] of [
+    ['cursor hooks.json absent', (r) => rmSync(join(r, '.cursor/hooks.json'))],
+    ['cursor hooks.json unparseable', (r) => writeFileSync(join(r, '.cursor/hooks.json'), '{')],
+    ['cursor hooks.json without beforeReadFile', (r) => writeFileSync(join(r, '.cursor/hooks.json'), JSON.stringify({ version: 1, hooks: { stop: [] } }))],
+    ['cursor only, nothing else registered', (r) => {
+      writeFileSync(join(r, '.harness/config/project.json'), JSON.stringify({ runtimes: ['cursor'] }));
+      rmSync(join(r, '.cursor'), { recursive: true, force: true });
+      rmSync(join(r, '.gitignore'));
+    }],
+  ]) {
+    const root = project({ lines: [spanLine()], runtimes: ['claude', 'cursor'] });
+    try {
+      mutate(root);
+      const w3 = runValidator(root).filter((w) => w.startsWith('TEL-W3'));
+      assert.equal(w3.some((w) => /cursor|beforeReadFile/.test(w)), false, `${name}: ${w3.join(' | ')}`);
+    } finally {
+      cleanup(root);
+    }
+  }
+  // The Claude load-hook check stays: same project without the Claude observe entry still WARNs for claude.
+  const root = project({ lines: [spanLine()], runtimes: ['claude', 'cursor'] });
+  try {
+    rmSync(join(root, '.cursor/hooks.json'));
+    writeFileSync(join(root, '.claude/settings.json'), JSON.stringify({ hooks: { Stop: [] } }));
+    const w3 = runValidator(root).filter((w) => w.startsWith('TEL-W3'));
+    assert.equal(w3.length, 1, w3.join(' | '));
+    assert.match(w3[0], /^TEL-W3 runtime claude: \.claude\/settings\.json PostToolUse has no asdd observe entry/);
+  } finally {
+    cleanup(root);
   }
 });
 

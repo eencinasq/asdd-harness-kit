@@ -207,8 +207,8 @@
         "node cli/bin/asdd.mjs check"
       ],
       "notes": "Wave 5 (AR-2 W4). RED first. TEL-W3 may WARN on the kit until TASK-014.",
-      "evidence": "node --test cli/src/harness/validators/telemetry.test.mjs -> exit 0, 11/11 (3 runs); verify-on-stop+command-gate+telemetry-lib+learning-lib tests -> 94/94; npm test -> exit 0 (226/226); kit vendor --check -> exit 0 (check-invariants/validators not vendored); HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live -> exit 0 (3 expected TEL-W3 WARNs, none in the learning signal); asdd check vs HEAD check-invariants: same exit 0, diff = the 3 TEL-W3 lines only; drift --slice (base c337df7) PASS",
-      "evidence_hash": "17e817418fe37b91f41890bd26802d3695b5b2279c19c96665017ce6aeca0113"
+      "evidence": "node --test cli/src/harness/validators/telemetry.test.mjs -> exit 0, 11/11 (3 runs); verify-on-stop+command-gate+telemetry-lib+learning-lib tests -> 94/94; npm test -> exit 0 (226/226); kit vendor --check -> exit 0 (check-invariants/validators not vendored); HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live -> exit 0 (3 expected TEL-W3 WARNs, none in the learning signal); asdd check vs HEAD check-invariants: same exit 0, diff = the 3 TEL-W3 lines only; drift --slice (base c337df7) PASS | Re-verified after TASK-012 (D-3 hookless, session 054) removed the Cursor beforeReadFile entry from the TEL-W3 load-hook check (LOAD_HOOKS = claude only) and changed/added the cursor TEL-W3 tests (DRIFT-02): node --test cli/src/harness/validators/telemetry.test.mjs -> tests 12 pass 12 fail 0 (3 runs); npm test exit 0 (235/235); kit vendor --check exit 0; HARNESS_DRIFT_BASE=c337df7 check --live: TEL-W3 lines are now .gitignore + runtime claude only (no runtime cursor line).",
+      "evidence_hash": "aa93e9c2eddad0ae116ad6dc0ce90d28552c61420b211ea686cd71bd4b4587e4"
     },
     {
       "id": "TASK-008",
@@ -308,8 +308,8 @@
         "node cli/bin/asdd.mjs check"
       ],
       "notes": "Wave 8. RED first. PAYLOAD_KEYS limited to keys present in committed fixtures (ADR-004).",
-      "evidence": "TDD: RED in session 031 (missing module, then exports-only stub: tests 26, pass 5, fail 21). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs -> # tests 26 # pass 26 # fail 0 (3 consecutive runs). In-process handler p99 over 200 samples per class (runs 1/2/3): claude-read-guidance 0.168/0.193/0.091 ms (writable stream), claude-read-nonguidance 0.008/0.008/0.007 ms, claude-skill 0.486/0.173/0.053 ms, cursor-default 0.000 ms; budget 50 ms. Whole-process wall time node telemetry-observe.mjs claude, 20 runs: p50 26.1-27.0 ms, max 29.0-39.1 ms (printed, not gated). npm test exit 0 (226/226; telemetry-observe.test.mjs is not in the npm test list until TASK-014 registration). HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0 (PASS harness invariants; WARN CONVERGE-02 REQ-016/REQ-018 for TASK-010 only because the new test file is untracked: testFiles reads git-tracked files, drift-lib.mjs:261-264).",
-      "evidence_hash": "83ea3996492806c1f49393cd8ba98927d860b65b1da6d9bc228479adbfa4dedd"
+      "evidence": "TDD: RED in session 031 (missing module, then exports-only stub: tests 26, pass 5, fail 21). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs -> # tests 26 # pass 26 # fail 0 (3 consecutive runs). In-process handler p99 over 200 samples per class (runs 1/2/3): claude-read-guidance 0.168/0.193/0.091 ms (writable stream), claude-read-nonguidance 0.008/0.008/0.007 ms, claude-skill 0.486/0.173/0.053 ms, cursor-default 0.000 ms; budget 50 ms. Whole-process wall time node telemetry-observe.mjs claude, 20 runs: p50 26.1-27.0 ms, max 29.0-39.1 ms (printed, not gated). npm test exit 0 (226/226; telemetry-observe.test.mjs is not in the npm test list until TASK-014 registration). HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0 (PASS harness invariants; WARN CONVERGE-02 REQ-016/REQ-018 for TASK-010 only because the new test file is untracked: testFiles reads git-tracked files, drift-lib.mjs:261-264). | Re-verified after TASK-012 appended 8 Cursor hookless tests to cli/src/harness/telemetry-observe.test.mjs (handler unchanged) (DRIFT-02): node --test cli/src/harness/telemetry-observe.test.mjs -> tests 34 pass 34 fail 0 (3 runs; the 26 TASK-010 cases unchanged and passing); npm test exit 0 (235/235); kit vendor --check exit 0.",
+      "evidence_hash": "5e19263bf9baf3fb774757d01d0570ddfe8fc32a1be0cb4bb0e0c3f417699c74"
     },
     {
       "id": "TASK-011",
@@ -348,7 +348,7 @@
       "id": "TASK-012",
       "title": "Cursor branch of asdd observe (conditional on the TASK-002 D-3 outcome)",
       "user_visible_behavior": "With D-3 ship: a Cursor beforeReadFile of a guidance file appends one Activation record with conversation_id; with D-3 hookless: no record. Every Cursor payload gets {\"permission\":\"allow\"} and exit 0.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 12,
       "area": "telemetry-emitters",
       "owner": "claude",
@@ -371,7 +371,9 @@
         "npm test",
         "node cli/bin/asdd.mjs check"
       ],
-      "notes": "Wave 9. Conditional per D-3 (read from cli/test/fixtures/telemetry/cursor/README.md). RED first."
+      "notes": "Wave 9. Conditional per D-3 (read from cli/test/fixtures/telemetry/cursor/README.md). RED first.",
+      "evidence": "D-3 = hookless (session 054; cli/test/fixtures/telemetry/cursor/README.md). Handler unchanged (no test required a change): observe cursor = {\"permission\":\"allow\"}\\n, exit 0, no span; PAYLOAD_KEYS has no cursor entry. RED: session 057 (mutation RED on telemetry-observe.test.mjs: tests 8 pass 6 fail 2, exit 1, reverted; validator RED: tests 12 pass 10 fail 2, exit 1). GREEN: node --test cli/src/harness/telemetry-observe.test.mjs -> tests 34 pass 34 fail 0 (TASK-012 tests: D-3 hookless README/no fixture/no cursor keys; every input to observe cursor x 4 telemetry states -> allow, exit 0, zero lines; no stdin; no lib step and no fs call; TRC-006 latency Cursor guidance p99 0.001 ms and Cursor non-guidance p99 0.000 ms, n=200, budget 50 ms); node --test cli/src/harness/validators/telemetry.test.mjs -> tests 12 pass 12 fail 0 (TEL-W3 load-hook check is Claude only; no cursor TEL-W3 line for a configured cursor runtime); node --test cli/src/harness/harness-profile.test.mjs -> 17/17 (Cursor column unknown without an observe hook, unchanged); focused 63/63 three runs; kit vendor --check exit 0; kit self --check exit 0; npm test exit 0 (235/235); HARNESS_DRIFT_BASE=c337df7 node cli/bin/asdd.mjs check --live exit 0, TEL-W3 runtime cursor WARN gone (remaining TEL-W3: .gitignore, runtime claude, both until TASK-014). TASK-007 and TASK-010 re-verified (DRIFT-02, sessions 058/059).",
+      "evidence_hash": "5e19263bf9baf3fb774757d01d0570ddfe8fc32a1be0cb4bb0e0c3f417699c74"
     },
     {
       "id": "TASK-013",

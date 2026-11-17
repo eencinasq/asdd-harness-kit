@@ -549,3 +549,128 @@ test('REQ-018 whole-process wall time of `telemetry-observe.mjs claude` (20 runs
   });
 });
 
+
+// --- TASK-012 (D-3 = hookless): Cursor answers allow and records nothing (REQ-014, REQ-016, REQ-018, REQ-004) ---
+// D-3 was decided hookless (cli/test/fixtures/telemetry/cursor/README.md): no Cursor payload fixture exists, so the
+// handler reads no Cursor key. The inputs below are test probes only, shaped after design §12.1 (Cursor row); they are
+// not fixtures and never justify a PAYLOAD_KEYS entry (ADR-004).
+
+const CURSOR_FIXTURE_DIR = join(HERE, '../../test/fixtures/telemetry/cursor');
+
+/** Cursor-shaped probes plus every Claude fixture, malformed and empty inputs. */
+function cursorInputs(root) {
+  const probe = (filePath) =>
+    JSON.stringify({
+      hook_event_name: 'beforeReadFile',
+      file_path: filePath,
+      conversation_id: 'conv-1',
+      content: 'SECRET-CONTENT',
+      attachments: [{ file_path: join(root, '.harness/steering/core.md') }],
+      user_email: 'someone@example.com',
+      workspace_roots: [root],
+    });
+  return {
+    'cursor-probe-steering': probe(join(root, '.harness/steering/controls.md')),
+    'cursor-probe-cursor-skill': probe(join(root, '.cursor/skills/codegraph/SKILL.md')),
+    'cursor-probe-nonguidance': probe(join(root, 'src/index.js')),
+    ...Object.fromEntries(FIXTURES.map((n) => [`claude-fixture-${n}`, rawPayload(n, root)])),
+    'invalid-json': '{bad',
+    empty: '',
+    'empty-object': '{}',
+    'json-null': 'null',
+    'json-array': '[]',
+  };
+}
+
+test('TASK-012 D-3 hookless: no Cursor fixture, README records hookless, PAYLOAD_KEYS has no cursor entry', () => {
+  const readme = readFileSync(join(CURSOR_FIXTURE_DIR, 'README.md'), 'utf8');
+  assert.match(readme, /\*\*hookless\*\*/, 'D-3 outcome read from the README, not decided here');
+  assert.deepEqual(readdirSync(CURSOR_FIXTURE_DIR).filter((f) => f.endsWith('.json')), [], 'hookless: no payload fixture');
+  assert.equal(Object.hasOwn(PAYLOAD_KEYS, 'cursor'), false);
+  const source = readFileSync(SCRIPT, 'utf8');
+  for (const key of ['beforeReadFile', 'conversation_id', 'attachments', 'user_email', 'workspace_roots', 'generation_id', 'cursor_version']) {
+    assert.equal(source.includes(key), false, `${key} in handler source`);
+  }
+});
+
+for (const [state, prepare] of Object.entries(STATES)) {
+  test(`TASK-012 hookless: every input to \`observe cursor\` answers allow, exit 0, zero lines under ${state}`, (t) => {
+    if (state === 'dir-read-only' && IS_ROOT) {
+      t.skip('root ignores directory permissions');
+      return;
+    }
+    withRoot({}, (root) => {
+      prepare(root);
+      for (const [name, input] of Object.entries(cursorInputs(root))) {
+        const res = runScript(['cursor'], input, root);
+        assert.equal(res.status, 0, `${name}: ${res.stderr}`);
+        assert.equal(res.stdout, CURSOR_ALLOW, name);
+        assert.equal(res.stderr, '', name);
+        assert.deepEqual(handleObserve(input, 'cursor', { root, env: {} }), { answer: CURSOR_ALLOW, span: null }, name);
+        assert.deepEqual(streamLines(root), [], `${name} under ${state}`);
+      }
+      if (state === 'dir-missing') assert.equal(existsSync(join(root, TELEMETRY_DIR)), false);
+    });
+  });
+}
+
+test('TASK-012 hookless: `observe cursor` with no stdin at all answers allow, exit 0, no line', () => {
+  withRoot({}, (root) => {
+    const res = spawnSync(process.execPath, [SCRIPT, 'cursor'], { cwd: root, env: cleanEnv(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.equal(res.status, 0);
+    assert.equal(res.stdout, CURSOR_ALLOW);
+    assert.equal(res.stderr, '');
+    assert.deepEqual(streamLines(root), []);
+  });
+});
+
+test('TASK-012 hookless: cursor calls no library step and no filesystem function (REQ-018 fail-open)', () => {
+  withRoot({}, (root) => {
+    const steps = ['guidanceTarget', 'skillTarget', 'attribute', 'startTrace', 'buildSpan', 'emit'];
+    const calls = [];
+    const lib = Object.fromEntries(
+      steps.map((s) => [
+        s,
+        () => {
+          calls.push(s);
+          throw new Error('boom');
+        },
+      ])
+    );
+    const inputs = cursorInputs(root);
+    const names = ['readFileSync', 'statSync', 'existsSync', 'openSync', 'writeSync', 'readSync', 'lstatSync', 'realpathSync', 'appendFileSync', 'mkdirSync'];
+    const spies = names.map((n) => mock.method(fs, n));
+    try {
+      for (const [name, input] of Object.entries(inputs)) {
+        assert.deepEqual(handleObserve(input, 'cursor', { root, env: {}, lib }), { answer: CURSOR_ALLOW, span: null }, name);
+      }
+      for (const spy of spies) assert.equal(spy.mock.callCount(), 0);
+    } finally {
+      for (const spy of spies) spy.mock.restore();
+    }
+    assert.deepEqual(calls, []);
+    assert.deepEqual(streamLines(root), []);
+  });
+});
+
+test('TASK-012 latency (TRC-006): Cursor guidance and Cursor non-guidance p99 <= 50 ms, >= 200 samples, no line', (t) => {
+  withRoot({}, (root) => {
+    const inputs = cursorInputs(root);
+    const classes = { 'cursor-guidance': inputs['cursor-probe-steering'], 'cursor-nonguidance': inputs['cursor-probe-nonguidance'] };
+    for (const [cls, raw] of Object.entries(classes)) {
+      const samples = [];
+      for (let i = 0; i < SAMPLES + 10; i += 1) {
+        const start = performance.now();
+        const out = handleObserve(raw, 'cursor', { root, env: {} });
+        const ms = performance.now() - start;
+        assert.equal(out.answer, CURSOR_ALLOW);
+        if (i >= 10) samples.push(ms); // first 10 are warm-up
+      }
+      assert.ok(samples.length >= 200);
+      const p99 = nearestRank(samples, 99);
+      t.diagnostic(`latency ${cls}: n=${samples.length} p50=${nearestRank(samples, 50).toFixed(3)}ms p99=${p99.toFixed(3)}ms`);
+      assert.ok(p99 <= P99_BUDGET_MS, `${cls} p99 ${p99.toFixed(3)} ms > ${P99_BUDGET_MS} ms`);
+    }
+    assert.deepEqual(streamLines(root), []);
+  });
+});

@@ -8,7 +8,8 @@ import { MAX_LINE_BYTES, STREAM_FILE, TELEMETRY_DIR, readTail, validateSpan } fr
  * - TEL-W1: the schema file is missing or does not parse as JSON;
  * - TEL-W2: one WARN per bad line in the bounded tail (readTail: not JSON, schema errors, over 4,096 bytes with
  *   its LF, no attributes.trace_source), numbered per OI-5 (design §4.4);
- * - TEL-W3 (OI-7, design §8): registration incomplete (gitignore lines, contract files, runtime load hook).
+ * - TEL-W3 (OI-7, design §8): registration incomplete (gitignore lines, contract files, Claude load hook; Cursor is
+ *   hookless for loads per D-3).
  * Reads only; never writes (REQ-006). check-invariants loads it with a guarded import, maps fail to warn, and keeps
  * its WARNs out of the learning signal.
  */
@@ -21,9 +22,10 @@ const FIX = 'run `asdd install .`';
 const MAX_SCHEMA_ERRORS = 3;
 // The installed (shell wrapper "$b") and kit-self (asdd.mjs) observe commands (design §12.2, TASK-014).
 const OBSERVE_CMD = /(asdd(\.mjs)?|"\$b") observe\b/;
+// Runtimes with a guidance load hook. Cursor is hookless for loads (D-3, 2026-11-17: no live beforeReadFile fixture,
+// cli/test/fixtures/telemetry/cursor/README.md), so a configured cursor runtime needs no observe entry.
 const LOAD_HOOKS = {
   claude: { file: '.claude/settings.json', event: 'PostToolUse' },
-  cursor: { file: '.cursor/hooks.json', event: 'beforeReadFile' },
 };
 
 function readJsonFile(path) {
