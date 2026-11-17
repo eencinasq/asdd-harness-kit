@@ -14,7 +14,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
-          "last_at": "2026-11-17T02:02:08.860Z"
+          "last_at": "2026-11-17T02:09:38.816Z"
         }
       ],
       "examples": [
@@ -32,7 +32,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
-          "last_at": "2026-11-17T02:02:08.860Z"
+          "last_at": "2026-11-17T02:09:38.816Z"
         }
       ],
       "examples": [
@@ -50,7 +50,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T02:02:08.860Z"
+          "last_at": "2026-11-17T02:09:38.816Z"
         }
       ],
       "examples": [
@@ -63,7 +63,7 @@
         {
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
-          "last_at": "2026-11-17T02:02:08.860Z"
+          "last_at": "2026-11-17T02:09:38.816Z"
         }
       ],
       "examples": [
@@ -76,7 +76,7 @@
         {
           "at": "2026-11-17T01:53:15.891Z",
           "slice_id": "telemetry-emitters",
-          "last_at": "2026-11-17T01:57:29.046Z"
+          "last_at": "2026-11-17T02:06:38.498Z"
         }
       ],
       "examples": [
@@ -89,11 +89,38 @@
         {
           "at": "2026-11-17T01:53:15.891Z",
           "slice_id": "telemetry-emitters",
-          "last_at": "2026-11-17T01:57:29.046Z"
+          "last_at": "2026-11-17T02:09:38.816Z"
         }
       ],
       "examples": [
-        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-003.md changed but is not mapped by telemetry-emitters (intent/design/tasks/spec or scope_paths)"
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-003.md changed but is not mapped by telemetry-emitters (intent/design/tasks/spec or scope_paths)",
+        "DRIFT-01 docs/knowledge-base/steering-proposals/SP-007.md changed but is not mapped by telemetry-emitters (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "sensor:QG-LEARN-04": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T02:03:16.683Z",
+          "slice_id": "skill-eval",
+          "last_at": "2026-11-17T02:06:38.498Z"
+        }
+      ],
+      "examples": [
+        "QG-LEARN-04 slice \"skill-eval\" completed Knowledge while pattern LP-2a52ea2c (sensor:DRIFT-01:cli) it contributed to is open — add a steering proposal (accepted or rejected counts) for it"
+      ]
+    },
+    "sensor:DRIFT-02": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T02:09:31.641Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T02:09:38.816Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-02 passing feature TASK-003 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
       ]
     }
   }

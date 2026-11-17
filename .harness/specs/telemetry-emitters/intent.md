@@ -52,6 +52,8 @@ Design narrows this list; nothing outside it changes.
 - Widened 2026-11-16 by PO decision (validation TRC-003):
   - Tests: `cli/src/harness/command-gate.test.mjs`, `cli/src/harness/sync-state.test.mjs`, `cli/src/harness/verify-on-stop.test.mjs` (new), `cli/test/install.sh`
   - Hook payload fixtures: `cli/test/fixtures/telemetry/**`
+- Widened 2026-11-16 by PO decision (learning patterns LP-2a52ea2c, LP-7f51c52f opened by this slice's Stop-hook runs):
+  - Steering proposals: `docs/knowledge-base/steering-proposals/SP-007.md`, `docs/knowledge-base/steering-proposals/SP-008.md`
 
 ## Depends on
 
