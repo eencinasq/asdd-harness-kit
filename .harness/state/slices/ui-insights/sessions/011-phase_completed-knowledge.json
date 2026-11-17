@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-insights-011",
+  "timestamp": "2026-11-17T16:52:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ui-insights",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lite note: the cost panel reads metrics.cost from a contract owned by the parallel slice cost-metrics and shows the absent hint until it lands; skill-eval runs from the UI are argv-only with a safe-ref check on --baseline.",
+  "concerns": []
+}

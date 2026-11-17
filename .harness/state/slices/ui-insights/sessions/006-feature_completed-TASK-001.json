@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-ui-insights-006",
+  "timestamp": "2026-11-17T16:20:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "ui-insights",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/ui-server-insights.mjs",
+    "cli/src/harness/ui-server.mjs",
+    "cli/src/harness/ui-server.test.mjs"
+  ],
+  "evidence": "GREEN: node --test cli/src/harness/ui-server.test.mjs 13/13 incl. 4 ui-insights tests (activation window/never-loaded/runtimes, absent hint, skill-eval summary + safe ref, cost pass-through/absent, endpoints + cache + 400s + 405).",
+  "concerns": []
+}
