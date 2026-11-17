@@ -362,6 +362,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/drift01-harness-logs/manifest.json",
       "features": ".harness/features/drift01-harness-logs.features.json"
+    },
+    {
+      "slice_id": "docs-p5-wave1",
+      "phase": "discovery",
+      "status": "in_progress",
+      "mode": "lite",
+      "manifest": ".harness/state/slices/docs-p5-wave1/manifest.json",
+      "features": ".harness/features/docs-p5-wave1.features.json"
     }
   ]
 }
