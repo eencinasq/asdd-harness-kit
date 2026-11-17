@@ -4,6 +4,7 @@
  * next-group instruction carries, and decide whether a `category: security` finding has the evidence it needs.
  */
 import { checklistById } from './checklists.ts';
+import { lineCount } from './findings.ts';
 
 type SurfaceRule = {
 	readonly id: string;
@@ -177,4 +178,55 @@ export const prSecurityFindingProblem = (finding: {
 		return 'security finding evidence has no file:line location for the entrypoint or sink';
 	}
 	return null;
+};
+
+/** A `file:line` an evidence text cites (pr-security-baseline REQ-004). */
+export type EvidenceLocation = { readonly file: string; readonly line: number };
+
+const URL_RE = /\b[a-z][a-z0-9+.-]*:\/\/\S+/gi;
+const LOCATIONS_RE = /(?<![\w./-])((?:\.\.?\/)*[\w./-]+\.[A-Za-z0-9]+):(\d+)/g;
+
+/** Every distinct `file:line` in an evidence text: URLs ignored, a leading `./` dropped, `:2-3` read as line 2. */
+export const evidenceLocations = (evidence: string): EvidenceLocation[] => {
+	const seen = new Set<string>();
+	const out: EvidenceLocation[] = [];
+	for (const m of evidence.replace(URL_RE, ' ').matchAll(LOCATIONS_RE)) {
+		const file = (m[1] ?? '').replace(/^(?:\.\/)+/, '');
+		const line = Number(m[2]);
+		const key = `${file}:${line}`;
+		if (!file || seen.has(key)) continue;
+		seen.add(key);
+		out.push({ file, line });
+	}
+	return out;
+};
+
+/**
+ * Why each cited location cannot be trusted at the PR head (REQ-004): outside the repository, missing there, or past the
+ * end of the file. `contents` maps a file to its text at the PR head (undefined when it does not exist there).
+ */
+export const locationProblems = (
+	locations: readonly EvidenceLocation[],
+	contents: ReadonlyMap<string, string | undefined>,
+): string[] => {
+	const problems: string[] = [];
+	for (const { file, line } of locations) {
+		const ref = `${file}:${line}`;
+		if (file.startsWith('/') || file.split('/').includes('..')) {
+			problems.push(`${ref} is outside the repository`);
+			continue;
+		}
+		if (!Number.isInteger(line) || line < 1) {
+			problems.push(`${ref} is not a line number`);
+			continue;
+		}
+		const text = contents.get(file);
+		if (text === undefined) {
+			problems.push(`${ref} does not exist at the PR head`);
+			continue;
+		}
+		const count = lineCount(text);
+		if (line > count) problems.push(`${ref} is past the end of the file at the PR head (${count} lines)`);
+	}
+	return problems;
 };

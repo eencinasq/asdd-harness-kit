@@ -55,7 +55,7 @@ const isRecord = (v: unknown): v is Record<string, unknown> => Boolean(v) && typ
 const fingerprintOf = (v: unknown): string =>
 	isRecord(v) && typeof v['fingerprint'] === 'string' ? v['fingerprint'] : '';
 
-const lineCount = (text: string): number =>
+export const lineCount = (text: string): number =>
 	text.length === 0 ? 0 : text.split('\n').length - (text.endsWith('\n') ? 1 : 0);
 
 /** `file` resolved inside `repoRoot` (symlinks followed), or null when it leaves the repo or does not exist. */

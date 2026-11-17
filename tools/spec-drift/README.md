@@ -270,7 +270,9 @@ Run state lives in `$XDG_STATE_HOME/spec-drift/security/<project>/run-<N>/`, nev
 **In PR review.** A review group whose files or added lines touch auth, crypto, deserialization, SQL / command / path
 building, HTTP handlers, browser sinks, secrets, CI workflows, dependency manifests, LLM calls or deployment files gets a
 `<security>` block with the matching checklists. A finding with `category: "security"` is kept only when its `evidence`
-names an affected principal or trust boundary and a `file:line`; otherwise it is skipped with a warning. The dashboard
+names an affected principal or trust boundary and a `file:line`, and every `file:line` it cites exists at the PR head
+(file present, line inside it; read with `git show`, never from the local checkout); otherwise it is skipped with a
+warning naming the bad location. The dashboard
 badges security findings. When the repository has no `.semgrep/security/` set (Semgrep engine), the PR scan also runs the
 built-in starter pack on the PR files and shows its findings as a separate `built-in security pack` hint in each group
 and in the report; it never blocks the review (a failed run is a note).

@@ -663,6 +663,38 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 				reports.some((text) => /### Built-in security pack/.test(text)),
 				'the review report lists the built-in pack',
 			);
+
+			// pr-security-baseline REQ-004: cited file:line locations must exist at the PR head.
+			const finding = (evidence: string) => ({
+				path: 'src/api/run.js',
+				content: 'A request value reaches a shell command.',
+				startLine: 2,
+				endLine: 2,
+				severity: 'critical',
+				category: 'security',
+				evidence,
+			});
+			const groupIndex = v.nextGroup?.index;
+			const submitted = await secCall('pr_review_submit_findings', {
+				groupIndex,
+				findings: [
+					finding('An untrusted request param (req.query.file) reaches exec at src/api/run.js:2.'),
+					finding('An untrusted request param reaches exec at src/api/run.js:99.'),
+					finding('An untrusted caller reaches the sink at src/api/nope.js:1.'),
+				],
+			});
+			const kept = (submitted.progress as unknown as { findingCount: number }).findingCount;
+			assert.equal(kept, 1, `only the finding citing a real head line is kept: ${JSON.stringify(submitted.warnings)}`);
+			assert.ok(
+				submitted.warnings?.some((w) =>
+					w.includes('src/api/run.js:99 is past the end of the file at the PR head (2 lines)'),
+				),
+				JSON.stringify(submitted.warnings),
+			);
+			assert.ok(
+				submitted.warnings?.some((w) => w.includes('src/api/nope.js:1 does not exist at the PR head')),
+				JSON.stringify(submitted.warnings),
+			);
 		} finally {
 			process.env['FAKE_GH_STATE'] = before;
 		}

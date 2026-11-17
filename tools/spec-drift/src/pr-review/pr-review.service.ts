@@ -9,7 +9,7 @@ import { APP_VERSION } from '../app.constants.ts';
 import { FileLock } from '../common/concurrency/file-lock.ts';
 import { KeyedMutex } from '../common/concurrency/keyed-mutex.ts';
 import { mcpRequestContext } from '../common/mcp/mcp-request-context.ts';
-import { prSecurityFindingProblem } from '../security/lens.ts';
+import { evidenceLocations, locationProblems, prSecurityFindingProblem } from '../security/lens.ts';
 import type { ArchitectureReviewView } from './architecture/architecture.types.ts';
 import { mergeArchitectureComments } from './architecture/architecture-import.ts';
 import {
@@ -495,6 +495,39 @@ export class PrReviewService {
 		);
 	}
 
+	/**
+	 * Split security findings by whether every `file:line` their evidence cites exists at the PR head (REQ-004). Each file
+	 * is read once at `headSha` (showFile), never from the local checkout; other findings pass through unchanged.
+	 */
+	private async checkSecurityLocations<F extends { readonly category?: string; readonly evidence?: string }>(
+		findings: readonly F[],
+		repoRoot: string,
+		headSha: string | undefined,
+	): Promise<{ kept: F[]; skipped: { f: F; problems: string[] }[] }> {
+		const kept: F[] = [];
+		const skipped: { f: F; problems: string[] }[] = [];
+		const cache = new Map<string, Promise<string | undefined>>();
+		const at = (file: string) => {
+			if (!cache.has(file)) {
+				cache.set(file, headSha ? this.github.showFile(repoRoot, headSha, file) : Promise.resolve(undefined));
+			}
+			return cache.get(file) as Promise<string | undefined>;
+		};
+		for (const f of findings) {
+			if (f.category !== 'security' || !headSha) {
+				kept.push(f);
+				continue;
+			}
+			const locations = evidenceLocations(f.evidence ?? '');
+			const inside = locations.filter((l) => !l.file.startsWith('/') && !l.file.split('/').includes('..'));
+			const contents = new Map(await Promise.all(inside.map(async (l) => [l.file, await at(l.file)] as const)));
+			const problems = locationProblems(locations, contents);
+			if (problems.length) skipped.push({ f, problems });
+			else kept.push(f);
+		}
+		return { kept, skipped };
+	}
+
 	/** Record one group's findings, rewrite the drafts and advance to the next group. */
 	private async submitFindingsUnlocked(input: SubmitFindingsInput): Promise<PrReviewView> {
 		const { pr, repoPath } = input;
@@ -516,7 +549,13 @@ export class PrReviewService {
 		const securitySkipped = profiled
 			.map((f) => ({ f, problem: prSecurityFindingProblem(f) }))
 			.filter((x): x is { f: (typeof profiled)[number]; problem: string } => x.problem !== null);
-		const resolved = profiled.filter((f) => prSecurityFindingProblem(f) === null);
+		const bounded = profiled.filter((f) => prSecurityFindingProblem(f) === null);
+		// pr-security-baseline REQ-004: every file:line a security finding cites must exist at the PR head.
+		const { kept: resolved, skipped: locationSkipped } = await this.checkSecurityLocations(
+			bounded,
+			paths.repoRoot,
+			state.current.head_sha,
+		);
 		const warnings = [
 			...unresolved.map(
 				(f, i) =>
@@ -526,6 +565,10 @@ export class PrReviewService {
 			...securitySkipped.map(
 				({ f, problem }) =>
 					`Security finding skipped (${problem}): ${f.path}:${f.startLine || '?'} — ${f.content.slice(0, 80)}. Resubmit it with that evidence, or with another category.`,
+			),
+			...locationSkipped.map(
+				({ f, problems }) =>
+					`Security finding skipped (${problems.join('; ')}): ${f.path}:${f.startLine || '?'} — ${f.content.slice(0, 80)}. Cite locations that exist at the PR head (read them with pr_review_read_file).`,
 			),
 		];
 
