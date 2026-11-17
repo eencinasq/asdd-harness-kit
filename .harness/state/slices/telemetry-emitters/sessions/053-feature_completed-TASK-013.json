@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "phase": "implementation",
+  "session_id": "sess-telemetry-emitters-053",
+  "timestamp": "2026-11-17T12:30:46.262Z",
+  "feature_id": "TASK-013",
+  "event_type": "feature_completed",
+  "scope_paths": [
+    "cli/src/harness/harness-profile.mjs",
+    "cli/src/harness/harness-profile.test.mjs"
+  ],
+  "evidence": "RED: 17 cases in cli/src/harness/harness-profile.test.mjs -> tests 17 pass 1 fail 16 (session 052, script absent). GREEN: node --test cli/src/harness/harness-profile.test.mjs -> tests 17 pass 17 fail 0, three consecutive runs; every invocation asserts the temp working-tree hash before = after (REQ-022) and 0 \"not loaded\" matches. Pins: REQ-023 exit 2 usage (no mode, unknown option, --slice without/invalid id, positional), exit 3 \"no telemetry exists for <target>\" (slice, --json, --bottlenecks), sessions-only -> phase table + \"no attributed spans for <slice>\" + unattributed count exit 0, --json shape + not_measured + unmeasured keys absent + no null; REQ-020 phase windows, p50/p95 fixture, scores + share unknown, AR-10 topology-only streams equal, --bottlenecks max/sum/slice_id tie-break, fixed H-* footer; REQ-021 expected steering via parseSteeringFrontmatter, skills, runtime columns, not observed/unknown/configured not observed, missing ids unknown, runtimes not configured, unattributed count, three-state legend; REQ-022 malformed skipped, 500-line and 262,144-byte bounds with cut first line not counted; REQ-004 no-network grep + throwing fetch. kit vendor --check exit 0; npm test exit 0 (tests 235 pass 235 fail 0; harness-profile.test.mjs joins the npm list in TASK-014); real repo: profile --slice telemetry-emitters / --json / --bottlenecks exit 0, no mode exit 2, unknown slice exit 3, git ls-files sha256 identical before and after; HARNESS_DRIFT_BASE=c337df7 check --live exit 0 (WARNs only: TEL-W3, QG-LEARN-03, QG-DEC-09, steering tags, CONVERGE-02 REQ-023 while the test file is untracked)."
+}

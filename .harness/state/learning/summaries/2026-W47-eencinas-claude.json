@@ -36,7 +36,7 @@
         {
           "at": "2026-11-17T12:00:15.013Z",
           "slice_id": null,
-          "last_at": "2026-11-17T12:14:41.046Z"
+          "last_at": "2026-11-17T12:30:28.206Z"
         }
       ],
       "examples": [
@@ -76,7 +76,7 @@
         {
           "at": "2026-11-17T12:00:15.013Z",
           "slice_id": null,
-          "last_at": "2026-11-17T12:14:41.046Z"
+          "last_at": "2026-11-17T12:30:28.206Z"
         }
       ],
       "examples": [
@@ -116,7 +116,7 @@
         {
           "at": "2026-11-17T12:00:15.013Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T12:14:41.046Z"
+          "last_at": "2026-11-17T12:30:28.206Z"
         }
       ],
       "examples": [
@@ -130,11 +130,16 @@
           "at": "2026-11-17T01:52:06.060Z",
           "slice_id": null,
           "last_at": "2026-11-17T02:52:32.804Z"
+        },
+        {
+          "at": "2026-11-17T12:30:28.206Z",
+          "slice_id": null
         }
       ],
       "examples": [
         "CONVERGE-02 feature TASK-001 lists REQ-016 but no test file mentions it",
-        "CONVERGE-02 feature TASK-007 lists REQ-019 but no test file mentions it"
+        "CONVERGE-02 feature TASK-007 lists REQ-019 but no test file mentions it",
+        "CONVERGE-02 feature TASK-013 lists REQ-023 but no test file mentions it"
       ]
     },
     "sensor:DRIFT-01:cli": {
@@ -160,7 +165,7 @@
         {
           "at": "2026-11-17T12:00:52.955Z",
           "slice_id": "telemetry-emitters",
-          "last_at": "2026-11-17T12:09:16.665Z"
+          "last_at": "2026-11-17T12:28:00.914Z"
         }
       ],
       "examples": [
@@ -190,7 +195,7 @@
         {
           "at": "2026-11-17T12:00:52.955Z",
           "slice_id": "telemetry-emitters",
-          "last_at": "2026-11-17T12:09:16.665Z"
+          "last_at": "2026-11-17T12:28:00.914Z"
         }
       ],
       "examples": [

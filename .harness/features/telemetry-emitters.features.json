@@ -375,7 +375,7 @@
       "id": "TASK-013",
       "title": "harness-profile.mjs: read-only asdd profile with modes, rendering, and exit codes",
       "user_visible_behavior": "asdd profile --slice/--bottlenecks/--json prints phase durations, gate/hook/sync latencies, scores and the three-state activation table, exits 0/2/3, and writes nothing.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 13,
       "area": "telemetry-emitters",
       "owner": "claude",
@@ -398,7 +398,9 @@
         "npm test",
         "node cli/bin/asdd.mjs check"
       ],
-      "notes": "Wave 9 (parallel with TASK-012, disjoint scopes). RED first."
+      "notes": "Wave 9 (parallel with TASK-012, disjoint scopes). RED first.",
+      "evidence": "RED: 17 cases in cli/src/harness/harness-profile.test.mjs -> tests 17 pass 1 fail 16 (session 052, script absent). GREEN: node --test cli/src/harness/harness-profile.test.mjs -> tests 17 pass 17 fail 0, three consecutive runs; every invocation asserts the temp working-tree hash before = after (REQ-022) and 0 \"not loaded\" matches. Pins: REQ-023 exit 2 usage (no mode, unknown option, --slice without/invalid id, positional), exit 3 \"no telemetry exists for <target>\" (slice, --json, --bottlenecks), sessions-only -> phase table + \"no attributed spans for <slice>\" + unattributed count exit 0, --json shape + not_measured + unmeasured keys absent + no null; REQ-020 phase windows, p50/p95 fixture, scores + share unknown, AR-10 topology-only streams equal, --bottlenecks max/sum/slice_id tie-break, fixed H-* footer; REQ-021 expected steering via parseSteeringFrontmatter, skills, runtime columns, not observed/unknown/configured not observed, missing ids unknown, runtimes not configured, unattributed count, three-state legend; REQ-022 malformed skipped, 500-line and 262,144-byte bounds with cut first line not counted; REQ-004 no-network grep + throwing fetch. kit vendor --check exit 0; npm test exit 0 (tests 235 pass 235 fail 0; harness-profile.test.mjs joins the npm list in TASK-014); real repo: profile --slice telemetry-emitters / --json / --bottlenecks exit 0, no mode exit 2, unknown slice exit 3, git ls-files sha256 identical before and after; HARNESS_DRIFT_BASE=c337df7 check --live exit 0 (WARNs only: TEL-W3, QG-LEARN-03, QG-DEC-09, steering tags, CONVERGE-02 REQ-023 while the test file is untracked).",
+      "evidence_hash": "8c977874ed6e8f5877ba573f0d949f3889d73c87945cc9a7c9bf8e4704f846e2"
     },
     {
       "id": "TASK-014",
