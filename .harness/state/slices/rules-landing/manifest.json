@@ -8,7 +8,7 @@
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-11T05:14:25.093Z",
-  "updated_at": "2026-11-17T02:01:34.007Z",
+  "updated_at": "2026-11-17T02:06:50.687Z",
   "paths": {
     "specs": ".harness/specs/rules-landing",
     "tasks": ".harness/specs/rules-landing/tasks.md",

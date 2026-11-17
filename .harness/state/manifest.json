@@ -378,6 +378,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/metrics-data-quality/manifest.json",
       "features": ".harness/features/metrics-data-quality.features.json"
+    },
+    {
+      "slice_id": "ui-drift-dead-link",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/ui-drift-dead-link/manifest.json",
+      "features": ".harness/features/ui-drift-dead-link.features.json"
     }
   ]
 }

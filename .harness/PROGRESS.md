@@ -49,5 +49,6 @@
 | telemetry-contract | lite | knowledge | DONE | 0 |
 | telemetry-emitters | full | discovery | in_progress | 0 |
 | ui-assets-dist | hotfix | knowledge | DONE | 0 |
+| ui-drift-dead-link | hotfix | knowledge | DONE | 0 |
 | ui-gate-decisions | escalated | knowledge | DONE | 0 |
 | ui-insights | lite | discovery | in_progress | 0 |
