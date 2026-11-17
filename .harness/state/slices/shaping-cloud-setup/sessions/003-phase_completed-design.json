@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-p65",
+  "human": "eencinas",
+  "slice_id": "shaping-cloud-setup",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:32:17.000Z",
+  "session_id": "sess-shaping-cloud-setup-003",
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "design.md: six-step script, plan/check modes, stubbed-PATH test; installer does not copy the script (ships in the npm package); docs changes; no domain terms, no ADRs."
+}

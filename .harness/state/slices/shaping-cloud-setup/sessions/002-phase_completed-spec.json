@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude-p65",
+  "human": "eencinas",
+  "slice_id": "shaping-cloud-setup",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:32:17.000Z",
+  "session_id": "sess-shaping-cloud-setup-002",
+  "event_type": "phase_completed",
+  "phase": "spec",
+  "evidence": "spec.md: REQ-001 widened (asdd CLI resolution, tools/ only in a kit checkout, knowledge sync) + REQ-004 (--plan/--check); mapping adds cli/test/cloud-setup.test.mjs and package.json."
+}
