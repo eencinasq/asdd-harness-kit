@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-17T00:59:19.096Z",
+  "generated_at": "2026-11-17T01:04:17.898Z",
   "threshold": 3,
   "summary": {
     "patterns": 29,
     "open": 0,
-    "in_flight": 4,
-    "verified": 1,
+    "in_flight": 3,
+    "verified": 2,
     "unsigned_failures": 0
   },
   "patterns": [
@@ -141,7 +141,7 @@
       "kind": "escape",
       "occurrences": 5,
       "threshold": 3,
-      "status": "proposed",
+      "status": "verified",
       "reopened": false,
       "first_seen": "2026-10-28T01:34:26.022Z",
       "last_seen": "2026-11-17T00:37:39.883Z",
@@ -158,9 +158,10 @@
         {
           "id": "SP-005",
           "file": "docs/knowledge-base/steering-proposals/SP-005.md",
-          "declared": "proposed",
-          "status": "proposed",
-          "recurrences": 0
+          "declared": "applied",
+          "status": "verified",
+          "recurrences": 0,
+          "quiet_sessions": 20
         }
       ]
     },
@@ -170,7 +171,7 @@
       "kind": "escape",
       "occurrences": 4,
       "threshold": 3,
-      "status": "proposed",
+      "status": "accepted",
       "reopened": false,
       "first_seen": "2026-10-28T13:22:35.735Z",
       "last_seen": "2026-11-17T00:28:33.442Z",
@@ -198,8 +199,8 @@
         {
           "id": "SP-006",
           "file": "docs/knowledge-base/steering-proposals/SP-006.md",
-          "declared": "proposed",
-          "status": "proposed",
+          "declared": "accepted",
+          "status": "accepted",
           "recurrences": 0
         }
       ]
