@@ -325,3 +325,196 @@ test('ui-drift-dead-link REQ-001 REQ-002: no link or route to the host-only spec
     await handle.close();
   }
 });
+
+// --- ui-insights (P5.7): activation, skill-eval, cost insights ---
+
+test('ui-insights TASK-002 REQ-001…004 the page has an Insights tab over the three endpoints and Slices metric cards', () => {
+  const app = readFileSync(join(HERE, 'ui/app.js'), 'utf8');
+  assert.match(app, /VIEWS = \[[^\]]*'insights'/);
+  for (const endpoint of ['/api/insights/activation', '/api/insights/skill-eval', '/api/insights/cost']) {
+    assert.ok(app.includes(endpoint), endpoint);
+  }
+  for (const field of ['lite_share', 'escalation_rate', 'stop_fail', 'phase_median_hours', 'open_patterns']) {
+    assert.ok(app.includes(field), `Slices card for ${field}`);
+  }
+  assert.match(app, /never_loaded/);
+  assert.match(app, /regressed/);
+  assert.match(app, /unknown_runtimes/);
+  assert.match(app, /\.hint/, 'absent sources show their hint');
+});
+
+function insightsRoot({ spans = null, observeWired = true, runtimes = ['claude', 'cursor'] } = {}) {
+  const root = mkdtempSync(join(tmpdir(), 'ui-insights-'));
+  const w = (rel, text) => {
+    mkdirSync(dirname(join(root, rel)), { recursive: true });
+    writeFileSync(join(root, rel), text);
+  };
+  w('.harness/steering/controls.md', '---\ninclusion: always\n---\n# controls\n');
+  w('.harness/steering/design-system.md', '---\ninclusion: auto\ntags:\n  - design\n---\n# design\n');
+  w('.agents/skills/shape-up/SKILL.md', '---\nname: shape-up\n---\n');
+  w('.agents/skills/codegraph/SKILL.md', '---\nname: codegraph\n---\n');
+  w('.harness/config/project.json', JSON.stringify({ runtimes }));
+  w('.harness/state/registry.json', JSON.stringify({ slices: [] }));
+  if (observeWired) {
+    w(
+      '.claude/settings.json',
+      JSON.stringify({ hooks: { PostToolUse: [{ matcher: 'Read|Skill', hooks: [{ type: 'command', command: 'asdd observe claude' }] }] } }),
+    );
+  }
+  if (spans) w('.harness/state/telemetry/spans.jsonl', `${spans.map((s) => (typeof s === 'string' ? s : JSON.stringify(s))).join('\n')}\n`);
+  return root;
+}
+
+const load = (target, iso, runtime = 'claude') => ({
+  schema_version: '1.0',
+  trace_id: 'a'.repeat(16),
+  span_id: 'b'.repeat(8),
+  kind: 'tool',
+  process_name: 'asdd-observe',
+  runtime,
+  start_time_iso: iso,
+  end_time_iso: iso,
+  duration_ms: 0,
+  status: 'OK',
+  attributes: { trace_source: 'self', target_path: target },
+  writer: 'runtime-hook',
+});
+
+test('ui-insights REQ-001 activation: installed vs loaded per runtime, never-loaded flagged, window applied', async () => {
+  const { activationInsights } = await import('./ui-server-insights.mjs');
+  const now = Date.parse('2026-11-17T12:00:00Z');
+  const root = insightsRoot({
+    spans: [
+      load('.harness/steering/controls.md', '2026-11-17T10:00:00Z'),
+      load('.harness/steering/controls.md', '2026-11-16T10:00:00Z'),
+      load('.agents/skills/shape-up/SKILL.md', '2026-10-01T10:00:00Z'),
+      { kind: 'command', start_time_iso: '2026-11-17T10:00:00Z', attributes: {} },
+      'not json',
+    ],
+  });
+  try {
+    const week = activationInsights(root, { window: '7', now });
+    assert.equal(week.source, 'present');
+    assert.equal(week.window_days, 7);
+    const by = Object.fromEntries(week.items.map((i) => [i.path, i]));
+    assert.equal(by['.harness/steering/controls.md'].loads.total, 2);
+    assert.equal(by['.harness/steering/controls.md'].loads.by_runtime.claude, 2);
+    assert.equal(by['.harness/steering/controls.md'].inclusion, 'always');
+    assert.equal(by['.agents/skills/shape-up/SKILL.md'].never_loaded, true, 'load outside the 7-day window');
+    assert.equal(by['.agents/skills/codegraph/SKILL.md'].type, 'skill');
+    assert.equal(by['.harness/steering/design-system.md'].never_loaded, true);
+    const rt = Object.fromEntries(week.runtimes.map((r) => [r.runtime, r.measured]));
+    assert.equal(rt.claude, 'observed');
+    assert.equal(rt.cursor, 'not measured');
+    const all = activationInsights(root, { window: 'all', now });
+    assert.equal(Object.fromEntries(all.items.map((i) => [i.path, i]))['.agents/skills/shape-up/SKILL.md'].never_loaded, false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('ui-insights REQ-004 activation absent: no spans → says so and names the producing command', async () => {
+  const { activationInsights } = await import('./ui-server-insights.mjs');
+  const root = insightsRoot({ observeWired: false });
+  try {
+    const out = activationInsights(root, { window: '30' });
+    assert.equal(out.source, 'absent');
+    assert.match(out.hint, /asdd observe/);
+    assert.equal(Object.fromEntries(out.runtimes.map((r) => [r.runtime, r.measured])).claude, 'hook not wired');
+    assert.equal(out.items.length, 4, 'installed items still listed');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('ui-insights REQ-002 REQ-003 REQ-004 skill-eval summary, cost pass-through, absent hints', async () => {
+  const { summarizeSkillEval, costInsights, isSafeRef } = await import('./ui-server-insights.mjs');
+  const suite = {
+    ok: false,
+    total: 2,
+    passed: 1,
+    failed: 1,
+    baseline: 'main',
+    regressed: ['shape-up/pitch'],
+    skills: [
+      {
+        name: 'shape-up',
+        total: 2,
+        passed: 1,
+        failed: 1,
+        results: [
+          { id: 'pitch', ok: false, delta: 'regressed', failures: ['skill_contains: missing "Ground"'], probes: [{ stdout: 'x'.repeat(5000) }] },
+          { id: 'po-mode', ok: true, delta: 'unchanged', failures: [] },
+        ],
+      },
+    ],
+  };
+  const s = summarizeSkillEval(suite);
+  assert.equal(s.source, 'present');
+  assert.deepEqual(s.regressed, ['shape-up/pitch']);
+  assert.equal(s.skills[0].cases[0].delta, 'regressed');
+  assert.ok(JSON.stringify(s).length < 2000, 'probe output is not shipped to the page');
+  assert.equal(summarizeSkillEval({ skills: [], total: 0, passed: 0, failed: 0, regressed: [], ok: false }).source, 'absent');
+  assert.match(summarizeSkillEval({ skills: [], total: 0 }).hint, /asdd skill-eval/);
+  assert.equal(isSafeRef('main'), true);
+  assert.equal(isSafeRef('origin/main~2'), true);
+  assert.equal(isSafeRef('--output=x'), false);
+  assert.equal(isSafeRef('a b'), false);
+
+  const cost = {
+    source: ['claude-transcript'],
+    totals: { input_tokens: 10, output_tokens: 5, cache_read_tokens: 0, cache_write_tokens: 0, usd: 0.01 },
+    by_slice: [],
+    by_phase: [],
+    by_model: [],
+    by_runtime: [{ runtime: 'cursor', unknown: true }],
+    unknown_runtimes: ['cursor'],
+  };
+  assert.equal(costInsights({ cost }).source, 'present');
+  assert.deepEqual(costInsights({ cost }).unknown_runtimes, ['cursor']);
+  const absent = costInsights({});
+  assert.equal(absent.source, 'absent');
+  assert.match(absent.hint, /asdd status --metrics/);
+});
+
+test('ui-insights REQ-001…004 GET endpoints serve the models; skill-eval uses the injected runner; no writes', async () => {
+  const { startUiServer } = await import('./ui-server.mjs');
+  const root = insightsRoot({ spans: [load('.harness/steering/controls.md', new Date().toISOString())] });
+  let calls = 0;
+  const skillEvalRunner = async ({ baseline }) => {
+    calls += 1;
+    return {
+      skills: [{ name: 'asdd-status', total: 1, passed: 1, failed: 0, results: [{ id: 'status-json', ok: true, failures: [] }] }],
+      total: 1,
+      passed: 1,
+      failed: 0,
+      regressed: [],
+      baseline: baseline ?? null,
+      ok: true,
+    };
+  };
+  const handle = await startUiServer({ root, port: 0, skillEvalRunner });
+  const base = `http://127.0.0.1:${handle.address.port}`;
+  try {
+    const act = await fetch(`${base}/api/insights/activation?window=30`).then((r) => r.json());
+    assert.equal(act.source, 'present');
+    assert.equal(act.window_days, 30);
+    const bad = await fetch(`${base}/api/insights/activation?window=abc`);
+    assert.equal(bad.status, 400);
+    const ev = await fetch(`${base}/api/insights/skill-eval`).then((r) => r.json());
+    assert.equal(ev.source, 'present');
+    await fetch(`${base}/api/insights/skill-eval`);
+    assert.equal(calls, 1, 'cached between GETs');
+    await fetch(`${base}/api/insights/skill-eval?refresh=1`);
+    assert.equal(calls, 2);
+    const badRef = await fetch(`${base}/api/insights/skill-eval?baseline=--output%3Dx`);
+    assert.equal(badRef.status, 400);
+    const cost = await fetch(`${base}/api/insights/cost`).then((r) => r.json());
+    assert.ok(['present', 'absent'].includes(cost.source));
+    const post = await fetch(`${base}/api/insights/cost`, { method: 'POST' });
+    assert.equal(post.status, 405);
+  } finally {
+    await handle.close();
+    rmSync(root, { recursive: true, force: true });
+  }
+});

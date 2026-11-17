@@ -87,7 +87,55 @@ iframe.pipeline {
   border-radius: 8px;
   background: var(--panel);
 }
+/* ui-insights: metric cards, Insights sections, flags */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.6rem;
+  margin: 0.75rem 0;
+}
+.card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.card span { color: var(--muted); font-size: 0.82rem; }
+.card strong { font-size: 1.2rem; }
+.card small { color: var(--muted); font-size: 0.78rem; overflow-wrap: anywhere; }
+.panel section + section { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.panel h2 { font-size: 1.05rem; margin: 0 0 0.5rem; }
+.panel h3 { font-size: 0.95rem; margin: 1rem 0 0.35rem; color: var(--muted); }
+th small { font-weight: 400; }
+td.muted, .muted { color: var(--muted); }
+tr.never td { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.flag {
+  display: inline-block;
+  padding: 0 0.4rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  border: 1px solid #c2410c;
+  color: #c2410c;
+}
+@media (prefers-color-scheme: dark) {
+  .flag { border-color: #fb923c; color: #fb923c; }
+}
+.missing { border-left: 3px solid var(--line); padding-left: 0.6rem; }
+code { overflow-wrap: anywhere; }
+select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+}
 @media (max-width: 640px) {
   .top, main { padding-left: 0.85rem; padding-right: 0.85rem; }
   iframe.pipeline { min-height: 20rem; }
+  .cards { grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); }
+  th, td { padding: 0.3rem 0.25rem; font-size: 0.85rem; }
 }
