@@ -29,6 +29,7 @@
 | knowledge-nest | escalated | implementation | ABANDONED | 0 |
 | learn-eval-gate | lite | knowledge | DONE | 0 |
 | mcp-standalone | escalated | implementation | ABANDONED | 0 |
+| metrics-data-quality | hotfix | knowledge | DONE | 0 |
 | modules-top-level | escalated | implementation | ABANDONED | 0 |
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
 | review-quality | full | knowledge | DONE | 0 |

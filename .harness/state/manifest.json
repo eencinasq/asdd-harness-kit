@@ -370,6 +370,14 @@
       "mode": "lite",
       "manifest": ".harness/state/slices/docs-p5-wave1/manifest.json",
       "features": ".harness/features/docs-p5-wave1.features.json"
+    },
+    {
+      "slice_id": "metrics-data-quality",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/metrics-data-quality/manifest.json",
+      "features": ".harness/features/metrics-data-quality.features.json"
     }
   ]
 }

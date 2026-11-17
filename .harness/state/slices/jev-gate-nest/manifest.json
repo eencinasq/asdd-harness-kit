@@ -13,7 +13,7 @@
   "escalation_required": false,
   "escalated_from_lite": true,
   "created_at": "2026-11-10T12:05:07.723Z",
-  "updated_at": "2026-11-17T01:53:10.741Z",
+  "updated_at": "2026-11-17T02:01:33.978Z",
   "paths": {
     "specs": ".harness/specs/jev-gate-nest",
     "tasks": ".harness/specs/jev-gate-nest/tasks.md",
