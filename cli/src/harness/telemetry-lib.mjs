@@ -1,10 +1,10 @@
 /**
  * Telemetry library (slice telemetry-emitters, design §3.1): span ids, buildSpan, fail-open emit,
- * schema-subset validator, bounded tail reader. Imports only node: built-ins (REQ-004) and never
- * sync-state.mjs (cycle rule). Writes only .harness/state/telemetry/spans.jsonl (REQ-006).
+ * schema-subset validator, bounded tail reader, and policy (attribute, guidanceTarget, skillTarget).
+ * Imports only node: built-ins (REQ-004) and never sync-state.mjs (cycle rule). Writes only .harness/state/telemetry/spans.jsonl (REQ-006).
  */
 import fs from 'node:fs';
-import { join } from 'node:path';
+import { isAbsolute, join, relative, sep } from 'node:path';
 import { randomBytes } from 'node:crypto';
 
 export const TELEMETRY_DIR = '.harness/state/telemetry';
@@ -230,5 +230,111 @@ export function readTail(root) {
     } catch {
       /* ignore */
     }
+  }
+}
+
+// --- Policy (TASK-004): attribution and guidance targets ---
+
+const SLICE_ID_RE = /^[a-z0-9_-]+$/;
+// telemetry.schema.json `phase` enum (string members); anything else -> unattributed so a span stays valid.
+const PHASES = new Set([
+  'discovery',
+  'spec',
+  'validation',
+  'domain',
+  'design',
+  'task_planning',
+  'implementation',
+  'qa',
+  'refactor',
+  'knowledge',
+]);
+const SKILL_NAME_RE = /^[A-Za-z0-9._-]+$/;
+const SKILL_ALIAS_ROOTS = new Set(['.agents', '.claude', '.cursor', '.devin']);
+const NONE = Object.freeze({ slice_id: null, phase: null });
+
+function readJson(file) {
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+/** { slice_id, phase } from the slice's generated manifest, or both null (missing, unparsable, phase off-enum). */
+function sliceFromManifest(root, id) {
+  if (typeof id !== 'string' || !SLICE_ID_RE.test(id)) return { ...NONE };
+  const manifest = readJson(join(root, '.harness/state/slices', id, 'manifest.json'));
+  const phase = manifest && typeof manifest === 'object' ? manifest.phase : undefined;
+  return PHASES.has(phase) ? { slice_id: id, phase } : { ...NONE };
+}
+
+/**
+ * REQ-017 / design §4.3 (OI-1). Rule 1: HARNESS_SLICE_ID set -> that slice + its manifest phase when the id is valid
+ * and the manifest parses, else both null (never falls through). Rule 2: exactly one `in_progress` slice in
+ * registry.json -> that slice + its manifest phase. Rule 3: both null. Reads only registry.json and one manifest;
+ * never consults trace ids.
+ */
+export function attribute(root = process.cwd(), env = process.env) {
+  try {
+    const explicit = env ? env[ATTRIBUTION_ENV] : undefined;
+    if (explicit !== undefined) return sliceFromManifest(root, explicit);
+    const registry = readJson(join(root, '.harness/state/registry.json'));
+    const slices = registry && Array.isArray(registry.slices) ? registry.slices : [];
+    const live = slices.filter((s) => s && typeof s === 'object' && s.status === 'in_progress');
+    return live.length === 1 ? sliceFromManifest(root, live[0].slice_id) : { ...NONE };
+  } catch {
+    return { ...NONE };
+  }
+}
+
+/** `<n>/SKILL.md` or `<n>/references/**` under a skills tree; null otherwise. */
+function skillRest(segments) {
+  const [name, ...rest] = segments;
+  if (!name || !SKILL_NAME_RE.test(name)) return null;
+  if (rest.length === 1 && rest[0] === 'SKILL.md') return segments;
+  if (rest.length >= 2 && rest[0] === 'references') return segments;
+  return null;
+}
+
+/**
+ * REQ-015 / design §12.4: canonical repo-relative guidance path or null. String operations only (no stat/realpath).
+ * Keeps `.harness/steering/**` and `.agents/skills/<n>/(SKILL.md|references/**)`; rewrites the `.claude`, `.cursor`
+ * and `.devin` skills aliases to `.agents/skills/`. Rejects NUL, `..` segments, `:` and paths outside root.
+ */
+export function guidanceTarget(raw, root) {
+  try {
+    if (typeof raw !== 'string' || raw === '' || raw.includes('\0')) return null;
+    let rel = raw;
+    if (isAbsolute(raw)) {
+      if (typeof root !== 'string' || root === '') return null;
+      rel = relative(root, raw);
+    }
+    if (rel.startsWith('..') || isAbsolute(rel)) return null;
+    const posix = rel.split(sep).join('/').replace(/\\/g, '/');
+    if (posix.includes(':')) return null;
+    const parts = posix.split('/');
+    if (parts.includes('..')) return null;
+    const segments = parts.filter((p) => p !== '' && p !== '.');
+    const [top, second, ...rest] = segments;
+    if (top === '.harness' && second === 'steering' && rest.length >= 1) return segments.join('/');
+    if (SKILL_ALIAS_ROOTS.has(top) && second === 'skills') {
+      const kept = skillRest(rest);
+      return kept ? ['.agents', 'skills', ...kept].join('/') : null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/** Skill tool name -> `.agents/skills/<name>/SKILL.md` only when that file exists; `:`, `/`, `..` -> null. */
+export function skillTarget(name, root = process.cwd()) {
+  try {
+    if (typeof name !== 'string' || !SKILL_NAME_RE.test(name) || name === '.' || name.includes('..')) return null;
+    const target = `.agents/skills/${name}/SKILL.md`;
+    return fs.statSync(join(root, target)).isFile() ? target : null;
+  } catch {
+    return null;
   }
 }

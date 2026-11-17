@@ -1,6 +1,7 @@
 /**
  * telemetry-emitters TASK-003 — telemetry-lib span core: ids, buildSpan, fail-open emit, validateSpan, readTail.
- * REQ-001…REQ-006, REQ-022. Every case runs in a temp dir, never against the repo's .harness/state/telemetry/.
+ * REQ-001…REQ-006, REQ-022. TASK-004 — policy: attribute(), guidanceTarget(), skillTarget() (REQ-015, REQ-017).
+ * Every case runs in a temp dir, never against the repo's .harness/state/ (the kit repo has several in_progress slices).
  */
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
@@ -27,10 +28,13 @@ import {
   TAIL_MAX_BYTES,
   TAIL_MAX_LINES,
   TELEMETRY_DIR,
+  attribute,
   buildSpan,
   childOf,
   emit,
+  guidanceTarget,
   readTail,
+  skillTarget,
   startTrace,
   validateSpan,
 } from './telemetry-lib.mjs';
@@ -617,6 +621,374 @@ test('REQ-022 readTail keeps the first line when the byte before the window is L
     assert.equal(cut.total, 2621);
     assert.equal(cut.fromStart, false);
     assert.equal(cut.lines.at(-1).text, 'u'.repeat(42));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// --- TASK-004 / REQ-017: attribution only when unambiguous ---
+
+const PHASES = SCHEMA.properties.phase.enum.filter((p) => typeof p === 'string');
+
+/** Temp repo with a registry and one manifest per slice. slices: { id: { status, phase } | { manifest: rawText } } */
+function attributionRoot(slices = {}, { registry } = {}) {
+  const root = tempRoot(false);
+  mkdirSync(join(root, '.harness/state/slices'), { recursive: true });
+  const rows = [];
+  for (const [id, spec] of Object.entries(slices)) {
+    const dir = join(root, '.harness/state/slices', id);
+    mkdirSync(dir, { recursive: true });
+    const text = spec.manifest ?? `${JSON.stringify({ slice_id: id, phase: spec.phase, status: spec.status })}\n`;
+    if (text !== null) writeFileSync(join(dir, 'manifest.json'), text);
+    rows.push({ slice_id: id, phase: spec.registryPhase ?? spec.phase, status: spec.status });
+  }
+  writeFileSync(
+    join(root, '.harness/state/registry.json'),
+    registry ?? `${JSON.stringify({ schema_version: '1.0', slices: rows })}\n`,
+  );
+  return root;
+}
+
+function withRoot(root, fn) {
+  try {
+    return fn(root);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+const NONE = { slice_id: null, phase: null };
+
+test('REQ-017 env names an existing slice -> that slice and its manifest phase', () => {
+  withRoot(
+    attributionRoot({
+      alpha: { status: 'in_progress', phase: 'design' },
+      beta: { status: 'in_progress', phase: 'qa' },
+    }),
+    (root) => {
+      assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: 'beta' }), { slice_id: 'beta', phase: 'qa' });
+      assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: 'alpha' }), { slice_id: 'alpha', phase: 'design' });
+    },
+  );
+});
+
+test('REQ-017 env naming a DONE slice still attributes it (env names an existing slice)', () => {
+  withRoot(attributionRoot({ old: { status: 'DONE', phase: 'knowledge' } }), (root) => {
+    assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: 'old' }), { slice_id: 'old', phase: 'knowledge' });
+  });
+});
+
+test('REQ-017 env names an unknown slice -> null, no fall-through to the single in_progress slice', () => {
+  withRoot(attributionRoot({ only: { status: 'in_progress', phase: 'implementation' } }), (root) => {
+    assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: 'missing' }), NONE);
+  });
+});
+
+test('REQ-017 env with invalid characters -> null, never resolves a path outside slices/', () => {
+  withRoot(attributionRoot({ only: { status: 'in_progress', phase: 'implementation' } }), (root) => {
+    // A manifest reachable by traversal must not be used.
+    writeFileSync(join(root, '.harness/state/manifest.json'), '{"phase":"design"}\n');
+    for (const bad of ['../', '..', 'Only', 'a/b', 'a b', 'only\n', 'x:y', '', '.']) {
+      assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: bad }), NONE, JSON.stringify(bad));
+    }
+  });
+});
+
+test('REQ-017 env unset: exactly one in_progress slice -> that slice and its manifest phase', () => {
+  withRoot(
+    attributionRoot({
+      done: { status: 'DONE', phase: 'knowledge' },
+      live: { status: 'in_progress', phase: 'implementation' },
+      blocked: { status: 'blocked', phase: 'spec' },
+    }),
+    (root) => {
+      assert.deepEqual(attribute(root, {}), { slice_id: 'live', phase: 'implementation' });
+    },
+  );
+});
+
+test('REQ-017 env unset: zero in_progress slices -> null', () => {
+  withRoot(attributionRoot({ done: { status: 'DONE', phase: 'knowledge' } }), (root) => {
+    assert.deepEqual(attribute(root, {}), NONE);
+  });
+});
+
+test('REQ-017 env unset: two in_progress slices -> null', () => {
+  withRoot(
+    attributionRoot({
+      a: { status: 'in_progress', phase: 'design' },
+      b: { status: 'in_progress', phase: 'design' },
+    }),
+    (root) => {
+      assert.deepEqual(attribute(root, {}), NONE);
+    },
+  );
+});
+
+test('REQ-017 unreadable or unparsable manifest -> null (env rule and registry rule)', () => {
+  withRoot(attributionRoot({ live: { status: 'in_progress', manifest: '{not json' } }), (root) => {
+    assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: 'live' }), NONE);
+    assert.deepEqual(attribute(root, {}), NONE);
+  });
+  withRoot(attributionRoot({ live: { status: 'in_progress', manifest: null } }), (root) => {
+    assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: 'live' }), NONE);
+    assert.deepEqual(attribute(root, {}), NONE);
+  });
+});
+
+test('REQ-017 unreadable registry or missing .harness -> null', () => {
+  withRoot(attributionRoot({ live: { status: 'in_progress', phase: 'qa' } }, { registry: '{oops' }), (root) => {
+    assert.deepEqual(attribute(root, {}), NONE);
+  });
+  withRoot(attributionRoot({ live: { status: 'in_progress', phase: 'qa' } }, { registry: '{"slices":{}}' }), (root) => {
+    assert.deepEqual(attribute(root, {}), NONE);
+  });
+  withRoot(tempRoot(false), (root) => {
+    assert.deepEqual(attribute(root, {}), NONE);
+    assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: 'x' }), NONE);
+  });
+});
+
+test('REQ-017 phase outside the schema enum -> both null', () => {
+  withRoot(attributionRoot({ live: { status: 'in_progress', phase: 'shipping' } }), (root) => {
+    assert.deepEqual(attribute(root, {}), NONE);
+    assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: 'live' }), NONE);
+  });
+  withRoot(attributionRoot({ live: { status: 'in_progress', phase: 7 } }), (root) => {
+    assert.deepEqual(attribute(root, {}), NONE);
+  });
+});
+
+test('REQ-017 phase follows the manifest at call time, not the registry or the env', () => {
+  withRoot(
+    attributionRoot({ live: { status: 'in_progress', phase: 'implementation', registryPhase: 'design' } }),
+    (root) => {
+      assert.deepEqual(attribute(root, {}), { slice_id: 'live', phase: 'implementation' });
+      const mp = join(root, '.harness/state/slices/live/manifest.json');
+      writeFileSync(mp, `${JSON.stringify({ slice_id: 'live', phase: 'qa', status: 'in_progress' })}\n`);
+      assert.deepEqual(attribute(root, { HARNESS_SLICE_ID: 'live' }), { slice_id: 'live', phase: 'qa' });
+      assert.deepEqual(attribute(root, {}), { slice_id: 'live', phase: 'qa' });
+    },
+  );
+});
+
+test('REQ-017 every schema phase is accepted and the result validates as span fields', () => {
+  for (const phase of PHASES) {
+    withRoot(attributionRoot({ live: { status: 'in_progress', phase } }), (root) => {
+      const got = attribute(root, {});
+      assert.deepEqual(got, { slice_id: 'live', phase });
+      const span = buildSpan(startTrace({ env: {} }), { kind: 'command', process_name: 'command-gate', ...got });
+      assert.deepEqual(validateSpan(span, SCHEMA), []);
+    });
+  }
+});
+
+test('REQ-017 HARNESS_TRACE_ID / HARNESS_SPAN_ID do not change the result (never read)', () => {
+  const trace = { HARNESS_TRACE_ID: 'a'.repeat(32), HARNESS_SPAN_ID: 'b'.repeat(16) };
+  withRoot(
+    attributionRoot({
+      a: { status: 'in_progress', phase: 'design' },
+      b: { status: 'in_progress', phase: 'qa' },
+    }),
+    (root) => {
+      assert.deepEqual(attribute(root, trace), attribute(root, {}));
+      assert.deepEqual(attribute(root, { ...trace, HARNESS_SLICE_ID: 'b' }), attribute(root, { HARNESS_SLICE_ID: 'b' }));
+      // A slice named like the trace id is still not chosen from it.
+      assert.deepEqual(attribute(root, { HARNESS_TRACE_ID: 'a' }), NONE);
+    },
+  );
+  const src = readFileSync(LIB_PATH, 'utf8');
+  const body = src.slice(src.indexOf('export function attribute'));
+  const fnText = body.slice(0, body.indexOf('\n}\n') + 2);
+  for (const needle of ['HARNESS_TRACE_ID', 'HARNESS_SPAN_ID', 'trace_id', 'parent_span_id']) {
+    assert.equal(fnText.includes(needle), false, needle);
+  }
+});
+
+test('REQ-017 attribute defaults env to process.env', () => {
+  withRoot(attributionRoot({ live: { status: 'in_progress', phase: 'qa' } }), (root) => {
+    const saved = process.env.HARNESS_SLICE_ID;
+    try {
+      delete process.env.HARNESS_SLICE_ID;
+      assert.deepEqual(attribute(root), { slice_id: 'live', phase: 'qa' });
+      process.env.HARNESS_SLICE_ID = 'nope';
+      assert.deepEqual(attribute(root), NONE);
+    } finally {
+      if (saved === undefined) delete process.env.HARNESS_SLICE_ID;
+      else process.env.HARNESS_SLICE_ID = saved;
+    }
+  });
+});
+
+// --- TASK-004 / REQ-015: guidance targets, string operations only ---
+
+const GROOT = join(tmpdir(), 'asdd-guidance-root');
+
+test('REQ-015 guidanceTarget table', () => {
+  const cases = [
+    // steering, relative and absolute
+    ['.harness/steering/controls.md', '.harness/steering/controls.md'],
+    ['.harness/steering/skills.md', '.harness/steering/skills.md'],
+    ['.harness/steering/bindings/nested/deep.md', '.harness/steering/bindings/nested/deep.md'],
+    [join(GROOT, '.harness/steering/skills.md'), '.harness/steering/skills.md'],
+    ['./.harness/steering/tech.md', '.harness/steering/tech.md'],
+    // canonical skills
+    ['.agents/skills/codegraph/SKILL.md', '.agents/skills/codegraph/SKILL.md'],
+    ['.agents/skills/codegraph/references/cli.md', '.agents/skills/codegraph/references/cli.md'],
+    ['.agents/skills/codegraph/references/a/b.md', '.agents/skills/codegraph/references/a/b.md'],
+    [join(GROOT, '.agents/skills/x/SKILL.md'), '.agents/skills/x/SKILL.md'],
+    // runtime aliases rewritten
+    ['.claude/skills/asdd-status/SKILL.md', '.agents/skills/asdd-status/SKILL.md'],
+    [join(GROOT, '.claude/skills/asdd-status/SKILL.md'), '.agents/skills/asdd-status/SKILL.md'],
+    ['.cursor/skills/foo/references/r.md', '.agents/skills/foo/references/r.md'],
+    ['.devin/skills/foo/SKILL.md', '.agents/skills/foo/SKILL.md'],
+    // non-guidance
+    ['package.json', null],
+    [join(GROOT, 'package.json'), null],
+    ['.harness/steering', null],
+    ['.harness/steering/', null],
+    ['.harness/state/registry.json', null],
+    ['.harness/specs/x/requirements.md', null],
+    ['.agents/skills/codegraph/other.md', null],
+    ['.agents/skills/codegraph/scripts/run.sh', null],
+    ['.agents/skills/codegraph/references', null],
+    ['.agents/skills/codegraph', null],
+    ['.agents/skills/SKILL.md', null],
+    ['.agents/agents/asdd-implementation-agent.md', null],
+    ['.opencode/skills/foo/SKILL.md', null],
+    ['.kiro/skills/foo/SKILL.md', null],
+    ['.claude/agents/x.md', null],
+    ['CLAUDE.md', null],
+    ['docs/.harness/steering/x.md', null],
+    // outside the root
+    [join(tmpdir(), 'elsewhere/.harness/steering/x.md'), null],
+    [`${GROOT}-evil/.harness/steering/x.md`, null],
+    ['/.harness/steering/x.md', null],
+    // traversal, NUL, colon
+    ['../.harness/steering/x.md', null],
+    ['.harness/steering/../../etc/passwd', null],
+    ['.harness/steering/../steering/x.md', null],
+    ['.agents/skills/../skills/x/SKILL.md', null],
+    ['.harness/steering/x\0.md', null],
+    ['.harness/steering/c:x.md', null],
+    ['C:/repo/.harness/steering/x.md', null],
+    ['.agents/skills/plugin:name/SKILL.md', null],
+    // non-strings and empty
+    ['', null],
+    [null, null],
+    [undefined, null],
+    [42, null],
+    [{}, null],
+  ];
+  for (const [raw, want] of cases) assert.equal(guidanceTarget(raw, GROOT), want, JSON.stringify(raw));
+});
+
+test('REQ-015 guidanceTarget uses no stat/realpath/exists (string operations only)', () => {
+  const spies = ['statSync', 'lstatSync', 'realpathSync', 'existsSync', 'accessSync', 'readFileSync', 'openSync'].map((m) =>
+    mock.method(fs, m),
+  );
+  try {
+    assert.equal(guidanceTarget(join(GROOT, '.claude/skills/a/SKILL.md'), GROOT), '.agents/skills/a/SKILL.md');
+    assert.equal(guidanceTarget('package.json', GROOT), null);
+    for (const s of spies) assert.equal(s.mock.callCount(), 0);
+  } finally {
+    for (const s of spies) s.mock.restore();
+  }
+});
+
+test('REQ-015 guidanceTarget never throws on a bad root (absolute needs a root; relative is used as is, §12.4)', () => {
+  assert.equal(guidanceTarget(join(GROOT, '.harness/steering/x.md'), null), null);
+  assert.equal(guidanceTarget(join(GROOT, '.harness/steering/x.md'), undefined), null);
+  assert.equal(guidanceTarget(join(GROOT, '.harness/steering/x.md'), 42), null);
+  assert.equal(guidanceTarget('.harness/steering/x.md', undefined), '.harness/steering/x.md');
+});
+
+// --- TASK-004: skillTarget ---
+
+function skillsRoot(names) {
+  const root = tempRoot(false);
+  for (const n of names) {
+    mkdirSync(join(root, '.agents/skills', n), { recursive: true });
+    writeFileSync(join(root, '.agents/skills', n, 'SKILL.md'), `# ${n}\n`);
+  }
+  return root;
+}
+
+test('REQ-015 skillTarget returns the canonical SKILL.md only for an installed, safe name', () => {
+  withRoot(skillsRoot(['codegraph', 'asdd-status', 'a.b_c-1']), (root) => {
+    mkdirSync(join(root, '.agents/skills/no-skill-md'), { recursive: true });
+    assert.equal(skillTarget('codegraph', root), '.agents/skills/codegraph/SKILL.md');
+    assert.equal(skillTarget('asdd-status', root), '.agents/skills/asdd-status/SKILL.md');
+    assert.equal(skillTarget('a.b_c-1', root), '.agents/skills/a.b_c-1/SKILL.md');
+    for (const bad of [
+      'humanizer:humanizer',
+      'plugin:codegraph',
+      'codegraph/references',
+      '../codegraph',
+      '..',
+      '.',
+      'a..b',
+      'not-installed',
+      'no-skill-md',
+      'code graph',
+      'codegraph\0',
+      '',
+      null,
+      undefined,
+      7,
+    ]) {
+      assert.equal(skillTarget(bad, root), null, JSON.stringify(bad));
+    }
+  });
+});
+
+// --- TASK-004: committed Claude fixtures (${REPO} -> temp root) ---
+
+const FIXTURE_DIR = join(HERE, '../../test/fixtures/telemetry/claude');
+
+function loadFixture(name, root) {
+  const text = readFileSync(join(FIXTURE_DIR, `${name}.json`), 'utf8').replaceAll('${REPO}', root);
+  return JSON.parse(text).payload;
+}
+
+test('REQ-015 Claude fixtures: Read paths and Skill names map to the canonical targets', () => {
+  withRoot(skillsRoot(['codegraph', 'asdd-status']), (root) => {
+    const read = (n) => guidanceTarget(loadFixture(n, root).tool_input.file_path, root);
+    const skill = (n) => skillTarget(loadFixture(n, root).tool_input.skill, root);
+    assert.equal(read('posttooluse-read-steering'), '.harness/steering/controls.md');
+    assert.equal(read('posttooluse-read-offset-limit'), '.harness/steering/skills.md');
+    assert.equal(read('posttooluse-read-subagent'), '.harness/steering/manifest.md');
+    assert.equal(read('posttooluse-read-claude-skills'), '.agents/skills/asdd-status/SKILL.md');
+    assert.equal(read('posttooluse-read-nonguidance'), null);
+    assert.equal(skill('posttooluse-skill-installed'), '.agents/skills/codegraph/SKILL.md');
+    assert.equal(skill('posttooluse-skill-namespaced'), null);
+  });
+});
+
+// --- TASK-004 / REQ-006: policy reads change no state ---
+
+test('REQ-006 attribute, guidanceTarget and skillTarget change no state (hash check)', () => {
+  const root = attributionRoot({
+    live: { status: 'in_progress', phase: 'implementation' },
+    other: { status: 'DONE', phase: 'knowledge' },
+  });
+  try {
+    mkdirSync(join(root, '.agents/skills/codegraph'), { recursive: true });
+    writeFileSync(join(root, '.agents/skills/codegraph/SKILL.md'), '# codegraph\n');
+    mkdirSync(join(root, TELEMETRY_DIR), { recursive: true });
+    const before = { harness: hashTree(join(root, '.harness')), agents: hashTree(join(root, '.agents')) };
+    const top = readdirSync(root).sort();
+    for (let i = 0; i < 5; i += 1) {
+      attribute(root, {});
+      attribute(root, { HARNESS_SLICE_ID: 'other' });
+      attribute(root, { HARNESS_SLICE_ID: 'ghost' });
+      guidanceTarget(join(root, '.claude/skills/codegraph/SKILL.md'), root);
+      skillTarget('codegraph', root);
+      skillTarget('ghost', root);
+    }
+    assert.deepEqual({ harness: hashTree(join(root, '.harness')), agents: hashTree(join(root, '.agents')) }, before);
+    assert.deepEqual(readdirSync(root).sort(), top);
+    assert.equal(existsSync(streamPath(root)), false);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

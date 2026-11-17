@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "telemetry-emitters",
+  "concerns": [],
+  "session_id": "sess-telemetry-emitters-018",
+  "timestamp": "2026-11-17T02:08:21.429Z",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "event_type": "feature_started",
+  "scope_paths": [
+    "cli/src/harness/telemetry-lib.mjs",
+    "cli/src/harness/telemetry-lib.test.mjs"
+  ],
+  "evidence": "Start TASK-004 (REQ-015, REQ-017, REQ-004, REQ-006). RED: added 20 cases to cli/src/harness/telemetry-lib.test.mjs (REQ-017 matrix: env names slice / DONE slice / unknown slice / invalid chars / one, zero, two in_progress / unparsable and missing manifest / unreadable registry / phase outside enum / phase follows manifest / every enum phase / HARNESS_TRACE_ID ignored / default process.env; REQ-015 guidanceTarget table incl. .claude|.cursor|.devin aliases, absolute in/out of root, .., NUL, colon, non-guidance; no stat/realpath spy; skillTarget installed / colon / slash / .. / not installed; committed Claude fixtures with ${REPO} -> temp root; REQ-006 hash check). Run 1 `node --test cli/src/harness/telemetry-lib.test.mjs` against TASK-003 lib -> exit 1, 1 file-level failure (SyntaxError: no export named attribute). Run 2 with exports-only stubs (throw not implemented) -> exit 1, tests 51, pass 31 (all TASK-003 cases), fail 20 (every TASK-004 case, reason: not implemented)."
+}
