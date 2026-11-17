@@ -15,13 +15,13 @@
       ],
       "depends_on": [],
       "verification": [
-        "test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 22"
+        "test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 27"
       ],
-      "evidence": "Amend 2026-11-16 (P5 + G15–G22): `test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 22` exits 0.",
+      "evidence": "Amend 2026-11-17 (P6 + G23–G27): `test -f docs/ASDD-ROADMAP.md && test $(grep -c '^#### P' docs/ASDD-ROADMAP.md) -ge 9 && test $(grep -cE '^\\| \\*\\*G[0-9]+' docs/ASDD-ROADMAP.md) -eq 27` exits 0.",
       "scope_paths": [
         "docs/ASDD-ROADMAP.md"
       ],
-      "evidence_hash": "1edd43a6fd20afa827204cc8f81d7afdb972c88340f1a9cb91d50bb06e9a1b3f"
+      "evidence_hash": "93d7c865f08a5a2f97de8ace9c6ad9ea5a52401d69cddf37ebbb714ba71338b4"
     }
   ]
 }

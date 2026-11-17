@@ -15,6 +15,7 @@
 | **P4** | `asdd-p4` | `tracker-sync`, Stop `advisory`, `spec-source` opt-in | P4.2 presets Cencosud |
 | **Shaping** | `egm-shaping` | Intent fitness, Goldfish scope-split, concepts_brief, critique-first, brownfield pack | — |
 | **P5** | `telemetry-emitters`, `skill-eval`, `learn-eval-gate`, `cost-metrics`, `asdd-ui`, `ui-gate-decisions`, `ui-insights` | `skill-eval`, `learn-eval-gate`, `asdd-ui`, `ui-gate-decisions` (P5.2, P5.3, P5.5, P5.6); en curso: `telemetry-emitters` | P5.8–P5.10 según demanda |
+| **P6** | `tracker-binding`, `shaping-agent`, `grounded-shaping`, `intent-intake`, `shaping-cloud-setup` | — (abierto, nov 2026) | — |
 
 Slices `asdd-p0`…`asdd-p4` están en `DONE` (escalated donde el scope cruzó módulos). El detalle por ítem está en §4.
 `egm-shaping` porta conceptos EGM (Elephant/Goldfish) a `shape-up` / `product-delivery` para intents lite-fit; SoT de build sigue en `.harness/`.
@@ -93,6 +94,11 @@ Nivel SDD ([Böckeler / Thoughtworks](https://martinfowler.com/articles/explorin
 | **G20** | Skills/steering sin versión propia ni distribución entre repos | No hay packs de organización ni inventario de versiones | **Según demanda** (P5.8) |
 | **G21** | Skills/agentes de terceros sin escaneo de seguridad | Prompt injection, comandos peligrosos, exfiltración | **Según demanda** (P5.9) |
 | **G22** | Sin gobierno de organización (steering central, audit log agregado) | Cada repo diverge; sin trazabilidad multi-repo de overrides | **Según demanda** (P5.10) |
+| **G23** | El proyecto no declara su tracker (Jira, Linear, GitHub) | Las skills preguntan o adivinan dónde viven pitches e intents | **Abierto** (P6.1 `tracker-binding`) |
+| **G24** | El PO/PM no tiene un agente de solo lectura sobre el repo | Shaping desde el IDE o con permisos de escritura que no necesita | **Abierto** (P6.2 `shaping-agent`) |
+| **G25** | Pitch e intents no se basan en el código, las specs ni el histórico | Scopes que duplican componentes; appetite sobreestimado | **Abierto** (P6.3 `grounded-shaping`) |
+| **G26** | Nada importa un intent del tracker a la máquina del ingeniero | El ingeniero reescribe el intent a mano; se pierde la trazabilidad | **Abierto** (P6.4 `intent-intake`) |
+| **G27** | El PO sin clon local no tiene las herramientas de grounding | Shaping solo posible con IDE y repo local | **Abierto** (P6.5 `shaping-cloud-setup`) |
 
 ## 4. Roadmap priorizado
 
@@ -195,6 +201,29 @@ Hotfixes que salieron del trabajo en paralelo (nov 2026): `npm-pack-json` (test 
 
 Olas: **A** (medir) P5.1–P5.4 · **B** (superficie humana) P5.5–P5.7 · **C** (distribuir) P5.8–P5.10, sin slice hasta que haya demanda de compartir skills entre repos u organizaciones.
 
+### P6 — Shaping del PO basado en evidencia
+
+Origen: decisión del 2026-11-17. El PO/PM hace el pitch y el product delivery hasta el intent; todo lo que sale de ese proceso se basa en el código, las specs y las slices que ya existen, para no sobreestimar y reutilizar componentes. La salida (pitch e intents) vive en el tracker del proyecto (Jira, Linear o GitHub); los ingenieros toman cada intent y trabajan con el harness en su máquina, con cualquier agente de código.
+
+```
+PO/PM (Claude Desktop → Code, o claude.ai/code), repo en solo lectura
+  shape-up + grounding        → Pitch en el tracker (betting_state, decided_by)
+  product-delivery + grounding → un ítem Intent por scope (Reutiliza / Extiende / Nuevo con evidencia)
+Ingeniero (su máquina, cualquier agente + harness)
+  asdd intake → intent.md + slice init (modo sugerido) + source; grounding re-verificado contra el código actual
+  pipeline normal → progreso de vuelta al Intent (tracker-sync)
+```
+
+| ID | Slice | Propuesta | Cubre | Modo | Depende de | Estado |
+|----|-------|-----------|-------|------|------------|--------|
+| P6.1 | `tracker-binding` | Bloque `tracker` en `project.json` + formato canónico del Intent por tracker | G23 | lite | — | **abierto** |
+| P6.2 | `shaping-agent` | `asdd-shaping-agent` de solo lectura (sin Write/Edit en el runtime) + MCP de knowledge y del tracker | G24 | lite | — | **abierto** |
+| P6.3 | `grounded-shaping` | Grounding obligatorio en `shape-up` y `product-delivery`; appetite con slices de referencia; modo PO que escribe solo en el tracker | G25 | lite | P6.1 | **abierto** |
+| P6.4 | `intent-intake` | `asdd intake` (offline, valida y crea la slice), intake en `external-trackers`, validador `intent-evidence` | G26 | lite | P6.1 | **abierto** |
+| P6.5 | `shaping-cloud-setup` | Script de setup para claude.ai/code (MCP + codegraph) y plays PO / ingeniero | G27 | lite | P6.1–P6.4 | **abierto** |
+
+Paralelismo: P6.1 y P6.2 primero; P6.3 y P6.4 en paralelo tras P6.1; P6.5 al final. Fuera de alcance: chat de shaping dentro de `asdd ui` (cliente ACP) y MCP remoto de grounding para el chat de Claude Desktop — se revisan si P6.5 no basta.
+
 ## 5. Resumen
 
 | Prioridad | Hecho ahora | Queda para 2ª versión |
@@ -205,6 +234,7 @@ Olas: **A** (medir) P5.1–P5.4 · **B** (superficie humana) P5.5–P5.7 · **C*
 | **P3** | Waves, portfolio, converge-eval | Windows hooks, import Spec Kit/OpenSpec |
 | **P4** | Tracker-sync, advisory Stop, spec-source pilot | Presets Cencosud |
 | **P5** | `asdd ui` + decisión de gates, `asdd skill-eval` + QG-LEARN-10 (en curso: telemetría, costo, insights) | Packs, escaneo de skills, gobierno de organización (según demanda) |
+| **P6** | — (abierto: tracker, agente PO, grounding, intake, setup cloud) | Cliente ACP en `asdd ui`, MCP remoto de grounding |
 
 ## 6. Fuera de alcance (decisiones vigentes)
 
