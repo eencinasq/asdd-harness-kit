@@ -474,6 +474,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/pr-review-group-brief/manifest.json",
       "features": ".harness/features/pr-review-group-brief.features.json"
+    },
+    {
+      "slice_id": "full-flow-fixture",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/full-flow-fixture/manifest.json",
+      "features": ".harness/features/full-flow-fixture.features.json"
     }
   ]
 }
