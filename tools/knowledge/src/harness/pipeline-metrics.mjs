@@ -56,7 +56,9 @@ export function stopFailCounts(summaryFiles) {
       if (!sig.startsWith('sensor:')) continue;
       const n = Array.isArray(slot.episodes) ? slot.episodes.length : 0;
       episodes += n;
-      const code = sig.slice('sensor:'.length).split(':')[0];
+      // A signature without a check code is a message shape (`sensor:<path>: feature …`): count it as `other`.
+      const head = sig.slice('sensor:'.length).split(':')[0];
+      const code = /^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d+$/.test(head) ? head : 'other';
       byCode[code] = (byCode[code] ?? 0) + n;
     }
   }

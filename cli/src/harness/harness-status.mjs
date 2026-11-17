@@ -54,16 +54,20 @@ const slices = Array.isArray(registry?.slices) ? registry.slices : [];
 
 console.log('');
 console.log('== Active Slices ==');
-if (slices.length === 0) {
+const listed = slices.filter((s) => s.status !== 'ABANDONED');
+const abandoned = slices.length - listed.length;
+if (listed.length === 0) {
   console.log('  (none)');
 } else {
-console.log(`  ${pad('Slice', 18)} ${pad('Mode', 10)} ${pad('Phase', 16)} ${pad('Status', 12)} ${pad('Features', 10)} ${pad('Dissents', 10)} Escalation`);
-  for (const s of slices) {
+  const idWidth = Math.max(18, ...listed.map((s) => String(s.slice_id).length + 1));
+  console.log(`  ${pad('Slice', idWidth)} ${pad('Mode', 10)} ${pad('Phase', 16)} ${pad('Status', 12)} ${pad('Features', 10)} ${pad('Dissents', 10)} Escalation`);
+  for (const s of listed) {
     const dissents = s.open_dissents ? `${s.open_dissents}` : '—';
     const esc = s.escalation_required ? `${s.escalation_signals} signal(s) — escalate required` : '—';
-    console.log(`  ${pad(s.slice_id, 18)} ${pad(s.mode || '—', 10)} ${pad(s.phase || '—', 16)} ${pad(s.status || '—', 12)} ${pad(String(s.active_features || 0), 10)} ${pad(dissents, 10)} ${esc}`);
+    console.log(`  ${pad(s.slice_id, idWidth)} ${pad(s.mode || '—', 10)} ${pad(s.phase || '—', 16)} ${pad(s.status || '—', 12)} ${pad(String(s.active_features || 0), 10)} ${pad(dissents, 10)} ${esc}`);
   }
 }
+if (abandoned) console.log(`  (${abandoned} ABANDONED slice(s) hidden)`);
 
 console.log('');
 console.log('== Active Work (derived from sessions) ==');

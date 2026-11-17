@@ -37,6 +37,22 @@ test('stopFailCounts: counts sensor: episodes by DRIFT code', () => {
   assert.deepEqual(by_code, { 'DRIFT-01': 2, 'DRIFT-02': 1 });
 });
 
+test('metrics-data-quality REQ-001 stopFailCounts: uncoded sensor signatures count under other', () => {
+  const { episodes, by_code } = stopFailCounts([
+    {
+      data: {
+        signatures: {
+          'sensor:QG-LEARN-04': { episodes: [{ at: t0 }] },
+          'sensor:<path>: feature TASK-N missing user_visible_behavior': { episodes: [{ at: t0 }, { at: t1 }] },
+          'sensor:lite slice "*" cannot complete with open escalation signals (EN-scope-spread)': { episodes: [{ at: t0 }] },
+        },
+      },
+    },
+  ]);
+  assert.equal(episodes, 4);
+  assert.deepEqual(by_code, { 'QG-LEARN-04': 1, other: 3 });
+});
+
 test('REQ-002 green lite DONE: lite_share 1, escalation_rate 0', () => {
   const m = computePipelineMetrics({
     slices: [
