@@ -1,20 +1,63 @@
 {
   "schema_version": "3.0",
   "slice_id": "ui-insights",
-  "phase": "discovery",
-  "status": "in_progress",
+  "phase": "knowledge",
+  "status": "DONE",
   "mode": "lite",
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-16T21:55:18.522Z",
-  "updated_at": "2026-11-17T15:24:52.860Z",
+  "updated_at": "2026-11-17T15:34:38.683Z",
   "paths": {
     "specs": ".harness/specs/ui-insights",
     "tasks": ".harness/specs/ui-insights/tasks.md",
     "features": ".harness/features/ui-insights.features.json"
   },
-  "gates": {},
+  "gates": {
+    "spec": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T15:29:15.000Z",
+      "evidence": "spec.md: REQ-001…004 (activation, skill-eval, cost, missing-data hints). Run authorized by the Tech Lead ('si', 2026-11-17).",
+      "concerns": []
+    },
+    "design": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T15:29:15.000Z",
+      "evidence": "design.md: ui-server-insights.mjs models, three GET endpoints, Insights tab; cost contract shared with cost-metrics; no domain terms; no ADR.",
+      "concerns": []
+    },
+    "task_planning": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T15:29:15.000Z",
+      "evidence": "tasks.md + features: TASK-001 models/endpoints, TASK-002 UI.",
+      "concerns": []
+    },
+    "implementation": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T16:50:00.000Z",
+      "evidence": "TASK-001 (ui-server-insights.mjs + /api/insights/activation|skill-eval|cost) and TASK-002 (Insights tab, Slices metric cards) passing.",
+      "concerns": []
+    },
+    "qa": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T16:51:00.000Z",
+      "evidence": "QA-light: ui-server.test.mjs 14/14; npm test 414/414; REQ-001…004 each covered by a named test; manual smoke of the endpoints and the page; all rendered data passes escapeHtml; GET only, no repo writes (git status clean of server output).",
+      "concerns": []
+    },
+    "knowledge": {
+      "status": "PASS",
+      "by": "eencinas",
+      "at": "2026-11-17T16:52:00.000Z",
+      "evidence": "Lite note: the cost panel reads metrics.cost from a contract owned by the parallel slice cost-metrics and shows the absent hint until it lands; skill-eval runs from the UI are argv-only with a safe-ref check on --baseline.",
+      "concerns": []
+    }
+  },
   "active_features": [],
   "open_dissents": 0,
   "source": null,
@@ -26,10 +69,92 @@
       "event": "phase_started",
       "phase": "discovery",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:29:15.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "spec",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:29:15.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "design",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T15:29:15.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "task_planning",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T16:00:00.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T16:20:00.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-001"
+    },
+    {
+      "timestamp": "2026-11-17T16:21:00.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-17T16:45:00.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "feature_completed",
+      "phase": "implementation",
+      "feature_id": "TASK-002"
+    },
+    {
+      "timestamp": "2026-11-17T16:50:00.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T16:51:00.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "qa",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-17T16:52:00.000Z",
+      "agent": "claude",
+      "human": "eencinas",
+      "event": "phase_completed",
+      "phase": "knowledge",
+      "feature_id": null
     }
   ],
   "contributors": [
     "squad",
-    "human"
+    "human",
+    "eencinas",
+    "claude"
   ]
 }

@@ -59,4 +59,4 @@
 | ui-assets-dist | hotfix | knowledge | DONE | 0 |
 | ui-drift-dead-link | hotfix | knowledge | DONE | 0 |
 | ui-gate-decisions | escalated | knowledge | DONE | 0 |
-| ui-insights | lite | discovery | in_progress | 0 |
+| ui-insights | lite | knowledge | DONE | 0 |

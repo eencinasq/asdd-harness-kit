@@ -31,7 +31,8 @@
         },
         {
           "at": "2026-11-17T15:12:49.806Z",
-          "slice_id": null
+          "slice_id": null,
+          "last_at": "2026-11-17T15:27:55.883Z"
         }
       ],
       "examples": [
@@ -66,7 +67,8 @@
         },
         {
           "at": "2026-11-17T15:12:49.806Z",
-          "slice_id": null
+          "slice_id": null,
+          "last_at": "2026-11-17T15:27:55.883Z"
         }
       ],
       "examples": [
@@ -101,7 +103,8 @@
         },
         {
           "at": "2026-11-17T15:12:49.806Z",
-          "slice_id": "sensor-fixes"
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-17T15:27:55.883Z"
         }
       ],
       "examples": [
