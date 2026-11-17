@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "author": "eencinas-claude-p62",
+  "week": "2026-W47",
+  "signatures": {
+    "command:git reset --hard": {
+      "source": "command",
+      "episodes": [
+        {
+          "at": "2026-11-17T12:00:59.033Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "denied: git reset --hard"
+      ]
+    },
+    "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T12:03:17.315Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ]
+    },
+    "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T12:03:17.315Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        ".harness/steering/quality-gates.project.md: coverage keys not reachable via tags (starvation, Phase-2 backlog): validation"
+      ]
+    },
+    "warn:QG-DEC-09": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T12:03:17.315Z",
+          "slice_id": "sensor-fixes"
+        }
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ]
+    }
+  }
+}
