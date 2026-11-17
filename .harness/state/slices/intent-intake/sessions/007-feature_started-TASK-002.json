@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-intent-intake-007",
+  "timestamp": "2026-11-17T12:11:48.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "intent-intake",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/src/harness/intake.mjs",
+    "cli/src/harness/init-slice.mjs",
+    "cli/src/harness/init-slice.test.mjs",
+    "cli/src/harness/intake-lib.test.mjs",
+    "cli/src/harness/commands.mjs"
+  ],
+  "evidence": "RED: intake-lib.test.mjs CLI tests fail (no intake.mjs); init-slice.test.mjs source-json test fails (no --source-json).",
+  "concerns": []
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "intent-intake",
+  "concerns": [],
+  "timestamp": "2026-11-17T12:15:40.000Z",
+  "session_id": "sess-intent-intake-015",
+  "event_type": "phase_completed",
+  "phase": "domain",
+  "evidence": "No new domain terms (Intent item, grounding table, and refs come from tracker-binding)."
+}

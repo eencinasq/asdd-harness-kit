@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-intent-intake-011",
+  "timestamp": "2026-11-17T12:13:29.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "intent-intake",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "scope_paths": [
+    "package.json",
+    "README.md",
+    "cli/README.md",
+    "cli/skills/external-trackers/SKILL.md"
+  ],
+  "evidence": "RED: TASK-004 verification fails — package.json has no intake-lib.test.mjs, README.md/cli/README.md/external-trackers SKILL.md do not mention asdd intake.",
+  "concerns": []
+}
