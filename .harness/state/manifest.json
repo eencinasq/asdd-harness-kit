@@ -450,6 +450,14 @@
       "mode": "full",
       "manifest": ".harness/state/slices/security-review/manifest.json",
       "features": ".harness/features/security-review.features.json"
+    },
+    {
+      "slice_id": "ui-insights-host-guard",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/ui-insights-host-guard/manifest.json",
+      "features": ".harness/features/ui-insights-host-guard.features.json"
     }
   ]
 }
