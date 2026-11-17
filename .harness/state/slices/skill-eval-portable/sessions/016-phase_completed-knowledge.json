@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "skill-eval-portable",
+  "concerns": [],
+  "timestamp": "2026-11-17T17:51:02.000Z",
+  "session_id": "sess-skill-eval-portable-016",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: an eval that only runs in the repo that ships it cannot back a gate meant for every project; ship fixtures with placeholders, and treat missing machine tools as skipped, not failed."
+}

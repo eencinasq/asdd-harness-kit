@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "skill-eval-portable",
+  "concerns": [],
+  "timestamp": "2026-11-17T17:45:17.000Z",
+  "session_id": "sess-skill-eval-portable-003",
+  "event_type": "phase_completed",
+  "phase": "design",
+  "evidence": "design.md: running-CLI placeholder, skip policy, override-by-file-name project fixtures; no domain terms; no ADR."
+}

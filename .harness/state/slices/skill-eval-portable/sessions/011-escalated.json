@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-skill-eval-portable-011",
+  "timestamp": "2026-11-17T17:50:50.213Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "skill-eval-portable",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "Shipping the fixtures touches package.json and the README besides cli/; no new domain terms, no dissent.",
+  "concerns": []
+}
