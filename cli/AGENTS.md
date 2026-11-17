@@ -8,18 +8,15 @@ Runtime-agnostic map. **Read this first**, then load steering from **`.harness/s
 
 ## INIT (every session)
 
-1. Read generated `.harness/state/registry.json` for squad state.
-2. Read generated `.harness/state/slices/<slice-id>/manifest.json` for the target slice.
-3. Read features when `paths.features` is set.
-4. **JIT steering loading:**
-   - Each steering file has YAML frontmatter with `inclusion` and `tags`.
-   - Load all `inclusion: "always"` files (controls, session-loop, manifest, skills, security-rules, README).
-   - Load `inclusion: "auto"` files **only when their tags match the current phase** (as named in `asdd sync`, e.g. `task_planning`), the slice `mode` (`lite`), or the active role (`review`, `ui`).
-   - Skip auto files whose tags do not intersect those keys — this saves context window. Explicit `Read` instructions in an agent file always apply.
-   - **Lite-first:** all slices start in `lite` mode (default in `asdd slice init`). Use `--full` only for work known upfront to be cross-cutting/architectural. Growth in a lite slice triggers evidence-based escalation — see [`asdd-lite.md`](.harness/steering/asdd-lite.md).
-5. Pick work:
-   - All slices `DONE`/`PARKED`/`ABANDONED` and no named slice → **stop**; ask for new intent or unpark.
-   - `phase` is `implementation` → choose dependency-ready features. Same-slice parallel work is allowed only with explicit unique owners and disjoint file scopes; otherwise work serially.
+Boot is a **strict sequence** — the sole order source. **Kernel first:** the always-loaded steering contracts are the primary artifacts. Missing `generated` state: regenerate with `asdd sync`, never by hand; anything else missing fails closed — HALT and report.
+
+1. **Kernel** — `.harness/steering/` `inclusion: always` files (`controls`, `manifest`, `README`, `security-rules`, `session-loop`, `skills`), filename order.
+2. Generated `.harness/state/registry.json` — squad index. **Stop:** all slices `DONE`/`PARKED`/`ABANDONED`, no named slice → ask for intent or unpark.
+3. Generated `.harness/state/slices/<slice-id>/manifest.json` — phase, mode, `paths`; then `paths.features` when set.
+4. `.harness/steering/` `inclusion: auto` files, filename order — only `tags` intersecting the phase (as named in `asdd sync`), `mode` (`lite`), or active role (`review`, `ui`); skip the rest.
+5. Pick work — `phase` `implementation` → dependency-ready features; same-slice parallelism needs unique owners and disjoint scopes.
+
+Boot ends at step 4 — `.agents/rules/`, agent profiles, `SKILL.md` bodies, `asdd knowledge` load on demand; agent-file `Read`s still apply. **Lite-first:** `lite` is the `asdd slice init` default; `--full` only for upfront cross-cutting/architectural work — growth escalates on evidence ([`asdd-lite.md`](.harness/steering/asdd-lite.md)).
 
 ## System of record
 

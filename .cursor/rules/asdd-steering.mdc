@@ -11,7 +11,7 @@ Index: `.harness/steering/README.md` · Skills: `.harness/steering/skills.md` ·
 
 ## When to load steering
 
-**INIT:** Read `.harness/PROGRESS.md` → generated `.harness/state/registry.json` → `.harness/state/slices/<slice-id>/manifest.json` → `paths.features` (if set) → `.harness/steering/` <!-- steering-gen:always -->
+**INIT:** strict boot order lives only in `AGENTS.md` → **INIT** (never restate or reorder it here); `.harness/steering/` inclusion is <!-- steering-gen:always -->
 (always files: `controls`, `manifest`, `README`, `security-rules`, `session-loop`, `skills`; auto files by tag per `.agents/agents/_runtime-template.md`)
 <!-- steering-gen:end -->. Pick one feature **only** when `phase` is `implementation`. If every slice is `DONE`/`PARKED`/`ABANDONED` and the human named no slice: stop — ask for new intent or explicit unpark.
 
