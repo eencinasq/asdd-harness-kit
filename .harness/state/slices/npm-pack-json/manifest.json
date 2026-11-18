@@ -7,8 +7,8 @@
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
-  "created_at": "2026-11-18T03:22:22.979Z",
-  "updated_at": "2026-11-18T03:22:22.979Z",
+  "created_at": "2026-11-18T03:22:28.987Z",
+  "updated_at": "2026-11-18T03:22:28.987Z",
   "paths": {
     "specs": ".harness/specs/npm-pack-json",
     "tasks": ".harness/specs/npm-pack-json/tasks.md",

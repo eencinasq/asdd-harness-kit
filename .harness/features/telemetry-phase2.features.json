@@ -25,7 +25,7 @@
       "owner": "devin",
       "depends_on": [],
       "evidence": "telemetry-lib.test.mjs 10/10 green (fail-open emit, ≤4KB write, env ID inheritance, validateSpan vocab/reserved rules, bounded readTail); npm test 244/0; asdd span emits schema-valid span end-to-end",
-      "evidence_hash": "04af7574f4e029aeb67662bc4dd82fc97ff81f652753cfd857df5e86d3ed9171"
+      "evidence_hash": "273af09affb11bf209369280917bc52b2731555213b00240bbd434afd06e8d83"
     },
     {
       "id": "TASK-002",
@@ -53,7 +53,7 @@
         "TASK-001"
       ],
       "evidence": "seam spans land: command-gate test/command spans (kind classification incl. npm/pnpm/node --test), verify-on-stop hook span, sync-state parent+child spans with HARNESS_TRACE_ID inheritance verified (children share trace, parent null); command-gate.test 20/20, sync-state.test green; _runtime-template telemetry rule vendored",
-      "evidence_hash": "80c50ff1b5d6a723daed8079c4040d8b03e3b08d2aa879e5b5be90fbd41b0ee1"
+      "evidence_hash": "03e107767095623dbc3e807988a1ccb653c69792c54fa00bee455494f59b19b4"
     },
     {
       "id": "TASK-003",
@@ -77,7 +77,7 @@
         "TASK-001"
       ],
       "evidence": "validators/telemetry.mjs wired as validator #11 — warn-only: absent dir legal, malformed line WARN not FAIL (lifecycle smoke proves), bounded readTail; asdd check 0 FAIL",
-      "evidence_hash": "6f5c44279f37fb363fc75d9900e40a38320b42964e04fb2371868ddaed659607"
+      "evidence_hash": "ad43e745561da65d8247c081f327c9117bec57a97a327cf6bd71982b6f3e05b4"
     },
     {
       "id": "TASK-004",
@@ -106,7 +106,7 @@
         "TASK-003"
       ],
       "evidence": "asdd profile --slice exit 0 writes profiling.json (phase rollups incl. synthesized markers, turn p50/p95, boot tax, H-* findings, bottleneck_score surfaces); --bottlenecks ranked; exit 3 on no data, 2 on usage — smoke-verified; project.json commands.profile+capabilities.telemetry; lifecycle.sh telemetry row green",
-      "evidence_hash": "9d0bb624fcc30ca2a132003b9140526d5ef14fa2719b356f819aca18e0390e7e"
+      "evidence_hash": "252b094b7c99cdd1d914579a4864ab2521adcaf43d24e90a67a34d3cd34164f7"
     },
     {
       "id": "TASK-005",
@@ -131,7 +131,7 @@
         "TASK-004"
       ],
       "evidence": "v2.md status→converged (repo+vault byte-identical, diff clean); package.json test list +telemetry-lib.test.mjs; npm test 244/0; regen --check 9/9; 24 DRIFT-02 features re-verified+re-stamped (cli-harness:TASK-011 stays blocked on pre-existing spec-drift debt)",
-      "evidence_hash": "a074b13d522bca2813093edd5e2130cc543950d0a0efca4cfccd97f60c55051a"
+      "evidence_hash": "b4c746527e1bf9c140f387a3613953bd41d79e5c735774832224c78a91b7a0d4"
     }
   ]
 }

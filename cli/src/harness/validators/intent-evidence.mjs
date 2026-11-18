@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { groundingFindings } from '../intake-lib.mjs';
@@ -11,8 +11,27 @@ import { groundingFindings } from '../intake-lib.mjs';
  * historical evidence, as DRIFT-02 does since SP-003) are not reported.
  */
 export default function validate(ctx) {
-  const { root, fail, warn, manifest } = ctx;
-  if (!manifest || !Array.isArray(manifest.active_slices)) return;
+  const { root, fail, warn, manifest, registry } = ctx;
+  // RV1-AR-1: slices are discovered from state/slices/<id>/manifest.json (the source registry.json derives from);
+  // ctx.manifest/ctx.registry entries union in for callers that pass an index directly. Every entry resolves to
+  // {slice_id, status?} — status is re-read from the per-slice manifest below regardless.
+  const seen = new Set();
+  const slices = [];
+  const push = (entry) => {
+    const id = typeof entry === 'string' ? entry : entry?.slice_id;
+    if (typeof id !== 'string' || !id.trim() || seen.has(id)) return;
+    seen.add(id);
+    slices.push(entry);
+  };
+  for (const entry of manifest?.active_slices ?? manifest?.slices ?? registry?.slices ?? []) push(entry);
+  try {
+    for (const name of readdirSync(join(root, '.harness/state/slices'), { withFileTypes: true })) {
+      if (name.isDirectory() && !name.name.startsWith('.')) push(name.name);
+    }
+  } catch {
+    // no slices dir
+  }
+  if (!Array.isArray(slices)) return;
 
   let severity = 'warn';
   try {
@@ -22,7 +41,7 @@ export default function validate(ctx) {
   }
   const report = severity === 'fail' ? fail : warn;
 
-  for (const entry of manifest.active_slices) {
+  for (const entry of slices) {
     const sliceId = typeof entry === 'string' ? entry : entry?.slice_id;
     if (typeof sliceId !== 'string' || !sliceId.trim()) continue;
     const intent = join(root, '.harness/specs', sliceId, 'intent.md');

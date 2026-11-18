@@ -407,10 +407,10 @@ echo "== telemetry (profiling v2): span seam emits, profile readout derives, val
 SPAN='{"kind":"command","process_name":"smoke-cmd","runtime":"cli","slice_id":"demo-slice","phase":"implementation","start_time_iso":"2026-01-01T00:00:00.000Z","end_time_iso":"2026-01-01T00:00:01.000Z","duration_ms":1000,"status":"OK","attributes":{"command_label":"smoke","exit_code":0}}'
 echo "$SPAN" | asdd span >/dev/null
 tail -1 .harness/state/telemetry/spans.jsonl | grep -q '"kind": "command"\|"kind":"command"'
-asdd profile --slice demo-slice >/dev/null
+asdd profiling --slice demo-slice >/dev/null
 test -f .harness/state/telemetry/slices/demo-slice/profiling.json
-asdd profile --bottlenecks >/dev/null
-asdd profile --slice no-such-slice >/dev/null 2>&1 && exit 1 || test "$?" = 3
+asdd profiling --bottlenecks >/dev/null
+asdd profiling --slice no-such-slice >/dev/null 2>&1 && exit 1 || test "$?" = 3
 # malformed span → warn-only: check still passes
 echo '{"kind":"bogus"}' >> .harness/state/telemetry/spans.jsonl
 asdd check >/tmp/asdd-lifecycle-neg.log 2>&1

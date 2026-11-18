@@ -4,7 +4,7 @@
     { "op": "install" },
     { "op": "slice", "id": "demo" }
   ],
-  "invoke": { "cmd": "profile", "args": ["--slice", "demo"] },
+  "invoke": { "cmd": "profiling", "args": ["--slice", "demo"] },
   "expect": {
     "exit": 0,
     "stdout_contains": ["PROFILE demo"],

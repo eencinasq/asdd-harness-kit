@@ -25,8 +25,8 @@
       ],
       "owner": "devin",
       "depends_on": [],
-      "evidence_hash": "dcd06a96e0b668da8663f15c9ee5d6812ecf4f020063c8fe62c64474b60be32e",
-      "evidence": "asdd check: zero steering-tags warnings (pseudo-always+starvation+symmetry all clear); registry coverage narrowed scaffold+installed; 234 npm tests pass"
+      "evidence": "asdd check: zero steering-tags warnings (pseudo-always+starvation+symmetry all clear); registry coverage narrowed scaffold+installed; 234 npm tests pass",
+      "evidence_hash": "c8a6755726810ea5416b6e4ee7b2fdfcc0cbf56545b39712f2b8d86a6364566d"
     },
     {
       "id": "TASK-002",
@@ -46,8 +46,8 @@
       ],
       "owner": "devin",
       "depends_on": [],
-      "evidence_hash": "123bdebf3133b2e0fea53fa6b95806ffce9a10eb1b31cb27a11a9723dad968f1",
-      "evidence": "cli/steering/skills.md gains ## Negative space (3 bullets); skills-lint PASS; guidance PASS at 36505<=37000 recorded decision"
+      "evidence": "cli/steering/skills.md gains ## Negative space (3 bullets); skills-lint PASS; guidance PASS at 36505<=37000 recorded decision",
+      "evidence_hash": "b79716349075903d0572e4cb6aa1ef99e8c93513d1fb3e2dc38ae88ec9c419b2"
     },
     {
       "id": "TASK-003",
@@ -74,7 +74,7 @@
         "TASK-002"
       ],
       "evidence": "re-verified 2026-11-17 (platform-spec final regen)",
-      "evidence_hash": "dd84a62f15c11d8ef05f3e807d37805dcc48df4d34fb06ab9bc5fa011fa4d7d3"
+      "evidence_hash": "fc0f6d48953c8143c02bd5d5967f1750de86eb216a6f182a566f23a7bc9257c8"
     }
   ]
 }

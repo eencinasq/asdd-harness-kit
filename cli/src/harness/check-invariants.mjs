@@ -36,9 +36,6 @@ import validateSpecDrift from './validators/spec-drift.mjs';
 import validateLearning from './validators/learning.mjs';
 import validateStale from './validators/stale.mjs';
 import validateIntentEvidence from './validators/intent-evidence.mjs';
-import validateTelemetry from './validators/telemetry.mjs';
-
-const invT0 = Date.now();
 
 const root = process.cwd();
 const argv = process.argv.slice(2);
@@ -93,7 +90,6 @@ validateSpecDrift(ctx);
 validateLearning(ctx);
 validateStale(ctx);
 validateIntentEvidence(ctx);
-validateTelemetry(ctx);
 
 // P1.3: converge FAILs for passing features (short path before session close)
 try {
@@ -162,32 +158,6 @@ if (argv.includes('--live') || argv.includes('--record') || process.env.HARNESS_
     writeSensorSignal(root, errors, { warns: warnings, runtime: process.env.HARNESS_RUNTIME || 'cli' });
   } catch {
     // learning is best-effort
-  }
-  // Sensor span (profiling v2 P-4): the invariant pass is metered beside the
-  // signal it mirrors — only on the measured path (--live hooks, --record
-  // baselines). Plain checks in unprovisioned trees (install verify, PR
-  // checkouts) must not mint a spans.jsonl that outlives its .gitignore row.
-  try {
-    const { mintSpan, emit } = await import('./telemetry-lib.mjs');
-    emit(mintSpan({
-      kind: 'sensor',
-      process_name: 'check-invariants',
-      runtime: process.env.HARNESS_RUNTIME || 'cli',
-      slice_id: slice,
-      start_time_iso: new Date(invT0).toISOString(),
-      end_time_iso: new Date().toISOString(),
-      duration_ms: Date.now() - invT0,
-      status: errors.length ? 'ERROR' : 'OK',
-      writer: 'check-invariants',
-      attributes: {
-        sensor_name: 'invariants',
-        exit_code: errors.length ? 1 : 0,
-        violations_count: errors.length,
-        ...(errors.length ? { failure_signature: 'sensor:invariants:fail' } : {}),
-      },
-    }), { root });
-  } catch {
-    // telemetry degrades to silence
   }
 }
 if (errors.length) {

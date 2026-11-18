@@ -44,7 +44,7 @@
       "owner": "devin",
       "depends_on": [],
       "evidence": "docs/spec/conformance-spec.md + cli/test/conformance/{runner,7 fixtures,bench}.mjs + conformance.test.mjs — 8/8 fixtures pass; wired into npm test",
-      "evidence_hash": "ed223cffe6675c5a8de48f0c29d7524e47c87088ef2e9ee94bec81dcb29e02a5"
+      "evidence_hash": "e77cbb24356bf35c5ccbc4e02767e3df16f44a4ab35a8ad5873ff0bdc88cd335"
     },
     {
       "id": "TASK-003",
@@ -91,7 +91,7 @@
         "TASK-001"
       ],
       "evidence": "phases.mjs RESOLVERS{posix,cmd,powershell} + hookShellFor + ctx.targetOs; options.mjs --target-os validated {win32,linux,darwin}; verified: win32 install writes cmd.exe hooks.json, POSIX unchanged; MCP disposition recorded in v0.md §8",
-      "evidence_hash": "e77d26729d5d5bb490975a78a1811eb6c2590ae65e6df345cd6107b186959b4c"
+      "evidence_hash": "994a6c9f7c5d3aa6e4f246b5039e326579b4b9356b5db909ec285ec1cfc45b96"
     }
   ]
 }

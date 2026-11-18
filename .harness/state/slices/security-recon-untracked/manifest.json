@@ -7,8 +7,8 @@
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
-  "created_at": "2026-11-18T03:22:22.987Z",
-  "updated_at": "2026-11-18T03:22:22.987Z",
+  "created_at": "2026-11-18T03:22:28.996Z",
+  "updated_at": "2026-11-18T03:22:28.996Z",
   "paths": {
     "specs": ".harness/specs/security-recon-untracked",
     "tasks": ".harness/specs/security-recon-untracked/tasks.md",

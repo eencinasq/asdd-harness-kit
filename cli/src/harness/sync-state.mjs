@@ -79,8 +79,12 @@ function platformVocabulary() {
   return null;
 }
 const VOCAB = platformVocabulary();
-if (!VOCAB && existsSync(join(root, '.harness'))) {
-  console.error('asdd: .harness/config/contribution-points.json missing — run `asdd install` to install the platform registry');
+// The missing-registry warning lives on the CLI path (main), not at import: library importers (learning-lib via
+// recordDenial, telemetry attribute()) must never write to stderr.
+function warnRegistryMissing() {
+  if (!VOCAB && existsSync(join(root, '.harness'))) {
+    console.error('asdd: .harness/config/contribution-points.json missing — run `asdd install` to install the platform registry');
+  }
 }
 
 // Ordered pipeline (registry vocabulary.phases, by `order`). 'refactor' is optional and handled in derivePhase.
@@ -578,6 +582,7 @@ async function main(run = null) {
   const args = process.argv.slice(2);
   const sliceArg = args.indexOf('--slice');
   const targetSlice = sliceArg >= 0 ? args[sliceArg + 1] : null;
+  warnRegistryMissing();
   await stampEvidence(root, { only: targetSlice });
 
   if (!existsSync(slicesDir)) {

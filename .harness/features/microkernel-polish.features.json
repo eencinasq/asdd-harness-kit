@@ -28,7 +28,7 @@
         "cli/registry/contribution-points.json",
         "cli/test/versions.test.mjs"
       ],
-      "evidence_hash": "b324b5b50ff4432083cc0489e20c12ea1675886caa5944b6e621bf703fd9b873"
+      "evidence_hash": "223157bf6fa50b952d7a4bc30720b5241dec6da7503ed93df6e8327e4ecbc18e"
     },
     {
       "id": "TASK-002",
@@ -52,7 +52,7 @@
         "cli/registry/contribution-points.json",
         "cli/test/registry.test.mjs"
       ],
-      "evidence_hash": "5a80f19c05d9de5652e244de1908ed00115cb052069093b741814ddbfb8759cd"
+      "evidence_hash": "c867a14c21f0bb043a02d14bdd24cf397e2ef359d9566c5e79cb7c04b78cae4a"
     },
     {
       "id": "TASK-003",
@@ -76,7 +76,7 @@
         "cli/test/registry.test.mjs",
         ".harness/specs/microkernel-polish/intent.md"
       ],
-      "evidence_hash": "8ece4523a6a6ad965a9caac44fdad9aefae020eb9f3ba956c5ac15d42df0537e"
+      "evidence_hash": "65dd4229c014ed60f6d36f89fd4911e93d90fddd20d944e7085a325ce590e65e"
     },
     {
       "id": "TASK-004",
@@ -99,7 +99,7 @@
       "scope_paths": [
         "cli/registry/contribution-points.json"
       ],
-      "evidence_hash": "b2ed32e520df7c1118c2445fc3098c9533dcf8270bf003eec02d4493cc8bf4db"
+      "evidence_hash": "1c61e412cc5dabfb4d97fb671bef7a5e3f3fb46142f2284e68d59a5aa8cab311"
     }
   ]
 }

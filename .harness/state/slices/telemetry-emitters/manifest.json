@@ -12,8 +12,8 @@
   ],
   "escalation_required": false,
   "escalated_from_lite": false,
-  "created_at": "2026-11-18T03:22:23.004Z",
-  "updated_at": "2026-11-18T03:22:23.004Z",
+  "created_at": "2026-11-18T03:22:29.017Z",
+  "updated_at": "2026-11-18T03:22:29.017Z",
   "paths": {
     "specs": ".harness/specs/telemetry-emitters",
     "tasks": ".harness/specs/telemetry-emitters/tasks.md",

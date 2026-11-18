@@ -54,10 +54,14 @@ function hookRuntime(payload) {
   return 'cli';
 }
 
-/** `check --live` attributes, only for a numeric exit status: exit_code and the count of `FAIL ` lines. */
+/** `check --live` attributes, only for a numeric exit status: exit_code, the count of `FAIL ` lines, and the failure signature. */
 function checkAttrs(result) {
   const lines = `${result.stdout || ''}\n${result.stderr || ''}`.split('\n');
-  return { exit_code: result.status, violations_count: lines.filter((line) => /^FAIL\s/.test(line)).length };
+  return {
+    exit_code: result.status,
+    violations_count: lines.filter((line) => /^FAIL\s/.test(line)).length,
+    ...(result.status !== 0 ? { failure_signature: 'hook:verify-on-stop' } : {}),
+  };
 }
 
 // Telemetry is best-effort and runs only after the payload is written (ADR-001): a missing or broken lib, a throw,
@@ -129,39 +133,12 @@ if (!existsSync(script)) {
   await finish('could-not-run', blockPayload('Verify-on-Stop: the asdd CLI is incomplete (check-invariants.mjs is missing). Reinstall it: npx asdd-harness-kit install .'));
 }
 
-const gateT0 = Date.now();
 const result = spawnSync(process.execPath, [script, '--live'], {
   cwd: root,
   encoding: 'utf8',
   timeout: 30000,
   env: { ...process.env, HARNESS_RUNTIME: isClaude ? 'claude' : 'cursor' },
 });
-
-// Hook span (profiling v2 G-TEL-3): one `hook` span per stop-hook iteration —
-// loop cost and exhaustion are metered, never gate-altering.
-try {
-  const { mintSpan, emit } = await import('./telemetry-lib.mjs');
-  const all = `${result.stdout || ''}${result.stderr || ''}`;
-  const violations = (all.match(/^FAIL\s/gm) ?? []).length;
-  const failed = result.status !== 0 || result.error || result.status === null;
-  emit(mintSpan({
-    kind: 'hook',
-    process_name: 'verify-on-stop',
-    runtime: isClaude ? 'claude' : 'cursor',
-    start_time_iso: new Date(gateT0).toISOString(),
-    end_time_iso: new Date().toISOString(),
-    duration_ms: Date.now() - gateT0,
-    status: result.error?.signal === 'SIGTERM' ? 'TIMEOUT' : (failed ? 'ERROR' : 'OK'),
-    writer: 'verify-on-stop',
-    attributes: {
-      exit_code: result.status ?? -1,
-      violations_count: violations,
-      ...(failed ? { failure_signature: 'hook:verify-on-stop' } : {}),
-    },
-  }), { root });
-} catch {
-  // telemetry degrades to silence
-}
 
 if (result.error || result.status === null) {
   const reason = result.error?.message || result.signal || 'no exit status';
