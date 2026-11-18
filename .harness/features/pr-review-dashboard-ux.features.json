@@ -1,0 +1,348 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "pr-review-dashboard-ux",
+  "source_tasks": ".harness/specs/pr-review-dashboard-ux/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "PR Review dashboard UX (coverage drill-down, header rev, security KPI/tab)",
+      "user_visible_behavior": "Coverage KPI opens a same-UI drill-down with Back (no Coverage tab); revision and date sit in the header after the PR number; a Security Findings KPI and tab surface architecture.builtinSecurity; the Revision KPI is gone.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17 (26a47bb): Coverage KPI drill-down with Back (no Coverage tab); Rev chip in header meta; Security Findings KPI+tab from architecture.builtinSecurity; Revision KPI removed. spec-drift typecheck OK, lint OK (warnings only, exit 0), build OK, ui.e2e-spec.ts 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/ui/shared/styles.css",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "85f330d383dc442a114b142e27445112f11e1a1bbdb70c801ab931f26ab54d63"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Security tab: built-in first, repo security findings, generate rules button",
+      "user_visible_behavior": "Security Findings shows the built-in pack first; then repository .semgrep/security findings when present; when the repo has no security set, a button asks the agent to generate security rules from area best practices and rescan.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-005",
+        "REQ-006",
+        "REQ-007"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test src/pr-review/architecture/architecture-scan.spec.ts && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: architecture-scan.spec 7/7 (repoSecurity scanned + generatePrompt when missing); typecheck/lint/build OK; ui.e2e 7/7 (Built-in + Repository sections + generate-security-rules).",
+      "scope_paths": [
+        "tools/spec-drift/src/pr-review/architecture/architecture.types.ts",
+        "tools/spec-drift/src/pr-review/architecture/architecture-scan.service.ts",
+        "tools/spec-drift/src/pr-review/architecture/architecture-report.ts",
+        "tools/spec-drift/src/pr-review/architecture/architecture-scan.spec.ts",
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "0556508a0e66947b5047236cace862bedc1c35b2456e544e079150e748aed69d"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Built-in security pack always runs on Semgrep PR scans",
+      "user_visible_behavior": "On Semgrep PR reviews with scannable files, the built-in security pack always appears in Security Findings (even when .semgrep/security/ exists); repo security still scans separately; generate button only when the repo set is missing.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-008"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test src/pr-review/architecture/architecture-scan.spec.ts && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: architecture-scan.spec 7/7 (built-in runs alongside repo security set); typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/src/pr-review/architecture/architecture-scan.service.ts",
+        "tools/spec-drift/src/pr-review/architecture/architecture.types.ts",
+        "tools/spec-drift/src/pr-review/architecture/architecture-scan.spec.ts",
+        "tools/spec-drift/ui/pr-review/main.ts"
+      ],
+      "evidence_hash": "38901a5d2d648c25234738c442976933cc177075a810f552e379911c67f966a5"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Generate security rules button when repoSecurity is missing",
+      "user_visible_behavior": "Security Findings always shows Ask the agent to write security rules when there is no repo security set, including legacy scans that omit repoSecurity; Rescan is available on the Security tab.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-009"
+      ],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: legacy scans without repoSecurity now show generate button + Rescan; typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "82f232d6d31f76cf238328eeca443dd67cccf0703465de821d911072be03d6a0"
+    },
+    {
+      "id": "TASK-005",
+      "title": "Human-readable Coverage drill-down",
+      "user_visible_behavior": "Coverage opens with a plain-language progress summary, shows findings before batches when present, uses friendly rule labels, and groups similar batches under one section.",
+      "status": "passing",
+      "priority": 5,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-010",
+        "REQ-011",
+        "REQ-012"
+      ],
+      "depends_on": [
+        "TASK-004"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: Coverage summary + findings-first + rule grouping (TypeScript/JavaScript); typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/ui/shared/styles.css",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "7aaf1c263d5894b10f1ba81df7427ca7f4df4bcc8ffdc05a8a1408e36a5fa289"
+    },
+    {
+      "id": "TASK-006",
+      "title": "Architecture/Security KPI cards clickable with generate CTA",
+      "user_visible_behavior": "Architecture and Security Findings KPI cards open their tab; when rules are missing the hint says to generate them.",
+      "status": "passing",
+      "priority": 6,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-013"
+      ],
+      "depends_on": [
+        "TASK-005"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: Architecture + Security KPI cards open tabs; missing-rules hints invite generate; typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "8f7565c46add0c80d068570369533cc4e78d49fa5e8bbe11d641e921127a0bbe"
+    },
+    {
+      "id": "TASK-007",
+      "title": "Code coverage KPI/tab: run JS/TS tests+coverage or generate CTA",
+      "user_visible_behavior": "Code coverage KPI and tab show Istanbul-style % after running JS/TS unit tests with coverage when configured; when missing, a button asks the agent to add tests+coverage and rescan.",
+      "status": "passing",
+      "priority": 7,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-014",
+        "REQ-015",
+        "REQ-016"
+      ],
+      "depends_on": [
+        "TASK-006"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test src/pr-review/code-coverage/code-coverage-scan.spec.ts && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: CodeCoverageScanService (detect/run/parse Istanbul json-summary); KPI+tab+generate CTA; architecture-rescan refreshes coverage; unit 5/5; typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/src/pr-review/code-coverage",
+        "tools/spec-drift/src/pr-review/pr-review.types.ts",
+        "tools/spec-drift/src/pr-review/pr-review.service.ts",
+        "tools/spec-drift/src/pr-review/pr-review.module.ts",
+        "tools/spec-drift/src/pr-review/pr-review.presenter.ts",
+        "tools/spec-drift/src/pr-review/workspace/review-workspace.service.ts",
+        "tools/spec-drift/src/pr-review/workspace/review-artifacts.repository.ts",
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "aea58a563a21b2e29e736035eb69b06718ef664a95943be14538493486167f8c"
+    },
+    {
+      "id": "TASK-008",
+      "title": "Code coverage Rescan always visible like Security",
+      "user_visible_behavior": "Code coverage tab always shows Rescan next to the generate CTA (including legacy reviews without a codeCoverage artifact).",
+      "status": "passing",
+      "priority": 8,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-017"
+      ],
+      "depends_on": [
+        "TASK-007"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: Rescan always visible on Code coverage (like Security); typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "06841805d11196c66513a619ef72e605ec33c4992eed9e43ca27c320ff3beb9e"
+    },
+    {
+      "id": "TASK-009",
+      "title": "Inline comments KPI clickable opens Comments tab",
+      "user_visible_behavior": "Clicking the Inline comments KPI opens the Comments tab.",
+      "status": "passing",
+      "priority": 9,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-018"
+      ],
+      "depends_on": [
+        "TASK-008"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: Inline comments KPI is a button that opens Comments tab; typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "52a182204aaf0a3422cfc8a5e90b30a8b9915062f434b032179f2b9cffd9ccc7"
+    },
+    {
+      "id": "TASK-010",
+      "title": "Always show Ticket criteria KPI and Requirements tab",
+      "user_visible_behavior": "Ticket criteria KPI and Requirements tab are always visible; without a ticket they show an empty/missing state inviting the agent to attach one.",
+      "status": "passing",
+      "priority": 10,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-019"
+      ],
+      "depends_on": [
+        "TASK-009"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: Ticket criteria KPI + Requirements always visible; empty state + attach-ticket CTA; typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "0aa1f0c534700f3f52dc71562dec420e887e626305ed28a350ffdb9a16f29a4d"
+    },
+    {
+      "id": "TASK-011",
+      "title": "Reload button left of Review progress KPI",
+      "user_visible_behavior": "Reload sits immediately to the left of the Review progress KPI card and keeps the same reload / discard-and-reload behavior.",
+      "status": "passing",
+      "priority": 11,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-020"
+      ],
+      "depends_on": [
+        "TASK-010"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: Reload moved left of Review progress KPI; typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/shared/styles.css",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "d84021c692d41fec4bf5dec87c6163d0ee08eb87ca3b09a24798cce55dd6d088"
+    },
+    {
+      "id": "TASK-012",
+      "title": "Header Reload + Review progress; other KPIs stay clickable",
+      "user_visible_behavior": "Reload and Review progress sit in the header as a compact control (progress opens drill-down); KPI row keeps Inline comments, Ticket criteria, Architecture, Security, and Code coverage clickable.",
+      "status": "passing",
+      "priority": 12,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-021"
+      ],
+      "depends_on": [
+        "TASK-011"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: compact header progress + Reload; KPI row keeps other cards clickable; typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/shared/styles.css",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "9022233c278e2e3d53d2641b1aa3b497ce3043dd876b673181036a1145cbb194"
+    },
+    {
+      "id": "TASK-013",
+      "title": "Unified Findings inbox + import + publish preview",
+      "user_visible_behavior": "Findings tab lists Architecture/Security/Ticket-evidence with filters and Add selected / Add all high / Skip; adds use a short template (word-capped); high defaults checked; Pin unmet as inline when evidence has path:line; publish confirm shows inline · summary · event with undo of last add.",
+      "status": "passing",
+      "priority": 13,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-022",
+        "REQ-023",
+        "REQ-024",
+        "REQ-025"
+      ],
+      "depends_on": [
+        "TASK-012"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test src/pr-review/findings/findings-inbox.spec.ts && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/ui.e2e-spec.ts"
+      ],
+      "evidence": "GREEN 2026-11-17: Findings inbox (filters + Add selected/high/Skip/Undo); pr_review_import_findings; Pin unmet as inline; publish preview “N inline · M in summary · event”; findings-inbox.spec 4/4; typecheck/lint/build OK; ui.e2e 7/7.",
+      "scope_paths": [
+        "tools/spec-drift/src/pr-review/findings/**",
+        "tools/spec-drift/src/pr-review/architecture/architecture-import.ts",
+        "tools/spec-drift/src/pr-review/pr-review.schemas.ts",
+        "tools/spec-drift/src/pr-review/pr-review.service.ts",
+        "tools/spec-drift/src/pr-review/pr-review.tools.ts",
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts"
+      ],
+      "evidence_hash": "7cbc10de78403106c0bc9d240c6b2e7a90ce2f1716fe042596e2bd47d676793f"
+    }
+  ]
+}

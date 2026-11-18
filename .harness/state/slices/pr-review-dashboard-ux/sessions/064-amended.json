@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-064",
+  "timestamp": "2026-11-18T01:16:42.189Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "Move Reload + Review progress into header with better UX; keep other KPI cards clickable",
+  "amendment_path": ".harness/specs/pr-review-dashboard-ux/amendments/2026-11-18T01-16-42-189Z.md",
+  "concerns": []
+}

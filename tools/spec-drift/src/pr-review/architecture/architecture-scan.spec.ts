@@ -29,11 +29,12 @@ type FakeOptions = {
 	readonly location?: Partial<RulesLocation>;
 	readonly packs?: readonly RulePack[];
 	readonly repoFindings?: readonly Finding[];
+	readonly securityFindings?: readonly Finding[];
 	readonly builtinFindings?: readonly Finding[];
 	readonly builtinError?: Error;
 };
 
-/** A CodeAnalyzer stub: records every run request and answers repo runs and built-in pack runs separately. */
+/** A CodeAnalyzer stub: records every run request and answers repo / security-set / built-in pack runs separately. */
 const fakeAnalyzer = (o: FakeOptions = {}) => {
 	const runs: AnalyzerRunRequest[] = [];
 	const analyzer: CodeAnalyzer = {
@@ -59,15 +60,18 @@ const fakeAnalyzer = (o: FakeOptions = {}) => {
 		run: async (request) => {
 			runs.push(request);
 			const builtin = request.packs.some((p) => p.id === BUILTIN_SECURITY_PACK_ID);
+			const securityOnly = request.packs.length === 1 && request.packs[0]?.id === 'security';
 			if (builtin && o.builtinError) throw o.builtinError;
 			return {
 				status: 'ok',
 				exitCode: 0,
-				findings: [...(builtin ? (o.builtinFindings ?? []) : (o.repoFindings ?? []))],
+				findings: [
+					...(builtin ? (o.builtinFindings ?? []) : securityOnly ? (o.securityFindings ?? []) : (o.repoFindings ?? [])),
+				],
 				stderrTail: '',
 			};
 		},
-		authoringGuide: () => [],
+		authoringGuide: () => ['Put YAML rules under the rules folder.'],
 	};
 	return { analyzer, runs };
 };
@@ -109,7 +113,7 @@ describe('pr-security-baseline REQ-001 REQ-002 REQ-003 built-in security pack in
 		assert.equal(view.builtinSecurity?.findings.length, 1);
 	});
 
-	it('REQ-002 does not run when the repo has a security set, on a non-Semgrep engine, or with no scannable files', async () => {
+	it('REQ-002 skips built-in only on non-Semgrep or with no scannable files (dashboard-ux REQ-008 always runs with a repo security set)', async () => {
 		const withSet = fakeAnalyzer({
 			packs: [
 				{
@@ -120,10 +124,14 @@ describe('pr-security-baseline REQ-001 REQ-002 REQ-003 built-in security pack in
 					files: ['/repo/.semgrep/security/s.yml'],
 				},
 			],
+			builtinFindings: [finding('security.js.command-injection', 'src/api/run.js', 2)],
+			securityFindings: [finding('security.repo.rule', 'src/api/run.js', 3)],
 		});
 		const a = await new ArchitectureScanService(withSet.analyzer, config).scan(scanOptions);
-		assert.equal(a.builtinSecurity, undefined);
-		assert.ok(!withSet.runs.some((r) => r.packs.some((p) => p.id === BUILTIN_SECURITY_PACK_ID)));
+		assert.equal(a.builtinSecurity?.status, 'scanned');
+		assert.ok(withSet.runs.some((r) => r.packs.some((p) => p.id === BUILTIN_SECURITY_PACK_ID)));
+		assert.equal(a.repoSecurity?.status, 'scanned');
+		assert.equal(a.repoSecurity?.findingCount, 1);
 
 		const codeql = fakeAnalyzer({ engineId: 'codeql' });
 		assert.equal(
@@ -135,6 +143,44 @@ describe('pr-security-baseline REQ-001 REQ-002 REQ-003 built-in security pack in
 		const c = await new ArchitectureScanService(deletesOnly.analyzer, config).scan({ ...scanOptions, paths: [] });
 		assert.equal(c.builtinSecurity, undefined);
 		assert.equal(deletesOnly.runs.length, 0);
+	});
+
+	it('pr-review-dashboard-ux REQ-006 REQ-007 REQ-008: repo security when present; generatePrompt when missing; built-in always', async () => {
+		const missing = await new ArchitectureScanService(fakeAnalyzer().analyzer, config).scan(scanOptions);
+		assert.equal(missing.repoSecurity?.status, 'missing');
+		assert.match(missing.repoSecurity?.generatePrompt ?? '', /Generate \.semgrep\/security security rules/);
+		assert.match(missing.repoSecurity?.generatePrompt ?? '', /pr_review_architecture_rescan/);
+		assert.equal(missing.builtinSecurity?.status, 'scanned');
+
+		const withSet = fakeAnalyzer({
+			packs: [
+				{
+					id: 'architecture',
+					kind: 'set',
+					path: '/repo/.semgrep/architecture',
+					set: 'architecture',
+					files: ['/repo/.semgrep/architecture/a.yml'],
+				},
+				{
+					id: 'security',
+					kind: 'set',
+					path: '/repo/.semgrep/security',
+					set: 'security',
+					files: ['/repo/.semgrep/security/s.yml'],
+				},
+			],
+			builtinFindings: [finding('security.js.command-injection', 'src/api/run.js', 2)],
+			securityFindings: [finding('security.repo.xss', 'src/api/run.js', 4)],
+		});
+		const present = await new ArchitectureScanService(withSet.analyzer, config).scan(scanOptions);
+		assert.equal(present.repoSecurity?.status, 'scanned');
+		assert.deepEqual(
+			present.repoSecurity?.findings.map((f) => f.checkId),
+			['security.repo.xss'],
+		);
+		assert.equal(present.repoSecurity?.generatePrompt, undefined);
+		assert.equal(present.builtinSecurity?.status, 'scanned');
+		assert.equal(present.builtinSecurity?.findingCount, 1);
 	});
 
 	it('REQ-003 a failed built-in run is a note; the repo result is unchanged', async () => {

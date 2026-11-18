@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-021",
+  "timestamp": "2026-11-18T00:18:40.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "feature_id": "TASK-004",
+  "scope_paths": [
+    "tools/spec-drift/ui/pr-review.html",
+    "tools/spec-drift/ui/pr-review/main.ts",
+    "tools/spec-drift/test/ui.e2e-spec.ts"
+  ],
+  "evidence": "REQ-009: show generate button for legacy scans missing repoSecurity.",
+  "concerns": []
+}

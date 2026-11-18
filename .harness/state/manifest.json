@@ -530,6 +530,14 @@
       "mode": "hotfix",
       "manifest": ".harness/state/slices/ci-npm-ci/manifest.json",
       "features": ".harness/features/ci-npm-ci.features.json"
+    },
+    {
+      "slice_id": "pr-review-dashboard-ux",
+      "phase": "implementation",
+      "status": "in_progress",
+      "mode": "hotfix",
+      "manifest": ".harness/state/slices/pr-review-dashboard-ux/manifest.json",
+      "features": ".harness/features/pr-review-dashboard-ux.features.json"
     }
   ]
 }

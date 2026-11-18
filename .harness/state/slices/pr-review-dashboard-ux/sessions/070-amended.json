@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-070",
+  "timestamp": "2026-11-18T01:36:16.258Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "Unified Findings inbox: filters, add to comments, ticket pin unmet, publish preview",
+  "amendment_path": ".harness/specs/pr-review-dashboard-ux/amendments/2026-11-18T01-36-16-258Z.md",
+  "concerns": []
+}

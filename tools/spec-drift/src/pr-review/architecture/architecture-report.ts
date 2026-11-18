@@ -30,6 +30,48 @@ export const buildRulesGeneratePrompt = (options: {
 				: 'After creating the rules, tell the user to re-run the PR review or architecture rescan.',
 	});
 
+/**
+ * Prompt to draft a repository security rule set (e.g. `.semgrep/security/`) from area best practices
+ * (pr-review-dashboard-ux REQ-007). Distinct from architecture rules under other packs.
+ */
+export const buildSecurityRulesGeneratePrompt = (options: {
+	readonly repoRoot: string;
+	readonly project: string;
+	readonly pr?: number;
+	readonly engine: EngineInfo;
+	readonly guide: readonly string[];
+}): string => {
+	const { engine, guide } = options;
+	const securityDir = `${engine.rulesDir}/security`;
+	const done =
+		options.pr !== undefined
+			? `After creating the security rules, call \`pr_review_architecture_rescan\` with pr=${options.pr} so the Security Findings tab re-runs on the PR files.`
+			: 'After creating the security rules, tell the user to re-run the PR review or architecture rescan.';
+	const steps = [
+		'Explore the codebase for its security surface: auth/session entrypoints, trust boundaries, parsers of untrusted input, shell/SQL/template sinks, secret handling, and dependency/config that affects those paths.',
+		'Prefer rules that encode **this** product’s area (e.g. web API, Nest handlers, Mongo queries) over a generic OWASP dump; cite the boundary each rule protects.',
+		...guide.map((step) => step.replaceAll(engine.rulesDir, securityDir)),
+		`Write the rules under \`${securityDir}/\` (YAML rule files the engine already understands). Do not overwrite unrelated packs (architecture, standards).`,
+		'Before writing files, list the rules you plan (id, what it forbids, which boundary) so the user can confirm.',
+		'Do **not** invent secrets or commit credentials.',
+	];
+	return [
+		`# Generate ${securityDir} security rules for ${options.project}`,
+		'',
+		`Repo root: \`${options.repoRoot}\``,
+		`There is no usable \`${securityDir}/\` rule set in this project yet.`,
+		'',
+		'## Goal',
+		`Create a project-specific ${engine.name} **security** rule set under \`${securityDir}/\` based on security best practices for this codebase’s area (injection, authz, unsafe sinks, secret exposure) — not a copy-paste of the kit’s built-in pack alone.`,
+		'',
+		'## How',
+		...steps.map((step, i) => `${i + 1}. ${step}`),
+		'',
+		'## Done',
+		done,
+	].join('\n');
+};
+
 export const architecturePromptSection = (arch: ArchitectureReviewView): string => {
 	const engine = engineOf(arch);
 	if (arch.status === 'missing-config' || arch.status === 'empty-config') {

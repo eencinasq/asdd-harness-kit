@@ -7,6 +7,8 @@ import { presentReview } from './pr-review.presenter.ts';
 import {
 	type ImportArchitectureInput,
 	ImportArchitectureSchema,
+	type ImportFindingsInput,
+	ImportFindingsSchema,
 	type MetricsInput,
 	MetricsSchema,
 	type NextGroupInput,
@@ -288,6 +290,19 @@ export class PrReviewTools {
 	})
 	async importArchitecture(args: ImportArchitectureInput) {
 		return presentReview(await this.review.importArchitecture(args));
+	}
+
+	@Tool({
+		name: 'pr_review_import_findings',
+		annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+		title: 'Import Findings inbox items into PR comments',
+		description:
+			'Convert selected Findings-inbox keys (arch:N, sec-builtin:N, sec-repo:N, ticket:AC-1) into inline comments in comments.md using the short comment template. Opens the dashboard on Comments.',
+		inputSchema: ImportFindingsSchema,
+		_meta: dashboardMeta,
+	})
+	async importFindings(args: ImportFindingsInput) {
+		return presentReview(await this.review.importFindings(args));
 	}
 
 	@Tool({

@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "author": "edwin-encinas",
+  "week": "2026-W47",
+  "signatures": {
+    "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T23:52:11.551Z",
+          "slice_id": null,
+          "last_at": "2026-11-18T00:15:05.208Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ]
+    },
+    "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T23:52:11.551Z",
+          "slice_id": null,
+          "last_at": "2026-11-18T00:15:05.208Z"
+        }
+      ],
+      "examples": [
+        ".harness/steering/quality-gates.project.md: coverage keys not reachable via tags (starvation, Phase-2 backlog): validation"
+      ]
+    },
+    "warn:hotfix slice \"*\": escalation signal EN-scope-spread — scope touches N top-level ": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T23:52:11.551Z",
+          "slice_id": "pr-review-dashboard-ux",
+          "last_at": "2026-11-17T23:52:28.891Z"
+        }
+      ],
+      "examples": [
+        "hotfix slice \"pr-review-dashboard-ux\": escalation signal E1-scope-spread — scope touches 2 top-level modules: .harness, tools"
+      ]
+    },
+    "warn:QG-DEC-09": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T23:52:11.551Z",
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-18T00:15:05.208Z"
+        }
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+      ]
+    }
+  }
+}

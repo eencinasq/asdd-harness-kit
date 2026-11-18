@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-052",
+  "timestamp": "2026-11-18T01:05:15.740Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "Always show Ticket criteria KPI and Requirements tab; empty state when no ticket",
+  "amendment_path": ".harness/specs/pr-review-dashboard-ux/amendments/2026-11-18T01-05-15-740Z.md",
+  "concerns": []
+}

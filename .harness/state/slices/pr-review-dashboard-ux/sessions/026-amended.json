@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-026",
+  "timestamp": "2026-11-18T00:24:01.710Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "Human-readable Coverage drill-down: clear summary, friendly labels, findings first",
+  "amendment_path": ".harness/specs/pr-review-dashboard-ux/amendments/2026-11-18T00-24-01-710Z.md",
+  "concerns": []
+}

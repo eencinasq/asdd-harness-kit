@@ -12,12 +12,10 @@ import { mcpRequestContext } from '../common/mcp/mcp-request-context.ts';
 import { evidenceLocations, locationProblems, prSecurityFindingProblem } from '../security/lens.ts';
 import type { ArchitectureReviewView } from './architecture/architecture.types.ts';
 import { mergeArchitectureComments } from './architecture/architecture-import.ts';
-import {
-	architectureFindingToReview,
-	architectureReportSection,
-	withArchitectureSection,
-} from './architecture/architecture-report.ts';
+import { architectureReportSection, withArchitectureSection } from './architecture/architecture-report.ts';
 import { ArchitectureScanService } from './architecture/architecture-scan.service.ts';
+import type { CodeCoverageView } from './code-coverage/code-coverage.types.ts';
+import { CodeCoverageScanService } from './code-coverage/code-coverage-scan.service.ts';
 import { CommentsService } from './comments/comments.service.ts';
 import {
 	findRiskyEdits,
@@ -61,11 +59,13 @@ import {
 	suggestEvent,
 } from './engine/index.ts';
 import { findingsToSarif, SARIF_FILE } from './engine/sarif.ts';
+import { collectInboxItems, inboxItemToReviewFinding, resolveInboxKeys } from './findings/findings-inbox.ts';
 import { GithubService, repoSlugFromPrUrl } from './github/github.service.ts';
 import { CALLS_FILE, costSummary, parseCalls, reviewCost } from './metrics/review-cost.ts';
 import { buildPublishMetrics, parseMetricsLog, summarizeMetrics } from './metrics/review-metrics.ts';
 import type {
 	ImportArchitectureInput,
+	ImportFindingsInput,
 	MetricsInput,
 	NextGroupInput,
 	PrInput,
@@ -120,6 +120,7 @@ const ARTIFACT_MIME_TYPES: Readonly<Record<string, string>> = {
 	'comments.md': 'text/markdown',
 	'units.json': 'application/json',
 	'architecture.json': 'application/json',
+	'code-coverage.json': 'application/json',
 	'requirements.json': 'application/json',
 	[SARIF_FILE]: 'application/sarif+json',
 };
@@ -164,6 +165,7 @@ export class PrReviewService {
 		@Inject(GithubService) private readonly github: GithubService,
 		@Inject(CommentsService) private readonly comments: CommentsService,
 		@Inject(ArchitectureScanService) private readonly architectureScan: ArchitectureScanService,
+		@Inject(CodeCoverageScanService) private readonly codeCoverageScan: CodeCoverageScanService,
 		@Inject(TicketService) private readonly tickets: TicketService,
 	) {}
 
@@ -203,6 +205,11 @@ export class PrReviewService {
 
 	importArchitecture(input: ImportArchitectureInput): Promise<PrReviewView> {
 		return this.exclusive(input, () => this.importArchitectureUnlocked(input));
+	}
+
+	/** Findings inbox → comments.md (architecture / security / ticket evidence). */
+	importFindings(input: ImportFindingsInput): Promise<PrReviewView> {
+		return this.exclusive(input, () => this.importFindingsUnlocked(input));
 	}
 
 	/** Model path: never submits a visible review, only a pending draft the author must submit. */
@@ -365,13 +372,12 @@ export class PrReviewService {
 			published: false,
 		});
 
-		await call.reportProgress(2, 4, 'Running the project architecture rules');
-		const architecture = await this.scanArchitecture(
-			pr,
-			paths,
-			metadata.files.length > 0 ? metadata.files : units.groups.flatMap((g) => [...g.files]),
-			metadata.headRefOid,
-		);
+		await call.reportProgress(2, 4, 'Running architecture rules and code coverage');
+		const scanFiles = metadata.files.length > 0 ? metadata.files : units.groups.flatMap((g) => [...g.files]);
+		const [architecture, codeCoverage] = await Promise.all([
+			this.scanArchitecture(pr, paths, scanFiles, metadata.headRefOid),
+			this.scanCodeCoverage(pr, paths, scanFiles),
+		]);
 
 		const risk = await this.computeRisk(paths, baseSha, changedFiles, architecture);
 		await this.artifacts.saveRisk(paths, risk);
@@ -426,6 +432,7 @@ export class PrReviewService {
 				diff,
 				units,
 				architecture,
+				codeCoverage,
 				requirements,
 				risk,
 				...(ticketRefs.length ? { ticketRefs } : {}),
@@ -435,6 +442,7 @@ export class PrReviewService {
 					`Prepared PR #${pr}: ${units.selectedCount}/${units.fileCount} files in ${units.groups.length} group(s).`,
 					coverageSummary(progress),
 					architecture.message,
+					codeCoverage.message,
 					riskLine(risk),
 					ticketLine,
 					progress.complete
@@ -697,6 +705,7 @@ export class PrReviewService {
 		const units = await this.artifacts.loadReviewUnits(paths);
 		const progress = await this.artifacts.loadProgress(paths);
 		const architecture = await this.artifacts.loadArchitecture(paths);
+		const codeCoverage = await this.artifacts.loadCodeCoverage(paths);
 		const requirements = await this.artifacts.loadRequirements(paths);
 		const risk = await this.artifacts.loadRisk(paths);
 		const base = {
@@ -708,6 +717,7 @@ export class PrReviewService {
 			diff: await this.artifacts.readText(paths.diff),
 			units,
 			architecture,
+			codeCoverage,
 			requirements,
 			risk,
 			progress: progress ? toLiveProgress(progress) : undefined,
@@ -724,7 +734,7 @@ export class PrReviewService {
 				{
 					...base,
 					phase: reviewing ? 'reviewing' : reportMarkdown ? 'draft' : 'prepared',
-					message: [summary, architecture?.message].filter(Boolean).join('\n'),
+					message: [summary, architecture?.message, codeCoverage?.message].filter(Boolean).join('\n'),
 				},
 				units ? progress : undefined,
 				units,
@@ -745,6 +755,7 @@ export class PrReviewService {
 					`Status for PR #${pr}: revision ${state.current.revision}, published=${state.current.published}.`,
 					progress ? coverageSummary(progress) : '',
 					architecture?.message ?? '',
+					codeCoverage?.message ?? '',
 				]
 					.filter(Boolean)
 					.join('\n'),
@@ -767,7 +778,11 @@ export class PrReviewService {
 		const progress = await this.artifacts.loadProgress(paths);
 		// Every changed file (reviewed groups + skipped files), at the revision under review.
 		const files = [...(units?.groups.flatMap((g) => [...g.files]) ?? []), ...(units?.skipped.map((s) => s.path) ?? [])];
-		const architecture = await this.scanArchitecture(pr, paths, [...new Set(files)], state.current.head_sha);
+		const uniqueFiles = [...new Set(files)];
+		const [architecture, codeCoverage] = await Promise.all([
+			this.scanArchitecture(pr, paths, uniqueFiles, state.current.head_sha),
+			this.scanCodeCoverage(pr, paths, uniqueFiles),
+		]);
 
 		const report = await this.artifacts.readText(paths.report);
 		const updatedReport = report !== undefined ? withArchitectureSection(report, architecture) : undefined;
@@ -782,11 +797,17 @@ export class PrReviewService {
 				state,
 				units,
 				architecture,
+				codeCoverage,
 				progress: progress ? toLiveProgress(progress) : undefined,
 				reportMarkdown: updatedReport ?? report,
 				commentsMarkdown: await this.artifacts.readText(paths.comments),
 				diff: await this.artifacts.readText(paths.diff),
-				message: [`Architecture rescan for PR #${pr}.`, architecture.message, progress ? coverageSummary(progress) : '']
+				message: [
+					`Architecture rescan for PR #${pr}.`,
+					architecture.message,
+					codeCoverage.message,
+					progress ? coverageSummary(progress) : '',
+				]
 					.filter(Boolean)
 					.join('\n'),
 			},
@@ -798,25 +819,44 @@ export class PrReviewService {
 	/** Merge selected (or all) architecture findings into comments.md as inline comments. */
 	private async importArchitectureUnlocked({ pr, repoPath, indices }: ImportArchitectureInput): Promise<PrReviewView> {
 		const paths = await this.workspace.resolve({ pr, repoPath });
-		const state = await this.workspace.loadState(paths.state);
 		const architecture = await this.artifacts.loadArchitecture(paths);
-		if (architecture?.status !== 'scanned') {
+		if (architecture?.status !== 'scanned' || architecture.findings.length === 0) {
 			throw new BadRequestException(
 				'No scanned architecture findings. Run pr_review_start or pr_review_architecture_rescan first.',
 			);
 		}
-		if (architecture.findings.length === 0) {
-			throw new BadRequestException('Architecture scan has zero findings to import.');
-		}
-		const selected = indices?.length
-			? indices.map((i) => architecture.findings[i]).filter((f) => f !== undefined)
-			: [...architecture.findings];
+		const keys =
+			indices?.length !== undefined
+				? indices.filter((i) => i >= 0 && i < architecture.findings.length).map((i) => `arch:${i}`)
+				: architecture.findings.map((_, i) => `arch:${i}`);
+		if (keys.length === 0) throw new BadRequestException('No architecture findings matched the selected indices.');
+		return this.importFindingsUnlocked({ pr, repoPath, keys });
+	}
+
+	/** Merge selected Findings-inbox keys into comments.md (REQ-022…024). */
+	private async importFindingsUnlocked({ pr, repoPath, keys }: ImportFindingsInput): Promise<PrReviewView> {
+		const paths = await this.workspace.resolve({ pr, repoPath });
+		const state = await this.workspace.loadState(paths.state);
+		const architecture = await this.artifacts.loadArchitecture(paths);
+		const requirements = await this.artifacts.loadRequirements(paths);
+		const inbox = collectInboxItems({
+			architectureFindings: architecture?.status === 'scanned' ? architecture.findings : [],
+			builtinSecurityFindings:
+				architecture?.builtinSecurity?.status === 'scanned' ? architecture.builtinSecurity.findings : [],
+			repoSecurityFindings: architecture?.repoSecurity?.status === 'scanned' ? architecture.repoSecurity.findings : [],
+			requirements,
+		});
+		const { selected, unknown } = resolveInboxKeys(keys, inbox);
 		if (selected.length === 0) {
-			throw new BadRequestException('No architecture findings matched the selected indices.');
+			throw new BadRequestException(
+				unknown.length
+					? `No findings matched keys: ${unknown.slice(0, 8).join(', ')}`
+					: 'No findings selected to import.',
+			);
 		}
 
 		const diff = await this.requireDiff(paths);
-		const { resolved, unresolved } = resolveFindings(selected.map(architectureFindingToReview), parseDiffText(diff));
+		const { resolved, unresolved } = resolveFindings(selected.map(inboxItemToReviewFinding), parseDiffText(diff));
 		const existingMd = await this.artifacts.readText(paths.comments);
 		const merged = mergeArchitectureComments({
 			pr,
@@ -828,15 +868,8 @@ export class PrReviewService {
 
 		const report =
 			(await this.artifacts.readText(paths.report)) ??
-			[
-				`# PR review #${pr}`,
-				'',
-				'## Verdict',
-				'Imported architecture findings.',
-				'',
-				findingsToReportSection(resolved),
-			].join('\n');
-		const reportMarkdown = withArchitectureSection(report, architecture);
+			[`# PR review #${pr}`, '', '## Verdict', 'Imported findings.', '', findingsToReportSection(resolved)].join('\n');
+		const reportMarkdown = architecture ? withArchitectureSection(report, architecture) : report;
 
 		const draft = await this.comments.saveDraft(paths, {
 			reportMarkdown,
@@ -854,6 +887,8 @@ export class PrReviewService {
 				paths,
 				state,
 				architecture,
+				requirements,
+				codeCoverage: await this.artifacts.loadCodeCoverage(paths),
 				units,
 				progress: progress ? toLiveProgress(progress) : undefined,
 				reportMarkdown,
@@ -862,14 +897,14 @@ export class PrReviewService {
 				check: await this.comments.checkAgainstOriginal(paths),
 				diff,
 				warnings: [
+					...unknown.map((k) => `Unknown finding key skipped: ${k}`),
 					...unresolved.map(
-						(f) =>
-							`Architecture finding not on RIGHT-side diff (skipped): ${f.path}:${f.startLine} — ${f.content.slice(0, 80)}`,
+						(f) => `Finding not on RIGHT-side diff (skipped): ${f.path}:${f.startLine} — ${f.content.slice(0, 80)}`,
 					),
 					...draft.warnings,
 				],
 				message: [
-					`Imported ${merged.addedInline} architecture finding(s) as inline comments` +
+					`Imported ${merged.addedInline} finding(s) as inline comments` +
 						(merged.addedToSummary ? ` (+${merged.addedToSummary} minor in summary)` : '') +
 						(unresolved.length ? `; ${unresolved.length} unanchored skipped` : '') +
 						'.',
@@ -1019,6 +1054,7 @@ export class PrReviewService {
 			diff: await this.artifacts.readText(paths.diff),
 			units: await this.artifacts.loadReviewUnits(paths),
 			architecture: await this.artifacts.loadArchitecture(paths),
+			codeCoverage: await this.artifacts.loadCodeCoverage(paths),
 			progress: progress ? toLiveProgress(progress) : undefined,
 			warnings,
 			message: 'UI draft saved.',
@@ -1079,6 +1115,22 @@ export class PrReviewService {
 		} finally {
 			await fs.rm(snapshot, { recursive: true, force: true });
 		}
+	}
+
+	/** Run JS/TS unit tests with coverage on the local checkout (or missing + generate prompt). */
+	private async scanCodeCoverage(
+		pr: number,
+		paths: ResolvedPaths,
+		files: readonly string[],
+	): Promise<CodeCoverageView> {
+		const codeCoverage = await this.codeCoverageScan.scan({
+			repoRoot: paths.repoRoot,
+			project: paths.project,
+			pr,
+			paths: files,
+		});
+		await this.artifacts.saveCodeCoverage(paths, codeCoverage);
+		return codeCoverage;
 	}
 
 	/** Attach (or replace) the ticket of a review; its criteria become the last coverage step. */

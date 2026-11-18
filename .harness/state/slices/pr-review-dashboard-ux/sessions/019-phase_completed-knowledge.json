@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-019",
+  "timestamp": "2026-11-18T00:15:30.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Confirmed UX: (1) built-in pack always on Semgrep, (2) repo .semgrep/security when present, (3) generate-security-rules button when missing. Supersedes PR-scan skip-when-repo-has-security from pr-security-baseline REQ-002.",
+  "concerns": []
+}

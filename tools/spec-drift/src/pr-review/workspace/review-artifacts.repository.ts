@@ -6,6 +6,7 @@ import { Injectable } from '@nestjs/common';
 import { writeFileAtomic, writeJsonAtomic } from '../../common/fs/atomic-write.ts';
 
 import type { ArchitectureReviewView } from '../architecture/architecture.types.ts';
+import type { CodeCoverageView } from '../code-coverage/code-coverage.types.ts';
 import type { ExistingComment } from '../context/review-context.ts';
 import type { ReviewProgress } from '../coverage/coverage.ts';
 import type { ResolvedPaths, ReviewUnitsView } from '../pr-review.types.ts';
@@ -91,6 +92,14 @@ export class ReviewArtifactsRepository {
 
 	saveArchitecture(paths: ResolvedPaths, arch: ArchitectureReviewView): Promise<void> {
 		return writeJson(paths.architecture, arch);
+	}
+
+	loadCodeCoverage(paths: ResolvedPaths): Promise<CodeCoverageView | undefined> {
+		return this.readJson<CodeCoverageView>(paths.codeCoverage);
+	}
+
+	saveCodeCoverage(paths: ResolvedPaths, coverage: CodeCoverageView): Promise<void> {
+		return writeJson(paths.codeCoverage, coverage);
 	}
 
 	/** Delete the whole PR workspace. */

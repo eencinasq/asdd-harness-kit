@@ -5,9 +5,14 @@ import { packsForMode } from '../../analysis/domain/pack-selection.ts';
 import { isRulesPath } from '../../analysis/domain/rule-readiness.ts';
 import { CODE_ANALYZER, type CodeAnalyzer } from '../../analysis/ports/code-analyzer.port.ts';
 import type { Env } from '../../config/env.schema.ts';
-import { BUILTIN_SECURITY_PACK_ID, securityPacks } from '../../security/builtin-pack.ts';
-import type { ArchitectureFinding, ArchitectureReviewView, BuiltinSecurityScan } from './architecture.types.ts';
-import { buildRulesGeneratePrompt } from './architecture-report.ts';
+import { BUILTIN_SECURITY_PACK_ID, builtinSecurityPack, SECURITY_SET } from '../../security/builtin-pack.ts';
+import type {
+	ArchitectureFinding,
+	ArchitectureReviewView,
+	BuiltinSecurityScan,
+	RepoSecurityScan,
+} from './architecture.types.ts';
+import { buildRulesGeneratePrompt, buildSecurityRulesGeneratePrompt } from './architecture-report.ts';
 
 const EXCLUDES = ['node_modules', 'dist'];
 const MAX_FINDINGS = 200;
@@ -49,31 +54,32 @@ export class ArchitectureScanService {
 		};
 	}
 
-	/** The repo's own rules on the PR files, plus the built-in security pack when the repo has no security set. */
+	/**
+	 * The repo's own rules on the PR files, plus security scans for the dashboard:
+	 * built-in pack always on Semgrep (REQ-008), and always a repo-security result (findings or generate prompt).
+	 */
 	async scan(options: ScanOptions): Promise<ArchitectureReviewView> {
 		const view = await this.scanRepoRules(options);
 		const builtinSecurity = await this.scanBuiltinSecurity(options);
-		return builtinSecurity ? { ...view, builtinSecurity } : view;
+		const repoSecurity = await this.scanRepoSecurity(options);
+		return {
+			...view,
+			...(builtinSecurity ? { builtinSecurity } : {}),
+			repoSecurity,
+		};
 	}
 
 	/**
-	 * pr-security-baseline REQ-001…003: the kit's starter security rules on the PR files, only when the engine is Semgrep,
-	 * the repo has no `security` rule set (its own set already runs with the repo rules) and there are code files to
-	 * scan. Never throws: a run that cannot start or fails becomes an `error` note.
+	 * Kit starter security rules on the PR files (pr-security-baseline REQ-001/003 + dashboard-ux REQ-008).
+	 * Always runs on Semgrep when there are scannable files — including when the repo has its own security set
+	 * (that set is scanned separately as `repoSecurity`). Never throws: failures become an `error` note.
 	 */
 	private async scanBuiltinSecurity(options: ScanOptions): Promise<BuiltinSecurityScan | undefined> {
 		const { engine } = this.analyzer;
 		if (engine.id !== 'semgrep') return undefined;
 		const targetPaths = this.codePaths(options);
 		if (!targetPaths) return undefined;
-		let available: Awaited<ReturnType<CodeAnalyzer['listPacks']>> = [];
-		try {
-			available = await this.analyzer.listPacks(options.repoRoot);
-		} catch {
-			// No readable rules folder: the repo certainly has no security set.
-		}
-		const packs = securityPacks(available, engine.id);
-		if (!packs || !packs.every((p) => p.id === BUILTIN_SECURITY_PACK_ID)) return undefined;
+		const packs = [builtinSecurityPack()];
 		const base = { packId: BUILTIN_SECURITY_PACK_ID };
 		try {
 			const run = await this.analyzer.run({
@@ -109,7 +115,7 @@ export class ArchitectureScanService {
 				status: 'scanned',
 				findingCount: findings.length,
 				findings: findings.slice(0, MAX_FINDINGS),
-				message: `Built-in security pack: ${findings.length} finding(s) on PR paths (the repository has no \`${engine.rulesDir}/security/\` rules).`,
+				message: `Built-in security pack: ${findings.length} finding(s) on PR paths.`,
 			};
 		} catch (error) {
 			const detail = error instanceof Error ? error.message : String(error);
@@ -122,6 +128,111 @@ export class ArchitectureScanService {
 				findingCount: 0,
 				findings: [],
 				message: `Built-in security pack: ${why}; the review continues without it.`,
+			};
+		}
+	}
+
+	/**
+	 * Repository `.semgrep/security/` (or engine equivalent) on the PR files.
+	 * Always returns a view: `missing` + generatePrompt when the set is absent (REQ-007).
+	 */
+	private async scanRepoSecurity(options: ScanOptions): Promise<RepoSecurityScan> {
+		const { engine } = this.analyzer;
+		const generatePrompt = buildSecurityRulesGeneratePrompt({
+			...options,
+			engine,
+			guide: this.analyzer.authoringGuide(),
+		});
+		const missing = (message: string): RepoSecurityScan => ({
+			status: 'missing',
+			findingCount: 0,
+			findings: [],
+			configFiles: [],
+			message,
+			generatePrompt,
+		});
+
+		let available: Awaited<ReturnType<CodeAnalyzer['listPacks']>> = [];
+		try {
+			available = await this.analyzer.listPacks(options.repoRoot);
+		} catch {
+			return missing(`No readable \`${engine.rulesDir}/\` — cannot load a security rule set.`);
+		}
+		const repoSet = available.find((p) => p.kind === 'set' && p.id === SECURITY_SET);
+		if (!repoSet) {
+			return missing(
+				`No \`${engine.rulesDir}/security/\` rules. Generate a security set from best practices for this codebase’s area.`,
+			);
+		}
+		const configFiles = repoSet.files.map((f) => f.slice(repoSet.path.length).replace(/^[/\\]/, '') || f);
+		if (repoSet.files.length === 0) {
+			return {
+				...missing(`\`${engine.rulesDir}/security/\` exists but has no rule files.`),
+				configFiles,
+			};
+		}
+
+		const targetPaths = this.codePaths(options);
+		if (!targetPaths) {
+			return {
+				status: 'scanned',
+				findingCount: 0,
+				findings: [],
+				configFiles,
+				message: 'No PR files to scan with the repository security rules.',
+			};
+		}
+
+		try {
+			const run = await this.analyzer.run({
+				repoRoot: options.repoRoot,
+				packs: [repoSet],
+				rules: await this.analyzer.loadRules([repoSet]),
+				paths: targetPaths,
+				targetRoot: options.targetRoot,
+				exclude: [...EXCLUDES, engine.rulesDir],
+				timeoutMs: this.timeoutMs,
+			});
+			if (run.status === 'failed') {
+				return {
+					status: 'error',
+					findingCount: 0,
+					findings: [],
+					configFiles,
+					message: `Repository security rules: ${engine.name} failed (exit ${run.exitCode}).`,
+				};
+			}
+			const findings: ArchitectureFinding[] = run.findings.map(
+				({ checkId, path, startLine, endLine, severity, message }) => ({
+					checkId,
+					path,
+					startLine,
+					endLine,
+					severity,
+					message,
+				}),
+			);
+			return {
+				status: 'scanned',
+				findingCount: findings.length,
+				findings: findings.slice(0, MAX_FINDINGS),
+				configFiles,
+				message:
+					findings.length === 0
+						? `Repository security rules clean (${configFiles.length} rule file(s) under \`${engine.rulesDir}/security/\`).`
+						: `Repository security rules: ${findings.length} finding(s) from \`${engine.rulesDir}/security/\` on PR paths.`,
+			};
+		} catch (error) {
+			const detail = error instanceof Error ? error.message : String(error);
+			const why = detail.includes('ENOENT')
+				? `${engine.name} is not installed (or not on PATH)`
+				: `${engine.name} could not run: ${detail}`;
+			return {
+				status: 'error',
+				findingCount: 0,
+				findings: [],
+				configFiles,
+				message: `Repository security rules: ${why}.`,
 			};
 		}
 	}

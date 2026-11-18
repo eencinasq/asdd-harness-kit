@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-057",
+  "timestamp": "2026-11-18T01:08:30.000Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "phase_completed",
+  "status": "PASS",
+  "phase": "knowledge",
+  "evidence": "Ticket criteria KPI and Requirements tab stay visible without a ticket; empty state + Ask the agent to attach a ticket (pr_review_set_ticket), same pattern as Security/Coverage missing.",
+  "concerns": []
+}

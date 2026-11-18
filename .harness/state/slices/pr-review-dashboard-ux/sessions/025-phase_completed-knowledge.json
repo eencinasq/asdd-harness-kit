@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-025",
+  "timestamp": "2026-11-18T00:20:30.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Bug: legacy architecture.json without repoSecurity showed “Not available” and hid the generate button. Fix: UI treats absent repoSecurity as missing + fallback prompt; Security tab has Rescan.",
+  "concerns": []
+}

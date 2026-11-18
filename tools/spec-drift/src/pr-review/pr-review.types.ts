@@ -1,4 +1,5 @@
 import type { ArchitectureReviewView } from './architecture/architecture.types.ts';
+import type { CodeCoverageView } from './code-coverage/code-coverage.types.ts';
 import type { ReviewProfile } from './engine/profile.ts';
 import type { ExcludeReason, LineSpan, ReviewFinding } from './engine/types.ts';
 import type { RequirementsState } from './requirements/requirements.types.ts';
@@ -42,6 +43,8 @@ export type ResolvedPaths = {
 	readonly units: string;
 	readonly progress: string;
 	readonly architecture: string;
+	/** Istanbul-style JS/TS coverage artifact (pr-review-dashboard-ux REQ-014). */
+	readonly codeCoverage: string;
 	readonly requirements: string;
 	/** PR risk ranking (spec-drift-depth REQ-002). */
 	readonly risk: string;
@@ -182,6 +185,8 @@ export type PrReviewView = {
 	readonly progress?: LiveProgressView;
 	/** Per-project architecture scan (or missing-config + generatePrompt). */
 	readonly architecture?: ArchitectureReviewView;
+	/** JS/TS unit-test coverage run (or missing + generatePrompt). */
+	readonly codeCoverage?: CodeCoverageView;
 	/** Ticket criteria and their verification (when the review has a ticket). */
 	readonly requirements?: RequirementsState;
 	/** Changed files ranked by risk: where to read first (spec-drift-depth REQ-002). */

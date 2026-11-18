@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-020",
+  "timestamp": "2026-11-18T00:18:24.980Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "Show generate security rules button for legacy scans missing repoSecurity",
+  "amendment_path": ".harness/specs/pr-review-dashboard-ux/amendments/2026-11-18T00-18-24-980Z.md",
+  "concerns": []
+}

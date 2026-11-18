@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-007",
+  "timestamp": "2026-11-17T23:55:00.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: keep hotfix feature scope_paths under one top-level module (tools/) — mapping .harness/specs into scope_paths trips E1 and blocks QA/Knowledge close. Coverage belongs as a KPI drill-down, not a permanent tab; scan summaries (architecture / builtinSecurity) share the KPI+tab pattern.",
+  "concerns": []
+}

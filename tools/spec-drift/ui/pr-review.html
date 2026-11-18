@@ -13,9 +13,33 @@
 					<h1 id="pr-title">Waiting for review data…</h1>
 					<p class="meta" id="review-meta"></p>
 				</div>
-				<div class="toolbar">
+				<div class="header-actions" id="header-actions" hidden>
+					<button
+						type="button"
+						class="header-progress"
+						id="kpi-coverage-card"
+						aria-controls="coverage-view"
+						title="Open review progress"
+					>
+						<span class="header-progress-top">
+							<span class="header-progress-label">Review progress</span>
+							<strong class="header-progress-value" id="kpi-coverage">—</strong>
+						</span>
+						<span class="header-progress-hint" id="kpi-coverage-hint"></span>
+						<span
+							class="meter header-progress-meter"
+							id="coverage-meter"
+							role="meter"
+							aria-label="Review progress"
+							aria-valuemin="0"
+							aria-valuemax="0"
+							aria-valuenow="0"
+						>
+							<span id="coverage-bar"></span>
+						</span>
+					</button>
+					<button type="button" class="btn" id="reload" disabled title="Reload review">Reload</button>
 					<button type="button" id="open-pr" class="btn btn-ghost" hidden>Open on GitHub ↗</button>
-					<button type="button" id="reload" class="btn" disabled>Reload</button>
 				</div>
 			</header>
 
@@ -30,49 +54,63 @@
 			<div id="empty" hidden></div>
 
 			<section class="kpis" id="kpis" aria-label="Summary" hidden>
-				<div class="kpi">
-					<span class="kpi-label">Coverage</span>
-					<strong class="kpi-value" id="kpi-coverage">—</strong>
-					<div class="meter" id="coverage-meter" role="meter" aria-label="Review coverage" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
-						<span id="coverage-bar"></span>
-					</div>
-				</div>
-				<div class="kpi">
+				<button type="button" class="kpi kpi-action" id="kpi-inlines-card" aria-controls="panel-comments">
 					<span class="kpi-label">Inline comments</span>
 					<strong class="kpi-value" id="kpi-inlines">0</strong>
 					<span class="kpi-hint" id="kpi-inlines-hint"></span>
-				</div>
-				<div class="kpi" id="kpi-req-card" hidden>
+				</button>
+				<button type="button" class="kpi kpi-action" id="kpi-req-card" aria-controls="panel-requirements">
 					<span class="kpi-label">Ticket criteria</span>
 					<strong class="kpi-value" id="kpi-req">—</strong>
 					<span class="kpi-hint" id="kpi-req-hint"></span>
-				</div>
-				<div class="kpi" id="kpi-arch-card">
+				</button>
+				<button type="button" class="kpi kpi-action" id="kpi-arch-card" aria-controls="panel-architecture">
 					<span class="kpi-label">Architecture</span>
 					<strong class="kpi-value" id="kpi-arch">—</strong>
 					<span class="kpi-hint" id="kpi-arch-hint"></span>
-				</div>
-				<div class="kpi">
-					<span class="kpi-label">Revision</span>
-					<strong class="kpi-value" id="kpi-rev">—</strong>
-					<span class="kpi-hint" id="kpi-rev-hint"></span>
-				</div>
+				</button>
+				<button type="button" class="kpi kpi-action" id="kpi-security-card" aria-controls="panel-security">
+					<span class="kpi-label">Security Findings</span>
+					<strong class="kpi-value" id="kpi-security">—</strong>
+					<span class="kpi-hint" id="kpi-security-hint"></span>
+				</button>
+				<button type="button" class="kpi kpi-action" id="kpi-code-coverage-card" aria-controls="panel-code-coverage">
+					<span class="kpi-label">Code coverage</span>
+					<strong class="kpi-value" id="kpi-code-coverage">—</strong>
+					<span class="kpi-hint" id="kpi-code-coverage-hint"></span>
+				</button>
 			</section>
 
 			<div id="alerts" class="stack"></div>
+
+			<section id="coverage-view" class="coverage-view" hidden>
+				<div class="toolbar">
+					<button type="button" class="btn btn-ghost" id="coverage-back">← Back</button>
+					<strong id="coverage-title">Coverage</strong>
+					<span class="spacer"></span>
+					<span class="subtle" id="coverage-count"></span>
+				</div>
+				<div id="panel-coverage"></div>
+			</section>
 
 			<div class="tabs" role="tablist" aria-label="Review sections" id="tabs" hidden>
 				<button type="button" role="tab" id="tab-comments" data-tab="comments" aria-controls="panel-comments">
 					Comments <span class="count" id="count-comments">0</span>
 				</button>
-				<button type="button" role="tab" id="tab-requirements" data-tab="requirements" aria-controls="panel-requirements" hidden>
-					Requirements <span class="count" id="count-requirements">0</span>
+				<button type="button" role="tab" id="tab-findings" data-tab="findings" aria-controls="panel-findings">
+					Findings <span class="count" id="count-findings">0</span>
 				</button>
-				<button type="button" role="tab" id="tab-coverage" data-tab="coverage" aria-controls="panel-coverage">
-					Coverage <span class="count" id="count-coverage">0</span>
+				<button type="button" role="tab" id="tab-requirements" data-tab="requirements" aria-controls="panel-requirements">
+					Requirements <span class="count" id="count-requirements">—</span>
 				</button>
 				<button type="button" role="tab" id="tab-architecture" data-tab="architecture" aria-controls="panel-architecture">
 					Architecture <span class="count" id="count-architecture">0</span>
+				</button>
+				<button type="button" role="tab" id="tab-security" data-tab="security" aria-controls="panel-security">
+					Security <span class="count" id="count-security">0</span>
+				</button>
+				<button type="button" role="tab" id="tab-code-coverage" data-tab="code-coverage" aria-controls="panel-code-coverage">
+					Coverage <span class="count" id="count-code-coverage">—</span>
 				</button>
 				<button type="button" role="tab" id="tab-report" data-tab="report" aria-controls="panel-report">Report</button>
 			</div>
@@ -92,26 +130,51 @@
 				</div>
 			</section>
 
+			<section role="tabpanel" id="panel-findings" aria-labelledby="tab-findings" hidden>
+				<p class="subtle">
+					Ready for comments: Architecture, Security, and Ticket evidence. Detail/rescan stay in their own tabs.
+				</p>
+				<div class="segmented" role="group" aria-label="Findings filter" id="findings-filter">
+					<button type="button" data-value="all" aria-pressed="true">All</button>
+					<button type="button" data-value="architecture" aria-pressed="false">Architecture</button>
+					<button type="button" data-value="security" aria-pressed="false">Security</button>
+					<button type="button" data-value="ticket" aria-pressed="false">Ticket evidence</button>
+				</div>
+				<div class="toolbar" id="findings-actions">
+					<button type="button" class="btn btn-primary" id="findings-add-selected" disabled>Add selected</button>
+					<button type="button" class="btn" id="findings-add-high">Add all high</button>
+					<button type="button" class="btn btn-ghost" id="findings-skip">Skip</button>
+					<span class="spacer"></span>
+					<button type="button" class="btn btn-ghost" id="findings-undo" hidden>Undo last add</button>
+				</div>
+				<ul class="list" id="findings-list"></ul>
+			</section>
+
 			<section role="tabpanel" id="panel-requirements" aria-labelledby="tab-requirements" hidden>
-				<div class="toolbar">
+				<div id="requirements-summary" class="stack"></div>
+				<div class="toolbar" id="requirements-actions">
+					<button type="button" class="btn btn-primary" id="attach-ticket" hidden>
+						Ask the agent to attach a ticket
+					</button>
+					<button type="button" class="btn" id="pin-unmet-inline" hidden>Pin unmet as inline</button>
+					<span class="spacer"></span>
+					<button type="button" class="btn btn-ghost" id="open-ticket" hidden>Open ticket ↗</button>
+				</div>
+				<div class="toolbar" id="requirements-ticket-head" hidden>
 					<div class="stack" style="gap: 2px">
 						<strong id="ticket-title"></strong>
 						<span class="subtle" id="ticket-meta"></span>
 					</div>
-					<span class="spacer"></span>
-					<button type="button" class="btn btn-ghost" id="open-ticket" hidden>Open ticket ↗</button>
 				</div>
 				<div id="requirements-alert"></div>
 				<ul class="list" id="requirements-list"></ul>
 				<div id="requirements-extra" class="stack"></div>
-				<div class="toolbar">
+				<div class="toolbar" id="requirements-save-bar">
 					<span class="subtle" id="requirements-dirty" aria-live="polite"></span>
 					<span class="spacer"></span>
 					<button type="button" class="btn" id="save-requirements" disabled>Save verdicts</button>
 				</div>
 			</section>
-
-			<section role="tabpanel" id="panel-coverage" aria-labelledby="tab-coverage" hidden></section>
 
 			<section role="tabpanel" id="panel-architecture" aria-labelledby="tab-architecture" hidden>
 				<div id="architecture-summary" class="stack"></div>
@@ -123,6 +186,30 @@
 					<button type="button" class="btn btn-ghost" id="rescan-architecture">Rescan</button>
 				</div>
 				<ul class="list" id="architecture-list"></ul>
+			</section>
+
+			<section role="tabpanel" id="panel-security" aria-labelledby="tab-security" hidden>
+				<div id="security-summary" class="stack"></div>
+				<div class="toolbar" id="security-actions">
+					<button type="button" class="btn btn-primary" id="generate-security-rules" hidden>
+						Ask the agent to write security rules
+					</button>
+					<span class="spacer"></span>
+					<button type="button" class="btn btn-ghost" id="rescan-security">Rescan</button>
+				</div>
+				<ul class="list" id="security-list"></ul>
+			</section>
+
+			<section role="tabpanel" id="panel-code-coverage" aria-labelledby="tab-code-coverage" hidden>
+				<div id="code-coverage-summary" class="stack"></div>
+				<div class="toolbar" id="code-coverage-actions">
+					<button type="button" class="btn btn-primary" id="generate-code-coverage" hidden>
+						Ask the agent to add tests + coverage
+					</button>
+					<span class="spacer"></span>
+					<button type="button" class="btn btn-ghost" id="rescan-code-coverage">Rescan</button>
+				</div>
+				<ul class="list" id="code-coverage-list"></ul>
 			</section>
 
 			<section role="tabpanel" id="panel-report" aria-labelledby="tab-report" hidden>

@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-11-17T22:16:32.886Z",
+  "generated_at": "2026-11-18T01:47:00.987Z",
   "slices": [
     {
       "slice_id": "agents-spec",
@@ -701,6 +701,24 @@
         "human",
         "eencinas",
         "claude"
+      ]
+    },
+    {
+      "slice_id": "pr-review-dashboard-ux",
+      "phase": "knowledge",
+      "status": "DONE",
+      "mode": "hotfix",
+      "active_features": 0,
+      "escalation_signals": 0,
+      "escalation_required": false,
+      "escalated_from_lite": false,
+      "open_dissents": 0,
+      "last_activity": "2026-11-18T01:47:00.959Z",
+      "contributors": [
+        "squad",
+        "human",
+        "eencinas",
+        "cursor"
       ]
     },
     {

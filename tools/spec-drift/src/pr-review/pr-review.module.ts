@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { whenToolset } from '../config/toolsets.ts';
 import { ArchitectureScanService } from './architecture/architecture-scan.service.ts';
+import { CodeCoverageScanService } from './code-coverage/code-coverage-scan.service.ts';
 import { CommentsService } from './comments/comments.service.ts';
 import { GithubService } from './github/github.service.ts';
 import { PrReviewPrompts } from './pr-review.prompts.ts';
@@ -23,6 +24,7 @@ import { ReviewWorkspaceService } from './workspace/review-workspace.service.ts'
 		ReviewArtifactsRepository,
 		CommentsService,
 		ArchitectureScanService,
+		CodeCoverageScanService,
 		TicketService,
 	],
 	exports: [PrReviewService],

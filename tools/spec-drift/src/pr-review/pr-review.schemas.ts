@@ -136,6 +136,11 @@ export const ImportArchitectureSchema = PrSchema.extend({
 		.describe('0-based indices into architecture.findings (omit = all)'),
 });
 
+/** Unified Findings inbox → comments.md (architecture / security / ticket evidence). */
+export const ImportFindingsSchema = PrSchema.extend({
+	keys: z.array(z.string().min(1)).min(1).describe('Inbox keys: arch:N, sec-builtin:N, sec-repo:N, ticket:AC-1'),
+});
+
 /** Model-facing publish: always creates a pending (draft) review that only the author sees. */
 export const PublishSchema = PrSchema.extend({
 	force: z
@@ -217,6 +222,7 @@ export type StartInput = z.infer<typeof StartSchema>;
 export type SubmitFindingsInput = z.infer<typeof SubmitFindingsSchema>;
 export type SaveDraftInput = z.infer<typeof SaveDraftSchema>;
 export type ImportArchitectureInput = z.infer<typeof ImportArchitectureSchema>;
+export type ImportFindingsInput = z.infer<typeof ImportFindingsSchema>;
 export type PublishInput = z.infer<typeof PublishSchema>;
 export type UiPublishInput = z.infer<typeof UiPublishSchema>;
 export type UiSaveInput = z.infer<typeof UiSaveSchema>;

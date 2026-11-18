@@ -42,7 +42,7 @@ describe('mergeArchitectureComments', () => {
 		assert.equal(result.addedToSummary, 1);
 		assert.equal(result.comments.meta.event, 'REQUEST_CHANGES');
 		assert.equal(result.comments.meta.repo, 'acme/demo');
-		assert.match(result.comments.summary, /Architecture \(minor\)/);
+		assert.match(result.comments.summary, /Findings \(minor\)/);
 	});
 
 	test('skips findings already present in the draft', () => {

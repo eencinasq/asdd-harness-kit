@@ -64,7 +64,7 @@ export const mergeArchitectureComments = (options: {
 	}
 
 	const summaryParts = [existing.summary.trim()].filter(Boolean);
-	if (summaryLines.length) summaryParts.push('', '**Architecture (minor)**', ...summaryLines);
+	if (summaryLines.length) summaryParts.push('', '**Findings (minor)**', ...summaryLines);
 
 	const event: ReviewEvent = findings.some((f) => f.severity === 'critical' || f.severity === 'high')
 		? 'REQUEST_CHANGES'

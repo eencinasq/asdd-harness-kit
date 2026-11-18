@@ -267,6 +267,7 @@ describe('dashboards in a real MCP Apps host', { skip }, () => {
 										endLine: 6,
 										severity: 'high',
 										category: 'security',
+										evidence: 'An untrusted caller controls the raw payload that reaches JSON.parse at src/app.ts:6.',
 									},
 								],
 				},
@@ -283,18 +284,128 @@ describe('dashboards in a real MCP Apps host', { skip }, () => {
 		await deliver(page, status);
 		await view.waitForFunction(() => document.getElementById('kpi-phase')?.dataset['phase'] === 'draft');
 		assert.equal((await view.textContent('#kpi-pr'))?.trim(), String(PR_NUMBER));
-		await view.click('#tab-coverage');
-		assert.match((await view.textContent('#panel-coverage')) ?? '', /Verify findings[\s\S]*✓ Confirmed/);
-		// spec-drift-depth REQ-002: changed files ranked by risk, before the groups (churn only in this repo).
+		// pr-review-dashboard-ux REQ-002 / REQ-003 / REQ-004: header rev + Security KPI/tab; no Coverage tab.
+		assert.equal(await view.locator('#tab-coverage').count(), 0);
+		assert.match((await view.textContent('#review-meta')) ?? '', /Rev \d+/);
+		// pr-review-dashboard-ux REQ-021: Reload + Review progress in header; other KPIs stay in the row.
+		assert.ok(await view.isVisible('#header-actions'));
+		assert.ok(await view.isVisible('#reload'));
+		assert.ok(await view.isVisible('#kpi-coverage-card'));
+		assert.equal(
+			await view.evaluate(() => {
+				const actions = document.getElementById('header-actions');
+				const kpis = document.getElementById('kpis');
+				const reload = document.getElementById('reload');
+				const progress = document.getElementById('kpi-coverage-card');
+				if (!actions || !kpis || !reload || !progress) return false;
+				const inHeader = actions.contains(reload) && actions.contains(progress);
+				const kpiIds = [...kpis.querySelectorAll('.kpi-action')].map((el) => el.id);
+				return (
+					inHeader &&
+					!kpis.contains(progress) &&
+					kpiIds.includes('kpi-inlines-card') &&
+					kpiIds.includes('kpi-req-card') &&
+					kpiIds.includes('kpi-arch-card') &&
+					kpiIds.includes('kpi-security-card') &&
+					kpiIds.includes('kpi-code-coverage-card')
+				);
+			}),
+			true,
+		);
+		assert.equal(await view.locator('#kpi-rev-hint').count(), 1);
+		assert.ok(await view.isVisible('#kpi-security-card'));
+		assert.ok(await view.isVisible('#tab-security'));
+		// pr-review-dashboard-ux REQ-019: Ticket criteria KPI + Requirements tab always visible (empty without ticket).
+		assert.ok(await view.isVisible('#kpi-req-card'));
+		assert.ok(await view.isVisible('#tab-requirements'));
+		assert.equal(await view.getAttribute('#tab-requirements', 'hidden'), null);
+		await view.click('#kpi-req-card');
+		assert.equal(await view.isVisible('#panel-requirements'), true);
+		assert.match((await view.textContent('#requirements-summary')) ?? '', /No ticket/i);
+		assert.equal(await view.isVisible('#attach-ticket'), true);
+		// pr-review-dashboard-ux REQ-013: Architecture/Security KPI cards open their tabs; missing → generate CTA hint.
+		assert.match((await view.textContent('#kpi-security-hint')) ?? '', /generate/i);
+		await view.click('#kpi-arch-card');
+		assert.equal(await view.isVisible('#panel-architecture'), true);
+		await view.click('#kpi-security-card');
+		assert.equal(await view.isVisible('#panel-security'), true);
+		// pr-review-dashboard-ux REQ-005…007: built-in first; no repo security set → generate button.
+		assert.match((await view.textContent('#security-summary')) ?? '', /Built-in security pack/);
+		assert.match((await view.textContent('#security-summary')) ?? '', /Repository security rules/);
+		assert.equal(await view.isVisible('#generate-security-rules'), true);
+		assert.equal(await view.isVisible('#rescan-security'), true);
+		assert.match((await view.textContent('#security-summary')) ?? '', /Ask the agent to write security rules/i);
+		// pr-review-dashboard-ux REQ-014…016: Code coverage KPI/tab; fixture has no test+coverage → generate CTA.
+		assert.ok(await view.isVisible('#kpi-code-coverage-card'));
+		assert.ok(await view.isVisible('#tab-code-coverage'));
+		assert.match((await view.textContent('#kpi-code-coverage-hint')) ?? '', /generate|coverage/i);
+		await view.click('#kpi-code-coverage-card');
+		assert.equal(await view.isVisible('#panel-code-coverage'), true);
+		assert.equal(await view.isVisible('#generate-code-coverage'), true);
+		// pr-review-dashboard-ux REQ-017: Rescan always visible like Security Findings.
+		assert.equal(await view.isVisible('#rescan-code-coverage'), true);
+		assert.match((await view.textContent('#code-coverage-summary')) ?? '', /coverage|tests/i);
+		// REQ-001: Coverage KPI opens a same-UI drill-down with Back.
+		await view.click('#kpi-coverage-card');
+		assert.equal(await view.isVisible('#coverage-view'), true);
+		// pr-review-dashboard-ux REQ-010…012: plain summary, findings first, human rule labels.
+		assert.match((await view.textContent('#coverage-summary')) ?? '', /review batches/i);
+		assert.match((await view.textContent('#coverage-findings')) ?? '', /finding|Confirmed/i);
+		assert.match((await view.textContent('#panel-coverage')) ?? '', /Verify findings|Closing steps/);
+		assert.match((await view.textContent('#panel-coverage')) ?? '', /TypeScript \/ JavaScript|Batches by guide/);
+		// spec-drift-depth REQ-002: risk hint still present (collapsed).
+		await view.click('#read-first > summary');
 		assert.match(
 			(await view.textContent('#read-first')) ?? '',
-			/Read first · \d+ files? ranked by risk[\s\S]*src\/app\.ts[\s\S]*commit in 90 days/,
+			/Suggested reading order[\s\S]*src\/app\.ts[\s\S]*commit in 90 days/,
 		);
 		assert.match((await view.textContent('#read-first')) ?? '', /Not available here: requirements, audit/);
-		await view.click('#tab-comments');
+		await view.click('#coverage-back');
+		// pr-review-dashboard-ux REQ-018: Inline comments KPI opens Comments tab.
+		await view.click('#tab-architecture');
+		assert.equal(await view.isVisible('#panel-architecture'), true);
+		await view.click('#kpi-inlines-card');
+		assert.equal(await view.isVisible('#panel-comments'), true);
 		assert.ok((await view.locator('#inline-list > [data-path]').count()) >= 1, 'inline comments rendered');
 		assert.equal(await view.isEnabled('#publish'), true);
 		assert.equal(await view.isEnabled('#save'), false, 'nothing to save before an edit');
+
+		// pr-review-dashboard-ux REQ-022…025: Findings inbox — filters, add, undo, publish preview.
+		await view.click('#tab-findings');
+		assert.equal(await view.isVisible('#panel-findings'), true);
+		assert.ok(await view.isVisible('#findings-filter'));
+		assert.ok(await view.isVisible('#findings-add-selected'));
+		assert.ok(await view.isVisible('#findings-add-high'));
+		assert.ok(await view.isVisible('#findings-skip'));
+		const findingsBefore = Number((await view.textContent('#count-findings'))?.trim() ?? '0');
+		assert.ok(findingsBefore >= 2, `expected architecture findings in inbox, got ${findingsBefore}`);
+		await view.click('#findings-filter button[data-value="architecture"]');
+		assert.equal(await view.getAttribute('#findings-filter button[data-value="architecture"]', 'aria-pressed'), 'true');
+		assert.ok((await view.locator('#findings-list input.finding-check').count()) >= 1);
+		toolCalls.length = 0;
+		const inlinesBeforeImport = await view.locator('#inline-list > [data-path]').count();
+		await view.click('#findings-add-high');
+		await view.waitForFunction(
+			() => document.getElementById('panel-comments') && !document.getElementById('panel-comments')?.hidden,
+		);
+		assert.ok(
+			toolCalls.some((c) => c.name === 'pr_review_import_findings'),
+			'import uses unified findings tool',
+		);
+		assert.ok(
+			(await view.locator('#inline-list > [data-path]').count()) > inlinesBeforeImport,
+			'high findings added as inline comments',
+		);
+		await view.click('#tab-findings');
+		assert.equal(await view.evaluate(() => document.getElementById('findings-undo')?.hidden), false);
+		await view.click('#findings-undo');
+		await view.waitForFunction(() => document.getElementById('findings-undo')?.hidden === true);
+		await view.click('#tab-comments');
+		assert.equal(
+			await view.locator('#inline-list > [data-path]').count(),
+			inlinesBeforeImport,
+			'undo restores prior draft',
+		);
 
 		// Editing marks the draft dirty and enables Save.
 		await view.fill('#summary', 'Edited summary from the dashboard.');
@@ -305,6 +416,7 @@ describe('dashboards in a real MCP Apps host', { skip }, () => {
 		toolCalls.length = 0;
 		await view.click('#publish');
 		assert.equal(await view.isVisible('#confirm'), true);
+		assert.match((await view.textContent('#confirm-body')) ?? '', /\d+ inline · \d+ in summary · /);
 		assert.equal(toolCalls.length, 0, 'no call before confirming');
 		await view.click('#confirm-publish');
 		// Rewriting the agent's summary is a risky edit: the server asks the human to confirm.
@@ -373,7 +485,7 @@ describe('dashboards in a real MCP Apps host', { skip }, () => {
 				...args,
 				results: [
 					{ id: 'AC-1', status: 'met', evidence: ['src/app.ts:4'] },
-					{ id: 'AC-2', status: 'unmet', note: 'JSON.parse throws' },
+					{ id: 'AC-2', status: 'unmet', note: 'JSON.parse throws', evidence: ['src/app.ts:6'] },
 					{ id: 'AC-3', status: 'partial' },
 					{ id: 'DOD-1', status: 'unverifiable' },
 				],
@@ -389,7 +501,20 @@ describe('dashboards in a real MCP Apps host', { skip }, () => {
 		assert.match((await view.textContent('#ticket-title')) ?? '', /#7 · Parse raw payloads/);
 		assert.match((await view.textContent('#requirements-alert')) ?? '', /1 criterion not met/);
 		assert.equal(await view.isEnabled('#save-requirements'), false);
+		// pr-review-dashboard-ux REQ-024: Pin unmet as inline when evidence has path:line.
+		assert.equal(await view.isVisible('#pin-unmet-inline'), true);
+		toolCalls.length = 0;
+		await view.click('#pin-unmet-inline');
+		await view.waitForFunction(
+			() => document.getElementById('panel-comments') && !document.getElementById('panel-comments')?.hidden,
+		);
+		const pin = toolCalls.find((c) => c.name === 'pr_review_import_findings');
+		assert.deepEqual(pin?.arguments?.['keys'], ['ticket:AC-2']);
+		await view.click('#tab-findings');
+		await view.click('#findings-filter button[data-value="ticket"]');
+		assert.match((await view.textContent('#findings-list')) ?? '', /AC-2|Ticket/);
 
+		await view.click('#tab-requirements');
 		toolCalls.length = 0;
 		await view.selectOption('#verdict-AC-2', 'met');
 		assert.equal(await view.isEnabled('#save-requirements'), true);

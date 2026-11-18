@@ -44,6 +44,11 @@ const toText = (view: PrReviewView, options: PresentOptions): string => {
 				`architecture: ${view.architecture.status} · findings=${view.architecture.findingCount} · ${view.architecture.rulesDir}`,
 			);
 		}
+		if (view.codeCoverage) {
+			const cov = view.codeCoverage;
+			const pct = cov.totals ? `${cov.totals.linesPct}% lines` : cov.status;
+			lines.push(`code coverage: ${cov.status} · ${pct}${cov.tool ? ` · ${cov.tool}` : ''}`);
+		}
 		const first = view.risk ? readFirst(view.risk, 3) : [];
 		if (first.length) {
 			lines.push(`read first (risk): ${first.map((f) => `${f.path} (${f.level}, score ${f.score})`).join(', ')}`);

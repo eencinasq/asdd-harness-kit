@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-013",
+  "timestamp": "2026-11-18T00:08:30.000Z",
+  "agent": "cursor",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: Security Findings tab is two stacked scans — builtinSecurity (fallback) then repoSecurity (`.semgrep/security/`); missing repo set always carries generatePrompt for area-specific security rules, separate from architecture generatePrompt.",
+  "concerns": []
+}

@@ -2,6 +2,12 @@ import { App } from '@modelcontextprotocol/ext-apps';
 
 import '../shared/styles.css';
 import { serializeCommentsMarkdown } from '../../src/pr-review/comments/comments-format.ts';
+import {
+	collectInboxItems,
+	type InboxSource,
+	isHighSeverity,
+	pinableUnmetCriteria,
+} from '../../src/pr-review/findings/findings-inbox.ts';
 import type { InlineComment, ParsedComments, PrReviewView, ReviewEvent } from '../../src/pr-review/pr-review.types.ts';
 import { INLINE_WORD_LIMIT, SUMMARY_WORD_LIMIT } from '../../src/pr-review/pr-review.types.ts';
 import { renderMarkdown } from '../shared/markdown.ts';
@@ -24,7 +30,8 @@ import {
 	withBusyButton,
 } from '../shared/ui.ts';
 
-type Tab = 'comments' | 'requirements' | 'coverage' | 'architecture' | 'report';
+type Tab = 'comments' | 'findings' | 'requirements' | 'architecture' | 'security' | 'code-coverage' | 'report';
+type FindingsFilter = 'all' | InboxSource;
 type Requirements = NonNullable<PrReviewView['requirements']>;
 type Verdict = 'met' | 'partial' | 'unmet' | 'unverifiable';
 
@@ -54,9 +61,21 @@ const alerts = $('alerts');
 const inlineList = $('inline-list');
 const summary = $<HTMLTextAreaElement>('summary');
 const summaryWords = $('summary-words');
+const coverageView = $('coverage-view');
 const coveragePanel = $('panel-coverage');
+const coverageBackBtn = $<HTMLButtonElement>('coverage-back');
+const coverageCard = $<HTMLButtonElement>('kpi-coverage-card');
+const inlinesCard = $<HTMLButtonElement>('kpi-inlines-card');
+const requirementsCard = $<HTMLButtonElement>('kpi-req-card');
+const architectureCard = $<HTMLButtonElement>('kpi-arch-card');
+const securityCard = $<HTMLButtonElement>('kpi-security-card');
+const codeCoverageCard = $<HTMLButtonElement>('kpi-code-coverage-card');
 const architectureSummary = $('architecture-summary');
 const architectureList = $('architecture-list');
+const securitySummary = $('security-summary');
+const securityList = $('security-list');
+const codeCoverageSummary = $('code-coverage-summary');
+const codeCoverageList = $('code-coverage-list');
 const reportView = $('report-view');
 const reportRendered = $('report-rendered');
 const actionbar = $('actionbar');
@@ -72,6 +91,10 @@ const confirmPublishBtn = $<HTMLButtonElement>('confirm-publish');
 const cancelPublishBtn = $<HTMLButtonElement>('cancel-publish');
 const sendAgentBtn = $<HTMLButtonElement>('send-agent');
 const generateRulesBtn = $<HTMLButtonElement>('generate-rules');
+const generateSecurityRulesBtn = $<HTMLButtonElement>('generate-security-rules');
+const generateCodeCoverageBtn = $<HTMLButtonElement>('generate-code-coverage');
+const rescanSecurityBtn = $<HTMLButtonElement>('rescan-security');
+const rescanCodeCoverageBtn = $<HTMLButtonElement>('rescan-code-coverage');
 const rescanArchitectureBtn = $<HTMLButtonElement>('rescan-architecture');
 const importArchitectureBtn = $<HTMLButtonElement>('import-architecture');
 const importArchitectureAllBtn = $<HTMLButtonElement>('import-architecture-all');
@@ -84,11 +107,36 @@ let current: PrReviewView | null = null;
 /** Comments markdown as last loaded / saved: the baseline for "unsaved changes". */
 let savedSnapshot = '';
 let activeTab: Tab | null = null;
+let coverageOpen = false;
 let busy = false;
 let reloadArmed = false;
+let findingsFilter: FindingsFilter = 'all';
+/** Comments markdown before the last Findings add — Undo last add. */
+let commentsBeforeLastImport: string | null = null;
+
+const hideTabPanels = (): void => {
+	for (const tab of tabsEl.querySelectorAll<HTMLButtonElement>('[role="tab"]')) {
+		tab.setAttribute('aria-selected', 'false');
+		tab.tabIndex = -1;
+		const panel = document.getElementById(tab.getAttribute('aria-controls') ?? '');
+		if (panel) panel.hidden = true;
+	}
+};
+
+const setCoverageOpen = (open: boolean): void => {
+	coverageOpen = open;
+	coverageView.hidden = !open;
+	tabsEl.hidden = open || !current;
+	coverageCard.setAttribute('aria-pressed', String(open));
+	if (open) {
+		hideTabPanels();
+		coverageBackBtn.focus();
+	}
+};
 
 const selectTab = createTabs<Tab>(tabsEl, (tab) => {
 	activeTab = tab;
+	if (coverageOpen) setCoverageOpen(false);
 });
 
 const wordCount = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
@@ -188,10 +236,41 @@ const verdictBadgeOf = (verdict: 'confirmed' | 'plausible' | 'rejected'): string
 		rejected: '<span class="badge tone-danger">✕ Rejected</span>',
 	})[verdict];
 
+/** Human labels for rule-doc ids (Coverage REQ-011). Unknown ids fall back to a cleaned title. */
+const RULE_LABELS: Record<string, string> = {
+	ts_js_tsx_jsx: 'TypeScript / JavaScript',
+	tests: 'Tests',
+	json: 'JSON',
+	python: 'Python',
+	go: 'Go',
+	java: 'Java',
+	yaml: 'YAML',
+	graphql: 'GraphQL',
+	terraform: 'Terraform',
+	default: 'General',
+	package_json: 'package.json',
+	github_workflows: 'GitHub Actions',
+};
+
+const ruleLabel = (ruleDocId: string | undefined): string => {
+	if (!ruleDocId) return 'Review batch';
+	const id = ruleDocId.replace(/\.md$/i, '');
+	return RULE_LABELS[id] ?? id.replaceAll('_', ' ');
+};
+
+type CoverageGroup = {
+	readonly index: number;
+	readonly label: string;
+	readonly files: readonly string[];
+	readonly status: 'pending' | 'reviewing' | 'done';
+	readonly findingCount: number;
+	readonly ruleDocId?: string;
+};
+
 const renderCoverage = (view: PrReviewView): void => {
 	const progress = view.progress;
 	const units = view.units;
-	const groups =
+	const groups: readonly CoverageGroup[] =
 		progress?.groups ??
 		(units?.groups ?? []).map((g, index) => ({
 			index,
@@ -201,56 +280,126 @@ const renderCoverage = (view: PrReviewView): void => {
 			findingCount: 0,
 			ruleDocId: g.ruleDocId,
 		}));
-	$('count-coverage').textContent = progress ? `${progress.doneCount}/${progress.totalCount}` : String(groups.length);
+	const done = progress?.doneCount ?? groups.filter((g) => g.status === 'done').length;
+	const total = progress?.totalCount ?? groups.length;
+	$('coverage-count').textContent = total ? `${done} of ${total} batches` : plural(groups.length, 'batch', 'batches');
+	$('coverage-title').textContent = 'Review progress';
 	if (groups.length === 0) {
-		coveragePanel.innerHTML = emptyState('No review groups yet', 'Ask the agent to start the review.');
+		coveragePanel.innerHTML = emptyState('No review batches yet', 'Ask the agent to start the review.');
 		return;
 	}
 
+	const remaining = total - done;
+	const summaryTone = remaining === 0 ? 'tone-success' : 'tone-info';
+	const summary = `<div class="callout ${summaryTone}" id="coverage-summary">
+			<p class="callout-title">${
+				remaining === 0
+					? `All ${total} review batches are done`
+					: `${done} of ${total} review batches done · ${remaining} left`
+			}</p>
+			<p class="muted">Coverage is how much of the PR the agent has walked through — each batch is a set of related files checked with one review guide. It is not test coverage.</p>
+		</div>`;
+
 	const next = view.nextGroup
 		? `<div class="callout">
-				<p class="callout-title">Next: group ${view.nextGroup.index + 1} · ${escapeHtml(view.nextGroup.label)}</p>
-				<p class="subtle">Review rule <code>${escapeHtml(view.nextGroup.ruleDocId)}</code> on ${plural(view.nextGroup.files.length, 'file')}.</p>
+				<p class="callout-title">Up next: ${escapeHtml(ruleLabel(view.nextGroup.ruleDocId))} · batch ${view.nextGroup.index + 1}</p>
+				<p class="subtle">${plural(view.nextGroup.files.length, 'file')} still to review.</p>
 			</div>`
 		: '';
 
-	const groupItems = groups
-		.map(
-			(g) => `
-		<li class="item">
-			<div class="item-head">
-				<span class="item-title">${g.index + 1}. ${escapeHtml(g.label)}</span>
-				${groupBadge(g.status)}
-				${g.findingCount ? `<span class="badge">${plural(g.findingCount, 'finding')}</span>` : ''}
-			</div>
-			<details class="disclosure">
-				<summary>${plural(g.files.length, 'file')}${g.ruleDocId ? ` · rule ${escapeHtml(g.ruleDocId)}` : ''}</summary>
-				<div class="disclosure-body">${g.files.map((f) => `<div class="item-path">${escapeHtml(f)}</div>`).join('')}</div>
-			</details>
-		</li>`,
-		)
-		.join('');
-
-	const findings = progress?.findings.length
-		? `<details class="disclosure">
-				<summary>${plural(progress.findings.length, 'finding')} submitted by the agent</summary>
-				<div class="disclosure-body"><ul class="list">${progress.findings
+	const findingsBlock = progress?.findings.length
+		? `<section class="coverage-section" id="coverage-findings">
+				<h3 class="coverage-section-title">${plural(progress.findings.length, 'finding')} from the agent</h3>
+				<ul class="list">${progress.findings
 					.map(
-						(f) => `<li${f.verdict === 'rejected' ? ' class="is-rejected"' : ''}>
+						(f) => `<li class="item${f.verdict === 'rejected' ? ' is-rejected' : ''}">
 							<div class="item-head">
 								<span class="badge">${escapeHtml(f.severity ?? 'medium')}</span>
-								${f.category === 'security' ? '<span class="badge tone-danger" title="Security finding: evidence names a boundary and a file:line">🔒 Security</span>' : ''}
+								${f.category === 'security' ? '<span class="badge tone-danger">Security</span>' : ''}
 								${f.verdict ? verdictBadgeOf(f.verdict) : ''}
-								${f.confidence !== undefined ? `<span class="subtle">confidence ${f.confidence}</span>` : ''}
-								<code class="item-path">${escapeHtml(f.path)}:${lineRange(f.startLine, f.endLine)}</code>
+								${f.confidence !== undefined ? `<span class="subtle">${f.confidence}% confidence</span>` : ''}
 							</div>
+							<code class="item-path">${escapeHtml(f.path)}:${lineRange(f.startLine, f.endLine)}</code>
 							<p class="item-body">${escapeHtml(f.content)}</p>
 							${f.verifyNote ? `<p class="subtle">${escapeHtml(f.verifyNote)}</p>` : ''}
 						</li>`,
 					)
-					.join('')}</ul></div>
-			</details>`
+					.join('')}</ul>
+			</section>`
 		: '';
+
+	// REQ-012: group batches that share a rule doc.
+	const byRule = new Map<string, CoverageGroup[]>();
+	for (const g of groups) {
+		const key = g.ruleDocId?.replace(/\.md$/i, '') || g.label;
+		const list = byRule.get(key) ?? [];
+		list.push(g);
+		byRule.set(key, list);
+	}
+
+	const ruleSections = [...byRule.entries()]
+		.map(([key, batches]) => {
+			const doneHere = batches.filter((b) => b.status === 'done').length;
+			const findingsHere = batches.reduce((n, b) => n + (b.findingCount || 0), 0);
+			const fileCount = batches.reduce((n, b) => n + b.files.length, 0);
+			const title = ruleLabel(key);
+			const statusHint = doneHere === batches.length ? 'All reviewed' : `${doneHere}/${batches.length} reviewed`;
+			const batchRows = batches
+				.map((g, i) => {
+					const part = batches.length > 1 ? `Batch ${i + 1} of ${batches.length}` : 'Batch';
+					return `<li class="item coverage-batch">
+						<div class="item-head">
+							<span class="item-title">${escapeHtml(part)}</span>
+							${groupBadge(g.status)}
+							${g.findingCount ? `<span class="badge">${plural(g.findingCount, 'finding')}</span>` : ''}
+						</div>
+						<details class="disclosure">
+							<summary>${plural(g.files.length, 'file')}</summary>
+							<div class="disclosure-body">${g.files.map((f) => `<div class="item-path">${escapeHtml(f)}</div>`).join('')}</div>
+						</details>
+					</li>`;
+				})
+				.join('');
+			return `<details class="disclosure coverage-rule" ${doneHere < batches.length ? 'open' : ''}>
+					<summary>
+						<strong>${escapeHtml(title)}</strong>
+						<span class="subtle">${statusHint} · ${plural(fileCount, 'file')}${
+							findingsHere ? ` · ${plural(findingsHere, 'finding')}` : ''
+						}</span>
+					</summary>
+					<div class="disclosure-body"><ul class="list">${batchRows}</ul></div>
+				</details>`;
+		})
+		.join('');
+
+	const allGroupsDone = groups.every((g) => g.status === 'done');
+	const verification = progress?.verification;
+	const verificationItem = verification
+		? `<li class="item">
+				<div class="item-head">
+					<span class="item-title">Verify findings</span>
+					${groupBadge(verification === 'done' ? 'done' : allGroupsDone ? 'reviewing' : 'pending')}
+				</div>
+				<p class="subtle">Each finding is re-checked: confirmed ones can be posted, plausible ones go to the summary, rejected ones are dropped.</p>
+			</li>`
+		: '';
+	const req = view.requirements;
+	const requirementsItem = req
+		? `<li class="item">
+				<div class="item-head">
+					<span class="item-title">Ticket criteria</span>
+					${groupBadge(req.status === 'done' ? 'done' : allGroupsDone && verification !== 'pending' ? 'reviewing' : 'pending')}
+				</div>
+				<p class="subtle">${plural(req.criteria.length, 'criterion', 'criteria')} from ${escapeHtml(req.ticket.ref ?? req.ticket.source)}.</p>
+			</li>`
+		: '';
+	const closingSteps =
+		verificationItem || requirementsItem
+			? `<section class="coverage-section">
+					<h3 class="coverage-section-title">Closing steps</h3>
+					<ul class="list">${verificationItem}${requirementsItem}</ul>
+				</section>`
+			: '';
 
 	const skipped = units?.skipped.length
 		? `<details class="disclosure">
@@ -264,28 +413,10 @@ const renderCoverage = (view: PrReviewView): void => {
 			</details>`
 		: '';
 
-	const allGroupsDone = groups.every((g) => g.status === 'done');
-	const verification = progress?.verification;
-	const verificationItem = verification
-		? `<li class="item">
-				<div class="item-head">
-					<span class="item-title">${groups.length + 1}. Verify findings</span>
-					${groupBadge(verification === 'done' ? 'done' : allGroupsDone ? 'reviewing' : 'pending')}
-				</div>
-				<p class="subtle">Each finding re-checked on its own: confirmed ones are posted, plausible ones go to the summary, rejected ones are dropped.</p>
-			</li>`
-		: '';
-	const req = view.requirements;
-	const requirementsItem = req
-		? `<li class="item">
-				<div class="item-head">
-					<span class="item-title">${groups.length + (verification ? 2 : 1)}. Ticket criteria</span>
-					${groupBadge(req.status === 'done' ? 'done' : allGroupsDone && verification !== 'pending' ? 'reviewing' : 'pending')}
-				</div>
-				<p class="subtle">${plural(req.criteria.length, 'criterion', 'criteria')} from ${escapeHtml(req.ticket.ref ?? req.ticket.source)}, verified against the whole PR.</p>
-			</li>`
-		: '';
-	coveragePanel.innerHTML = `${readFirstBlock(view)}${next}<ul class="list">${groupItems}${verificationItem}${requirementsItem}</ul>${findings}${skipped}`;
+	coveragePanel.innerHTML = `${summary}${next}${findingsBlock}<section class="coverage-section">
+			<h3 class="coverage-section-title">Batches by guide</h3>
+			${ruleSections}
+		</section>${closingSteps}${readFirstBlock(view)}${skipped}`;
 };
 
 /** Where to read first: changed files ranked by risk (spec-drift-depth REQ-002). Advisory: the groups keep their order. */
@@ -309,9 +440,13 @@ const readFirstBlock = (view: PrReviewView): string => {
 	const missing = risk.unavailable.length
 		? `<p class="subtle">Not available here: ${escapeHtml(risk.unavailable.join(', '))}.</p>`
 		: '';
-	return `<details class="disclosure" id="read-first" open>
-			<summary>Read first · ${plural(top.length, 'file')} ranked by risk</summary>
-			<div class="disclosure-body"><ul class="list">${rows}</ul><p class="subtle">${escapeHtml(risk.formula)}.</p>${missing}</div>
+	return `<details class="disclosure" id="read-first">
+			<summary>Suggested reading order · ${plural(top.length, 'risky file')}</summary>
+			<div class="disclosure-body">
+				<p class="subtle">Optional hint — start here if you want to skim the riskiest changes first. The agent still reviews every batch.</p>
+				<ul class="list">${rows}</ul>
+				<p class="subtle">${escapeHtml(risk.formula)}.</p>${missing}
+			</div>
 		</details>`;
 };
 
@@ -342,10 +477,10 @@ const renderArchitecture = (view: PrReviewView): void => {
 	$('kpi-arch').textContent = arch.status === 'scanned' ? String(arch.findingCount) : '—';
 	$('kpi-arch-hint').textContent =
 		arch.status === 'scanned'
-			? `${engine.name} · ${plural(arch.configFiles.length, 'rule file')}`
+			? `${engine.name} · ${plural(arch.configFiles.length, 'rule file')} · open tab`
 			: needsRules
-				? `No ${engine.rulesDir} rules`
-				: `${engine.name} failed`;
+				? `No ${engine.rulesDir} rules — open tab to generate`
+				: `${engine.name} failed · open tab`;
 	card.classList.add(arch.status === 'scanned' ? (arch.findingCount ? 'tone-warning' : 'tone-success') : 'tone-danger');
 
 	if (needsRules) {
@@ -385,6 +520,275 @@ const renderArchitecture = (view: PrReviewView): void => {
 	updateImportButton();
 };
 
+// ── Security Findings (built-in first, then repo .semgrep/security) ───────────
+
+type RepoSecurityView = NonNullable<NonNullable<PrReviewView['architecture']>['repoSecurity']>;
+
+const securityFindingItem = (f: {
+	readonly checkId: string;
+	readonly path: string;
+	readonly startLine: number;
+	readonly endLine: number;
+	readonly severity: string;
+	readonly message: string;
+}): string => `
+			<li class="item ${severityClass(f.severity)}">
+				<div class="item-head">
+					<span class="badge tone-danger">Security</span>
+					<span class="badge ${severityClass(f.severity)}">${severityLabel(f.severity)}</span>
+					<code class="item-title">${escapeHtml(f.checkId)}</code>
+				</div>
+				<div class="item-path">${escapeHtml(f.path)}:${lineRange(f.startLine, f.endLine)}</div>
+				<p class="item-body">${escapeHtml(f.message)}</p>
+			</li>`;
+
+/** Prompt used when the server did not send generatePrompt (legacy architecture.json). */
+const fallbackSecurityGeneratePrompt = (view: PrReviewView): string => {
+	const project = view.state.repo || baseName(view.paths.repoRoot) || 'this project';
+	const root = view.paths.repoRoot || '.';
+	return [
+		`# Generate .semgrep/security security rules for ${project}`,
+		'',
+		`Repo root: \`${root}\``,
+		'There is no usable `.semgrep/security/` rule set in this project yet.',
+		'',
+		'## Goal',
+		'Create a project-specific Semgrep **security** rule set under `.semgrep/security/` based on security best practices for this codebase’s area (injection, authz, unsafe sinks, secret exposure).',
+		'',
+		'## How',
+		'1. Explore auth/session entrypoints, trust boundaries, parsers of untrusted input, and shell/SQL/template sinks.',
+		'2. Prefer rules that encode this product’s area over a generic dump; cite the boundary each rule protects.',
+		'3. Write YAML rules under `.semgrep/security/` without overwriting unrelated packs.',
+		'4. Before writing files, list the rules you plan so the user can confirm.',
+		'',
+		'## Done',
+		`After creating the security rules, call \`pr_review_architecture_rescan\` with pr=${view.pr} so the Security Findings tab re-runs on the PR files.`,
+	].join('\n');
+};
+
+/**
+ * Normalize repo security for the tab (REQ-009): legacy scans omit `repoSecurity` even when the
+ * built-in message already says there is no `.semgrep/security/` — treat that as `missing`.
+ */
+const resolveRepoSecurity = (view: PrReviewView): RepoSecurityView | undefined => {
+	const saved = view.architecture?.repoSecurity;
+	if (saved) return saved;
+	if (!view.architecture) return undefined;
+	return {
+		status: 'missing',
+		findingCount: 0,
+		findings: [],
+		configFiles: [],
+		message: 'No `.semgrep/security/` rules. Generate a security set from best practices for this codebase’s area.',
+		generatePrompt: fallbackSecurityGeneratePrompt(view),
+	};
+};
+
+const renderSecurity = (view: PrReviewView): void => {
+	const builtin = view.architecture?.builtinSecurity;
+	const repo = resolveRepoSecurity(view);
+	const card = securityCard;
+	card.classList.remove('tone-danger', 'tone-warning', 'tone-success');
+
+	const findingTotal = (builtin?.findingCount ?? 0) + (repo?.status === 'scanned' ? repo.findingCount : 0);
+	$('count-security').textContent = String(findingTotal);
+	generateSecurityRulesBtn.hidden = !(repo?.status === 'missing' && Boolean(repo.generatePrompt));
+
+	if (!view.architecture) {
+		$('kpi-security').textContent = '—';
+		$('kpi-security-hint').textContent = 'Not scanned';
+		securitySummary.innerHTML = emptyState(
+			'No security scan yet',
+			'It runs with the architecture scan when the review starts.',
+		);
+		securityList.innerHTML = '';
+		return;
+	}
+
+	const hasError = builtin?.status === 'error' || repo?.status === 'error';
+	const hasFindings = findingTotal > 0;
+	$('kpi-security').textContent = hasError && !hasFindings ? '—' : String(findingTotal);
+	$('kpi-security-hint').textContent =
+		repo?.status === 'missing'
+			? builtin
+				? 'Built-in · open tab to generate repo rules'
+				: 'No repo security set — open tab to generate'
+			: repo?.status === 'scanned'
+				? builtin
+					? `Built-in + ${plural(repo.configFiles.length, 'repo rule file')} · open tab`
+					: `${plural(repo.configFiles.length, 'repo rule file')} · open tab`
+				: builtin
+					? 'Built-in pack · open tab'
+					: 'Security scan · open tab';
+	card.classList.add(hasError ? 'tone-danger' : hasFindings ? 'tone-warning' : 'tone-success');
+
+	const blocks: string[] = [];
+
+	// REQ-005 / REQ-008: built-in section first (always on Semgrep when scannable).
+	if (builtin) {
+		if (builtin.status === 'error') {
+			blocks.push(`<div class="callout tone-danger">
+				<p class="callout-title">Built-in security pack</p>
+				<p>${inlineMarkdown(builtin.message)}</p>
+			</div>`);
+		} else {
+			blocks.push(`<div class="callout">
+				<p class="callout-title">Built-in security pack</p>
+				<p class="muted">${inlineMarkdown(builtin.message)}</p>
+			</div>`);
+		}
+	} else {
+		blocks.push(`<div class="callout">
+			<p class="callout-title">Built-in security pack</p>
+			<p class="muted">Skipped — engine is not Semgrep, or this PR has no scannable files.</p>
+		</div>`);
+	}
+
+	// REQ-006 / REQ-007 / REQ-009: repository security set next (legacy scans without repoSecurity → missing).
+	if (!repo) {
+		blocks.push(`<div class="callout">
+			<p class="callout-title">Repository security rules</p>
+			<p class="muted">Not available on this scan.</p>
+		</div>`);
+	} else if (repo.status === 'missing') {
+		blocks.push(`<div class="callout tone-warning">
+			<p class="callout-title">Repository security rules</p>
+			<p>${inlineMarkdown(repo.message)} Use <strong>Ask the agent to write security rules</strong>, then <strong>Rescan</strong>.</p>
+		</div>`);
+	} else if (repo.status === 'error') {
+		blocks.push(`<div class="callout tone-danger">
+			<p class="callout-title">Repository security rules</p>
+			<p>${inlineMarkdown(repo.message)}</p>
+		</div>`);
+	} else {
+		blocks.push(`<div class="callout">
+			<p class="callout-title">Repository security rules</p>
+			<p class="muted">${inlineMarkdown(repo.message)}</p>
+		</div>`);
+	}
+
+	securitySummary.innerHTML = blocks.join('');
+
+	const items: string[] = [];
+	if (builtin?.status === 'scanned') {
+		items.push(
+			...(builtin.findings.length
+				? builtin.findings.map(securityFindingItem)
+				: [
+						`<li>${emptyState('No built-in findings', 'The built-in pack found nothing on the PR files.', 'success')}</li>`,
+					]),
+		);
+	}
+	if (repo?.status === 'scanned') {
+		items.push(
+			...(repo.findings.length
+				? repo.findings.map(securityFindingItem)
+				: [
+						`<li>${emptyState('No repository security findings', 'The repo security rules found nothing on the PR files.', 'success')}</li>`,
+					]),
+		);
+	}
+	securityList.innerHTML = items.join('');
+};
+
+// ── Code coverage (Istanbul-style JS/TS) ─────────────────────────────────────
+
+const fallbackCodeCoverageGeneratePrompt = (view: PrReviewView): string => {
+	const project = view.state.repo || baseName(view.paths.repoRoot) || 'this project';
+	const root = view.paths.repoRoot || '.';
+	return [
+		`# Add JS/TS unit tests and Istanbul-style coverage for ${project}`,
+		'',
+		`Repo root: \`${root}\``,
+		'This project has no usable JS/TS unit-test + coverage setup yet (Jest, Vitest, c8, or nyc).',
+		'',
+		'## Goal',
+		'Add a minimal unit-test runner and coverage reporting so PR Review can show an Istanbul-style summary.',
+		'',
+		'## Done',
+		`After tests and coverage work, call \`pr_review_architecture_rescan\` with pr=${view.pr} so the Code coverage tab re-runs.`,
+	].join('\n');
+};
+
+const renderCodeCoverage = (view: PrReviewView): void => {
+	const cov = view.codeCoverage;
+	const card = codeCoverageCard;
+	card.classList.remove('tone-danger', 'tone-warning', 'tone-success');
+	const missing = !cov || cov.status === 'missing';
+	generateCodeCoverageBtn.hidden = !(missing && Boolean(cov?.generatePrompt || view.paths.repoRoot));
+	// REQ-017: always show Rescan like Security Findings (including legacy reviews without codeCoverage).
+	rescanCodeCoverageBtn.hidden = false;
+
+	if (!cov) {
+		$('kpi-code-coverage').textContent = '—';
+		$('kpi-code-coverage-hint').textContent = 'Not scanned — open tab to generate';
+		$('count-code-coverage').textContent = '—';
+		card.classList.add('tone-warning');
+		codeCoverageSummary.innerHTML = `<div class="callout tone-warning">
+			<p class="callout-title">No code coverage yet</p>
+			<p>It runs with the architecture scan when the review starts. Use <strong>Ask the agent to add tests + coverage</strong>, then <strong>Rescan</strong>.</p>
+		</div>`;
+		codeCoverageList.innerHTML = '';
+		return;
+	}
+
+	if (cov.status === 'scanned' && cov.totals) {
+		const pct = `${Math.round(cov.totals.linesPct)}%`;
+		$('kpi-code-coverage').textContent = pct;
+		$('count-code-coverage').textContent = pct;
+		$('kpi-code-coverage-hint').textContent =
+			`${cov.tool ?? 'coverage'} · ${cov.totals.linesCovered}/${cov.totals.linesTotal} lines · open tab`;
+		card.classList.add(
+			cov.totals.linesPct >= 80 ? 'tone-success' : cov.totals.linesPct >= 50 ? 'tone-warning' : 'tone-danger',
+		);
+		codeCoverageSummary.innerHTML = `<div class="callout">
+			<p class="callout-title">Istanbul-style coverage (${escapeHtml(cov.tool ?? 'js')})</p>
+			<p class="muted">${inlineMarkdown(cov.message)}</p>
+			<p class="muted">Lines ${cov.totals.linesPct}% · Statements ${cov.totals.statementsPct}% · Functions ${cov.totals.functionsPct}% · Branches ${cov.totals.branchesPct}%</p>
+			${cov.command ? `<details class="disclosure"><summary>Command</summary><pre class="block">${escapeHtml(cov.command)}</pre></details>` : ''}
+		</div>`;
+		codeCoverageList.innerHTML = cov.files.length
+			? cov.files
+					.map(
+						(f) => `
+			<li class="item">
+				<div class="item-head">
+					<span class="badge ${f.linesPct >= 80 ? 'tone-success' : f.linesPct >= 50 ? 'tone-warning' : 'tone-danger'}">${Math.round(f.linesPct)}%</span>
+					<code class="item-title">${escapeHtml(f.path)}</code>
+				</div>
+				<div class="item-path">${f.linesCovered}/${f.linesTotal} lines covered</div>
+			</li>`,
+					)
+					.join('')
+			: `<li>${emptyState('No PR file rows', 'Overall totals are above; no matching JS/TS paths in the summary.')}</li>`;
+		return;
+	}
+
+	if (cov.status === 'missing') {
+		$('kpi-code-coverage').textContent = '—';
+		$('count-code-coverage').textContent = '—';
+		$('kpi-code-coverage-hint').textContent = 'No test+coverage setup — open tab to generate';
+		card.classList.add('tone-warning');
+		codeCoverageSummary.innerHTML = `<div class="callout tone-warning">
+			<p class="callout-title">No JS/TS coverage setup</p>
+			<p>${inlineMarkdown(cov.message)} Use <strong>Ask the agent to add tests + coverage</strong>, then <strong>Rescan</strong>.</p>
+		</div>`;
+		codeCoverageList.innerHTML = '';
+		return;
+	}
+
+	$('kpi-code-coverage').textContent = '—';
+	$('count-code-coverage').textContent = '—';
+	$('kpi-code-coverage-hint').textContent = `${cov.tool ?? 'coverage'} failed · open tab`;
+	card.classList.add('tone-danger');
+	codeCoverageSummary.innerHTML = `<div class="callout tone-danger">
+		<p class="callout-title">${inlineMarkdown(cov.message)}</p>
+		${cov.stderrTail ? `<details class="disclosure"><summary>Error output</summary><pre class="block">${escapeHtml(cov.stderrTail)}</pre></details>` : ''}
+		${cov.command ? `<details class="disclosure"><summary>Command</summary><pre class="block">${escapeHtml(cov.command)}</pre></details>` : ''}
+	</div>`;
+	codeCoverageList.innerHTML = '';
+};
+
 const selectedArchitectureIndices = (): number[] =>
 	[...architectureList.querySelectorAll<HTMLInputElement>('input.arch-check:checked')].map((i) =>
 		Number(i.dataset['index']),
@@ -401,8 +805,18 @@ const updateImportButton = (): void => {
 // ── Requirements (ticket criteria) ───────────────────────────────────────────
 
 const requirementsList = $('requirements-list');
+const requirementsSummary = $('requirements-summary');
 const saveRequirementsBtn = $<HTMLButtonElement>('save-requirements');
+const attachTicketBtn = $<HTMLButtonElement>('attach-ticket');
+const pinUnmetBtn = $<HTMLButtonElement>('pin-unmet-inline');
 const openTicketBtn = $<HTMLButtonElement>('open-ticket');
+const requirementsTicketHead = $('requirements-ticket-head');
+const requirementsSaveBar = $('requirements-save-bar');
+const findingsList = $('findings-list');
+const findingsAddSelectedBtn = $<HTMLButtonElement>('findings-add-selected');
+const findingsAddHighBtn = $<HTMLButtonElement>('findings-add-high');
+const findingsSkipBtn = $<HTMLButtonElement>('findings-skip');
+const findingsUndoBtn = $<HTMLButtonElement>('findings-undo');
 
 /** Verdicts the human changed in this view and has not saved yet. */
 const changedVerdicts = (): Array<{ id: string; status: Verdict }> => {
@@ -431,20 +845,181 @@ const verdictBadge = (status: string): string => {
 		: '<span class="badge">Pending</span>';
 };
 
+const inboxItemsFor = (view: PrReviewView) =>
+	collectInboxItems({
+		architectureFindings: view.architecture?.status === 'scanned' ? view.architecture.findings : [],
+		builtinSecurityFindings:
+			view.architecture?.builtinSecurity?.status === 'scanned' ? view.architecture.builtinSecurity.findings : [],
+		repoSecurityFindings:
+			view.architecture?.repoSecurity?.status === 'scanned' ? view.architecture.repoSecurity.findings : [],
+		requirements: view.requirements,
+	});
+
+const selectedFindingKeys = (): string[] =>
+	[...findingsList.querySelectorAll<HTMLInputElement>('input.finding-check:checked')].map((el) => el.value);
+
+const refreshFindingsActions = (): void => {
+	const count = selectedFindingKeys().length;
+	findingsAddSelectedBtn.disabled = busy || count === 0;
+	findingsAddSelectedBtn.textContent = count ? `Add selected (${count})` : 'Add selected';
+	findingsUndoBtn.hidden = !commentsBeforeLastImport;
+};
+
+/** Map FindingSeverity → analyzer-style label for shared badge CSS. */
+const findingSevUi = (severity: string): string =>
+	severity === 'critical' || severity === 'high' ? 'ERROR' : severity === 'medium' ? 'WARNING' : 'INFO';
+
+const findingSevLabel = (severity: string): string =>
+	({ critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' })[severity] ?? severity;
+
+const countSummaryNotes = (text: string): number => {
+	const block = text.match(/\*\*Findings \(minor\)\*\*\n([\s\S]*?)(?=\n\*\*|\n## |$)/);
+	if (!block?.[1]) return 0;
+	return block[1].split('\n').filter((line) => line.startsWith('- ')).length;
+};
+
+const renderFindings = (view: PrReviewView): void => {
+	const items = inboxItemsFor(view);
+	const filtered = findingsFilter === 'all' ? items : items.filter((i) => i.source === findingsFilter);
+	$('count-findings').textContent = String(items.length);
+	findingsAddHighBtn.disabled = busy || !items.some((i) => isHighSeverity(i.severity));
+
+	if (!filtered.length) {
+		findingsList.innerHTML = `<li>${emptyState(
+			'No findings for this filter',
+			'Architecture/Security scans and unmet ticket evidence with path:line show up here.',
+		)}</li>`;
+		refreshFindingsActions();
+		return;
+	}
+
+	const sourceBadge = (source: InboxSource): string =>
+		source === 'architecture'
+			? '<span class="badge">Architecture</span>'
+			: source === 'security'
+				? '<span class="badge tone-danger">Security</span>'
+				: '<span class="badge tone-warning">Ticket</span>';
+
+	findingsList.innerHTML = `
+		<li><label class="choice"><input type="checkbox" id="findings-select-all" /> Select all visible</label></li>
+		${filtered
+			.map((f) => {
+				const sev = findingSevUi(f.severity);
+				return `
+		<li class="item ${severityClass(sev)}">
+			<label class="item-head" style="cursor:pointer">
+				<input type="checkbox" class="finding-check" value="${escapeHtml(f.key)}" ${f.defaultChecked ? 'checked' : ''} aria-label="Include ${escapeHtml(f.title)}" />
+				<span class="badge ${severityClass(sev)}">${escapeHtml(findingSevLabel(f.severity))}</span>
+				${sourceBadge(f.source)}
+				<code class="item-title">${escapeHtml(f.title)}</code>
+			</label>
+			<div class="item-path">${escapeHtml(f.path)}:${lineRange(f.startLine, f.endLine)}</div>
+			<p class="item-body">${escapeHtml(f.message)}</p>
+		</li>`;
+			})
+			.join('')}`;
+	refreshFindingsActions();
+};
+
+const importFindingKeys = async (keys: string[]): Promise<boolean> => {
+	if (!keys.length || !current) return false;
+	commentsBeforeLastImport = draftMarkdown() || current.commentsMarkdown || '';
+	const ok = await callTool('pr_review_import_findings', { ...prArgs(), keys }, 'Could not add findings');
+	if (ok) {
+		refreshFindingsActions();
+		selectTab('comments');
+		setStatus(`Added ${keys.length} finding(s) to Comments.`, 'success');
+	} else {
+		commentsBeforeLastImport = null;
+		refreshFindingsActions();
+	}
+	return ok;
+};
+
+const undoLastFindingsImport = async (): Promise<boolean> => {
+	if (!commentsBeforeLastImport || !current) return false;
+	const previous = commentsBeforeLastImport;
+	const ok = await callTool(
+		'pr_review_ui_save',
+		{ ...prArgs(), commentsMarkdown: previous, reportMarkdown: current.reportMarkdown },
+		'Could not undo the last add',
+	);
+	if (ok) {
+		commentsBeforeLastImport = null;
+		refreshFindingsActions();
+		selectTab('comments');
+		setStatus('Undid the last Findings add.', 'success');
+	}
+	return ok;
+};
+
+const attachTicketPrompt = (view: PrReviewView): string => {
+	const refs = view.ticketRefs?.map((r) => r.ref).join(', ');
+	const hint = refs
+		? `Possible ticket ref(s) from the PR: ${refs}. Confirm with the human if needed.`
+		: 'Ask the human for the Jira/Linear key, GitHub issue (#N), or paste the ticket text.';
+	return [
+		`# Attach a ticket to PR #${view.pr}`,
+		'',
+		hint,
+		'',
+		'## Goal',
+		'Attach the ticket this PR implements so the Requirements tab can verify acceptance criteria.',
+		'',
+		'## How',
+		'1. Resolve the ticket (Jira/Linear tools, `gh` for GitHub issues, or pasted text).',
+		`2. Call \`pr_review_set_ticket\` with pr=${view.pr} and the ticket payload (source + text/ref/criteria as the tool expects).`,
+		'3. Continue the review; criteria become the last coverage step.',
+	].join('\n');
+};
+
 const renderRequirements = (view: PrReviewView): void => {
 	const req: Requirements | undefined = view.requirements;
-	$('tab-requirements').hidden = !req;
-	$('kpi-req-card').hidden = !req;
-	if (!req) return;
+	const card = requirementsCard;
+	card.classList.remove('tone-danger', 'tone-warning', 'tone-success');
+	// REQ-019: always visible (never hide tab/KPI).
+	$('tab-requirements').hidden = false;
+	card.hidden = false;
+
+	if (!req) {
+		$('kpi-req').textContent = '—';
+		$('count-requirements').textContent = '—';
+		$('kpi-req-hint').textContent = 'No ticket — open tab to attach';
+		card.classList.add('tone-warning');
+		attachTicketBtn.hidden = false;
+		pinUnmetBtn.hidden = true;
+		openTicketBtn.hidden = true;
+		requirementsTicketHead.hidden = true;
+		requirementsSaveBar.hidden = true;
+		const refs = view.ticketRefs?.length
+			? `<p class="muted">Possible refs: ${view.ticketRefs.map((r) => `<code>${escapeHtml(r.ref)}</code>`).join(', ')}.</p>`
+			: '';
+		requirementsSummary.innerHTML = `<div class="callout tone-warning">
+			<p class="callout-title">No ticket attached</p>
+			<p>Pass a Jira/Linear key, GitHub issue, or pasted text when starting the review (or use <strong>Ask the agent to attach a ticket</strong>).</p>
+			${refs}
+		</div>`;
+		$('requirements-alert').innerHTML = '';
+		requirementsList.innerHTML = '';
+		$('requirements-extra').innerHTML = '';
+		refreshRequirementsDirty();
+		return;
+	}
+
+	attachTicketBtn.hidden = true;
+	pinUnmetBtn.hidden = !(req.status === 'done' && pinableUnmetCriteria(req.criteria).length > 0);
+	requirementsTicketHead.hidden = false;
+	requirementsSaveBar.hidden = false;
+	requirementsSummary.innerHTML = '';
 
 	const met = req.criteria.filter((c) => c.status === 'met').length;
 	const unmet = req.criteria.filter((c) => c.status === 'unmet').length;
 	const verified = req.status === 'done';
 	$('count-requirements').textContent = verified ? `${met}/${req.criteria.length}` : String(req.criteria.length);
 	$('kpi-req').textContent = verified ? `${met}/${req.criteria.length}` : '—';
-	$('kpi-req-hint').textContent = verified ? (unmet ? `${unmet} not met` : 'met') : 'Verified after the groups';
-	const card = $('kpi-req-card');
-	card.classList.remove('tone-danger', 'tone-warning', 'tone-success');
+	$('kpi-req-hint').textContent = verified
+		? `${unmet ? `${unmet} not met` : 'met'} · open tab`
+		: 'Verified after the groups · open tab';
 	if (verified)
 		card.classList.add(unmet ? 'tone-danger' : met === req.criteria.length ? 'tone-success' : 'tone-warning');
 
@@ -545,8 +1120,13 @@ const renderHeader = (view: PrReviewView): void => {
 		needsConfirmation: 'tone-warning',
 		published: 'tone-success',
 	}[view.phase];
+	const revDate = view.state.current.date;
+	const revDateLabel = /^\d{4}-\d{2}-\d{2}$/.test(revDate) ? revDate : revDate ? formatWhen(revDate) : '';
 	$('review-meta').innerHTML = [
 		`<span class="mono">#<span id="kpi-pr">${view.pr}</span></span>`,
+		`<span class="rev-chip" title="Review revision"><span id="kpi-rev">Rev ${view.state.current.revision}</span>${
+			revDateLabel ? `<span class="dot"></span><span id="kpi-rev-hint">${escapeHtml(revDateLabel)}</span>` : ''
+		}</span>`,
 		meta
 			? `<span class="dot"></span><code>${escapeHtml(meta.headRefName)}</code> → <code>${escapeHtml(meta.baseRefName)}</code>`
 			: '',
@@ -570,6 +1150,7 @@ const renderHeader = (view: PrReviewView): void => {
 };
 
 const renderKpis = (view: PrReviewView): void => {
+	$('header-actions').hidden = false;
 	$('kpis').hidden = false;
 	const progress = view.progress;
 	const done = progress?.doneCount ?? 0;
@@ -579,23 +1160,23 @@ const renderKpis = (view: PrReviewView): void => {
 	const meter = $('coverage-meter');
 	meter.setAttribute('aria-valuemax', String(total));
 	meter.setAttribute('aria-valuenow', String(done));
-	meter.setAttribute('aria-valuetext', `${done} of ${total} groups reviewed`);
+	meter.setAttribute('aria-valuetext', `${done} of ${total} review batches done`);
 	meter.className = `meter${pct < 100 ? ' tone-warning' : ''}`;
 	$('coverage-bar').style.width = `${pct}%`;
+	const coverageHint = $('kpi-coverage-hint');
+	if (coverageHint) {
+		coverageHint.textContent = total
+			? pct === 100
+				? 'All batches reviewed'
+				: `${total - done} batch${total - done === 1 ? '' : 'es'} left`
+			: '';
+	}
 
 	const comments = view.parsed?.comments ?? [];
 	$('kpi-inlines').textContent = String(comments.length);
 	const edited = view.check?.changes.filter((c) => c.kind !== 'unchanged').length ?? 0;
-	$('kpi-inlines-hint').textContent = edited
-		? `${plural(edited, 'edit')} by you`
-		: view.parsed
-			? 'As drafted'
-			: 'No draft yet';
-
-	$('kpi-rev').textContent = String(view.state.current.revision);
-	// Revisions store a calendar date (YYYY-MM-DD), not a time: show it as such.
-	const date = view.state.current.date;
-	$('kpi-rev-hint').textContent = /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : date ? formatWhen(date) : '';
+	const inlinesHint = edited ? `${plural(edited, 'edit')} by you` : view.parsed ? 'As drafted' : 'No draft yet';
+	$('kpi-inlines-hint').textContent = `${inlinesHint} · open tab`;
 };
 
 const renderAlerts = (view: PrReviewView): void => {
@@ -662,18 +1243,39 @@ const setActionsDisabled = (disabled: boolean): void => {
 	rescanArchitectureBtn.disabled = disabled;
 	importArchitectureAllBtn.disabled = disabled;
 	generateRulesBtn.disabled = disabled;
+	generateSecurityRulesBtn.disabled = disabled;
+	generateCodeCoverageBtn.disabled = disabled;
+	attachTicketBtn.disabled = disabled;
+	rescanSecurityBtn.disabled = disabled;
+	rescanCodeCoverageBtn.disabled = disabled;
 	refreshDirty();
 	updateImportButton();
 	refreshRequirementsDirty();
+	refreshFindingsActions();
+	if (current) findingsAddHighBtn.disabled = busy || !inboxItemsFor(current).some((i) => isHighSeverity(i.severity));
+	findingsSkipBtn.disabled = busy;
+	pinUnmetBtn.disabled = busy;
 };
 
 const defaultTab = (view: PrReviewView): Tab => {
 	if (view.phase === 'needsConfirmation') return 'comments';
 	const groupsDone = view.progress?.groups.every((g) => g.status === 'done');
 	if (view.requirements?.status === 'pending' && groupsDone) return 'requirements';
-	if (view.phase === 'prepared' || view.phase === 'reviewing' || coverageIncomplete()) return 'coverage';
 	if (view.message.startsWith('Imported')) return 'comments';
-	return activeTab ?? (view.parsed ? 'comments' : 'coverage');
+	return activeTab ?? 'comments';
+};
+
+/** Prefer the coverage drill-down while groups are still open; otherwise pick a tab. */
+const showDefaultSection = (view: PrReviewView): void => {
+	if (view.phase === 'needsConfirmation') {
+		selectTab('comments');
+		return;
+	}
+	if (view.phase === 'prepared' || view.phase === 'reviewing' || coverageIncomplete()) {
+		setCoverageOpen(true);
+		return;
+	}
+	selectTab(defaultTab(view));
 };
 
 /** `announce`: show the server's message (only for actions the human took in this view). */
@@ -683,20 +1285,25 @@ const render = (incoming: PrReviewView, announce = false): void => {
 		incoming.requirements || current?.pr !== incoming.pr || !current.requirements
 			? incoming
 			: { ...incoming, requirements: current.requirements };
+	const keepCoverage = coverageOpen && current?.pr === incoming.pr;
 	current = view;
 	loading.hidden = true;
 	emptyEl.hidden = true;
-	tabsEl.hidden = false;
+	tabsEl.hidden = keepCoverage;
 	renderHeader(view);
 	renderKpis(view);
 	renderAlerts(view);
 	renderComments(view);
+	renderFindings(view);
 	renderRequirements(view);
 	renderCoverage(view);
 	renderArchitecture(view);
+	renderSecurity(view);
+	renderCodeCoverage(view);
 	renderReport(view);
 	renderActions(view);
-	selectTab(defaultTab(view));
+	if (keepCoverage) setCoverageOpen(true);
+	else showDefaultSection(view);
 	// The server's messages are written for the model; show them only as feedback to an action here.
 	if (view.phase === 'needsConfirmation') setStatus('Confirm your edits before submitting.');
 	else setStatus(announce ? (view.message.split('\n')[0] ?? '') : '');
@@ -789,12 +1396,19 @@ reloadBtn.addEventListener('click', () => {
 
 publishBtn.addEventListener('click', () => {
 	if (!current) return;
-	const count = collectDraft()?.comments.length ?? 0;
+	const draft = collectDraft();
+	const inlineCount = draft?.comments.length ?? 0;
+	const summaryNotes = countSummaryNotes(draft?.summary ?? summary.value);
 	const event = selectedEvent();
 	$('confirm-title').textContent =
 		current.phase === 'needsConfirmation' ? 'Submit with your edits?' : `Submit “${EVENT_LABELS[event]}” to GitHub?`;
-	$('confirm-body').textContent =
-		`This posts ${plural(count, 'inline comment')} and the summary on PR #${current.pr} as you. The author and reviewers are notified.`;
+	$('confirm-body').textContent = [
+		`${inlineCount} inline · ${summaryNotes} in summary · ${EVENT_LABELS[event]}`,
+		`This posts on PR #${current.pr} as you. The author and reviewers are notified.`,
+		commentsBeforeLastImport ? 'Undo last Findings add is available on the Findings tab.' : '',
+	]
+		.filter(Boolean)
+		.join(' ');
 	confirmPublishBtn.textContent = current.phase === 'needsConfirmation' ? 'Submit anyway' : 'Submit review';
 	confirmBox.hidden = false;
 	confirmPublishBtn.focus();
@@ -845,8 +1459,70 @@ generateRulesBtn.addEventListener('click', () => {
 	);
 });
 
+generateSecurityRulesBtn.addEventListener('click', () => {
+	if (!current) return;
+	const prompt = resolveRepoSecurity(current)?.generatePrompt;
+	if (!prompt) {
+		setStatus('No security-rule prompt is available for this repo.', 'danger');
+		return;
+	}
+	run(generateSecurityRulesBtn, 'Sending…', () =>
+		askAgent(prompt, 'Asked the agent to write security rules. Rescan when it is done.'),
+	);
+});
+
+rescanSecurityBtn.addEventListener('click', () =>
+	run(rescanSecurityBtn, 'Scanning…', () => callTool('pr_review_architecture_rescan', prArgs(), 'Rescan failed')),
+);
+
 rescanArchitectureBtn.addEventListener('click', () =>
 	run(rescanArchitectureBtn, 'Scanning…', () => callTool('pr_review_architecture_rescan', prArgs(), 'Rescan failed')),
+);
+
+coverageCard.addEventListener('click', () => {
+	if (coverageOpen) {
+		setCoverageOpen(false);
+		selectTab(activeTab ?? 'comments');
+		return;
+	}
+	setCoverageOpen(true);
+});
+
+coverageBackBtn.addEventListener('click', () => {
+	setCoverageOpen(false);
+	selectTab(activeTab ?? 'comments');
+});
+
+inlinesCard.addEventListener('click', () => selectTab('comments'));
+requirementsCard.addEventListener('click', () => selectTab('requirements'));
+architectureCard.addEventListener('click', () => selectTab('architecture'));
+securityCard.addEventListener('click', () => selectTab('security'));
+codeCoverageCard.addEventListener('click', () => selectTab('code-coverage'));
+
+attachTicketBtn.addEventListener('click', () => {
+	const view = current;
+	if (!view) {
+		setStatus('No review loaded yet.', 'danger');
+		return;
+	}
+	run(attachTicketBtn, 'Sending…', () =>
+		askAgent(attachTicketPrompt(view), 'Asked the agent to attach a ticket. Reload when it is done.'),
+	);
+});
+
+generateCodeCoverageBtn.addEventListener('click', () => {
+	const prompt = current?.codeCoverage?.generatePrompt ?? (current ? fallbackCodeCoverageGeneratePrompt(current) : '');
+	if (!prompt) {
+		setStatus('No coverage-setup prompt is available for this repo.', 'danger');
+		return;
+	}
+	run(generateCodeCoverageBtn, 'Sending…', () =>
+		askAgent(prompt, 'Asked the agent to add tests + coverage. Rescan when it is done.'),
+	);
+});
+
+rescanCodeCoverageBtn.addEventListener('click', () =>
+	run(rescanCodeCoverageBtn, 'Scanning…', () => callTool('pr_review_architecture_rescan', prArgs(), 'Rescan failed')),
 );
 
 architectureList.addEventListener('change', (event) => {
@@ -877,6 +1553,60 @@ importArchitectureAllBtn.addEventListener('click', () =>
 	run(importArchitectureAllBtn, 'Adding…', () =>
 		callTool('pr_review_import_architecture', prArgs(), 'Could not add the findings'),
 	),
+);
+
+createSegmented($('findings-filter'), (value) => {
+	findingsFilter = value as FindingsFilter;
+	if (current) renderFindings(current);
+});
+
+findingsList.addEventListener('change', (event) => {
+	const target = event.target as HTMLInputElement;
+	if (target.id === 'findings-select-all') {
+		for (const box of findingsList.querySelectorAll<HTMLInputElement>('input.finding-check'))
+			box.checked = target.checked;
+	} else if (target.classList.contains('finding-check')) {
+		const all = document.getElementById('findings-select-all') as HTMLInputElement | null;
+		const boxes = [...findingsList.querySelectorAll<HTMLInputElement>('input.finding-check')];
+		if (all) {
+			all.checked = boxes.length > 0 && boxes.every((b) => b.checked);
+			all.indeterminate = !all.checked && boxes.some((b) => b.checked);
+		}
+	}
+	refreshFindingsActions();
+});
+
+findingsAddSelectedBtn.addEventListener('click', () =>
+	run(findingsAddSelectedBtn, 'Adding…', () => importFindingKeys(selectedFindingKeys())),
+);
+
+findingsAddHighBtn.addEventListener('click', () =>
+	run(findingsAddHighBtn, 'Adding…', async () => {
+		if (!current) return false;
+		const keys = inboxItemsFor(current)
+			.filter((i) => isHighSeverity(i.severity))
+			.map((i) => i.key);
+		return importFindingKeys(keys);
+	}),
+);
+
+findingsSkipBtn.addEventListener('click', () => {
+	for (const box of findingsList.querySelectorAll<HTMLInputElement>('input.finding-check, #findings-select-all')) {
+		box.checked = false;
+		box.indeterminate = false;
+	}
+	refreshFindingsActions();
+	setStatus('Selection cleared.', 'success');
+});
+
+findingsUndoBtn.addEventListener('click', () => run(findingsUndoBtn, 'Undoing…', () => undoLastFindingsImport()));
+
+pinUnmetBtn.addEventListener('click', () =>
+	run(pinUnmetBtn, 'Pinning…', async () => {
+		if (!current?.requirements) return false;
+		const keys = pinableUnmetCriteria(current.requirements.criteria).map((c) => `ticket:${c.id}`);
+		return importFindingKeys(keys);
+	}),
 );
 
 requirementsList.addEventListener('change', refreshRequirementsDirty);
