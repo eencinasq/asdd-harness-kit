@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { mcpRequestContext } from '../common/mcp/mcp-request-context.ts';
 import type { Env } from '../config/env.schema.ts';
 import { securityPacks } from '../security/builtin-pack.ts';
+import { WorkspaceRoot } from '../workspace/workspace-root.ts';
 import {
 	type AdrCoverageResult,
 	type Finding,
@@ -81,22 +82,27 @@ const atLeast = (min: Severity | undefined) => {
  */
 @Injectable()
 export class AnalysisService {
-	/** Repo whose rule packs are scanned (ANALYSIS_REPO_ROOT). */
-	readonly repoRoot: string;
 	private readonly timeoutMs: number;
-	/** Repo with the asdd harness (HARNESS_ROOT): its `.harness/audits/` reports are the audit trend. */
-	private readonly harnessRoot: string;
 	/** Repositories of the multi-repo overview (SPEC_DRIFT_REPOS). */
 	private readonly repos: readonly string[];
 
 	constructor(
 		@Inject(CODE_ANALYZER) private readonly analyzer: CodeAnalyzer,
 		@Inject(ConfigService) config: ConfigService<Env, true>,
+		@Inject(WorkspaceRoot) private readonly workspace: WorkspaceRoot,
 	) {
-		this.repoRoot = config.get('ANALYSIS_REPO_ROOT', { infer: true });
-		this.harnessRoot = config.get('HARNESS_ROOT', { infer: true });
 		this.repos = (config.get('SPEC_DRIFT_REPOS', { infer: true }) ?? []).map((r: string) => path.resolve(r));
 		this.timeoutMs = config.get('ANALYSIS_TIMEOUT_SECONDS', { infer: true }) * 1000;
+	}
+
+	/** Repo whose rule packs are scanned: ANALYSIS_REPO_ROOT, else the client's project (see WorkspaceRoot). */
+	get repoRoot(): string {
+		return this.workspace.analysisRoot();
+	}
+
+	/** Repo with the asdd harness: its `.harness/audits/` reports are the audit trend. */
+	private get harnessRoot(): string {
+		return this.workspace.harnessRoot();
 	}
 
 	get engine() {

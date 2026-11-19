@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { writeJsonAtomic } from '../../common/fs/atomic-write.ts';
 import type { Env } from '../../config/env.schema.ts';
+import { WorkspaceRoot } from '../../workspace/workspace-root.ts';
 import { GithubService } from '../github/github.service.ts';
 import type { ResolvedPaths, ReviewState } from '../pr-review.types.ts';
 
@@ -39,7 +40,6 @@ export type CurrentStatePatch = Partial<ReviewState['current']> & {
  */
 @Injectable()
 export class ReviewWorkspaceService {
-	private readonly defaultRepo?: string;
 	/** `<project>/<pr>` → workspace dir, for resources (repo-dir workspaces can't be derived from the URI). */
 	private readonly known = new Map<string, string>();
 	private readonly fallbackRoot: string;
@@ -47,8 +47,8 @@ export class ReviewWorkspaceService {
 	constructor(
 		@Inject(GithubService) private readonly github: GithubService,
 		@Inject(ConfigService) config: ConfigService<Env, true>,
+		@Inject(WorkspaceRoot) private readonly workspace: WorkspaceRoot,
 	) {
-		this.defaultRepo = config.get('PR_REVIEW_REPO', { infer: true });
 		this.fallbackRoot =
 			config.get('PR_REVIEW_ROOT', { infer: true }) ??
 			path.join(config.get('XDG_STATE_HOME', { infer: true }), 'pr-review');
@@ -60,7 +60,7 @@ export class ReviewWorkspaceService {
 	}
 
 	resolveRepoRoot(repoPath?: string): Promise<string> {
-		return this.github.repoTopLevel(repoPath ?? this.defaultRepo ?? process.cwd());
+		return this.github.repoTopLevel(repoPath ?? this.workspace.prReviewRepo());
 	}
 
 	/**

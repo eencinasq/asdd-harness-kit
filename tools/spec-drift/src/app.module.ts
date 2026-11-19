@@ -17,6 +17,8 @@ import { toolsetEnabled } from './config/toolsets.ts';
 import { HealthModule } from './health/health.module.ts';
 import { PrReviewModule } from './pr-review/pr-review.module.ts';
 import { SecurityModule } from './security/security.module.ts';
+import { ClientRootsInterceptor } from './workspace/client-roots.interceptor.ts';
+import { WorkspaceModule } from './workspace/workspace.module.ts';
 
 const LOCAL_NAMES = ['localhost', '127.0.0.1', '[::1]'];
 
@@ -61,6 +63,7 @@ const serverInstructions = (): string =>
 				};
 			},
 		}),
+		WorkspaceModule,
 		CommonModule,
 		HealthModule,
 		AnalysisModule.forRoot(parseEngine(process.env[ENGINE_ENV]) === 'codeql' ? { engine: CodeqlEngineModule } : {}),
@@ -71,6 +74,8 @@ const serverInstructions = (): string =>
 	providers: [
 		// Order matters: the request context must wrap error handling and the handler.
 		{ provide: APP_INTERCEPTOR, useClass: McpRequestContextInterceptor },
+		// Before the handler reads a repo root: point it at the client's current project.
+		{ provide: APP_INTERCEPTOR, useClass: ClientRootsInterceptor },
 		{ provide: APP_INTERCEPTOR, useClass: McpErrorsInterceptor },
 	],
 })

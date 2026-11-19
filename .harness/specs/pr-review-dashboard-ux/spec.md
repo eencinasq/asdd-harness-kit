@@ -35,3 +35,4 @@ Mapped: `tools/spec-drift/ui/pr-review.html`, `tools/spec-drift/ui/pr-review/mai
 - **REQ-023.** Adding Findings to comments shall use a short template (source + rule/criterion + message, optional suggested fix) truncated to the inline word limit; high/critical severity defaults to checked; Security uses the same add-to-comments path as Architecture.
 - **REQ-024.** Ticket criteria remain a checklist in the review summary; unmet criteria with `path:line` evidence may be pinned as inline comments.
 - **REQ-025.** Before publish, the confirmation shall preview inline count, summary-note count, and suggested event, with an easy undo of the last Findings add.
+- **REQ-026.** Architecture, Security, Ticket-evidence, and open code-review Findings shall share one import path (`pr_review_import_findings`); importing shall require a started review.

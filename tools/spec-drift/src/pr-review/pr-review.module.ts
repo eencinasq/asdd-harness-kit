@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { whenToolset } from '../config/toolsets.ts';
+import { WorkspaceModule } from '../workspace/workspace.module.ts';
 import { ArchitectureScanService } from './architecture/architecture-scan.service.ts';
 import { CodeCoverageScanService } from './code-coverage/code-coverage-scan.service.ts';
 import { CommentsService } from './comments/comments.service.ts';
@@ -13,6 +14,7 @@ import { ReviewArtifactsRepository } from './workspace/review-artifacts.reposito
 import { ReviewWorkspaceService } from './workspace/review-workspace.service.ts';
 
 @Module({
+	imports: [WorkspaceModule],
 	providers: [
 		// MCP entry points (spec-drift-adoption REQ-003: only with the review toolset)
 		...whenToolset('review', [PrReviewTools, PrReviewPrompts]),

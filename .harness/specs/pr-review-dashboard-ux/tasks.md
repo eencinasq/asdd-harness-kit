@@ -15,3 +15,4 @@
 | TASK-011 Reload button left of Review progress KPI | REQ-020 | `ui/pr-review.html`, `ui/shared/styles.css`, `test/ui.e2e-spec.ts` |
 | TASK-012 Header Reload + Review progress; other KPIs stay clickable | REQ-021 | `ui/pr-review.html`, `ui/shared/styles.css`, `ui/pr-review/main.ts`, `test/ui.e2e-spec.ts` |
 | TASK-013 Unified Findings inbox + import + publish preview | REQ-022, REQ-023, REQ-024, REQ-025 | `src/pr-review/findings/**`, `architecture-import.ts`, `pr-review.schemas.ts`, `pr-review.service.ts`, `pr-review.tools.ts`, `ui/pr-review.html`, `ui/pr-review/main.ts`, `test/ui.e2e-spec.ts` |
+| TASK-014 Engine wiring verification + full test coverage | REQ-026 | `src/pr-review/findings/**`, `pr-review.service.ts`, `test/pr-review.e2e-spec.ts`, `test/requirements.e2e-spec.ts`, `test/mcp.e2e-spec.ts`, `test/ui.e2e-spec.ts` |

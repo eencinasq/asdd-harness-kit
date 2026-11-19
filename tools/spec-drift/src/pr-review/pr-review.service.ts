@@ -328,10 +328,9 @@ export class PrReviewService {
 		const metadata = await this.github.fetchPrMetadata(pr, paths.repoRoot);
 		// Resolve the ticket first: a bad ticket argument fails before the slow steps.
 		const resolvedTicket = ticket ? await this.tickets.resolve(ticket, paths.repoRoot) : undefined;
-		const [diff, baseSha] = await Promise.all([
-			this.github.fetchPrDiff(pr, paths.repoRoot),
-			this.github.resolveBaseSha(metadata.baseRefName, paths.repoRoot),
-		]);
+		// Base first: the too-large fallback diffs against it locally (and one `git fetch` at a time).
+		const baseSha = await this.github.resolveBaseSha(metadata.baseRefName, paths.repoRoot);
+		const diff = await this.github.fetchPrDiff(pr, paths.repoRoot, { baseSha, headSha: metadata.headRefOid });
 		await this.artifacts.writeText(paths.diff, diff);
 
 		await call.reportProgress(1, 4, 'Splitting the diff into review groups');
@@ -837,6 +836,9 @@ export class PrReviewService {
 	private async importFindingsUnlocked({ pr, repoPath, keys }: ImportFindingsInput): Promise<PrReviewView> {
 		const paths = await this.workspace.resolve({ pr, repoPath });
 		const state = await this.workspace.loadState(paths.state);
+		if (!state.current.head_sha) {
+			throw new BadRequestException('Call pr_review_start first before importing findings.');
+		}
 		const architecture = await this.artifacts.loadArchitecture(paths);
 		const requirements = await this.artifacts.loadRequirements(paths);
 		const inbox = collectInboxItems({

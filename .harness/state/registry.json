@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "generated_at": "2026-11-18T01:47:00.987Z",
+  "generated_at": "2026-11-18T02:24:34.211Z",
   "slices": [
     {
       "slice_id": "agents-spec",
@@ -713,7 +713,7 @@
       "escalation_required": false,
       "escalated_from_lite": false,
       "open_dissents": 0,
-      "last_activity": "2026-11-18T01:47:00.959Z",
+      "last_activity": "2026-11-18T02:24:34.191Z",
       "contributors": [
         "squad",
         "human",

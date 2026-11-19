@@ -323,10 +323,10 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 	test('pr_review_import_architecture turns semgrep findings into comments, without duplicates', async () => {
 		const v = await view('pr_review_import_architecture');
 		assert.equal(v.parsed?.comments.length, 3, '1 agent finding + 2 architecture findings');
-		const archBodies = v.parsed!.comments.filter((c) => c.body.startsWith('[architecture]')).map((c) => c.body);
+		const archBodies = v.parsed!.comments.filter((c) => c.body.startsWith('Architecture:')).map((c) => c.body);
 		assert.equal(archBodies.length, 2);
 		assert.ok(
-			archBodies.every((b) => /^\[architecture\] demo\.no-/.test(b)),
+			archBodies.every((b) => /^Architecture: demo\.no-/.test(b)),
 			JSON.stringify(archBodies),
 		);
 		assert.ok(
@@ -336,13 +336,27 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 
 		const again = await view('pr_review_import_architecture');
 		assert.equal(again.parsed?.comments.length, 3, 're-import adds nothing');
-		assert.match(again.message, /Imported 0 architecture finding/);
+		assert.match(again.message, /Imported 0 finding/);
 	});
 
 	test('pr_review_import_architecture rejects indices that match nothing', async () => {
 		const result = await call('pr_review_import_architecture', { indices: [99] });
 		assert.equal(result.isError, true);
 		assert.match(textOf(result), /No architecture findings matched/);
+	});
+
+	test('pr_review_import_findings imports architecture keys with the inbox template', async () => {
+		const before = (await view('pr_review_status')).parsed?.comments.length ?? 0;
+		const v = await view('pr_review_import_findings', { keys: ['arch:0'] });
+		assert.ok((v.parsed?.comments.length ?? 0) >= before);
+		assert.ok(
+			v.parsed?.comments.some((c) => c.body.startsWith('Architecture:')),
+			JSON.stringify(v.parsed?.comments.map((c) => c.body.slice(0, 80))),
+		);
+		assert.match(v.message, /Imported \d+ finding/);
+		const bad = await call('pr_review_import_findings', { keys: ['arch:999'] });
+		assert.equal(bad.isError, true);
+		assert.match(textOf(bad), /No findings matched keys/);
 	});
 
 	test('pr_review_architecture_rescan replaces (not duplicates) the report section', async () => {
@@ -354,7 +368,7 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 
 	test('risky human edits need force=true before publishing', async () => {
 		const status = await view('pr_review_status');
-		const agentComment = status.parsed!.comments.find((c) => !c.body.startsWith('[architecture]'))!;
+		const agentComment = status.parsed!.comments.find((c) => !c.body.startsWith('Architecture:'))!;
 		const edited = status.commentsMarkdown!.replace(agentComment.body, 'LGTM actually.');
 		await view('pr_review_ui_save', { commentsMarkdown: edited });
 
@@ -455,13 +469,14 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 	});
 
 	test('tools that need a started review explain what to call first', async () => {
-		for (const [name, pattern] of [
-			['pr_review_next_group', /call pr_review_start first/],
-			['pr_review_submit_findings', /Call pr_review_start first/],
-			['pr_review_import_architecture', /pr_review_start or pr_review_architecture_rescan first/],
-			['pr_review_publish', /Save a draft first/],
+		for (const [name, args, pattern] of [
+			['pr_review_next_group', {}, /call pr_review_start first/],
+			['pr_review_submit_findings', { findings: [] }, /Call pr_review_start first/],
+			['pr_review_import_architecture', {}, /pr_review_start or pr_review_architecture_rescan first/],
+			['pr_review_import_findings', { keys: ['arch:0'] }, /Call pr_review_start first/],
+			['pr_review_publish', {}, /Save a draft first/],
 		] as const) {
-			const result = await call(name, name === 'pr_review_submit_findings' ? { findings: [] } : {});
+			const result = await call(name, args);
 			assert.equal(result.isError, true, name);
 			assert.match(textOf(result), pattern, name);
 		}
@@ -634,16 +649,17 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 		};
 		try {
 			let v = await secCall('pr_review_start');
-			assert.equal(v.architecture?.status, 'scanned', 'the repo rules still run');
-			assert.equal(v.architecture?.builtinSecurity?.status, 'scanned');
+			const startedArchitecture = v.architecture;
+			assert.equal(startedArchitecture?.status, 'scanned', 'the repo rules still run');
+			assert.equal(startedArchitecture?.builtinSecurity?.status, 'scanned');
 			assert.ok(
-				v.architecture?.builtinSecurity?.findings.some(
+				startedArchitecture?.builtinSecurity?.findings.some(
 					(f) => f.checkId === 'security.js.command-injection' && f.path === 'src/api/run.js' && f.startLine === 2,
 				),
-				JSON.stringify(v.architecture?.builtinSecurity),
+				JSON.stringify(startedArchitecture?.builtinSecurity),
 			);
 			assert.ok(
-				!v.architecture?.findings.some((f) => f.checkId.startsWith('security.')),
+				!startedArchitecture?.findings.some((f) => f.checkId.startsWith('security.')),
 				'kept apart from repo findings',
 			);
 			// Walk to the group that holds the handler: its instruction carries the labeled built-in hint.
@@ -694,6 +710,17 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 			assert.ok(
 				submitted.warnings?.some((w) => w.includes('src/api/nope.js:1 does not exist at the PR head')),
 				JSON.stringify(submitted.warnings),
+			);
+
+			// Unified Findings inbox: built-in security findings import with the Security template.
+			const secIdx = startedArchitecture?.builtinSecurity?.findings.findIndex(
+				(f) => f.checkId === 'security.js.command-injection',
+			);
+			assert.ok(secIdx !== undefined && secIdx >= 0, 'builtin security finding index');
+			const imported = await secCall('pr_review_import_findings', { keys: [`sec-builtin:${secIdx}`] });
+			assert.ok(
+				imported.parsed?.comments.some((c) => c.body.startsWith('Security: security.js.command-injection')),
+				JSON.stringify(imported.parsed?.comments.map((c) => c.body.slice(0, 120))),
 			);
 		} finally {
 			process.env['FAKE_GH_STATE'] = before;
