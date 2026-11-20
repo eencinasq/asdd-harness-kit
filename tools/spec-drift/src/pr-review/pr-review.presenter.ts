@@ -49,6 +49,13 @@ const toText = (view: PrReviewView, options: PresentOptions): string => {
 			const pct = cov.totals ? `${cov.totals.linesPct}% lines` : cov.status;
 			lines.push(`code coverage: ${cov.status} · ${pct}${cov.tool ? ` · ${cov.tool}` : ''}`);
 		}
+		if (view.guidedAudit && view.guidedAudit.status !== 'idle') {
+			const g = view.guidedAudit;
+			lines.push(
+				`guided audit: ${g.status}${g.runId ? ` · ${g.runId}` : ''} · confirmed=${g.findingCount}` +
+					(g.coverage ? ` · checklists ${g.coverage.reviewed}/${g.coverage.total}` : ''),
+			);
+		}
 		const first = view.risk ? readFirst(view.risk, 3) : [];
 		if (first.length) {
 			lines.push(`read first (risk): ${first.map((f) => `${f.path} (${f.level}, score ${f.score})`).join(', ')}`);

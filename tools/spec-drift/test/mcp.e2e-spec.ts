@@ -40,6 +40,8 @@ const EXPECTED_UI: Record<string, { uri: string; appOnly?: boolean }> = {
 	pr_review_architecture_rescan: { uri: UI.pr },
 	pr_review_import_architecture: { uri: UI.pr },
 	pr_review_import_findings: { uri: UI.pr },
+	pr_review_start_guided_audit: { uri: UI.pr },
+	pr_review_sync_guided_audit: { uri: UI.pr },
 	pr_review_publish: { uri: UI.pr },
 	pr_review_ui_save: { uri: UI.pr, appOnly: true },
 	pr_review_ui_reload: { uri: UI.pr, appOnly: true },
@@ -85,7 +87,7 @@ const textOf = (result: Awaited<ReturnType<Client['callTool']>>): string =>
 /** Contract every transport must satisfy. */
 const assertContract = async (client: Client): Promise<void> => {
 	const { tools } = await client.listTools();
-	assert.equal(tools.length, 46, 'tool count');
+	assert.equal(tools.length, 48, 'tool count');
 	for (const [name, ui] of Object.entries(EXPECTED_UI)) {
 		const meta = tools.find((t) => t.name === name)?._meta as Record<string, any> | undefined;
 		assert.equal(meta?.ui?.resourceUri, ui.uri, `${name} ui.resourceUri`);
@@ -426,7 +428,7 @@ describe('HTTP transport security', () => {
 			await client.connect(
 				new StreamableHTTPClientTransport(new URL(url), { requestInit: { headers: { 'x-api-key': key } } }),
 			);
-			assert.equal((await client.listTools()).tools.length, 46);
+			assert.equal((await client.listTools()).tools.length, 48);
 			await client.close();
 		} finally {
 			child.kill();

@@ -171,6 +171,11 @@ export class SecurityAuditService {
 		return JSON.parse(readFileSync(file, 'utf8')) as SecurityRun;
 	}
 
+	/** Public read for PR review to sync confirmed findings into the dashboard (REQ-028). */
+	getRun(runId: string): Promise<SecurityRun> {
+		return this.load(runId);
+	}
+
 	private async save(run: SecurityRun): Promise<void> {
 		const dir = this.runDir(run.id);
 		await fs.mkdir(dir, { recursive: true });

@@ -474,6 +474,8 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 			['pr_review_submit_findings', { findings: [] }, /Call pr_review_start first/],
 			['pr_review_import_architecture', {}, /pr_review_start or pr_review_architecture_rescan first/],
 			['pr_review_import_findings', { keys: ['arch:0'] }, /Call pr_review_start first/],
+			['pr_review_start_guided_audit', {}, /Call pr_review_start first/],
+			['pr_review_sync_guided_audit', {}, /Call pr_review_start first|No guided audit/],
 			['pr_review_publish', {}, /Save a draft first/],
 		] as const) {
 			const result = await call(name, args);
@@ -625,6 +627,34 @@ describe('PR review lifecycle (fake gh, real git + semgrep)', {
 			assert.equal(v.architecture?.status, 'missing-config');
 			assert.match(v.architecture?.generatePrompt ?? '', /Generate \.semgrep architecture rules/);
 			assert.match(v.architecture?.generatePrompt ?? '', /pr_review_architecture_rescan/);
+		} finally {
+			process.env['FAKE_GH_STATE'] = before;
+		}
+	});
+
+	test('pr-review-dashboard-ux REQ-027…028: start_guided_audit scopes a run and sync refreshes the view', async () => {
+		const guided = createReviewedRepo();
+		const before = process.env['FAKE_GH_STATE'];
+		process.env['FAKE_GH_STATE'] = guided.ghState;
+		const guidedCall = async (name: string, args: Record<string, unknown> = {}) => {
+			const result = await client.callTool({ name, arguments: { pr, repoPath: guided.repo, ...args } });
+			assert.ok(!result.isError, `${name} failed: ${textOf(result)}`);
+			return result.structuredContent as unknown as PrReviewView;
+		};
+		try {
+			await guidedCall('pr_review_start');
+			const started = await guidedCall('pr_review_start_guided_audit');
+			assert.equal(started.guidedAudit?.status, 'in_progress');
+			assert.ok(started.guidedAudit?.runId?.startsWith('run-'));
+			assert.match(started.guidedAudit?.auditPrompt ?? '', /Guided security audit for PR/);
+			assert.match(started.guidedAudit?.auditPrompt ?? '', /pr_review_sync_guided_audit/);
+			assert.match(started.prompt ?? '', /security_audit_checklist|methodology/i);
+			const linked = await guidedCall('pr_review_status');
+			assert.equal(linked.guidedAudit?.runId, started.guidedAudit?.runId);
+			const synced = await guidedCall('pr_review_sync_guided_audit');
+			assert.ok(synced.guidedAudit?.runId);
+			assert.equal(synced.guidedAudit?.findingCount ?? 0, 0);
+			assert.match(synced.guidedAudit?.message ?? '', /checklists|confirmed|In progress|complete/i);
 		} finally {
 			process.env['FAKE_GH_STATE'] = before;
 		}

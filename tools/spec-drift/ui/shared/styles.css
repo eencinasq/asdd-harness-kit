@@ -1,39 +1,43 @@
 /*
- * Design tokens. Each one reads the MCP Apps host variable first (Claude, Cursor… set them through
- * applyHostStyleVariables), so the dashboards look native in the host. The fallbacks follow the
- * host's light / dark theme through `light-dark()` (applyDocumentTheme sets `color-scheme`).
+ * Soft light product theme (findings-dashboard reference): white canvas, muted gray cards,
+ * pastel severity/status pills. Host CSS vars still win when the MCP host injects them;
+ * `light-dark()` keeps a readable dark fallback when only color-scheme flips.
  */
 :root {
 	color-scheme: light dark;
 
-	--bg: var(--color-background-primary, light-dark(#ffffff, #1a1b1e));
-	--surface: var(--color-background-secondary, light-dark(#f7f7f8, #222327));
-	--surface-2: var(--color-background-tertiary, light-dark(#efeff1, #2a2b30));
-	--text: var(--color-text-primary, light-dark(#1d1e21, #ececee));
-	--text-2: var(--color-text-secondary, light-dark(#55575d, #b4b6bc));
-	--text-3: var(--color-text-tertiary, light-dark(#74767c, #8d9097));
-	--border: var(--color-border-primary, light-dark(#d9dade, #3a3c42));
-	--border-soft: var(--color-border-secondary, light-dark(#e8e9ec, #2f3136));
-	--ring: var(--color-ring-primary, light-dark(#2f6fde, #7aa7ff));
+	--bg: var(--color-background-primary, light-dark(#ffffff, #141516));
+	--surface: var(--color-background-secondary, light-dark(#f3f4f6, #1e2022));
+	--surface-2: var(--color-background-tertiary, light-dark(#eaecef, #2a2d30));
+	--text: var(--color-text-primary, light-dark(#111827, #f3f4f6));
+	--text-2: var(--color-text-secondary, light-dark(#4b5563, #9ca3af));
+	--text-3: var(--color-text-tertiary, light-dark(#6b7280, #6b7280));
+	--border: var(--color-border-primary, light-dark(#d1d5db, #3f4448));
+	--border-soft: var(--color-border-secondary, light-dark(#e5e7eb, #2f3336));
+	--ring: var(--color-ring-primary, light-dark(#111827, #e5e7eb));
 
-	--inverse-bg: var(--color-background-inverse, light-dark(#1d1e21, #ececee));
-	--inverse-text: var(--color-text-inverse, light-dark(#ffffff, #1a1b1e));
+	--inverse-bg: var(--color-background-inverse, light-dark(#111827, #f3f4f6));
+	--inverse-text: var(--color-text-inverse, light-dark(#ffffff, #111827));
 
-	--danger: var(--color-text-danger, light-dark(#c4302b, #ff8a80));
-	--danger-bg: var(--color-background-danger, light-dark(#fdecea, #3a2321));
-	--danger-border: var(--color-border-danger, light-dark(#f2b8b5, #6b3530));
-	--warning: var(--color-text-warning, light-dark(#9a6200, #f3c560));
-	--warning-bg: var(--color-background-warning, light-dark(#fff5e0, #3a3020));
-	--warning-border: var(--color-border-warning, light-dark(#f1d398, #6b5630));
-	--success: var(--color-text-success, light-dark(#1d7a46, #6fd69b));
-	--success-bg: var(--color-background-success, light-dark(#e7f6ed, #1f3428));
-	--success-border: var(--color-border-success, light-dark(#a9dcbc, #2f5a40));
-	--info: var(--color-text-info, light-dark(#2f5fb8, #8fb3ff));
-	--info-bg: var(--color-background-info, light-dark(#eaf1fd, #212b3d));
-	--info-border: var(--color-border-info, light-dark(#b9cdf3, #34466b));
+	/* High — soft rose */
+	--danger: var(--color-text-danger, light-dark(#991b1b, #fca5a5));
+	--danger-bg: var(--color-background-danger, light-dark(#fde2e2, #3b1d1d));
+	--danger-border: var(--color-border-danger, light-dark(#fecaca, #7f1d1d));
+	/* Medium — soft amber */
+	--warning: var(--color-text-warning, light-dark(#92400e, #fcd34d));
+	--warning-bg: var(--color-background-warning, light-dark(#fef3c7, #3b2f14));
+	--warning-border: var(--color-border-warning, light-dark(#fde68a, #78716c));
+	/* Confirmed — soft green */
+	--success: var(--color-text-success, light-dark(#166534, #86efac));
+	--success-bg: var(--color-background-success, light-dark(#dcf2d8, #14532d));
+	--success-border: var(--color-border-success, light-dark(#bbf7d0, #166534));
+	/* Low / neutral info — cool gray (not loud blue) */
+	--info: var(--color-text-info, light-dark(#374151, #d1d5db));
+	--info-bg: var(--color-background-info, light-dark(#f3f4f6, #272a2d));
+	--info-border: var(--color-border-info, light-dark(#e5e7eb, #3f4448));
 
-	--font: var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
-	--mono: var(--font-mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace);
+	--font: var(--font-sans, "Inter", "SF Pro Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif);
+	--mono: var(--font-mono, "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace);
 	--text-xs: var(--font-text-xs-size, 0.75rem);
 	--text-sm: var(--font-text-sm-size, 0.8125rem);
 	--text-md: var(--font-text-md-size, 0.875rem);
@@ -41,11 +45,11 @@
 	--weight-medium: var(--font-weight-medium, 500);
 	--weight-semibold: var(--font-weight-semibold, 600);
 
-	--radius-sm: var(--border-radius-sm, 6px);
-	--radius-md: var(--border-radius-md, 8px);
-	--radius-lg: var(--border-radius-lg, 12px);
+	--radius-sm: var(--border-radius-sm, 8px);
+	--radius-md: var(--border-radius-md, 10px);
+	--radius-lg: var(--border-radius-lg, 14px);
 	--radius-full: var(--border-radius-full, 999px);
-	--shadow: var(--shadow-sm, 0 1px 2px rgb(0 0 0 / 0.06));
+	--shadow: var(--shadow-sm, 0 1px 2px rgb(17 24 39 / 0.04));
 
 	--space-1: 4px;
 	--space-2: 8px;
@@ -176,7 +180,7 @@ p {
 .header-progress:hover,
 .header-progress:focus-visible {
 	border-color: var(--border);
-	box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #2563eb) 25%, transparent);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--ring) 18%, transparent);
 	outline: none;
 }
 
@@ -419,21 +423,23 @@ textarea {
 /* Segmented control (filters). `aria-pressed` carries the state. */
 .segmented {
 	display: inline-flex;
-	padding: 2px;
-	border: 1px solid var(--border);
-	border-radius: var(--radius-md);
-	background: var(--surface);
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
 }
 
 .segmented button {
 	display: inline-flex;
 	gap: var(--space-1);
 	align-items: center;
-	min-height: 26px;
-	padding: 0 var(--space-2);
-	border: 0;
-	border-radius: calc(var(--radius-md) - 2px);
-	background: transparent;
+	min-height: 28px;
+	padding: 0 12px;
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius-full);
+	background: var(--bg);
 	color: var(--text-2);
 	font-size: var(--text-xs);
 	font-weight: var(--weight-medium);
@@ -441,9 +447,11 @@ textarea {
 }
 
 .segmented button[aria-pressed="true"] {
+	border-color: var(--ring);
 	background: var(--bg);
 	color: var(--text);
-	box-shadow: var(--shadow);
+	box-shadow: none;
+	font-weight: var(--weight-semibold);
 }
 
 .count {
@@ -579,9 +587,9 @@ textarea {
 .kpi {
 	display: grid;
 	flex: 1 1 132px;
-	gap: 2px;
-	padding: var(--space-3);
-	border: 1px solid var(--border-soft);
+	gap: 4px;
+	padding: var(--space-3) var(--space-4);
+	border: 1px solid transparent;
 	border-radius: var(--radius-lg);
 	background: var(--surface);
 }
@@ -593,20 +601,19 @@ button.kpi-action {
 	text-align: left;
 	cursor: pointer;
 	transition:
-		border-color 0.12s ease,
+		background-color 0.12s ease,
 		box-shadow 0.12s ease;
 }
 
 button.kpi-action:hover,
 button.kpi-action:focus-visible {
-	border-color: var(--border);
-	box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #2563eb) 25%, transparent);
+	background: var(--surface-2);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--ring) 18%, transparent);
 	outline: none;
 }
 
 button.kpi-action[aria-pressed="true"] {
-	border-color: var(--border);
-	box-shadow: inset 0 0 0 1px var(--border);
+	box-shadow: inset 0 0 0 1.5px var(--ring);
 }
 
 .meta .rev-chip {
@@ -655,16 +662,18 @@ button.kpi-action[aria-pressed="true"] {
 }
 
 .kpi-label {
-	color: var(--text-2);
+	color: var(--text-3);
 	font-size: var(--text-xs);
 	font-weight: var(--weight-medium);
 }
 
 .kpi-value {
-	font-size: 1.375rem;
+	font-size: 1.5rem;
 	font-weight: var(--weight-semibold);
 	font-variant-numeric: tabular-nums;
-	line-height: 1.2;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+	color: var(--text);
 }
 
 .kpi-hint {
@@ -713,57 +722,44 @@ button.kpi-action[aria-pressed="true"] {
 	display: inline-flex;
 	gap: var(--space-1);
 	align-items: center;
-	min-height: 20px;
-	padding: 0 var(--space-2);
-	border: 1px solid var(--border-soft);
+	min-height: 22px;
+	padding: 0 10px;
+	border: 1px solid transparent;
 	border-radius: var(--radius-full);
 	background: var(--surface);
 	color: var(--text-2);
 	font-size: var(--text-xs);
 	font-weight: var(--weight-medium);
+	letter-spacing: 0.01em;
+	text-transform: lowercase;
 	white-space: nowrap;
 }
 
 .badge.sev-error,
 .badge.tone-danger {
-	border-color: var(--danger-border);
+	border-color: transparent;
 	background: var(--danger-bg);
 	color: var(--danger);
 }
 
 .badge.sev-warning,
 .badge.tone-warning {
-	border-color: var(--warning-border);
+	border-color: transparent;
 	background: var(--warning-bg);
 	color: var(--warning);
 }
 
 .badge.sev-info,
 .badge.tone-info {
-	border-color: var(--info-border);
+	border-color: transparent;
 	background: var(--info-bg);
 	color: var(--info);
 }
 
 .badge.tone-success {
-	border-color: var(--success-border);
+	border-color: transparent;
 	background: var(--success-bg);
 	color: var(--success);
-}
-
-/* Severity marker: icon shape + text, never color alone. */
-.badge.sev-error::before {
-	content: "●";
-}
-
-.badge.sev-warning::before {
-	content: "▲";
-	font-size: 0.8em;
-}
-
-.badge.sev-info::before {
-	content: "■";
-	font-size: 0.8em;
 }
 
 /* ── Callouts, status, empty states ─────────────────────────────────────── */
@@ -800,6 +796,71 @@ button.kpi-action[aria-pressed="true"] {
 
 .callout .toolbar {
 	margin-top: var(--space-1);
+}
+
+/* Compact multi-source scan status (Security tab). */
+.status-strip {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	align-items: center;
+}
+
+.status-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-1);
+	max-width: 100%;
+	padding: 2px var(--space-2);
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius-sm);
+	background: var(--surface);
+	color: var(--text-2);
+	font-size: var(--text-xs);
+	line-height: 1.35;
+}
+
+.status-chip .chip-label {
+	font-weight: var(--weight-semibold);
+	color: var(--text);
+}
+
+.status-chip.tone-success {
+	border-color: var(--success-border);
+	background: var(--success-bg);
+	color: var(--success);
+}
+
+.status-chip.tone-success .chip-label {
+	color: var(--success);
+}
+
+.status-chip.tone-warning {
+	border-color: var(--warning-border);
+	background: var(--warning-bg);
+	color: var(--warning);
+}
+
+.status-chip.tone-warning .chip-label {
+	color: var(--warning);
+}
+
+.status-chip.tone-danger {
+	border-color: var(--danger-border);
+	background: var(--danger-bg);
+	color: var(--danger);
+}
+
+.status-chip.tone-danger .chip-label {
+	color: var(--danger);
+}
+
+.status-chip.tone-muted {
+	color: var(--text-3);
+}
+
+.status-chip.tone-muted .chip-label {
+	color: var(--text-2);
 }
 
 .status {
@@ -877,32 +938,34 @@ button.kpi-action[aria-pressed="true"] {
 
 .list {
 	display: grid;
-	gap: var(--space-2);
+	gap: 0;
 	margin: 0;
 	padding: 0;
 	list-style: none;
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius-lg);
+	background: var(--bg);
+	overflow: hidden;
 }
 
 .item {
 	display: grid;
 	gap: var(--space-2);
-	padding: var(--space-3);
-	border: 1px solid var(--border-soft);
-	border-left: 3px solid var(--border);
-	border-radius: var(--radius-md);
-	background: var(--bg);
+	padding: var(--space-3) var(--space-4);
+	border: 0;
+	border-bottom: 1px solid var(--border-soft);
+	border-radius: 0;
+	background: transparent;
 }
 
-.item.sev-error {
-	border-left-color: var(--danger);
+.item:last-child {
+	border-bottom: 0;
 }
 
-.item.sev-warning {
-	border-left-color: var(--warning);
-}
-
+.item.sev-error,
+.item.sev-warning,
 .item.sev-info {
-	border-left-color: var(--info);
+	border-left: 0;
 }
 
 .item-head {

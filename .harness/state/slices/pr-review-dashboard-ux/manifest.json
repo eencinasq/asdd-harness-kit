@@ -2,13 +2,13 @@
   "schema_version": "3.0",
   "slice_id": "pr-review-dashboard-ux",
   "phase": "knowledge",
-  "status": "DONE",
+  "status": "in_progress",
   "mode": "hotfix",
   "escalation_signals": [],
   "escalation_required": false,
   "escalated_from_lite": false,
   "created_at": "2026-11-17T23:45:20.810Z",
-  "updated_at": "2026-11-18T02:24:34.191Z",
+  "updated_at": "2026-11-19T01:55:35.363Z",
   "paths": {
     "specs": ".harness/specs/pr-review-dashboard-ux",
     "tasks": ".harness/specs/pr-review-dashboard-ux/tasks.md",
@@ -37,7 +37,16 @@
       "concerns": []
     }
   },
-  "active_features": [],
+  "active_features": [
+    {
+      "id": "TASK-015",
+      "owner": "eencinas",
+      "human": "eencinas",
+      "since": "2026-11-19T01:55:30.000Z",
+      "handoff_from": null,
+      "scope_paths": []
+    }
+  ],
   "open_dissents": 0,
   "source": null,
   "session_log": [
@@ -688,6 +697,22 @@
       "event": "phase_completed",
       "phase": "knowledge",
       "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-19T01:45:01.468Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "checkpoint",
+      "phase": "implementation",
+      "feature_id": null
+    },
+    {
+      "timestamp": "2026-11-19T01:55:30.000Z",
+      "agent": "eencinas",
+      "human": "eencinas",
+      "event": "feature_started",
+      "phase": "implementation",
+      "feature_id": "TASK-015"
     }
   ],
   "contributors": [

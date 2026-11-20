@@ -1,6 +1,6 @@
 /* Trend chart (spec-drift-adoption REQ-002). One series; color validated for both modes (dataviz validator). */
 :root {
-	--trend-line: light-dark(#2f6fde, #5f93ee);
+	--trend-line: light-dark(#111827, #9ca3af);
 }
 .trend-chart {
 	position: relative;

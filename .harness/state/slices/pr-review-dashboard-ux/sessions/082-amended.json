@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pr-review-dashboard-ux-082",
+  "timestamp": "2026-11-19T01:45:01.468Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "pr-review-dashboard-ux",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "Guided security audit → PR Security tab: on-demand CTA + confirmed findings in inbox",
+  "amendment_path": ".harness/specs/pr-review-dashboard-ux/amendments/2026-11-19T01-45-01-468Z.md",
+  "concerns": []
+}

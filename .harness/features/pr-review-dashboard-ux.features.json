@@ -370,6 +370,42 @@
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
       "evidence_hash": "1744e35be200c3cba640d141a068a13b6bf432b44350adb5152e4cb12184bdc0"
+    },
+    {
+      "id": "TASK-015",
+      "title": "Guided security audit → Security tab + Findings inbox",
+      "user_visible_behavior": "Security tab offers Ask the agent to audit PR files (starts a PR-scoped guided audit and sends the prompt); Guided audit section shows confirmed file:line findings after sync/reload; those findings appear in the Findings inbox as sec-audit keys and import via pr_review_import_findings.",
+      "status": "in_progress",
+      "priority": 15,
+      "owner": "squad",
+      "req_ids": [
+        "REQ-027",
+        "REQ-028",
+        "REQ-029"
+      ],
+      "depends_on": [
+        "TASK-014"
+      ],
+      "verification": [
+        "cd tools/spec-drift && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test src/pr-review/guided-audit/*.spec.ts src/pr-review/findings/findings-inbox.spec.ts && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm typecheck && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm lint && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH pnpm build && PATH=$HOME/.nvm/versions/node/v24.22.3/bin:$PATH node --import tsx --test --test-concurrency=1 test/mcp.e2e-spec.ts test/ui.e2e-spec.ts"
+      ],
+      "evidence": "DRAFT 2026-11-18: pr_review_start_guided_audit + pr_review_sync_guided_audit; Security tab Guided audit + Ask the agent to audit PR files; sec-audit inbox keys (confirmed file:line only); guided-audit-map + findings-inbox unit; mcp tool count 48; ui e2e Guided audit CTA; pr-review e2e REQ-027…028 green.",
+      "scope_paths": [
+        "tools/spec-drift/src/pr-review/guided-audit/**",
+        "tools/spec-drift/src/pr-review/findings/**",
+        "tools/spec-drift/src/pr-review/workspace/**",
+        "tools/spec-drift/src/pr-review/pr-review.types.ts",
+        "tools/spec-drift/src/pr-review/pr-review.service.ts",
+        "tools/spec-drift/src/pr-review/pr-review.module.ts",
+        "tools/spec-drift/src/pr-review/pr-review.tools.ts",
+        "tools/spec-drift/src/pr-review/pr-review.schemas.ts",
+        "tools/spec-drift/src/security/security.service.ts",
+        "tools/spec-drift/ui/pr-review.html",
+        "tools/spec-drift/ui/pr-review/main.ts",
+        "tools/spec-drift/test/ui.e2e-spec.ts",
+        "tools/spec-drift/test/pr-review.e2e-spec.ts",
+        "tools/spec-drift/test/mcp.e2e-spec.ts"
+      ]
     }
   ]
 }

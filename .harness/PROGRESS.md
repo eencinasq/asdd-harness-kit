@@ -41,7 +41,7 @@
 | modules-top-level | escalated | implementation | ABANDONED | 0 |
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
 | po-readonly-gate | escalated | knowledge | DONE | 0 |
-| pr-review-dashboard-ux | hotfix | knowledge | DONE | 0 |
+| pr-review-dashboard-ux | hotfix | knowledge | in_progress | 1 |
 | pr-review-group-brief | hotfix | knowledge | DONE | 0 |
 | pr-security-baseline | hotfix | knowledge | DONE | 0 |
 | review-quality | full | knowledge | DONE | 0 |

@@ -104,6 +104,7 @@ export class ReviewWorkspaceService {
 			progress: path.join(base, 'progress.json'),
 			architecture: path.join(base, 'architecture.json'),
 			codeCoverage: path.join(base, 'code-coverage.json'),
+			guidedAudit: path.join(base, 'guided-audit.json'),
 			requirements: path.join(base, 'requirements.json'),
 			risk: path.join(base, 'risk.json'),
 			existingComments: path.join(base, 'existing-comments.json'),

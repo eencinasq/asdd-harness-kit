@@ -329,12 +329,14 @@ describe('dashboards in a real MCP Apps host', { skip }, () => {
 		assert.equal(await view.isVisible('#panel-architecture'), true);
 		await view.click('#kpi-security-card');
 		assert.equal(await view.isVisible('#panel-security'), true);
-		// pr-review-dashboard-ux REQ-005…007: built-in first; no repo security set → generate button.
-		assert.match((await view.textContent('#security-summary')) ?? '', /Built-in security pack/);
+		// pr-review-dashboard-ux REQ-005…007: compact status strip; missing repo set → generate CTA callout.
+		assert.match((await view.textContent('#security-summary')) ?? '', /Built-in/);
 		assert.match((await view.textContent('#security-summary')) ?? '', /Repository security rules/);
 		assert.equal(await view.isVisible('#generate-security-rules'), true);
+		assert.equal(await view.isVisible('#start-guided-audit'), true);
 		assert.equal(await view.isVisible('#rescan-security'), true);
 		assert.match((await view.textContent('#security-summary')) ?? '', /Ask the agent to write security rules/i);
+		assert.match((await view.textContent('#security-summary')) ?? '', /Guided audit/);
 		// pr-review-dashboard-ux REQ-014…016: Code coverage KPI/tab; fixture has no test+coverage → generate CTA.
 		assert.ok(await view.isVisible('#kpi-code-coverage-card'));
 		assert.ok(await view.isVisible('#tab-code-coverage'));

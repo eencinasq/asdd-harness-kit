@@ -29,13 +29,24 @@ describe('findings inbox (pr-review-dashboard-ux REQ-022…024)', () => {
 		assert.equal(parseEvidenceRef('src/a.ts'), undefined);
 	});
 
-	it('collects architecture, security, and pin-able unmet ticket items', () => {
+	it('collects architecture, security, guided-audit, and pin-able unmet ticket items', () => {
 		const items = collectInboxItems({
 			architectureFindings: [
 				{ checkId: 'arch.x', path: 'a.ts', startLine: 1, endLine: 1, severity: 'WARNING', message: 'm' },
 			],
 			builtinSecurityFindings: [
 				{ checkId: 'sec.y', path: 'b.ts', startLine: 2, endLine: 2, severity: 'ERROR', message: 'm' },
+			],
+			guidedAuditFindings: [
+				{
+					fingerprint: 'fp-abc',
+					checkId: 'XSS in handler',
+					path: 'c.ts',
+					startLine: 9,
+					endLine: 9,
+					severity: 'ERROR',
+					message: 'Unescaped',
+				},
 			],
 			requirements: {
 				ticket: { source: 'text', text: 't' },
@@ -55,12 +66,14 @@ describe('findings inbox (pr-review-dashboard-ux REQ-022…024)', () => {
 				unrelatedChanges: [],
 			},
 		});
-		assert.equal(items.length, 3);
+		assert.equal(items.length, 4);
 		assert.equal(items[0]?.key, 'arch:0');
 		assert.equal(items[0]?.defaultChecked, false);
 		assert.equal(items[1]?.key, 'sec-builtin:0');
 		assert.equal(items[1]?.defaultChecked, true);
-		assert.equal(items[2]?.key, 'ticket:AC-1');
+		assert.equal(items[2]?.key, 'sec-audit:fp-abc');
+		assert.equal(items[2]?.defaultChecked, true);
+		assert.equal(items[3]?.key, 'ticket:AC-1');
 		assert.equal(ticketPinItems(undefined).length, 0);
 	});
 

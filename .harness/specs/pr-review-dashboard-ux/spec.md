@@ -36,3 +36,6 @@ Mapped: `tools/spec-drift/ui/pr-review.html`, `tools/spec-drift/ui/pr-review/mai
 - **REQ-024.** Ticket criteria remain a checklist in the review summary; unmet criteria with `path:line` evidence may be pinned as inline comments.
 - **REQ-025.** Before publish, the confirmation shall preview inline count, summary-note count, and suggested event, with an easy undo of the last Findings add.
 - **REQ-026.** Architecture, Security, Ticket-evidence, and open code-review Findings shall share one import path (`pr_review_import_findings`); importing shall require a started review.
+- **REQ-027.** The Security Findings tab shall offer **Ask the agent to audit PR files**, which starts a guided security audit scoped to the PR changed files and sends the host agent the audit prompt.
+- **REQ-028.** WHEN a guided audit run is linked to the review, the Security Findings tab shall show a Guided audit section with checklist coverage and confirmed findings that have `file:line` evidence; Reload/status shall refresh those findings from the run.
+- **REQ-029.** Confirmed guided-audit findings with `file:line` anchors shall appear in the Findings inbox as `sec-audit:…` keys and import via `pr_review_import_findings`; `needs_validation` and `rejected` shall not enter the inbox.

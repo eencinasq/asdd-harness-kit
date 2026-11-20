@@ -191,10 +191,14 @@
 			<section role="tabpanel" id="panel-security" aria-labelledby="tab-security" hidden>
 				<div id="security-summary" class="stack"></div>
 				<div class="toolbar" id="security-actions">
-					<button type="button" class="btn btn-primary" id="generate-security-rules" hidden>
+					<button type="button" class="btn btn-primary" id="start-guided-audit">
+						Ask the agent to audit PR files
+					</button>
+					<button type="button" class="btn" id="generate-security-rules" hidden>
 						Ask the agent to write security rules
 					</button>
 					<span class="spacer"></span>
+					<button type="button" class="btn btn-ghost" id="sync-guided-audit" hidden>Sync guided audit</button>
 					<button type="button" class="btn btn-ghost" id="rescan-security">Rescan</button>
 				</div>
 				<ul class="list" id="security-list"></ul>

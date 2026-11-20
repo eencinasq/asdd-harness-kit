@@ -31,6 +31,8 @@ import {
 	SubmitFindingsSchema,
 	type SubmitRequirementsInput,
 	SubmitRequirementsSchema,
+	type SyncGuidedAuditInput,
+	SyncGuidedAuditSchema,
 	type UiPublishInput,
 	UiPublishSchema,
 	type UiRequirementsInput,
@@ -297,12 +299,38 @@ export class PrReviewTools {
 		annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
 		title: 'Import Findings inbox items into PR comments',
 		description:
-			'Convert selected Findings-inbox keys (arch:N, sec-builtin:N, sec-repo:N, ticket:AC-1) into inline comments in comments.md using the short comment template. Opens the dashboard on Comments.',
+			'Convert selected Findings-inbox keys (arch:N, sec-builtin:N, sec-repo:N, sec-audit:<fingerprint>, ticket:AC-1) into inline comments in comments.md using the short comment template. Opens the dashboard on Comments.',
 		inputSchema: ImportFindingsSchema,
 		_meta: dashboardMeta,
 	})
 	async importFindings(args: ImportFindingsInput) {
 		return presentReview(await this.review.importFindings(args));
+	}
+
+	@Tool({
+		name: 'pr_review_start_guided_audit',
+		annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+		title: 'Start guided security audit for PR',
+		description:
+			'Start a cloudflare/security-audit-skill guided audit scoped to the PR changed files, link it to the review, and return the host-agent prompt (also in guidedAudit.auditPrompt). Then work checklists with security_audit_checklist / security_audit_submit_findings and call pr_review_sync_guided_audit. Opens the PR Review dashboard on Security.',
+		inputSchema: PrSchema,
+		_meta: dashboardMeta,
+	})
+	async startGuidedAudit(args: PrInput) {
+		return presentReview(await this.review.startGuidedAudit(args));
+	}
+
+	@Tool({
+		name: 'pr_review_sync_guided_audit',
+		annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+		title: 'Sync guided security audit findings into PR review',
+		description:
+			'Refresh confirmed guided-audit findings (file:line only) from a security_audit run into the PR Security tab and Findings inbox. Pass runId or use the run linked by pr_review_start_guided_audit. Opens the dashboard on Security.',
+		inputSchema: SyncGuidedAuditSchema,
+		_meta: dashboardMeta,
+	})
+	async syncGuidedAudit(args: SyncGuidedAuditInput) {
+		return presentReview(await this.review.syncGuidedAudit(args));
 	}
 
 	@Tool({
