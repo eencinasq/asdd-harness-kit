@@ -106,7 +106,7 @@
         "TASK-003"
       ],
       "evidence": "asdd profile --slice exit 0 writes profiling.json (phase rollups incl. synthesized markers, turn p50/p95, boot tax, H-* findings, bottleneck_score surfaces); --bottlenecks ranked; exit 3 on no data, 2 on usage — smoke-verified; project.json commands.profile+capabilities.telemetry; lifecycle.sh telemetry row green",
-      "evidence_hash": "b3f3dc85df7acc4da7a295b96f421c49f8bfa7a0ce4b3ded11bce4592ee62d67"
+      "evidence_hash": "02cce1255204d9e54711c1563fed6fcd9659ec54d25aad7d686e73e0f8f553c7"
     },
     {
       "id": "TASK-005",
@@ -131,7 +131,7 @@
         "TASK-004"
       ],
       "evidence": "v2.md status→converged (repo+vault byte-identical, diff clean); package.json test list +telemetry-lib.test.mjs; npm test 244/0; regen --check 9/9; 24 DRIFT-02 features re-verified+re-stamped (cli-harness:TASK-011 stays blocked on pre-existing spec-drift debt)",
-      "evidence_hash": "b4c746527e1bf9c140f387a3613953bd41d79e5c735774832224c78a91b7a0d4"
+      "evidence_hash": "f8c344f2df452bb583d040481352b85315cd63dbe7267f451009353823ae06c4"
     }
   ]
 }
