@@ -17,6 +17,7 @@
 | asdd-ui | escalated | knowledge | DONE | 0 |
 | ci-npm-ci | escalated | knowledge | DONE | 0 |
 | claude-hook-cwd | escalated | knowledge | DONE | 0 |
+| cli-args | escalated | knowledge | DONE | 0 |
 | cli-harness | escalated | knowledge | ABANDONED | 0 |
 | cost-metrics | escalated | knowledge | DONE | 0 |
 | docs-p5-wave1 | escalated | knowledge | DONE | 0 |
@@ -41,6 +42,7 @@
 | microkernel-polish | lite | qa | in_progress | 1 |
 | modules-top-level | escalated | qa | ABANDONED | 0 |
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
+| pipeline-e2e | lite | knowledge | DONE | 0 |
 | platform-contract | full | knowledge | DONE | 0 |
 | platform-spec | full | qa | in_progress | 0 |
 | po-readonly-gate | escalated | knowledge | DONE | 0 |

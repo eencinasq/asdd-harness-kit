@@ -58,6 +58,52 @@ test('dispatch: version, help, unknown command, kit usage', () => {
   assert.equal(asdd('migrate', 'nope').status, 2);
 });
 
+test('parseCommand: registry flags through node:util parseArgs', async () => {
+  const { UsageError, parseCommand } = await import('../src/harness/commands.mjs');
+  const drift = parseCommand('drift', ['--json', '--base=main', '--slice', 'a', '--slice', 'b']);
+  assert.equal(drift.values.json, true);
+  assert.equal(drift.values.base, 'main');
+  assert.deepEqual(drift.values.slice, ['a', 'b']);
+  // A flag the script defaults stays undefined: the registry default only documents it.
+  assert.equal(parseCommand('audit', []).values.since, undefined);
+  const init = parseCommand('slice init', ['alpha', '--full']);
+  assert.equal(init.args['slice-id'], 'alpha');
+  assert.deepEqual(parseCommand('knowledge search', ['auth', 'flow', '--k', '3']).args.query, ['auth', 'flow']);
+  assert.throws(() => parseCommand('drift', ['--nope']), (e) => e instanceof UsageError && /unknown option: --nope/.test(e.message));
+  assert.throws(() => parseCommand('drift', ['--base']), /--base needs a value/);
+  assert.throws(() => parseCommand('drift', ['--json=yes']), /--json takes no value/);
+  assert.throws(() => parseCommand('slice init', []), /missing <slice-id>/);
+  assert.throws(() => parseCommand('waves', ['extra']), /unexpected argument: extra/);
+});
+
+test('help: generated per command, and asdd help <command>', () => {
+  const drift = asdd('drift', '--help');
+  assert.equal(drift.status, 0);
+  assert.match(drift.stdout, /Usage:\n {2}asdd drift \[options\]/);
+  assert.match(drift.stdout, /--slice <id> +check this slice \(repeatable\)/);
+  assert.equal(asdd('help', 'slice', 'init').stdout, asdd('slice', 'init', '-h').stdout);
+  assert.match(asdd('kit', 'build', '--help').stdout, /--obfuscate/);
+  assert.match(asdd('doctor', '--help').stdout, /asdd doctor \[<dir>\] \[options\]/);
+  assert.match(asdd('install', '--help').stdout, /Modules: .*http-api/);
+  const bad = asdd('waves', '--nope');
+  assert.equal(bad.status, 2);
+  assert.match(bad.stderr, /unknown option: --nope\nusage: asdd waves \[options\]/);
+  assert.equal(asdd('help', 'frobnicate').status, 2);
+});
+
+test('completion: bash, zsh, and fish scripts from the registry', () => {
+  const bash = asdd('completion', 'bash');
+  assert.equal(bash.status, 0);
+  assert.match(bash.stdout, /complete -o default -F _asdd_complete asdd/);
+  assert.match(bash.stdout, /drift\) words="--json --base --target --slice --requirements --pr-branch --pr-body --help -h"/);
+  assert.match(bash.stdout, /init\) words="--full --hotfix --source-json --help -h"/);
+  const syntax = spawnSync('bash', ['-n'], { input: bash.stdout, encoding: 'utf8' });
+  assert.equal(syntax.status, 0, syntax.stderr);
+  assert.match(asdd('completion', 'zsh').stdout, /bashcompinit/);
+  assert.match(asdd('completion', 'fish').stdout, /complete -c asdd -n '__fish_seen_subcommand_from kit; and __fish_seen_subcommand_from build' -l obfuscate/);
+  assert.equal(asdd('completion', 'tcsh').status, 2);
+});
+
 test('repair restores missing slice sessions, specs, and features', () => {
   const dir = mkdtempSync(join(tmpdir(), 'asdd-repair-'));
   try {

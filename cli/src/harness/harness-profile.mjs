@@ -17,6 +17,7 @@ import { join } from 'node:path';
 import { readSessions } from './sync-state.mjs';
 import { ACTIVATION_LEGEND, profileModel, readTail } from './telemetry-lib.mjs';
 import { parseSteeringFrontmatter } from './validators/steering-tags.mjs';
+import { UsageError, parseCommand, runMain } from './commands.mjs';
 
 const USAGE = 'usage: asdd profile [--slice <id>] [--bottlenecks] [--json]';
 const SLICE_ID_RE = /^[a-z0-9_-]+$/;
@@ -27,18 +28,15 @@ const FOOTER = 'Test thrash (H-BOOT, H-LOOP inputs) is not measured; H-* finding
 
 /** { slice, bottlenecks, json } or { error } (REQ-023: unknown option, --slice without an id, no mode). */
 export function parseArgs(argv) {
-  const opts = { slice: null, bottlenecks: false, json: false };
-  for (let i = 0; i < argv.length; i += 1) {
-    const a = argv[i];
-    if (a === '--json') opts.json = true;
-    else if (a === '--bottlenecks') opts.bottlenecks = true;
-    else if (a === '--slice') {
-      const id = argv[i + 1];
-      if (typeof id !== 'string' || id.startsWith('-') || !SLICE_ID_RE.test(id)) return { error: '--slice needs a slice id' };
-      opts.slice = id;
-      i += 1;
-    } else return { error: `unknown option: ${a}` };
+  let values;
+  try {
+    ({ values } = parseCommand('profile', argv));
+  } catch (error) {
+    if (error instanceof UsageError) return { error: error.message.split('\n')[0] };
+    throw error;
   }
+  const opts = { slice: values.slice ?? null, bottlenecks: values.bottlenecks, json: values.json };
+  if (opts.slice !== null && !SLICE_ID_RE.test(opts.slice)) return { error: '--slice needs a slice id' };
   if (!opts.slice && !opts.bottlenecks && !opts.json) return { error: 'no mode given' };
   return opts;
 }
@@ -365,6 +363,6 @@ export function main(argv = process.argv.slice(2), root = process.cwd()) {
   return 0;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  process.exitCode = main();
-}
+export const run = (argv = process.argv.slice(2)) => main(argv);
+
+await runMain(import.meta.url, run);

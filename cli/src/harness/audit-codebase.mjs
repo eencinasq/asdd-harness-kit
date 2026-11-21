@@ -18,7 +18,6 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { pathToFileURL } from 'node:url';
 import {
   findingId,
   harnessManaged,
@@ -34,6 +33,7 @@ import {
 } from './drift-lib.mjs';
 import { AUDITS_DIR, applyTriage, latestReport } from './audit-lib.mjs';
 import { loadArchitectureSources, runSemgrepScan } from './semgrep-lib.mjs';
+import { parseCommand, runMain } from './commands.mjs';
 
 const COMMAND_TIMEOUT_MS = 300000;
 const RECURRING = 3;
@@ -198,25 +198,9 @@ export function writeReport(root, report) {
   return rel;
 }
 
-function parseArgs(argv) {
-  const opts = { json: false, write: true, hotspots: 10, since: '90.days' };
-  for (let i = 0; i < argv.length; i += 1) {
-    const a = argv[i];
-    if (a === '--json') opts.json = true;
-    else if (a === '--no-write') opts.write = false;
-    else if (a === '--hotspots') opts.hotspots = Number(argv[++i]) || 10;
-    else if (a === '--since') opts.since = argv[++i];
-    else if (a === '-h' || a === '--help') opts.help = true;
-  }
-  return opts;
-}
-
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const opts = parseArgs(process.argv.slice(2));
-  if (opts.help) {
-    console.log('Usage: asdd audit [--json] [--no-write] [--hotspots N] [--since 90.days]');
-    process.exit(0);
-  }
+export async function run(argv = process.argv.slice(2)) {
+  const { values } = parseCommand('audit', argv);
+  const opts = { json: values.json, write: !values['no-write'], hotspots: Number(values.hotspots) || 10, since: values.since };
   const root = process.cwd();
   const report = runAudit({ root, hotspotLimit: opts.hotspots, since: opts.since });
   const rel = opts.write ? writeReport(root, report) : null;
@@ -232,4 +216,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     for (const h of report.hotspots.slice(0, 5)) console.log(`hotspot ${h.path} score ${h.score} (churn ${h.churn}, req ${h.req_links}, findings ${h.findings})`);
     if (rel) console.log(`wrote ${rel}`);
   }
+  return 0;
 }
+
+await runMain(import.meta.url, run);

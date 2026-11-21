@@ -19,7 +19,7 @@
         "node cli/bin/asdd.mjs kit regen --check",
         "node --test cli/test/versions.test.mjs"
       ],
-      "evidence": "re-verified under microkernel-polish: asdd kit regen --check: 9/9 generators, 0 skipped, exit 0 | registry+versions tests: 34+5 pass | asdd check: 0 FAIL",
+      "evidence": "re-verified under microkernel-polish: asdd kit regen --check: 9/9 generators, 0 skipped, exit 0 | registry+versions tests: 34+5 pass | asdd check: 0 FAIL Re-verified 2026-11-21 after cli-args (registry args/flags, run(argv) on parseArgs): verification commands pass (registry 35, versions 5, conformance 8, semgrep-lib+audit 18, init-flow 2, telemetry-lib+command-gate 99, validators/telemetry 12, profile 6; npm test 502).",
       "scope_paths": [
         "cli/src/kit/versions.mjs",
         "cli/src/harness/learn.mjs",
@@ -28,7 +28,7 @@
         "cli/registry/contribution-points.json",
         "cli/test/versions.test.mjs"
       ],
-      "evidence_hash": "223157bf6fa50b952d7a4bc30720b5241dec6da7503ed93df6e8327e4ecbc18e"
+      "evidence_hash": "cda7630e17afbc244273f98dd62d9888a349cfdb6ebee194175f27e178c18dd8"
     },
     {
       "id": "TASK-002",
@@ -46,13 +46,13 @@
       "verification": [
         "node --test cli/test/registry.test.mjs"
       ],
-      "evidence": "node --test registry.test.mjs: 34 pass — 5 new shape tests (telemetry accept, missing emit, mutating call, spec-drift append ban, unknown contract); adapter.schema documents both subtypes",
+      "evidence": "node --test registry.test.mjs: 34 pass — 5 new shape tests (telemetry accept, missing emit, mutating call, spec-drift append ban, unknown contract); adapter.schema documents both subtypes Re-verified 2026-11-21 after cli-args (registry args/flags, run(argv) on parseArgs): verification commands pass (registry 35, versions 5, conformance 8, semgrep-lib+audit 18, init-flow 2, telemetry-lib+command-gate 99, validators/telemetry 12, profile 6; npm test 502).",
       "scope_paths": [
         "cli/src/install/registry.mjs",
         "cli/registry/contribution-points.json",
         "cli/test/registry.test.mjs"
       ],
-      "evidence_hash": "574d530641b728222edad024d4841d99494e14f901bf76e04a25228b5dfbf62c"
+      "evidence_hash": "5c97ddacfd4f06d03ea9ec3c2e1c3b8e4afcc96a705082075c37b90c3fd383a5"
     },
     {
       "id": "TASK-003",
@@ -70,13 +70,13 @@
       "verification": [
         "node --test cli/test/registry.test.mjs"
       ],
-      "evidence": "node --test registry.test.mjs: 34 pass — contributes.phases fails closed /kit-internal/ pinned (Q-NEW-1); commands already pinned (Q-NEW-3); resolution recorded in design.md + session 005",
+      "evidence": "node --test registry.test.mjs: 34 pass — contributes.phases fails closed /kit-internal/ pinned (Q-NEW-1); commands already pinned (Q-NEW-3); resolution recorded in design.md + session 005 Re-verified 2026-11-21 after cli-args (registry args/flags, run(argv) on parseArgs): verification commands pass (registry 35, versions 5, conformance 8, semgrep-lib+audit 18, init-flow 2, telemetry-lib+command-gate 99, validators/telemetry 12, profile 6; npm test 502).",
       "scope_paths": [
         "cli/src/install/registry.mjs",
         "cli/test/registry.test.mjs",
         ".harness/specs/microkernel-polish/intent.md"
       ],
-      "evidence_hash": "26c3b69ad831467f88472e5da55f59c0bfda9d366379564e24d088c2db17bbe1"
+      "evidence_hash": "e90f192a779b3034cb64c2a56328a08c2f11a1c2c20c1babcd004c57b7fd77a6"
     },
     {
       "id": "TASK-004",
@@ -95,11 +95,11 @@
         "node --test cli/test/registry.test.mjs",
         "node cli/bin/asdd.mjs kit regen --check"
       ],
-      "evidence": "registry diff: generators.harness-profile.run + profiling_rollup.merge.regen → \"asdd profile --slice <id>\" (declared Phase-2 CLI surface; old .harness/scripts path retired)",
+      "evidence": "registry diff: generators.harness-profile.run + profiling_rollup.merge.regen → \"asdd profile --slice <id>\" (declared Phase-2 CLI surface; old .harness/scripts path retired) Re-verified 2026-11-21 after cli-args (registry args/flags, run(argv) on parseArgs): verification commands pass (registry 35, versions 5, conformance 8, semgrep-lib+audit 18, init-flow 2, telemetry-lib+command-gate 99, validators/telemetry 12, profile 6; npm test 502).",
       "scope_paths": [
         "cli/registry/contribution-points.json"
       ],
-      "evidence_hash": "1c61e412cc5dabfb4d97fb671bef7a5e3f3fb46142f2284e68d59a5aa8cab311"
+      "evidence_hash": "d36e785bced231c1cdea776b80d2f6867d0158081e84bdda2b94e4db3176b80c"
     }
   ]
 }

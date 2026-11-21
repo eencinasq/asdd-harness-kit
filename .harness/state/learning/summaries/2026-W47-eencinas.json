@@ -147,7 +147,16 @@
         {
           "at": "2026-11-21T01:26:46.766Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-21T03:14:24.417Z"
+          "last_at": "2026-11-21T03:16:20.748Z"
+        },
+        {
+          "at": "2026-11-21T12:38:52.890Z",
+          "slice_id": "agents-use-scripts"
+        },
+        {
+          "at": "2026-11-21T17:48:13.305Z",
+          "slice_id": "agents-use-scripts",
+          "last_at": "2026-11-21T18:29:36.118Z"
         }
       ],
       "examples": [
@@ -313,7 +322,16 @@
         {
           "at": "2026-11-21T01:26:46.766Z",
           "slice_id": null,
-          "last_at": "2026-11-21T03:14:24.417Z"
+          "last_at": "2026-11-21T03:16:20.748Z"
+        },
+        {
+          "at": "2026-11-21T12:38:52.890Z",
+          "slice_id": null
+        },
+        {
+          "at": "2026-11-21T17:48:13.305Z",
+          "slice_id": null,
+          "last_at": "2026-11-21T18:29:36.118Z"
         }
       ],
       "examples": [
@@ -326,11 +344,32 @@
         {
           "at": "2026-11-21T01:26:46.766Z",
           "slice_id": null,
-          "last_at": "2026-11-21T03:14:24.417Z"
+          "last_at": "2026-11-21T03:16:20.748Z"
+        },
+        {
+          "at": "2026-11-21T12:38:52.890Z",
+          "slice_id": null
+        },
+        {
+          "at": "2026-11-21T17:48:13.305Z",
+          "slice_id": null,
+          "last_at": "2026-11-21T18:29:36.118Z"
         }
       ],
       "examples": [
         "CONVERGE-02 feature TASK-014 lists REQ-026 but no test file mentions it"
+      ]
+    },
+    "command:rm -rf": {
+      "source": "command",
+      "episodes": [
+        {
+          "at": "2026-11-21T17:26:44.115Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "denied: rm -rf"
       ]
     }
   },

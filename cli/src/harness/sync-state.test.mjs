@@ -172,6 +172,8 @@ function syncProject(state, { lib = 'working', knowledge = 'real', learn = 'real
   const root = telFs.mkdtempSync(telPath.join(telTmp(), 'sync-tel-'));
   const dir = telPath.join(root, HARNESS_COPY);
   telFs.cpSync(TEL_HERE, dir, { recursive: true, filter: (src) => !src.endsWith('.test.mjs') });
+  // The package layout: cli/registry next to cli/src (the commands read their arguments from it).
+  telFs.cpSync(telPath.join(TEL_HERE, '../../registry'), telPath.join(dir, '../../registry'), { recursive: true });
   telFs.mkdirSync(telPath.join(root, '.harness/state/slices'), { recursive: true });
   telFs.writeFileSync(telPath.join(root, '.harness/state/manifest.json'), JSON.stringify({ schema_version: '3.0', active_slices: [] }));
   // Frozen clock here too: the fixture's own session timestamp must not differ between two fixtures.

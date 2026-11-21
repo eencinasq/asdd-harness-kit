@@ -15,6 +15,8 @@
  * verify-on-stop.mjs): a lib that throws on load or is missing leaves `telemetry` null, and every runtime still gets
  * its exact answer, exit 0, no stderr and no span.
  */
+import { realpathSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 let telemetry = null;
 try {
   telemetry = await import('./telemetry-lib.mjs').catch(() => null);
@@ -140,6 +142,24 @@ export async function runObserveCli(argv = process.argv.slice(2)) {
   process.exitCode = 0;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  await runObserveCli();
+/** `asdd observe <runtime>`. Fail-open: a malformed command line still answers the runtime and exits 0. */
+export async function run(argv = process.argv.slice(2)) {
+  let runtime = argv[0];
+  try {
+    const { parseCommand } = await import('./commands.mjs');
+    runtime = parseCommand('observe', argv).args.runtime;
+  } catch {
+    /* fail-open: keep the raw first argument */
+  }
+  await runObserveCli([runtime]);
 }
+
+// Imported lazily like the telemetry lib: a broken CLI module must not stop the hook from answering.
+const isEntry = () => {
+  try {
+    return Boolean(process.argv[1]) && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href;
+  } catch {
+    return false;
+  }
+};
+if (isEntry()) await run();

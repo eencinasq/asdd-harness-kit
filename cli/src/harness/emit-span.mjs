@@ -9,24 +9,37 @@
  *
  *   echo '{"kind":"turn",...}' | asdd span
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, realpathSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { emit, mintSpan } from './telemetry-lib.mjs';
 
-let raw = '';
-try {
-  raw = readFileSync(0, 'utf8');
-} catch {
-  process.exit(0);
+/** A hook: no arguments, and no import of the argument parser (it must answer whatever else is broken). */
+export async function run() {
+  let raw = '';
+  try {
+    raw = readFileSync(0, 'utf8');
+  } catch {
+    process.exit(0);
+  }
+  let span;
+  try {
+    span = JSON.parse(raw);
+  } catch {
+    process.exit(0);
+  }
+  if (!span.writer) span.writer = 'asdd-span';
+  const minted = mintSpan(span, { env: process.env });
+  if (emit(minted, { root: process.cwd() })) {
+    process.stdout.write(`SPAN ${minted.span_id}\n`);
+  }
+  return 0;
 }
-let span;
-try {
-  span = JSON.parse(raw);
-} catch {
-  process.exit(0);
-}
-if (!span.writer) span.writer = 'asdd-span';
-const minted = mintSpan(span, { env: process.env });
-if (emit(minted, { root: process.cwd() })) {
-  process.stdout.write(`SPAN ${minted.span_id}\n`);
-}
-process.exit(0);
+
+const isEntry = () => {
+  try {
+    return Boolean(process.argv[1]) && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href;
+  } catch {
+    return false;
+  }
+};
+if (isEntry()) process.exitCode = (await run()) ?? process.exitCode;

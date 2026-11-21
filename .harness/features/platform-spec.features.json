@@ -43,8 +43,8 @@
       ],
       "owner": "devin",
       "depends_on": [],
-      "evidence": "docs/spec/conformance-spec.md + cli/test/conformance/{runner,7 fixtures,bench}.mjs + conformance.test.mjs — 8/8 fixtures pass; wired into npm test",
-      "evidence_hash": "e77cbb24356bf35c5ccbc4e02767e3df16f44a4ab35a8ad5873ff0bdc88cd335"
+      "evidence": "docs/spec/conformance-spec.md + cli/test/conformance/{runner,7 fixtures,bench}.mjs + conformance.test.mjs — 8/8 fixtures pass; wired into npm test Re-verified 2026-11-21 after cli-args (registry args/flags, run(argv) on parseArgs): verification commands pass (registry 35, versions 5, conformance 8, semgrep-lib+audit 18, init-flow 2, telemetry-lib+command-gate 99, validators/telemetry 12, profile 6; npm test 502).",
+      "evidence_hash": "db637085bf5885e7dcbb6039752bf5cd2d0d7343b0a011646e8afb66f51ecbdd"
     },
     {
       "id": "TASK-003",

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-pipeline-e2e-004",
+  "timestamp": "2026-11-21T19:34:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "pipeline-e2e",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "mode": "lite",
+  "evidence": "Finding (not acted on): converge reads git-tracked test files only, so a new unstaged test reads as CONVERGE-02 until git add.",
+  "concerns": []
+}

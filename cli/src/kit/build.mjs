@@ -10,6 +10,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { assets, fingerprint, sources } from './fingerprint.mjs';
+import { parseCommand } from '../harness/commands.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const SRC = join(ROOT, 'cli/src');
@@ -85,8 +86,7 @@ function stampMeta({ obfuscate }) {
 
 /** @returns {Promise<number>} */
 export async function run(argv = []) {
-  const obfuscate = argv.includes('--obfuscate');
-  const check = argv.includes('--check');
+  const { obfuscate, check } = parseCommand('kit build', argv).values;
   if (!existsSync(SRC)) {
     console.error('FAIL  cli/src missing');
     return 1;

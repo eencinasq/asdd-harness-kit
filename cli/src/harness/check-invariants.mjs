@@ -36,132 +36,137 @@ import validateSpecDrift from './validators/spec-drift.mjs';
 import validateLearning from './validators/learning.mjs';
 import validateStale from './validators/stale.mjs';
 import validateIntentEvidence from './validators/intent-evidence.mjs';
+import { parseCommand, runMain } from './commands.mjs';
 
-const root = process.cwd();
-const argv = process.argv.slice(2);
-const sliceIdx = argv.indexOf('--slice');
-const slice = sliceIdx >= 0 ? argv[sliceIdx + 1] : null;
-const errors = [];
-const warnings = [];
+export async function run(argv = process.argv.slice(2)) {
+  const root = process.cwd();
+  const { values } = parseCommand('check', argv);
+  const slice = values.slice ?? null;
+  const errors = [];
+  const warnings = [];
 
-function fail(msg) {
-  errors.push(msg);
-}
-
-function warn(msg) {
-  warnings.push(msg);
-}
-
-function readJson(rel) {
-  const p = join(root, rel);
-  if (!existsSync(p)) {
-    fail(`missing JSON: ${rel}`);
-    return null;
+  function fail(msg) {
+    errors.push(msg);
   }
+
+  function warn(msg) {
+    warnings.push(msg);
+  }
+
+  function readJson(rel) {
+    const p = join(root, rel);
+    if (!existsSync(p)) {
+      fail(`missing JSON: ${rel}`);
+      return null;
+    }
+    try {
+      return JSON.parse(readFileSync(p, 'utf8'));
+    } catch (e) {
+      fail(`invalid JSON ${rel}: ${e.message}`);
+      return null;
+    }
+  }
+
+  function dirExists(rel) {
+    return existsSync(join(root, rel));
+  }
+
+  // The global slice index is the generated registry (state/manifest.json retired — RV1-AR-1). Its absence is a
+  // legitimate state (AR-2: zero-slice project / pre-sync fresh clone), so it is read softly — validators/manifest.mjs
+  // owns the missing-versus-absent verdict.
+  const registryPath = join(root, '.harness/state/registry.json');
+  const registry = existsSync(registryPath) ? readJson('.harness/state/registry.json') : null;
+
+  const ctx = { root, fail, warn, readJson, dirExists, registry, slice };
+
+  validatePaths(ctx);
+  validateManifest(ctx);
+  validateFeatures(ctx);
+  validateSkills(ctx);
+  validateSteeringTags(ctx);
+  validateSteeringProfile(ctx);
+  validateLiteEscalation(ctx);
+  validatePhaseChain(ctx);
+  validateSpecDrift(ctx);
+  validateLearning(ctx);
+  validateStale(ctx);
+  validateIntentEvidence(ctx);
+
+  // P1.3: converge FAILs for passing features (short path before session close)
   try {
-    return JSON.parse(readFileSync(p, 'utf8'));
-  } catch (e) {
-    fail(`invalid JSON ${rel}: ${e.message}`);
-    return null;
-  }
-}
-
-function dirExists(rel) {
-  return existsSync(join(root, rel));
-}
-
-// The global slice index is the generated registry (state/manifest.json retired — RV1-AR-1). Its absence is a
-// legitimate state (AR-2: zero-slice project / pre-sync fresh clone), so it is read softly — validators/manifest.mjs
-// owns the missing-versus-absent verdict.
-const registryPath = join(root, '.harness/state/registry.json');
-const registry = existsSync(registryPath) ? readJson('.harness/state/registry.json') : null;
-
-const ctx = { root, fail, warn, readJson, dirExists, registry, slice };
-
-validatePaths(ctx);
-validateManifest(ctx);
-validateFeatures(ctx);
-validateSkills(ctx);
-validateSteeringTags(ctx);
-validateSteeringProfile(ctx);
-validateLiteEscalation(ctx);
-validatePhaseChain(ctx);
-validateSpecDrift(ctx);
-validateLearning(ctx);
-validateStale(ctx);
-validateIntentEvidence(ctx);
-
-// P1.3: converge FAILs for passing features (short path before session close)
-try {
-  const { runConverge } = await import('./converge-lib.mjs');
-  const converge = runConverge({ root, sliceId: slice || undefined });
-  for (const f of converge.fails) fail(`${f.code} ${f.message}`);
-  for (const f of converge.warns) warn(`${f.code} ${f.message}`);
-} catch {
-  // converge is best-effort if the module cannot load
-}
-
-// P2.3: uphill features still open late in the cycle
-try {
-  const { lateUphillFindings } = await import('./hill-lib.mjs');
-  for (const u of lateUphillFindings(root)) {
-    if (slice && u.slice_id !== slice) continue;
-    warn(
-      `HILL-01 feature ${u.feature_id} on slice "${u.slice_id}" is still uphill in phase ${u.phase} — resolve unknowns or set hill: downhill`,
-    );
-  }
-} catch {
-  // hill is best-effort
-}
-
-// Telemetry (REQ-019, ADR-006): WARN-only and best-effort. Its ctx maps fail to warn (and omits readJson, which
-// fails), its WARNs stay in their own list (printed, never passed to writeSensorSignal), and a load failure or a
-// throw adds no output (AMB-010).
-const telemetryWarnings = [];
-try {
-  const { default: validateTelemetry } = await import('./validators/telemetry.mjs');
-  const found = [];
-  const keep = (msg) => found.push(msg);
-  validateTelemetry({ root, fail: keep, warn: keep });
-  telemetryWarnings.push(...found);
-} catch {
-  // telemetry is best-effort
-}
-
-// K-1 (--slice): validators scope natively where they can; this sweep drops any
-// remaining finding that names another slice. Slice-agnostic findings (repo-global
-// invariants) stay visible — they gate the named slice too.
-if (slice) {
-  const esc = slice.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const otherSlice = new RegExp(
-    `slice "(?!${esc}")` +
-    `|/slices/(?!${esc}(?:/|"))` +
-    `|/specs/(?!${esc}(?:/|"))` +
-    `|/features/(?!${esc}\\.features\\.json)`,
-  );
-  const keep = (msg) => !otherSlice.test(msg);
-  const beforeE = errors.length;
-  const beforeW = warnings.length;
-  for (let i = errors.length - 1; i >= 0; i -= 1) if (!keep(errors[i])) errors.splice(i, 1);
-  for (let i = warnings.length - 1; i >= 0; i -= 1) if (!keep(warnings[i])) warnings.splice(i, 1);
-  const suppressed = beforeE - errors.length + (beforeW - warnings.length);
-  if (suppressed) console.warn(`NOTE  --slice ${slice}: suppressed ${suppressed} finding(s) attributable to other slices (run without --slice for the global view)`);
-}
-
-if (warnings.length || telemetryWarnings.length) {
-  for (const w of [...warnings, ...telemetryWarnings]) console.warn(`WARN  ${w}`);
-}
-if (argv.includes('--live') || argv.includes('--record') || process.env.HARNESS_JEV_LIVE === '1') {
-  // Imported lazily so a missing or broken learning lib never changes the gate result.
-  try {
-    const { writeSensorSignal } = await import('./learning-lib.mjs');
-    writeSensorSignal(root, errors, { warns: warnings, runtime: process.env.HARNESS_RUNTIME || 'cli' });
+    const { runConverge } = await import('./converge-lib.mjs');
+    const converge = runConverge({ root, sliceId: slice || undefined });
+    for (const f of converge.fails) fail(`${f.code} ${f.message}`);
+    for (const f of converge.warns) warn(`${f.code} ${f.message}`);
   } catch {
-    // learning is best-effort
+    // converge is best-effort if the module cannot load
   }
+
+  // P2.3: uphill features still open late in the cycle
+  try {
+    const { lateUphillFindings } = await import('./hill-lib.mjs');
+    for (const u of lateUphillFindings(root)) {
+      if (slice && u.slice_id !== slice) continue;
+      warn(
+        `HILL-01 feature ${u.feature_id} on slice "${u.slice_id}" is still uphill in phase ${u.phase} — resolve unknowns or set hill: downhill`,
+      );
+    }
+  } catch {
+    // hill is best-effort
+  }
+
+  // Telemetry (REQ-019, ADR-006): WARN-only and best-effort. Its ctx maps fail to warn (and omits readJson, which
+  // fails), its WARNs stay in their own list (printed, never passed to writeSensorSignal), and a load failure or a
+  // throw adds no output (AMB-010).
+  const telemetryWarnings = [];
+  try {
+    const { default: validateTelemetry } = await import('./validators/telemetry.mjs');
+    const found = [];
+    const keep = (msg) => found.push(msg);
+    validateTelemetry({ root, fail: keep, warn: keep });
+    telemetryWarnings.push(...found);
+  } catch {
+    // telemetry is best-effort
+  }
+
+  // K-1 (--slice): validators scope natively where they can; this sweep drops any
+  // remaining finding that names another slice. Slice-agnostic findings (repo-global
+  // invariants) stay visible — they gate the named slice too.
+  if (slice) {
+    const esc = slice.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const otherSlice = new RegExp(
+      `slice "(?!${esc}")` +
+      `|/slices/(?!${esc}(?:/|"))` +
+      `|/specs/(?!${esc}(?:/|"))` +
+      `|/features/(?!${esc}\\.features\\.json)`,
+    );
+    const keep = (msg) => !otherSlice.test(msg);
+    const beforeE = errors.length;
+    const beforeW = warnings.length;
+    for (let i = errors.length - 1; i >= 0; i -= 1) if (!keep(errors[i])) errors.splice(i, 1);
+    for (let i = warnings.length - 1; i >= 0; i -= 1) if (!keep(warnings[i])) warnings.splice(i, 1);
+    const suppressed = beforeE - errors.length + (beforeW - warnings.length);
+    if (suppressed) console.warn(`NOTE  --slice ${slice}: suppressed ${suppressed} finding(s) attributable to other slices (run without --slice for the global view)`);
+  }
+
+  if (warnings.length || telemetryWarnings.length) {
+    for (const w of [...warnings, ...telemetryWarnings]) console.warn(`WARN  ${w}`);
+  }
+  if (values.live || values.record || process.env.HARNESS_JEV_LIVE === '1') {
+    // Imported lazily so a missing or broken learning lib never changes the gate result.
+    try {
+      const { writeSensorSignal } = await import('./learning-lib.mjs');
+      writeSensorSignal(root, errors, { warns: warnings, runtime: process.env.HARNESS_RUNTIME || 'cli' });
+    } catch {
+      // learning is best-effort
+    }
+  }
+  if (errors.length) {
+    for (const e of errors) console.error(`FAIL  ${e}`);
+    return 1;
+  }
+  console.log('PASS  harness invariants');
+  return 0;
 }
-if (errors.length) {
-  for (const e of errors) console.error(`FAIL  ${e}`);
-  process.exit(1);
-}
-console.log('PASS  harness invariants');
+
+await runMain(import.meta.url, run);

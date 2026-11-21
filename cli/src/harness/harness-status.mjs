@@ -8,147 +8,152 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { computePipelineMetrics, formatPipelineMetrics } from './pipeline-metrics.mjs';
 import { renderPipelineHtml } from './pipeline-html.mjs';
+import { parseCommand, runMain } from './commands.mjs';
 
-const root = process.cwd();
-const argv = process.argv.slice(2);
-const wantMetrics = argv.includes('--metrics');
-const wantJson = argv.includes('--json');
-const wantHtml = argv.includes('--html');
+export async function run(argv = process.argv.slice(2)) {
+  const root = process.cwd();
+  const { values } = parseCommand('status', argv);
+  const wantMetrics = values.metrics;
+  const wantJson = values.json;
+  const wantHtml = values.html;
 
-function readJson(rel) {
-  const p = join(root, rel);
-  if (!existsSync(p)) return null;
-  try {
-    return JSON.parse(readFileSync(p, 'utf8'));
-  } catch {
-    return null;
-  }
-}
-
-function fmtDate(iso) {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? iso : d.toISOString().slice(0, 16).replace('T', ' ');
-}
-
-function pad(s, w) {
-  return String(s).padEnd(w);
-}
-
-if (wantHtml) {
-  process.stdout.write(renderPipelineHtml({ root }));
-  process.exit(0);
-}
-
-if (wantMetrics || wantJson) {
-  const metrics = computePipelineMetrics({ root });
-  if (wantJson) {
-    process.stdout.write(`${JSON.stringify(metrics, null, 2)}\n`);
-    process.exit(0);
-  }
-  process.stdout.write(`${formatPipelineMetrics(metrics)}\n`);
-}
-
-const registry = readJson('.harness/state/registry.json');
-const slices = Array.isArray(registry?.slices) ? registry.slices : [];
-
-console.log('');
-console.log('== Active Slices ==');
-const listed = slices.filter((s) => s.status !== 'ABANDONED');
-const abandoned = slices.length - listed.length;
-if (listed.length === 0) {
-  console.log('  (none)');
-} else {
-  const idWidth = Math.max(18, ...listed.map((s) => String(s.slice_id).length + 1));
-  console.log(`  ${pad('Slice', idWidth)} ${pad('Mode', 10)} ${pad('Phase', 16)} ${pad('Status', 12)} ${pad('Features', 10)} ${pad('Dissents', 10)} Escalation`);
-  for (const s of listed) {
-    const dissents = s.open_dissents ? `${s.open_dissents}` : '—';
-    const esc = s.escalation_required ? `${s.escalation_signals} signal(s) — escalate required` : '—';
-    console.log(`  ${pad(s.slice_id, idWidth)} ${pad(s.mode || '—', 10)} ${pad(s.phase || '—', 16)} ${pad(s.status || '—', 12)} ${pad(String(s.active_features || 0), 10)} ${pad(dissents, 10)} ${esc}`);
-  }
-}
-if (abandoned) console.log(`  (${abandoned} ABANDONED slice(s) hidden)`);
-
-console.log('');
-console.log('== Active Work (derived from sessions) ==');
-let anyActive = false;
-for (const s of slices) {
-  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
-  const active = manifest?.active_features || [];
-  if (active.length === 0) continue;
-  anyActive = true;
-  console.log(`  [${s.slice_id}]`);
-  for (const f of active) {
-    const handoff = f.handoff_from ? ` (from ${f.handoff_from})` : '';
-    console.log(`    • ${f.id} @${f.human || f.owner}${handoff}`);
-  }
-}
-if (!anyActive) console.log('  (none)');
-
-console.log('');
-console.log('== Contributors ==');
-for (const s of slices) {
-  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
-  const contributors = manifest?.contributors || [];
-  if (contributors.length === 0) continue;
-  console.log(`  [${s.slice_id}] ${contributors.join(', ')}`);
-}
-
-console.log('');
-console.log('== Escalation Signals ==');
-let anySignal = false;
-for (const s of slices) {
-  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
-  const signals = manifest?.escalation_signals || [];
-  if (signals.length === 0) continue;
-  anySignal = true;
-  console.log(`  [${s.slice_id}] mode:${manifest.mode}${manifest.escalation_required ? ' (escalation required)' : ''}`);
-  for (const sig of signals) {
-    console.log(`    • ${sig.type} — ${sig.evidence}`);
-  }
-}
-if (!anySignal) console.log('  (none)');
-
-console.log('');
-console.log('== Hill (uphill) ==');
-{
-  const { listUphillFeatures } = await import('./hill-lib.mjs');
-  const uphill = listUphillFeatures(root);
-  if (uphill.length === 0) {
-    console.log('  (none)');
-  } else {
-    for (const u of uphill) {
-      const late = u.phase === 'qa' || u.phase === 'knowledge' ? ' — late in cycle' : '';
-      console.log(`  [${u.slice_id}] ${u.feature_id} (${u.status}) @${u.phase || '—'}${late}`);
+  function readJson(rel) {
+    const p = join(root, rel);
+    if (!existsSync(p)) return null;
+    try {
+      return JSON.parse(readFileSync(p, 'utf8'));
+    } catch {
+      return null;
     }
   }
-}
 
-console.log('');
-console.log('== Gate Summary ==');
-for (const s of slices) {
-  const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
-  const gates = manifest?.gates || {};
-  const gateStr = Object.entries(gates)
-    .map(([phase, g]) => `${phase}:${g.status}`)
-    .join(' ');
-  if (gateStr) {
-    console.log(`  [${s.slice_id}] ${gateStr}`);
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? iso : d.toISOString().slice(0, 16).replace('T', ' ');
   }
-}
 
-console.log('');
-console.log('== Learning (QG-LEARN) ==');
-const learning = readJson('.harness/state/learning/patterns.json');
-const watched = (learning?.patterns || []).filter((p) => p.status !== 'watching');
-if (watched.length === 0) {
-  console.log('  (no patterns at threshold)');
-} else {
-  for (const p of watched) {
-    const props = p.proposals.length ? ` ${p.proposals.map((x) => `${x.id}:${x.status}`).join(', ')}` : '';
-    console.log(`  ${pad(p.id, 12)} ${pad(p.status, 11)} ${pad(p.kind, 7)} x${pad(String(p.occurrences), 4)} ${p.signature}${props}`);
+  function pad(s, w) {
+    return String(s).padEnd(w);
   }
-  if (watched.some((p) => p.status === 'open')) console.log('  → asdd learn --propose <LP-id>');
+
+  if (wantHtml) {
+    process.stdout.write(renderPipelineHtml({ root }));
+    process.exit(0);
+  }
+
+  if (wantMetrics || wantJson) {
+    const metrics = computePipelineMetrics({ root });
+    if (wantJson) {
+      process.stdout.write(`${JSON.stringify(metrics, null, 2)}\n`);
+      process.exit(0);
+    }
+    process.stdout.write(`${formatPipelineMetrics(metrics)}\n`);
+  }
+
+  const registry = readJson('.harness/state/registry.json');
+  const slices = Array.isArray(registry?.slices) ? registry.slices : [];
+
+  console.log('');
+  console.log('== Active Slices ==');
+  const listed = slices.filter((s) => s.status !== 'ABANDONED');
+  const abandoned = slices.length - listed.length;
+  if (listed.length === 0) {
+    console.log('  (none)');
+  } else {
+    const idWidth = Math.max(18, ...listed.map((s) => String(s.slice_id).length + 1));
+    console.log(`  ${pad('Slice', idWidth)} ${pad('Mode', 10)} ${pad('Phase', 16)} ${pad('Status', 12)} ${pad('Features', 10)} ${pad('Dissents', 10)} Escalation`);
+    for (const s of listed) {
+      const dissents = s.open_dissents ? `${s.open_dissents}` : '—';
+      const esc = s.escalation_required ? `${s.escalation_signals} signal(s) — escalate required` : '—';
+      console.log(`  ${pad(s.slice_id, idWidth)} ${pad(s.mode || '—', 10)} ${pad(s.phase || '—', 16)} ${pad(s.status || '—', 12)} ${pad(String(s.active_features || 0), 10)} ${pad(dissents, 10)} ${esc}`);
+    }
+  }
+  if (abandoned) console.log(`  (${abandoned} ABANDONED slice(s) hidden)`);
+
+  console.log('');
+  console.log('== Active Work (derived from sessions) ==');
+  let anyActive = false;
+  for (const s of slices) {
+    const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+    const active = manifest?.active_features || [];
+    if (active.length === 0) continue;
+    anyActive = true;
+    console.log(`  [${s.slice_id}]`);
+    for (const f of active) {
+      const handoff = f.handoff_from ? ` (from ${f.handoff_from})` : '';
+      console.log(`    • ${f.id} @${f.human || f.owner}${handoff}`);
+    }
+  }
+  if (!anyActive) console.log('  (none)');
+
+  console.log('');
+  console.log('== Contributors ==');
+  for (const s of slices) {
+    const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+    const contributors = manifest?.contributors || [];
+    if (contributors.length === 0) continue;
+    console.log(`  [${s.slice_id}] ${contributors.join(', ')}`);
+  }
+
+  console.log('');
+  console.log('== Escalation Signals ==');
+  let anySignal = false;
+  for (const s of slices) {
+    const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+    const signals = manifest?.escalation_signals || [];
+    if (signals.length === 0) continue;
+    anySignal = true;
+    console.log(`  [${s.slice_id}] mode:${manifest.mode}${manifest.escalation_required ? ' (escalation required)' : ''}`);
+    for (const sig of signals) {
+      console.log(`    • ${sig.type} — ${sig.evidence}`);
+    }
+  }
+  if (!anySignal) console.log('  (none)');
+
+  console.log('');
+  console.log('== Hill (uphill) ==');
+  {
+    const { listUphillFeatures } = await import('./hill-lib.mjs');
+    const uphill = listUphillFeatures(root);
+    if (uphill.length === 0) {
+      console.log('  (none)');
+    } else {
+      for (const u of uphill) {
+        const late = u.phase === 'qa' || u.phase === 'knowledge' ? ' — late in cycle' : '';
+        console.log(`  [${u.slice_id}] ${u.feature_id} (${u.status}) @${u.phase || '—'}${late}`);
+      }
+    }
+  }
+
+  console.log('');
+  console.log('== Gate Summary ==');
+  for (const s of slices) {
+    const manifest = readJson(`.harness/state/slices/${s.slice_id}/manifest.json`);
+    const gates = manifest?.gates || {};
+    const gateStr = Object.entries(gates)
+      .map(([phase, g]) => `${phase}:${g.status}`)
+      .join(' ');
+    if (gateStr) {
+      console.log(`  [${s.slice_id}] ${gateStr}`);
+    }
+  }
+
+  console.log('');
+  console.log('== Learning (QG-LEARN) ==');
+  const learning = readJson('.harness/state/learning/patterns.json');
+  const watched = (learning?.patterns || []).filter((p) => p.status !== 'watching');
+  if (watched.length === 0) {
+    console.log('  (no patterns at threshold)');
+  } else {
+    for (const p of watched) {
+      const props = p.proposals.length ? ` ${p.proposals.map((x) => `${x.id}:${x.status}`).join(', ')}` : '';
+      console.log(`  ${pad(p.id, 12)} ${pad(p.status, 11)} ${pad(p.kind, 7)} x${pad(String(p.occurrences), 4)} ${p.signature}${props}`);
+    }
+    if (watched.some((p) => p.status === 'open')) console.log('  → asdd learn --propose <LP-id>');
+  }
+
+  console.log('');
 }
 
-console.log('');
+await runMain(import.meta.url, run);

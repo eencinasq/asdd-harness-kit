@@ -5,6 +5,7 @@
 import { existsSync, lstatSync, readdirSync, readFileSync, readlinkSync, rmdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
+import { parseCommand } from './harness/commands.mjs';
 import { fileHash } from './install/context.mjs';
 import { KIT_TOOL_SERVERS } from './install/phases.mjs';
 import { gitignoreLines } from './install/registry.mjs';
@@ -132,12 +133,10 @@ function prune(target, dir) {
 
 /** @returns {number} exit status */
 export function uninstall(argv) {
-  const json = argv.includes('--json');
-  const dryRun = argv.includes('--dry-run');
-  const unknown = argv.filter((a) => a.startsWith('-') && !['--json', '--dry-run'].includes(a));
-  if (unknown.length) throw new CliError(`unknown option: ${unknown[0]} (accepted: --dry-run, --json)`, 2);
+  const { values, args } = parseCommand('uninstall', argv);
+  const { json, 'dry-run': dryRun } = values;
   if (json) setQuiet(true);
-  const target = resolve(argv.find((a) => !a.startsWith('-')) ?? '.');
+  const target = resolve(args.dir ?? '.');
   const record = readJson(join(target, VERSIONS));
   if (!record) {
     if (json) process.stdout.write(`${JSON.stringify({ ok: true, target, removed: [], kept: [], nothing: true })}\n`);

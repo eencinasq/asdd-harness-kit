@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { delimiter, join, resolve } from 'node:path';
 
+import { parseCommand } from './harness/commands.mjs';
 import { describe, ignoreReport } from './install/ignored.mjs';
 import { fileHash, filesUnder } from './install/context.mjs';
 import { isKit, VERSION } from './paths.mjs';
@@ -165,8 +166,9 @@ export function checks(dir) {
 
 /** @returns {number} exit status: 1 when any check fails */
 export function doctor(argv) {
-  const json = argv.includes('--json');
-  const dir = resolve(argv.find((a) => !a.startsWith('-')) ?? '.');
+  const { values, args } = parseCommand('doctor', argv);
+  const { json } = values;
+  const dir = resolve(args.dir ?? '.');
   const results = checks(dir);
   const failed = results.some((r) => r.level === 'fail');
   if (json) process.stdout.write(`${JSON.stringify({ version: VERSION, dir, ok: !failed, checks: results })}\n`);

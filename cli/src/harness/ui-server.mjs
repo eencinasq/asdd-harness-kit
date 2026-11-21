@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, watch } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, extname, join, normalize, sep } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import { runDrift } from './drift-lib.mjs';
 import { search as knowledgeSearch } from './knowledge-query.mjs';
@@ -16,6 +16,7 @@ import { renderPipelineHtml } from './pipeline-html.mjs';
 import { computePipelineMetrics } from './pipeline-metrics.mjs';
 import { readSessions } from './sync-state.mjs';
 import { activationInsights, costInsights, createSkillEvalRunner, isSafeRef, WINDOW_RE } from './ui-server-insights.mjs';
+import { parseCommand, runMain } from './commands.mjs';
 
 const ASDD_BIN = join(dirname(fileURLToPath(import.meta.url)), '../../bin/asdd.mjs');
 
@@ -105,15 +106,8 @@ export function assertLoopbackWrite(req, port) {
  * @returns {{ port: number }}
  */
 export function parseUiArgs(argv = []) {
-  let port = DEFAULT_PORT;
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a === '--port' && argv[i + 1]) {
-      port = Number(argv[++i]);
-    } else if (a.startsWith('--port=')) {
-      port = Number(a.slice('--port='.length));
-    }
-  }
+  const { values } = parseCommand('ui', argv);
+  const port = values.port === undefined ? DEFAULT_PORT : Number(values.port);
   if (!Number.isInteger(port) || port < 0 || port > 65535) {
     throw new Error(`invalid --port: ${port}`);
   }
@@ -523,7 +517,7 @@ export async function startUiServer(opts = {}) {
   };
 }
 
-async function main(argv) {
+export async function run(argv = process.argv.slice(2)) {
   const { port } = parseUiArgs(argv);
   const root = process.cwd();
   const handle = await startUiServer({ root, port });
@@ -536,10 +530,4 @@ async function main(argv) {
   process.on('SIGTERM', stop);
 }
 
-const isMain = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
-if (isMain) {
-  main(process.argv.slice(2)).catch((err) => {
-    console.error(err?.message || err);
-    process.exit(1);
-  });
-}
+await runMain(import.meta.url, run);

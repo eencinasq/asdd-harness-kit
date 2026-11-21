@@ -160,30 +160,22 @@ export async function writeKnowledgeIndex(root = process.cwd(), { embed = false,
   return meta;
 }
 
-function argValue(args, name) {
-  const eq = args.find((a) => a.startsWith(`${name}=`));
-  if (eq) return eq.slice(name.length + 1);
-  const i = args.indexOf(name);
-  return i >= 0 ? args[i + 1] : undefined;
-}
-
-async function main() {
+async function main(values) {
   const root = process.cwd();
-  const args = process.argv.slice(2);
-  const backend = argValue(args, '--backend') ?? 'auto';
+  const backend = values.backend ?? 'auto';
   if (!['auto', 'jsonl', 'sqlite'].includes(backend)) {
     console.error(`unknown --backend: ${backend} (auto|jsonl|sqlite)`);
     process.exit(1);
   }
 
-  if (args.includes('--status')) {
+  if (values.status) {
     const metaPath = join(root, KNOWLEDGE_DIR, 'meta.json');
     const meta = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf8')) : null;
     console.log(meta ? JSON.stringify(meta, null, 2) : 'no knowledge index — run sync-knowledge.mjs');
     return;
   }
 
-  if (args.includes('--check')) {
+  if (values.check) {
     const dir = join(root, KNOWLEDGE_DIR);
     const missing = ['nodes.jsonl', 'edges.jsonl', 'chunks.jsonl'].filter((f) => !existsSync(join(dir, f)));
     if (missing.length) {
@@ -204,15 +196,24 @@ async function main() {
     return;
   }
 
-  const meta = await writeKnowledgeIndex(root, { embed: args.includes('--embed'), backend });
+  const meta = await writeKnowledgeIndex(root, { embed: values.embed, backend });
   console.log(
     `WRITE ${KNOWLEDGE_DIR}/ — ${meta.nodes} nodes, ${meta.edges} edges, ${meta.chunks} chunks, ${meta.embeddings.total} embedded [${(meta.backends ?? []).join('+')}]`
   );
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
+// asdd CLI: `asdd kit vendor` drops everything from this line down in the MCP servers' copies.
+import { parseCommand, runMain } from './commands.mjs';
+
+export async function run(argv = process.argv.slice(2)) {
+  const { values } = parseCommand('knowledge sync', argv);
+  try {
+    await main(values);
+  } catch (error) {
     console.error(`sync-knowledge failed: ${error?.message ?? error}`);
-    process.exit(1);
-  });
+    return 1;
+  }
+  return 0;
 }
+
+await runMain(import.meta.url, run);

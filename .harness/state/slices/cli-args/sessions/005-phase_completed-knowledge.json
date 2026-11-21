@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-cli-args-005",
+  "timestamp": "2026-11-21T18:51:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "cli-args",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Closed after E1 escalation. Lessons: hooks must not import the argument parser (fail-open/closed proofs); entry detection needs realpath (macOS tmp symlink); a script's CLI tail starts at the '// asdd CLI: ' marker so kit vendor keeps it out of MCP servers.",
+  "concerns": []
+}

@@ -7,11 +7,12 @@
  *   asdd kit vendor           write the copies
  *   asdd kit vendor --check   exit 1 when a copy is stale (npm test runs this)
  *
- * Each copy is the source plus a header, minus its CLI block (`if (import.meta.url === …argv[1]) {…}` at
- * the end of the file), which must never run inside a server bundle.
+ * Each copy is the source plus a header, minus its CLI tail (from the `// asdd CLI: ` marker line to the end of
+ * the file: run(argv), its argument parsing, the runMain footer), which must never run inside a server bundle.
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, posix, relative } from 'node:path';
+import { parseCommand } from '../harness/commands.mjs';
 
 const ROOT = join(import.meta.dirname, '../../..');
 const SCRIPTS = join(ROOT, 'cli/src/harness');
@@ -24,7 +25,8 @@ export const VENDORED = {
 };
 
 const IMPORT = /(?:\bfrom\s*|\bimport\s*\(\s*)['"](\.{1,2}\/[^'"]+)['"]/g;
-const CLI_BLOCK = /^if \(import\.meta\.url === `file:\/\/\$\{process\.argv\[1\]\}`\) \{$/m;
+// A script's CLI tail (run(argv), its argument parsing, the runMain footer) starts at this marker line.
+const CLI_BLOCK = /^\/\/ asdd CLI: /m;
 
 /** Every module reachable from the entries, as paths relative to cli/src/harness. */
 export function closure(entries) {
@@ -34,7 +36,8 @@ export function closure(entries) {
     const abs = join(SCRIPTS, rel);
     if (!existsSync(abs)) throw new Error(`cli/src/harness/${rel} not found`);
     seen.add(rel);
-    for (const [, spec] of readFileSync(abs, 'utf8').matchAll(IMPORT)) {
+    // The CLI tail is dropped from the copy, so its imports (commands.mjs) are not followed.
+    for (const [, spec] of withoutCli(readFileSync(abs, 'utf8')).matchAll(IMPORT)) {
       visit(posix.normalize(posix.join(posix.dirname(rel), spec)));
     }
   };
@@ -42,10 +45,13 @@ export function closure(entries) {
   return [...seen].sort();
 }
 
-export function vendoredText(rel) {
-  let text = readFileSync(join(SCRIPTS, rel), 'utf8');
+const withoutCli = (text) => {
   const cli = text.search(CLI_BLOCK);
-  if (cli >= 0) text = `${text.slice(0, cli).trimEnd()}\n`;
+  return cli >= 0 ? `${text.slice(0, cli).trimEnd()}\n` : text;
+};
+
+export function vendoredText(rel) {
+  let text = withoutCli(readFileSync(join(SCRIPTS, rel), 'utf8'));
   if (/^#!/.test(text)) text = text.slice(text.indexOf('\n') + 1);
   return `// GENERATED from cli/src/harness/${rel} by asdd kit vendor: edit the source, then rerun it.\n${text}`;
 }
@@ -59,7 +65,7 @@ const listFiles = (dir) =>
     : [];
 
 export function run(argv = []) {
-  const check = argv.includes('--check');
+  const { check } = parseCommand('kit vendor', argv).values;
   const problems = [];
   for (const [tool, entries] of Object.entries(VENDORED)) {
     const outDir = join(ROOT, 'tools', tool, 'src/harness');

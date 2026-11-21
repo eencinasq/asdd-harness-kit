@@ -369,8 +369,32 @@ test('command tables derive from registry commands (D-9)', async () => {
   const scripts = Object.values(HARNESS_COMMANDS).flatMap((e) =>
     e.sub ? Object.values(e.sub).map((s) => s.script) : [e.script]);
   for (const s of scripts) assert.ok(existsSync(join(KIT_ROOT, 'cli/src/harness', s)), `no script: ${s}`);
-  // every kit module exists under cli/src/kit
-  for (const spec of Object.values(KIT_COMMANDS)) {
-    assert.ok(existsSync(join(KIT_ROOT, 'cli/src', spec)), `no kit module: ${spec}`);
+  // every kit and control module exists under cli/src
+  const { CONTROL_COMMANDS } = await import('../src/harness/commands.mjs');
+  for (const spec of [...Object.values(KIT_COMMANDS), ...Object.values(CONTROL_COMMANDS)]) {
+    assert.ok(existsSync(join(KIT_ROOT, 'cli/src', spec.module)), `no module: ${spec.module}`);
+  }
+  assert.deepEqual(Object.keys(CONTROL_COMMANDS), ['install', 'uninstall', 'doctor']);
+});
+
+test('every command declares well-formed arguments: help, flags, positionals', async () => {
+  const { allCommands } = await import('../src/harness/commands.mjs');
+  const FLAG_KEYS = new Set(['type', 'short', 'multiple', 'default', 'value', 'help', 'hidden']);
+  for (const [name, spec] of allCommands()) {
+    assert.ok(typeof spec.help === 'string' && spec.help.length, `${name}: help`);
+    assert.doesNotMatch(spec.help, /\[--/, `${name}: options belong in flags, not in help`);
+    for (const [flag, f] of Object.entries(spec.flags ?? {})) {
+      assert.match(flag, /^[a-z][a-z0-9-]*$/, `${name} --${flag}: name`);
+      assert.notEqual(flag, 'help', `${name}: --help is built in`);
+      assert.ok(['boolean', 'string'].includes(f.type), `${name} --${flag}: type`);
+      assert.ok(f.help, `${name} --${flag}: help`);
+      for (const k of Object.keys(f)) assert.ok(FLAG_KEYS.has(k), `${name} --${flag}: unknown key ${k}`);
+    }
+    const args = spec.args ?? [];
+    args.forEach((a, i) => {
+      assert.match(a.name, /^[a-z][a-z0-9-]*$/, `${name} <${a.name}>`);
+      if (a.variadic) assert.equal(i, args.length - 1, `${name}: only the last positional is variadic`);
+      if (a.required) assert.ok(args.slice(0, i).every((b) => b.required), `${name}: a required positional after an optional one`);
+    });
   }
 });

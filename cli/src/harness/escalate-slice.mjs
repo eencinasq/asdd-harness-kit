@@ -13,85 +13,89 @@
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { parseCommand, runMain } from './commands.mjs';
 
-const root = process.cwd();
-const args = process.argv.slice(2);
-const sliceId = args.find((a) => !a.startsWith('-'));
+export async function run(argv = process.argv.slice(2)) {
+  const root = process.cwd();
+  const { values, args: named } = parseCommand('slice escalate', argv);
+  const sliceId = named['slice-id'];
 
-function argValue(flag) {
-  const idx = args.indexOf(flag);
-  return idx >= 0 ? args[idx + 1] : null;
+  function argValue(flag) {
+    return values[flag.slice(2)] ?? null;
+  }
+
+  const reasonsRaw = argValue('--reasons');
+  const by = argValue('--by') || 'harness';
+  const note = argValue('--note') || '';
+
+  if (!sliceId || !reasonsRaw) {
+    console.error('Usage: asdd slice escalate <slice-id> --reasons "E1,E4" [--by <owner>] [--note "why"]');
+    process.exit(1);
+  }
+  if (!/^[a-z0-9_-]+$/.test(sliceId)) {
+    console.error('FAIL  slice-id must be lowercase alphanumeric with hyphens/underscores');
+    process.exit(1);
+  }
+
+  const sliceDir = join(root, '.harness/state/slices', sliceId);
+  const sessionsDir = join(sliceDir, 'sessions');
+  if (!existsSync(sessionsDir)) {
+    console.error(`FAIL  slice "${sliceId}" has no sessions directory: ${sessionsDir}`);
+    process.exit(1);
+  }
+
+  const reasons = reasonsRaw
+    .split(',')
+    .map((r) => r.trim())
+    .filter(Boolean);
+  if (reasons.length === 0) {
+    console.error('FAIL  --reasons must list at least one escalation trigger');
+    process.exit(1);
+  }
+
+  const manifestPath = join(sliceDir, 'manifest.json');
+  const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
+  if (manifest.mode === 'full') {
+    console.error(`FAIL  slice "${sliceId}" is already full mode — nothing to escalate`);
+    process.exit(1);
+  }
+  if (manifest.mode === 'escalated') {
+    console.error(`FAIL  slice "${sliceId}" is already escalated`);
+    process.exit(1);
+  }
+
+  const nextIndex = readdirSync(sessionsDir).filter((n) => /^\d+/.test(n)).length + 1;
+  const seq = String(nextIndex).padStart(3, '0');
+
+  const session = {
+    schema_version: '1.0',
+    session_id: `sess-${sliceId}-${seq}`,
+    timestamp: new Date().toISOString(),
+    agent: by,
+    human: by,
+    slice_id: sliceId,
+    event_type: 'checkpoint',
+    mode: 'escalated',
+    escalation_reasons: reasons,
+    evidence: note || `Escalating ${manifest.mode || 'lite'} → escalated: ${reasons.join(', ')}`,
+    concerns: [],
+  };
+
+  const file = join(sessionsDir, `${seq}-escalated.json`);
+  writeFileSync(file, `${JSON.stringify(session, null, 2)}\n`);
+  console.log(`CREATE .harness/state/slices/${sliceId}/sessions/${seq}-escalated.json`);
+
+  const { spawnSync } = await import('node:child_process');
+  const sync = spawnSync(process.execPath, [decodeURIComponent(new URL('./sync-state.mjs', import.meta.url).pathname), '--slice', sliceId], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  if (sync.status !== 0) {
+    console.error('WARN  sync-state failed:', sync.stderr);
+  }
+
+  console.log(`Slice "${sliceId}" escalated (lite → escalated).`);
+  console.log('Next: backfill .harness/specs/' + sliceId + '/capability.md and requirements.md from spec.md, then continue at the Validation phase of full ASDD.');
 }
 
-const reasonsRaw = argValue('--reasons');
-const by = argValue('--by') || 'harness';
-const note = argValue('--note') || '';
-
-if (!sliceId || !reasonsRaw) {
-  console.error('Usage: asdd slice escalate <slice-id> --reasons "E1,E4" [--by <owner>] [--note "why"]');
-  process.exit(1);
-}
-if (!/^[a-z0-9_-]+$/.test(sliceId)) {
-  console.error('FAIL  slice-id must be lowercase alphanumeric with hyphens/underscores');
-  process.exit(1);
-}
-
-const sliceDir = join(root, '.harness/state/slices', sliceId);
-const sessionsDir = join(sliceDir, 'sessions');
-if (!existsSync(sessionsDir)) {
-  console.error(`FAIL  slice "${sliceId}" has no sessions directory: ${sessionsDir}`);
-  process.exit(1);
-}
-
-const reasons = reasonsRaw
-  .split(',')
-  .map((r) => r.trim())
-  .filter(Boolean);
-if (reasons.length === 0) {
-  console.error('FAIL  --reasons must list at least one escalation trigger');
-  process.exit(1);
-}
-
-const manifestPath = join(sliceDir, 'manifest.json');
-const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
-if (manifest.mode === 'full') {
-  console.error(`FAIL  slice "${sliceId}" is already full mode — nothing to escalate`);
-  process.exit(1);
-}
-if (manifest.mode === 'escalated') {
-  console.error(`FAIL  slice "${sliceId}" is already escalated`);
-  process.exit(1);
-}
-
-const nextIndex = readdirSync(sessionsDir).filter((n) => /^\d+/.test(n)).length + 1;
-const seq = String(nextIndex).padStart(3, '0');
-
-const session = {
-  schema_version: '1.0',
-  session_id: `sess-${sliceId}-${seq}`,
-  timestamp: new Date().toISOString(),
-  agent: by,
-  human: by,
-  slice_id: sliceId,
-  event_type: 'checkpoint',
-  mode: 'escalated',
-  escalation_reasons: reasons,
-  evidence: note || `Escalating ${manifest.mode || 'lite'} → escalated: ${reasons.join(', ')}`,
-  concerns: [],
-};
-
-const file = join(sessionsDir, `${seq}-escalated.json`);
-writeFileSync(file, `${JSON.stringify(session, null, 2)}\n`);
-console.log(`CREATE .harness/state/slices/${sliceId}/sessions/${seq}-escalated.json`);
-
-const { spawnSync } = await import('node:child_process');
-const sync = spawnSync(process.execPath, [decodeURIComponent(new URL('./sync-state.mjs', import.meta.url).pathname), '--slice', sliceId], {
-  cwd: root,
-  encoding: 'utf8',
-});
-if (sync.status !== 0) {
-  console.error('WARN  sync-state failed:', sync.stderr);
-}
-
-console.log(`Slice "${sliceId}" escalated (lite → escalated).`);
-console.log('Next: backfill .harness/specs/' + sliceId + '/capability.md and requirements.md from spec.md, then continue at the Validation phase of full ASDD.');
+await runMain(import.meta.url, run);

@@ -6,40 +6,45 @@ import { existsSync, realpathSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { HARNESS_COMMANDS, KIT_COMMANDS, resolveHarnessCommand } from './harness/commands.mjs';
+import {
+  CONTROL_COMMANDS,
+  HARNESS_COMMANDS,
+  KIT_COMMANDS,
+  UsageError,
+  allCommands,
+  commandHelp,
+  completion,
+  resolveHarnessCommand,
+  usage,
+  wantsHelp,
+} from './harness/commands.mjs';
 import { CLI_ROOT, CliError, HARNESS_DIR, IS_FULL, isKit, VERSION } from './paths.mjs';
 import { localAsdd, projectKitVersion, versionFit } from './pin.mjs';
 import { err } from './ui.mjs';
 
-const harnessHelp = () =>
-  Object.entries(HARNESS_COMMANDS)
-    .flatMap(([name, e]) => (e.sub ? Object.entries(e.sub).map(([s, x]) => [`${name} ${s}`, x.help]) : [[name, e.help]]))
-    .map(([name, help]) => `  asdd ${name.padEnd(18)} ${help}`)
-    .join('\n');
+/** `name <args>` without `asdd` and `[options]`: the overview lists commands, `--help` their options. */
+const synopsis = (name) => usage(name).replace(/^asdd /, '').replace(/ \[options\]$/, '');
+const lines = (rows) => rows.map(([name, help]) => `  asdd ${name.padEnd(30)} ${help ?? ''}`.trimEnd()).join('\n');
+const rows = (names) => names.map(([name, e]) => [synopsis(name), e.help]);
 
 export const HELP = () => `asdd ${VERSION}: ASDD + Harness Engineering kit
 
 Harness (in a project; agents, skills, and hooks run these):
-${harnessHelp()}
+${lines(rows(allCommands().filter(([name]) => !name.startsWith('kit ') && !CONTROL_COMMANDS[name])))}
 
 Install and check:
-  asdd install <dir> [options]        install or upgrade the kit (asdd install --help for every option)
-  asdd install --interactive          the same, as a wizard
-  asdd install <dir> --pr             the same on a new branch, as a pull request (git + gh)
-  asdd uninstall [dir] [--dry-run] [--json]   remove what install added and the project did not change
-  asdd doctor [dir] [--json]          check Node, git, npm, codegraph, semgrep, gh, and the project's install
+${lines(rows(Object.entries(CONTROL_COMMANDS)))}
+${lines([['install --interactive', 'the same, as a wizard'], ['install <dir> --pr', 'the same on a new branch, as a pull request (git + gh)']])}
 
 Kit development (in the kit repo):
-  asdd kit versions [bump <version>]  regenerate cli/versions.json (what install ships, by version)
-  asdd kit build [--obfuscate] [--check]  compile cli/src → cli/dist (projects and npm ship dist only)
-  asdd kit vendor [--check]           copy cli/src/harness libs into tools/*/src/harness
-  asdd kit guidance [--only a,b] [dir]  stale guidance, cutoffs, steering budget, test asserts
-  asdd kit skills-lint [--only a,b] [dir]  skill grammar (S-*), fleet routing (SL-*), rule size (R-004/005)
-  asdd kit agents-lint [--only a,b] [dir]  agent grammar (A-*), tier/capability envelope and handoffs (AL-*)
-  asdd kit self [--check]             copy what cli/ ships into the kit's own .harness/ (--check: fail while stale)
+${lines(rows(Object.entries(KIT_COMMANDS).map(([n, e]) => [`kit ${n}`, e])))}
 
 Other:
-  asdd --version | help
+${lines([
+  ['<command> --help', 'every option of a command (also: asdd help <command>)'],
+  ['completion bash|zsh|fish', 'shell completion, e.g. source <(asdd completion zsh)'],
+  ['--version | help', ''],
+])}
 
 In a project: npm i -D asdd-harness-kit (pinned by the lockfile; a global asdd hands commands to it) or npm i -g asdd-harness-kit.
 Install and upgrade with npx: npx asdd-harness-kit install <dir>  (or npx github:eencinasq/asdd-harness-kit install <dir>)
@@ -101,6 +106,10 @@ async function runHarness(args) {
     // stderr: stdout may be JSON (asdd drift --json).
     if (fit.level === 'warn' && !['gate', 'verify'].includes(args[0])) process.stderr.write(`⚠ ${fit.message}\n`);
   }
+  if (wantsHelp(command.argv)) {
+    process.stdout.write(commandHelp(command.name));
+    return 0;
+  }
   const script = join(HARNESS_DIR, command.script);
   if (!existsSync(script)) {
     throw new CliError(
@@ -110,24 +119,46 @@ async function runHarness(args) {
     );
   }
   process.chdir(root);
-  // The scripts read process.argv like a direct `node <script> …` run, and run their CLI on import.
-  process.argv = [process.argv[0], script, ...command.argv];
-  await import(pathToFileURL(script).href);
-  return undefined;
+  const { run } = await import(pathToFileURL(script).href);
+  return run(command.argv);
 }
 
 async function kit([name, ...args]) {
   if (!KIT_COMMANDS[name]) throw new CliError(`usage: asdd kit ${Object.keys(KIT_COMMANDS).join('|')} [options] (got ${name ?? 'nothing'})`, 2);
-  const { run } = await import(KIT_COMMANDS[name]);
+  if (wantsHelp(args)) {
+    process.stdout.write(commandHelp(`kit ${name}`));
+    return 0;
+  }
+  const { run } = await import(KIT_COMMANDS[name].module);
   return run(args);
+}
+
+/** `asdd help [command…]`: the overview, or one command's generated help. */
+function help(words) {
+  if (!words.length) {
+    process.stdout.write(HELP());
+    return 0;
+  }
+  const name = words.join(' ');
+  const text = commandHelp(name);
+  if (!text) {
+    const group = HARNESS_COMMANDS[name]?.sub ?? (name === 'kit' ? KIT_COMMANDS : null);
+    if (!group) throw new CliError(`unknown command: ${name} (run: asdd help)`, 2);
+    process.stdout.write(`asdd ${name}: ${Object.keys(group).join(' | ')}  (asdd help ${name} <command>)\n`);
+    return 0;
+  }
+  process.stdout.write(text);
+  return 0;
 }
 
 /** @returns {Promise<number | undefined>} exit status (undefined: a harness script set its own) */
 export async function main(argv) {
   let [command, ...args] = argv;
   try {
-    if (!command || command === 'help' || command === '--help' || command === '-h') {
-      process.stdout.write(HELP());
+    if (!command || command === '--help' || command === '-h') return help([]);
+    if (command === 'help') return help(args);
+    if (command === 'completion') {
+      process.stdout.write(completion(args[0]));
       return 0;
     }
     if (command === '--version' || command === '-v' || command === 'version') {
@@ -141,6 +172,11 @@ export async function main(argv) {
     if (!known.includes(command) && (command.startsWith('-') || !/^[a-z-]+$/.test(command))) {
       args = [command, ...args];
       command = 'install';
+    }
+    // install prints its own help (the registry's, plus the modules and runtimes this kit ships).
+    if (CONTROL_COMMANDS[command] && command !== 'install' && wantsHelp(args)) {
+      process.stdout.write(commandHelp(command));
+      return 0;
     }
     if (FULL_ONLY.includes(command) && !IS_FULL) {
       throw new CliError(`asdd ${command} comes with the full asdd-harness-kit package: npx asdd-harness-kit ${command} …`, 2);
@@ -164,7 +200,7 @@ export async function main(argv) {
         throw new CliError(`unknown command: ${command} (run: asdd help)`, 2);
     }
   } catch (error) {
-    if (!(error instanceof CliError)) throw error;
+    if (!(error instanceof CliError) && !(error instanceof UsageError)) throw error;
     err(error.message);
     return error.code;
   }
