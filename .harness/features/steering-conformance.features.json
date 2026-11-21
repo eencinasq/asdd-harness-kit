@@ -73,8 +73,8 @@
         "TASK-001",
         "TASK-002"
       ],
-      "evidence": "re-verified 2026-11-17 (platform-spec final regen)",
-      "evidence_hash": "fc0f6d48953c8143c02bd5d5967f1750de86eb216a6f182a566f23a7bc9257c8"
+      "evidence": "re-verified 2026-11-21 (semgrep-union: spec-drift.md steering copy): generate-runtime-steering --check PASS, kit self --check OK",
+      "evidence_hash": "49b42a74a2973257bdcf513bf117b6158140f0a0a2bd669ee156009f10ab3bcd"
     }
   ]
 }

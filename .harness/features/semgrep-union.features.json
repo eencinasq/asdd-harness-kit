@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "semgrep-union",
+  "source_tasks": ".harness/specs/semgrep-union/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Union selected and generated Semgrep configs",
+      "user_visible_behavior": "asdd audit / verify_architecture_rules run the project's .semgrep/ rule sets (architecture, standards, ...) plus rules generated from the specs' boundary tables. tech.md languages named in prose next to backticks are detected (previously none were, so no spec rule was ever generated here).",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/semgrep-lib.test.mjs cli/src/harness/audit-codebase.test.mjs",
+        "npm test"
+      ],
+      "evidence": "semgrep-lib + audit-codebase tests: 18 pass (union: two --config flags; .semgrep folder selected; languagesFrom reads prose). npm test 495 pass. Live scan of the kit: selected+generated, .semgrep sets + 2 generated rules, 1 finding (audit.service.ts:144, fixed by TASK-003).",
+      "scope_paths": [
+        "cli/src/harness/semgrep-lib.mjs",
+        "cli/src/harness/semgrep-lib.test.mjs",
+        "cli/src/harness/audit-codebase.mjs",
+        "cli/steering/spec-drift.md",
+        "tools/spec-drift/src/harness/semgrep-lib.mjs"
+      ],
+      "evidence_hash": "30a81bb832102856e73cab8c58d93549a70f68637d58bac725564cacd0c86460"
+    },
+    {
+      "id": "TASK-002",
+      "title": "init-flow stops importing the installer",
+      "user_visible_behavior": "asdd init-flow names the project from project.json project_id; the harness layer imports nothing outside itself.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/init-flow.test.mjs",
+        "semgrep scan --config p/default cli/src/harness/init-flow.mjs (0 parse errors)"
+      ],
+      "evidence": "init-flow test: 1 pass; semgrep parse errors 0",
+      "scope_paths": [
+        "cli/src/harness/init-flow.mjs"
+      ],
+      "evidence_hash": "e725b6a67a84c25654c7bdd8b24e5fbaa21b998df3d7a36f861d4716de09747e"
+    },
+    {
+      "id": "TASK-003",
+      "title": "spec-drift audit lists slices from registry.json",
+      "user_visible_behavior": "verify_spec_compliance, traceability_matrix and the manifest resource find slices via registry.json or the slice directories.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm build && node --import tsx --test src/audit/*.spec.ts && node --import tsx --test --test-concurrency=1 test/audit.e2e-spec.ts test/empty-audit.e2e-spec.ts test/output-schemas.e2e-spec.ts test/mcp.e2e-spec.ts"
+      ],
+      "evidence": "typecheck, lint, build OK; audit unit 6 pass; e2e 40 pass (node v24.22.3)",
+      "scope_paths": [
+        "tools/spec-drift/src/audit/audit.service.ts",
+        "tools/spec-drift/test/empty-audit.e2e-spec.ts",
+        "tools/spec-drift/test/output-schemas.e2e-spec.ts"
+      ],
+      "evidence_hash": "c9c442669c93d9e5a4262e7ed4d2e6582bc00de1f997141b3dfe37144efcc703"
+    }
+  ]
+}

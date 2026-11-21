@@ -11,7 +11,6 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { suggestProjectName } from '../install/phases.mjs';
 
 const asddBin = resolve(fileURLToPath(new URL('../../bin/asdd.mjs', import.meta.url)));
 const argv = process.argv.slice(2);
@@ -58,8 +57,19 @@ function patchBinding(rel, transform) {
   return true;
 }
 
+/** The project_id `asdd install` wrote (it runs first); the harness imports nothing outside itself (vendored). */
+function projectName() {
+  try {
+    const id = JSON.parse(readFileSync(join(target, '.harness/config/project.json'), 'utf8')).project_id;
+    if (typeof id === 'string' && id.trim()) return id.trim();
+  } catch {
+    // no project.json yet: fall back to the directory name
+  }
+  return basename(target);
+}
+
 function fillMinimumBindings() {
-  const name = suggestProjectName(target) || basename(target);
+  const name = projectName();
   patchBinding('.harness/steering/quality-gates.project.md', (t) =>
     t
       .replace(/Active findings:\s*unfilled/i, 'Active findings: none')
@@ -72,7 +82,7 @@ function fillMinimumBindings() {
   patchBinding('.harness/steering/product.md', (t) =>
     t
       .replace(/\(stub\)/gi, '')
-      .replace(/<!-- One paragraph:[\s\S]*?-->/, `${name} — onboarded via \`asdd init-flow\`.`)
+      .replace(/[<]!-- One paragraph:[\s\S]*?-->/, `${name} — onboarded via \`asdd init-flow\`.`)
       .replace(/^- …$/m, `- Ship value with harness-governed slices.`)
       .replace(/\| … \| … \|/, `| Developer | Complete a lite slice safely |`)
       .replace(/^1\. …$/m, `1. Spec drift sensors must stay fail-closed.`),

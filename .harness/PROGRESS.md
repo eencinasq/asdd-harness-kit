@@ -52,6 +52,7 @@
 | rules-landing | lite | knowledge | DONE | 0 |
 | security-recon-untracked | hotfix | knowledge | DONE | 0 |
 | security-review | full | knowledge | DONE | 0 |
+| semgrep-union | lite | qa | in_progress | 0 |
 | sensor-fixes | escalated | knowledge | DONE | 0 |
 | shaping-agent | escalated | knowledge | DONE | 0 |
 | shaping-cloud-setup | escalated | knowledge | DONE | 0 |

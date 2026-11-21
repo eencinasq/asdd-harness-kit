@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-semgrep-union-002",
+  "timestamp": "2026-11-21T02:40:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "semgrep-union",
+  "event_type": "phase_completed",
+  "phase": "implementation",
+  "mode": "lite",
+  "evidence": "TASK-001..003 passing: npm test 495 pass; spec-drift typecheck/lint/build OK, audit unit 6 pass, e2e 40 pass. Layer import bans left to spec-drift DependencyAnalyzer (no duplicate Semgrep rules). steering-conformance TASK-003 re-verified (generate-runtime-steering --check PASS, kit self --check OK) after the spec-drift.md steering copy changed.",
+  "scope_paths": ["cli/src/harness/semgrep-lib.mjs", "cli/src/harness/init-flow.mjs", "tools/spec-drift/src/audit/audit.service.ts"],
+  "concerns": ["The hand-written .semgrep/ rules live in a concurrent session's uncommitted work; this slice only changes the engine that runs them."]
+}

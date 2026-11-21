@@ -140,9 +140,19 @@ export class AuditService {
 		return r.status === 0 ? r.stdout.trim() : null;
 	}
 
+	/**
+	 * Slice ids from the generated registry.json (RV1-AR-1: the global manifest.json is retired). registry.json is
+	 * gitignored, so a fresh clone without `asdd sync` falls back to the .harness/state/slices/<id>/ directories.
+	 */
 	private activeSlices(): string[] {
-		const manifest = this.readJson<{ active_slices?: unknown[] }>('.harness/state/manifest.json');
-		return (manifest?.active_slices ?? []).map(sliceIdOf).filter(Boolean);
+		const registry = this.readJson<{ slices?: unknown[] }>('.harness/state/registry.json');
+		if (Array.isArray(registry?.slices)) return registry.slices.map(sliceIdOf).filter(Boolean);
+		const dir = path.join(this.root, '.harness/state/slices');
+		if (!existsSync(dir)) return [];
+		return readdirSync(dir, { withFileTypes: true })
+			.filter((e) => e.isDirectory())
+			.map((e) => e.name)
+			.sort();
 	}
 
 	// ── architecture rules ────────────────────────────────────────────────────
@@ -284,7 +294,7 @@ export class AuditService {
 			return {
 				...empty,
 				no_data: {
-					reason: 'No slices in .harness/state/manifest.json yet: no specification to check.',
+					reason: 'No slices in .harness/state/ yet: no specification to check.',
 					next: 'Start one with asdd slice init <slice-id>.',
 				},
 			};
@@ -531,8 +541,7 @@ export class AuditService {
 			};
 		}
 		try {
-			const registry = this.readJson<{ slices?: unknown[] }>('.harness/state/registry.json');
-			const all = (registry?.slices ?? []).map(sliceIdOf).filter(Boolean);
+			const all = this.activeSlices();
 			if (slice_id && !all.includes(slice_id)) {
 				return { ...empty, error: `Unknown slice "${slice_id}". Slices: ${all.join(', ') || '(none)'}.` };
 			}

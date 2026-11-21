@@ -47,10 +47,7 @@ before(async () => {
 	root = mkdtempSync(path.join(os.tmpdir(), 'sd-output-'));
 	// The kit is installed with one slice, so an unknown slice id is bad input (without the kit it is "no data").
 	mkdirSync(path.join(root, '.harness/state'), { recursive: true });
-	writeFileSync(
-		path.join(root, '.harness/state/manifest.json'),
-		'{ "schema_version": "3.0", "active_slices": [{ "slice_id": "s1" }] }\n',
-	);
+	writeFileSync(path.join(root, '.harness/state/registry.json'), '{ "slices": [{ "slice_id": "s1" }] }\n');
 	moduleRef = await Test.createTestingModule({ imports: [AppModule] })
 		.overrideProvider(AUDIT_OPTIONS)
 		.useValue({ root, semgrepBin: path.join(root, 'no-semgrep'), gateTimeoutMs: 10_000 })
