@@ -259,6 +259,12 @@ test('REQ-005 reserved attributes and forbidden kinds return false', () => {
       assert.equal(silent(() => emit(sampleSpan({ kind }), { root })), false, kind);
     }
     assert.equal(existsSync(streamPath(root)), false);
+    for (const writer of ['asdd-span', 'runtime-hook']) {
+      for (const kind of ['turn', 'subagent']) {
+        assert.equal(silent(() => emit(sampleSpan({ kind, writer }), { root })), true, `${writer} ${kind}`);
+      }
+      assert.equal(silent(() => emit(sampleSpan({ kind: 'phase', writer }), { root })), false, `${writer} phase`);
+    }
     for (const kind of ['command', 'sensor', 'hook', 'sync', 'tool']) {
       assert.equal(silent(() => emit(sampleSpan({ kind }), { root })), true, kind);
     }

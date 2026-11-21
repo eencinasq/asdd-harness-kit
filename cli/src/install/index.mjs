@@ -142,13 +142,27 @@ function installGitattributes(ctx) {
   } else {
     next = `${text}${text && !text.endsWith('\n') ? '\n' : ''}${block}\n`;
   }
-  if (next === text) return;
   if (ctx.dryRun) {
-    log(`${c.dim('GITATTR')}  ${file} (merge-policy block)`);
+    if (next !== text) log(`${c.dim('GITATTR')}  ${file} (merge-policy block)`);
     return;
   }
-  writeFileSync(file, next);
-  log(`${c.blue('GITATTR')}  ${file}`);
+  if (next !== text) {
+    writeFileSync(file, next);
+    log(`${c.blue('GITATTR')}  ${file}`);
+  }
+  ensureOursDriver(ctx.target);
+}
+
+/**
+ * `merge=ours` names a custom driver git does not ship; undefined drivers fall back to a text merge. Define it in the
+ * clone's local config (git config is never committed, so every clone re-runs `asdd install`).
+ */
+function ensureOursDriver(target) {
+  const get = spawnSync('git', ['-C', target, 'config', '--local', '--get', 'merge.ours.driver'], { encoding: 'utf8' });
+  if (get.status === 0 && get.stdout.trim()) return;
+  const set = spawnSync('git', ['-C', target, 'config', '--local', 'merge.ours.driver', 'true'], { encoding: 'utf8' });
+  if (set.status === 0) log(`${c.blue('GITCONFIG')}  merge.ours.driver=true`);
+  else warn('could not define merge.ours.driver; run `git config merge.ours.driver true` so merge=ours rows keep the local copy');
 }
 
 /**

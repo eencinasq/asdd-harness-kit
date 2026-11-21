@@ -53,7 +53,7 @@ export default function validate(ctx) {
     const daysIdle = Math.floor((now - newest) / 86400000);
     if (daysIdle > limit) {
       const phase = typeof entry === 'string' ? 'unknown' : (entry.phase ?? PHASES[0]);
-      warn(`STALE-01 slice "${sliceId}": no session activity for ${daysIdle}d (limit ${limit}d) at phase ${phase} — park it (asdd slice park ${sliceId}), resume it, or abandon it`);
+      warn(`STALE-01 slice "${sliceId}": no session activity for ${daysIdle}d (limit ${limit}d) at phase ${phase} — park or abandon it (a checkpoint session with "status": "PARKED"/"ABANDONED", then asdd sync — MAN-07), or resume it`);
     }
   }
 }

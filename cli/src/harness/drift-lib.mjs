@@ -167,9 +167,15 @@ function readJsonSafe(p) {
 }
 
 export function listSlices(root) {
-  // The generated global index (registry.json); global state/manifest.json retired — RV1-AR-1.
+  // The generated global index (registry.json); global state/manifest.json retired — RV1-AR-1. registry.json is
+  // gitignored, so a fresh clone without `asdd sync` has none: fall back to the slice directories themselves.
   const manifest = readJsonSafe(join(root, '.harness/state/registry.json'));
-  const entries = Array.isArray(manifest?.slices) ? manifest.slices : [];
+  const slicesDir = join(root, '.harness/state/slices');
+  const entries = Array.isArray(manifest?.slices)
+    ? manifest.slices
+    : existsSync(slicesDir)
+      ? readdirSync(slicesDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort()
+      : [];
   return entries
     .map((s) => (typeof s === 'string' ? { slice_id: s } : s))
     .filter((s) => s?.slice_id)
@@ -383,12 +389,15 @@ export function runDrift(opts) {
   // K-2: DONE/PARKED slices keep covering their own declarations — a slice going
   // DONE must not orphan its uncommitted diff; post-verification edits are still
   // caught per-feature by DRIFT-02. ABANDONED slices stay uncovered on purpose.
+  // Only their exact file entries count: a closed slice's glob or directory would
+  // permanently hide every new unmapped file under it.
   if (gitAvailable && editSlices.length) {
-    const coverageSlices = [...editSlices];
-    for (const s of slices) {
-      if ((s.status === 'DONE' || s.status === 'PARKED') && !coverageSlices.includes(s)) coverageSlices.push(s);
-    }
-    const mapped = coverageSlices.flatMap((s) => mappedPaths(root, s));
+    const exactFile = (p) => !/[*?]/.test(p) && /\.[A-Za-z0-9]+$/.test(p);
+    const closed = slices.filter((s) => (s.status === 'DONE' || s.status === 'PARKED') && !editSlices.includes(s));
+    const mapped = [
+      ...editSlices.flatMap((s) => mappedPaths(root, s)),
+      ...closed.flatMap((s) => mappedPaths(root, s).filter(exactFile)),
+    ];
     const isTest = testFileMatcher(root);
     const reqIds = [...new Set(editSlices.flatMap((s) => parseRequirements(root, s.slice_id).map((r) => r.id)))];
     let unmapped = changedProduct.filter((f) =>

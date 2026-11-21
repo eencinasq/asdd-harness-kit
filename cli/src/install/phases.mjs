@@ -111,7 +111,8 @@ export const claudeHook = (command, onFail = 2) =>
   String(command).startsWith(CLAUDE_ROOT_CD) ? command : `${CLAUDE_ROOT_CD} || exit ${onFail}; ${command}`;
 
 /** The command a target's hooks run for `verb`: the resolver in a project, cli/ in the kit repo. */
-export const asddCommand = (ctx, verb) => (ctx.self ? `node ${KIT_BIN} ${verb}` : projectAsdd(verb, hookShellFor(ctx.targetOs ?? process.platform)));
+export const asddCommand = (ctx, verb, shell) =>
+  ctx.self ? `node ${KIT_BIN} ${verb}` : projectAsdd(verb, shell ?? hookShellFor(ctx.targetOs ?? process.platform));
 
 /**
  * The load hook (`asdd observe <runtime>`), fail-open unlike the gate resolver: asdd missing, failing, or slow, the
@@ -326,14 +327,20 @@ export function installProjectAdapter(ctx) {
   writeFileSync(config, `${JSON.stringify(project, null, 2)}\n`);
 }
 
-/** MCP servers that live under tools/ in the kit repo. Projects never receive a copy; agents use `asdd` instead. */
-/** Kit MCP servers = the tools/ directories (each ships a bin/ launcher). */
-export const KIT_TOOL_SERVERS = Object.freeze(
-  readdirSync(join(KIT_ROOT, 'tools'), { withFileTypes: true })
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name)
-    .sort(),
-);
+/**
+ * MCP servers that live under tools/ in the kit repo. Projects never receive a copy; agents use `asdd` instead.
+ * The explicit list covers servers the npm package does not ship (jev-gate), so install/uninstall still retire
+ * their old entries; it is unioned with the tools/ directories present in a kit checkout (none in some packages).
+ */
+const KNOWN_TOOL_SERVERS = ['jev-gate', 'knowledge', 'spec-drift'];
+function toolDirs() {
+  try {
+    return readdirSync(join(KIT_ROOT, 'tools'), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
+  } catch {
+    return [];
+  }
+}
+export const KIT_TOOL_SERVERS = Object.freeze([...new Set([...KNOWN_TOOL_SERVERS, ...toolDirs()])].sort());
 
 const mcpFile = (ctx) => join(ctx.target, '.agents/mcp/mcp.json');
 

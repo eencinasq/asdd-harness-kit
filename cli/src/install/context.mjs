@@ -93,6 +93,16 @@ export class InstallContext {
     this.installedArtifacts = installed?.artifacts ?? null;
     /** What the kit wrote at the last install: rel path → sha256 (absent before kit 3.9). */
     this.kitHashes = installed?.kit_files ?? {};
+    /**
+     * Installs that predate `kit_files` (no hashes at all) prove ownership by `managed_files` instead; once an install
+     * records hashes, a missing hash means the kit cannot prove it wrote the file.
+     */
+    this.prevManaged = (installed && !installed.kit_files && previousManaged(this.installedVersionsFile)) || new Set();
+  }
+
+  /** A pre-hash install recorded this file as kit-managed (see prevManaged). */
+  legacyOwned(rel) {
+    return this.prevManaged.has(rel);
   }
 
   /** Path relative to the target, as installed-versions.json records it. */
@@ -123,7 +133,7 @@ export class InstallContext {
     const rel = this.rel(dest);
     if (policy === 'refresh') this.kitFiles.add(rel);
     const action = this.copyAction(src, dest, rel, policy);
-    if (policy === 'refresh' && (action !== 'skip' || this.kitHashes[rel] !== undefined)) {
+    if (policy === 'refresh' && (action !== 'skip' || this.kitHashes[rel] !== undefined || this.prevManaged.has(rel))) {
       this.recordManaged(dest);
       // Test hook: list refreshed kit sources (each needs a versions.json entry)
       if (process.env.HARNESS_TRACE_REFRESH) appendFileSync(process.env.HARNESS_TRACE_REFRESH, `${relative(this.kit, src)}\n`);
@@ -163,7 +173,7 @@ export class InstallContext {
     const recorded = this.kitHashes[rel];
     // Refreshed only while still provably the kit's copy: hash unchanged since the kit wrote it (skills.md is
     // regenerated after copying, so its hash never matches — it is always the kit's). Anything else stays.
-    const own = recorded !== undefined && (current === recorded || REGENERATED.has(rel));
+    const own = (recorded !== undefined && (current === recorded || REGENERATED.has(rel))) || this.legacyOwned(rel);
     if (!own) return 'skip';
     return this.needsUpdate(src) ? 'update' : 'keep';
   }
@@ -188,7 +198,7 @@ export class InstallContext {
         return;
       }
       // A file the kit cannot prove it rendered is the project's own: keep it (--force still restores the kit version).
-      const unchanged = this.kitHashes[rel] !== undefined && fileHash(dest) === this.kitHashes[rel];
+      const unchanged = (this.kitHashes[rel] !== undefined && fileHash(dest) === this.kitHashes[rel]) || this.legacyOwned(rel);
       if (!unchanged && !this.force) {
         this.stats.skipped += 1;
         this.skipped.push(rel);

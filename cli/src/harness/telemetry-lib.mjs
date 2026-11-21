@@ -20,6 +20,9 @@ const SPAN_ID_RE = /^[a-f0-9]{8,16}$/;
 // REQ-005: producers never emit these kinds or set evaluator-reserved attributes.
 const FORBIDDEN_KINDS = new Set(['phase', 'turn', 'subagent', 'test']);
 const RESERVED_ATTRIBUTES = ['heuristic', 'trigger_span_id', 'source'];
+// The agent dispatch seam (`asdd span`) and runtime hooks observe turns and subagent dispatches directly.
+const DISPATCH_WRITERS = new Set(['asdd-span', 'runtime-hook']);
+const DISPATCH_KINDS = new Set(['turn', 'subagent']);
 
 function hex(bytes) {
   return randomBytes(bytes).toString('hex');
@@ -96,11 +99,13 @@ export function emit(span, { root = process.cwd() } = {}) {
     if (!span || typeof span !== 'object' || Array.isArray(span)) return false;
     // REQ-005: reserved kinds are evaluator-synthesized; producers may not emit them. Carve-outs: the
     // synthesizers themselves (rollup/heuristic-evaluator writers, synthesized trace_source), and the
-    // gate-seam test classifier (kind 'test' is a producer observation when test_runner identifies the runner).
+    // gate-seam test classifier (kind 'test' is a producer observation when test_runner identifies the runner),
+    // and turn/subagent spans from the dispatch seam (asdd-span/runtime-hook writers).
     const attrs = span.attributes;
     const synth = span.writer === 'heuristic-evaluator' || span.writer === 'rollup' || attrs?.trace_source === 'synthesized';
     const producerTest = span.kind === 'test' && typeof attrs?.test_runner === 'string';
-    if (FORBIDDEN_KINDS.has(span.kind) && !synth && !producerTest) return false;
+    const dispatch = DISPATCH_KINDS.has(span.kind) && DISPATCH_WRITERS.has(span.writer);
+    if (FORBIDDEN_KINDS.has(span.kind) && !synth && !producerTest && !dispatch) return false;
     if (builtinSpanProblems(span).length) return false;
     let json = JSON.stringify(span);
     if (typeof json !== 'string') return false;

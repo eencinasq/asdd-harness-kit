@@ -176,30 +176,37 @@ const CONTRACT_SHAPES = {
 export function checkExecutableShape(kit, manifest) {
   const where = `${MODULE_DIR}/${manifest.name}/${MODULE_MANIFEST}`;
   for (const e of manifest.contributes?.adapters ?? []) {
-    const src = resolve(join(kit, MODULE_DIR, manifest.name, e.path));
-    if (statSync(src).isDirectory()) continue; // dir mounts expand to files; each file is checked via mountMap callers
+    const root = resolve(join(kit, MODULE_DIR, manifest.name, e.path));
     const contract = e.contract ?? 'spec-drift-adapter';
     const shape = CONTRACT_SHAPES[contract];
     if (!shape) {
       throw new CliError(`${where}: adapter "${e.path}" declares unknown contract "${contract}" (known: ${Object.keys(CONTRACT_SHAPES).join(', ')})`);
     }
-    const text = readFileSync(src, 'utf8');
-    if (shape.banned.test(text)) {
-      throw new CliError(`${where}: adapter "${e.path}" calls a mutating filesystem call — the ${contract} contract is ${shape.discipline}`);
+    // A directory mount installs every non-SKIPPED file under it (mountMap), so each of those files is checked.
+    const files = statSync(root).isDirectory()
+      ? filesUnder(root).filter((rel) => !SKIPPED.test(rel.split('/').pop())).map((rel) => ({ src: join(root, rel), label: `${e.path}/${rel}` }))
+      : [{ src: root, label: e.path }];
+    for (const f of files) checkAdapterFile(where, f.src, f.label, contract, shape);
+  }
+}
+
+function checkAdapterFile(where, src, path, contract, shape) {
+  const text = readFileSync(src, 'utf8');
+  if (shape.banned.test(text)) {
+    throw new CliError(`${where}: adapter "${path}" calls a mutating filesystem call — the ${contract} contract is ${shape.discipline}`);
+  }
+  const want = `{id, description, ${shape.entry}}`;
+  const block = DEFAULT_BLOCK.exec(text)?.[1];
+  if (!block) {
+    throw new CliError(`${where}: adapter "${path}" must literal-export default ${want}`);
+  }
+  for (const field of ['id', 'description']) {
+    if (!new RegExp(`\\b${field}\\s*:`).test(block)) {
+      throw new CliError(`${where}: adapter "${path}" default export missing ${field} (contract: ${want})`);
     }
-    const want = `{id, description, ${shape.entry}}`;
-    const block = DEFAULT_BLOCK.exec(text)?.[1];
-    if (!block) {
-      throw new CliError(`${where}: adapter "${e.path}" must literal-export default ${want}`);
-    }
-    for (const field of ['id', 'description']) {
-      if (!new RegExp(`\\b${field}\\s*:`).test(block)) {
-        throw new CliError(`${where}: adapter "${e.path}" default export missing ${field} (contract: ${want})`);
-      }
-    }
-    if (!new RegExp(`\\b${shape.entry}\\s*[(:]`).test(block)) {
-      throw new CliError(`${where}: adapter "${e.path}" default export missing ${shape.entry} (contract: ${want})`);
-    }
+  }
+  if (!new RegExp(`\\b${shape.entry}\\s*[(:]`).test(block)) {
+    throw new CliError(`${where}: adapter "${path}" default export missing ${shape.entry} (contract: ${want})`);
   }
 }
 

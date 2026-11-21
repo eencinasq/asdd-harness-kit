@@ -109,6 +109,24 @@ test('a file at a kit path the kit cannot prove it wrote is skipped, never overw
   assert.doesNotMatch(readFileSync(join(dir, rel), 'utf8'), /<!-- local -->/);
 });
 
+test('an install that predates kit_files proves ownership by managed_files and refreshes changed kit files', () => {
+  const dir = app('prehash');
+  assert.equal(asdd(['install', dir, '--skip-deps', '--json']).status, 0);
+  const versions = join(dir, '.harness/config/installed-versions.json');
+  const rel = '.harness/steering/controls.md';
+  patch(versions, (v) => {
+    delete v.kit_files;
+    v.artifacts['cli/steering/controls.md'] = '0.0.1';
+  });
+  appendFileSync(join(dir, rel), '\n<!-- old kit copy -->\n');
+  const res = json(asdd(['install', dir, '--skip-deps', '--json']));
+  assert.deepEqual(res.skipped, []);
+  assert.doesNotMatch(readFileSync(join(dir, rel), 'utf8'), /<!-- old kit copy -->/);
+  const after = JSON.parse(readFileSync(versions, 'utf8'));
+  assert.ok(after.managed_files.includes(rel));
+  assert.ok(after.kit_files[rel]);
+});
+
 test('a rendered runtime agent file with no recorded render is kept unless --force', () => {
   const dir = app('render');
   assert.equal(asdd(['install', dir, '--runtime=cursor', '--skip-deps', '--json']).status, 0);

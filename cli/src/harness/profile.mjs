@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * asdd profile — Phase-2 telemetry readout (profiling v2 §5).
+ * asdd profiling — Phase-2 telemetry readout (profiling v2 §5).
  *
- *   asdd profile --slice <id>     per-slice phase/turn/boot-tax/H-* report
- *   asdd profile --bottlenecks    cross-slice surfaces ranked by bottleneck_score
- *   asdd profile --json           machine-readable rollup
+ *   asdd profiling --slice <id>     per-slice phase/turn/boot-tax/H-* report
+ *   asdd profiling --bottlenecks    cross-slice surfaces ranked by bottleneck_score
+ *   asdd profiling --json           machine-readable rollup
  *
  * Exit 0 on a successful report; 3 when no spans exist for the scope
  * (distinct from "report succeeded"); 2 on usage error. Profiling is a
@@ -44,11 +44,11 @@ const sliceId = sliceIdx >= 0 ? args[sliceIdx + 1] : null;
 const wantBottlenecks = args.includes('--bottlenecks');
 const wantJson = args.includes('--json');
 if (sliceIdx >= 0 && !sliceId) {
-  console.error('usage: asdd profile --slice <id> | --bottlenecks [--json]');
+  console.error('usage: asdd profiling --slice <id> | --bottlenecks [--json]');
   process.exit(2);
 }
 if (!sliceId && !wantBottlenecks && !wantJson) {
-  console.error('usage: asdd profile --slice <id> | --bottlenecks [--json]');
+  console.error('usage: asdd profiling --slice <id> | --bottlenecks [--json]');
   process.exit(2);
 }
 
@@ -71,6 +71,19 @@ for (const { text } of tail.lines) {
     const s = JSON.parse(text);
     if (s && typeof s === 'object' && validateSpan(s).length === 0) allSpans.push(s);
   } catch { /* malformed lines are skipped by the readout; the validator warns */ }
+}
+
+// A finding already recorded by any earlier detection span (whatever its age) is not new:
+// the evaluator's 30-minute dedupe window alone would re-emit historical findings on every run.
+const detectionKey = (heuristic, signature, trigger) => `${heuristic}|${signature ?? '-'}|${trigger ?? '-'}`;
+function unseenFindings(findings, existingDetections) {
+  const seen = new Set(existingDetections.map((d) => detectionKey(d.attributes?.heuristic, d.attributes?.failure_signature, d.attributes?.trigger_span_id)));
+  return findings.filter((f) => {
+    const key = detectionKey(f.heuristic, f.failure_signature, f.trigger_span_id);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 // Fires: append a detection span per new finding (AR-4 — producers are never
@@ -119,7 +132,7 @@ function sliceRollup(id) {
   const spans = [...producerSpans, ...phaseSpans.filter((p) => !producerSpans.some((s) => s.span_id === p.span_id))];
   const sessions = loadSessions(id);
   const detections = allSpans.filter((s) => s.slice_id === id && EVALUATOR_WRITERS.has(s.writer));
-  const findings = evaluateHeuristics([...spans, ...detections], { sessions });
+  const findings = unseenFindings(evaluateHeuristics([...spans, ...detections], { sessions }), detections);
   fireFindings(findings, detections);
 
   const turns = producerSpans.filter((s) => s.kind === 'turn');

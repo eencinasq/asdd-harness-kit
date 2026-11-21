@@ -142,7 +142,10 @@ function testRunner(text) {
   if (/^node\s+--test/.test(text)) return 'node-test';
   if (/jest/.test(text)) return 'jest';
   if (/vitest/.test(text)) return 'vitest';
-  return 'nx';
+  if (/mocha/.test(text)) return 'mocha';
+  if (/\bnx\b/.test(text)) return 'nx';
+  if (/^pnpm\b/.test(text)) return 'pnpm';
+  return 'other';
 }
 
 // Telemetry is best-effort and lazy: a missing lib must never change the verdict.

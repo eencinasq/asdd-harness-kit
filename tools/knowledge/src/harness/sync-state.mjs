@@ -66,7 +66,8 @@ export { readSessions };
 /**
  * Phase + mode vocabulary comes from the platform registry (D-3), not constants. Lookup order: the project's
  * installed copy (pin fidelity — the kit version the project runs), then the registry bundled with this CLI copy
- * (kit repo, npm package, vendored tools trees). Absent vocabulary degrades to empty lists: bare dirs keep working.
+ * (kit repo, npm package; vendored tools/<name>/src/harness copies resolve tools/<name>/registry, which is absent).
+ * Absent vocabulary falls back to the built-in pipeline literals so `asdd sync` never writes degraded phase/mode state.
  */
 function platformVocabulary() {
   for (const p of [
@@ -88,7 +89,8 @@ function warnRegistryMissing() {
 }
 
 // Ordered pipeline (registry vocabulary.phases, by `order`). 'refactor' is optional and handled in derivePhase.
-export const PHASES = (VOCAB?.phases ? [...VOCAB.phases].sort((a, b) => a.order - b.order).map((p) => p.id) : []);
+const FALLBACK_PHASES = ['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'knowledge'];
+export const PHASES = (VOCAB?.phases?.length ? [...VOCAB.phases].sort((a, b) => a.order - b.order).map((p) => p.id) : FALLBACK_PHASES);
 
 export function derivePhase(sessions) {
   const phaseEvents = sessions.filter((s) =>
@@ -105,7 +107,7 @@ export function derivePhase(sessions) {
   return latest.phase;
 }
 
-export const SLICE_MODES = VOCAB?.modes ?? [];
+export const SLICE_MODES = VOCAB?.modes?.length ? VOCAB.modes : ['lite', 'hotfix', 'full', 'escalated'];
 
 /** Serial modes: at most one in_progress feature; escalation signals block DONE. */
 export function isSerialMode(mode) {
@@ -406,10 +408,11 @@ function writeProgress(registry) {
 function resolveSessionCollisions(sliceId, sliceDir) {
   const sessionsDir = join(sliceDir, 'sessions');
   if (!existsSync(sessionsDir)) return;
-  const files = readdirSync(sessionsDir).filter((n) => /^\d{3}-.+\.json$/.test(n));
+  const SESSION_RE = /^(\d+)-(.+\.json)$/;
+  const files = readdirSync(sessionsDir).filter((n) => SESSION_RE.test(n));
   const bySeq = new Map();
   for (const f of files) {
-    const seq = f.slice(0, 3);
+    const seq = Number(SESSION_RE.exec(f)[1]);
     const list = bySeq.get(seq) ?? [];
     list.push(f);
     bySeq.set(seq, list);
@@ -422,14 +425,14 @@ function resolveSessionCollisions(sliceId, sliceDir) {
       return 0;
     }
   };
-  const used = new Set([...bySeq.keys()].map(Number));
+  const used = new Set(bySeq.keys());
   let next = Math.max(0, ...used) + 1;
   for (const [, group] of bySeq) {
     if (group.length < 2) continue;
     group.sort((a, b) => timestampOf(a) - timestampOf(b) || a.localeCompare(b));
     for (const loser of group.slice(1)) {
       while (used.has(next)) next += 1;
-      const target = `${String(next).padStart(3, '0')}-${loser.slice(4)}`;
+      const target = `${String(next).padStart(3, '0')}-${SESSION_RE.exec(loser)[2]}`;
       renameSync(join(sessionsDir, loser), join(sessionsDir, target));
       console.log(`SYNC  ${sliceId} renamed ${loser} → ${target} (AR-3 collision)`);
       used.add(next);
