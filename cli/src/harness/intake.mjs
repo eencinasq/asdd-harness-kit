@@ -45,13 +45,20 @@ for (const w of warnings) if (!asJson) console.error(`WARN  ${w}`);
 if (errors.length) stop(errors);
 
 const sliceId = parsed.block.slice_id;
-const manifestPath = join(root, '.harness/state/manifest.json');
-if (!existsSync(manifestPath)) stop(['no harness here: .harness/state/manifest.json is missing (run asdd install)']);
-const active = JSON.parse(readFileSync(manifestPath, 'utf8')).active_slices ?? [];
+// The slice index is the generated registry.json (global state/manifest.json retired — RV1-AR-1); it may be absent on a
+// fresh clone, so the slice dirs and specs are checked too.
+const stateDir = join(root, '.harness/state');
+if (!existsSync(stateDir)) stop(['no harness here: .harness/state is missing (run asdd install)']);
+let registered = [];
+try {
+  registered = JSON.parse(readFileSync(join(stateDir, 'registry.json'), 'utf8')).slices ?? [];
+} catch {
+  registered = [];
+}
 if (
-  existsSync(join(root, '.harness/state/slices', sliceId)) ||
+  existsSync(join(stateDir, 'slices', sliceId)) ||
   existsSync(join(root, '.harness/specs', sliceId, 'intent.md')) ||
-  active.some((s) => (typeof s === 'string' ? s : s?.slice_id) === sliceId)
+  registered.some((s) => (typeof s === 'string' ? s : s?.slice_id) === sliceId)
 ) {
   stop([`slice "${sliceId}" already exists; an Intent item is imported once (amend the slice instead)`]);
 }

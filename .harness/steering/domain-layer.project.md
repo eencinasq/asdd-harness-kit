@@ -35,7 +35,7 @@ The kit is a set of scripts and documents, not a layered application. Its "domai
 
 **Gate command:** `npm test` (non-zero exit = not passing)
 
-**Semgrep rules:** `…` (none committed: the architecture check generates a temporary config from the boundaries below)
+**Semgrep rules:** `.semgrep/` (`architecture/` boundaries, state, telemetry, adapters, hook-input taint; `standards/js.yml`; each rule file has a test file beside it — `semgrep --test .semgrep`)
 
 **CI / lint:** `.github/workflows/harness-invariants.yml`; `asdd kit skills-lint`, `asdd kit agents-lint`; Biome in `tools/*`
 
@@ -44,6 +44,18 @@ The kit is a set of scripts and documents, not a layered application. Its "domai
 | Paths | Must not import |
 |-------|-----------------|
 | `cli/src/harness` | `.agents` |
+
+## Dependency layers
+
+`cli/src/harness` depends on nothing outside itself: `asdd kit vendor` copies its files into `tools/*/src/harness`, where only siblings resolve.
+
+| Layer | Paths | May depend on |
+|-------|-------|---------------|
+| Shared | `cli/src/paths.mjs`, `cli/src/ui.mjs`, `cli/src/semver.mjs`, `cli/src/pin.mjs` | — |
+| Harness | `cli/src/harness/**` | — |
+| Installer | `cli/src/install/**` | Shared |
+| Kit tooling | `cli/src/kit/**` | Harness, Installer, Shared |
+| CLI entry | `cli/bin/**`, `cli/src/main.mjs`, `cli/src/doctor.mjs`, `cli/src/uninstall.mjs` | Harness, Installer, Kit tooling, Shared |
 
 ## Exceptions
 

@@ -73,7 +73,7 @@ export function item({ block = {}, drop = [], grounding, fitness = 'fit' } = {})
 }
 
 /** A temp repo where the item's evidence resolves. */
-export function repo({ manifest = true } = {}) {
+export function repo({ manifest = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'asdd-intake-'));
   const w = (rel, text) => {
     mkdirSync(dirname(join(root, rel)), { recursive: true });
@@ -195,6 +195,42 @@ test('intent-intake REQ-002 asdd intake creates the slice in the suggested mode 
   }
 });
 
+test('intent-intake REQ-002 asdd intake works without the retired global manifest (RV1-AR-1) and refuses ids already in registry.json', () => {
+  const root = repo({ manifest: false });
+  try {
+    writeFileSync(join(root, 'item.md'), item());
+    const r = runIntake(root, ['--from', 'item.md', '--ref', 'u']);
+    assert.equal(r.status, 0, r.stderr + r.stdout);
+    assert.ok(existsSync(join(root, '.harness/specs/checkout-saved-cards/intent.md')));
+    assert.ok(!existsSync(join(root, '.harness/state/manifest.json')), 'intake never recreates the retired global manifest');
+
+    // A slice known only to the generated registry (no state dir yet) is still a duplicate
+    const other = repo({ manifest: false });
+    try {
+      writeFileSync(join(other, '.harness/state/registry.json'), JSON.stringify({ schema_version: '3.0', slices: [{ slice_id: 'checkout-saved-cards' }] }));
+      writeFileSync(join(other, 'item.md'), item());
+      const dup = runIntake(other, ['--from', 'item.md', '--ref', 'u']);
+      assert.notEqual(dup.status, 0);
+      assert.match(dup.stderr, /already exists/);
+    } finally {
+      rmSync(other, { recursive: true, force: true });
+    }
+
+    // Outside a harness (no .harness/state) intake still refuses to run
+    const bare = mkdtempSync(join(tmpdir(), 'asdd-intake-bare-'));
+    try {
+      writeFileSync(join(bare, 'item.md'), item());
+      const none = runIntake(bare, ['--from', 'item.md', '--ref', 'u', '--accept-stale']);
+      assert.notEqual(none.status, 0);
+      assert.match(none.stderr, /\.harness\/state/);
+    } finally {
+      rmSync(bare, { recursive: true, force: true });
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('intent-intake REQ-001 REQ-003 asdd intake rejects invalid items and stops on stale refs unless --accept-stale', () => {
   const root = repo();
   try {
@@ -241,12 +277,12 @@ test('intent-intake REQ-004 the validator reports stale grounding: WARN by defau
   try {
     writeFileSync(join(root, 'item.md'), item());
     assert.equal(runIntake(root, ['--from', 'item.md', '--ref', 'u']).status, 0);
-    const manifest = JSON.parse(readFileSync(join(root, '.harness/state/manifest.json'), 'utf8'));
+    // The validator discovers slices from .harness/state/slices/ (RV1-AR-1); no global manifest is passed.
     const run = (project) => {
       mkdirSync(join(root, '.harness/config'), { recursive: true });
       writeFileSync(join(root, '.harness/config/project.json'), JSON.stringify(project));
       const out = { fail: [], warn: [] };
-      validate({ root, manifest, fail: (m) => out.fail.push(m), warn: (m) => out.warn.push(m) });
+      validate({ root, fail: (m) => out.fail.push(m), warn: (m) => out.warn.push(m) });
       return out;
     };
     assert.deepEqual(run({}), { fail: [], warn: [] });

@@ -73,8 +73,8 @@
         "TASK-001",
         "TASK-002"
       ],
-      "evidence": "re-verified 2026-11-21 (semgrep-union: spec-drift.md steering copy): generate-runtime-steering --check PASS, kit self --check OK",
-      "evidence_hash": "49b42a74a2973257bdcf513bf117b6158140f0a0a2bd669ee156009f10ab3bcd"
+      "evidence": "re-verified 2026-11-21 (domain-layer.project.md: Dependency layers + .semgrep rules): generate-runtime-steering --check PASS, kit self --check OK; proposal Status grep not runnable on this machine",
+      "evidence_hash": "7fd025dc8e18ff4dd46bd34e93a6a5b57a108a32aeb1a684d9603c10156513c4"
     }
   ]
 }
