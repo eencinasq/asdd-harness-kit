@@ -8,10 +8,11 @@
  * Usage:
  *   asdd repair [--dry-run] [--slice <id>] [--json]
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { PHASES, SLICE_MODES } from './sync-state.mjs';
 
 const root = process.cwd();
 const args = process.argv.slice(2);
@@ -26,7 +27,6 @@ if (sliceArg >= 0 && (!onlySlice || onlySlice.startsWith('-'))) {
 }
 
 const SLICE_ID_RE = /^[a-z0-9_-]+$/;
-const PHASES = ['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'knowledge'];
 const SKELETON = [
   '.harness/state',
   '.harness/state/slices',
@@ -79,9 +79,10 @@ function listDirs(rel) {
     .filter((n) => SLICE_ID_RE.test(n));
 }
 
-function discoverSliceIds(globalManifest) {
+function discoverSliceIds(registry) {
   const ids = new Set();
-  for (const entry of globalManifest?.active_slices ?? []) {
+  // The generated index is one discovery source (global state/manifest.json retired — RV1-AR-1).
+  for (const entry of registry?.slices ?? []) {
     const id = typeof entry === 'string' ? entry : entry?.slice_id;
     if (id && SLICE_ID_RE.test(id)) ids.add(id);
   }
@@ -120,8 +121,8 @@ function seedSessions(sliceId, fromManifest, fromGlobal) {
     : PHASES.includes(fromGlobal?.phase) ? fromGlobal.phase
       : 'discovery';
   const status = fromManifest?.status || fromGlobal?.status || 'in_progress';
-  const mode = ['lite', 'hotfix', 'full', 'escalated'].includes(fromManifest?.mode) ? fromManifest.mode
-    : ['lite', 'hotfix', 'full', 'escalated'].includes(fromGlobal?.mode) ? fromGlobal.mode
+  const mode = SLICE_MODES.includes(fromManifest?.mode) ? fromManifest.mode
+    : SLICE_MODES.includes(fromGlobal?.mode) ? fromGlobal.mode
       : 'lite';
   const done = status === 'DONE';
 
@@ -221,55 +222,38 @@ function repairSlice(sliceId, globalById) {
   ensureFeatures(sliceId);
 }
 
-function ensureGlobalManifest(sliceIds) {
+/**
+ * Global .harness/state/manifest.json is retired (RV1-AR-1): the generated registry.json is the slice index.
+ * Whatever project data it carried (domain_model_version) is preserved into tracked .harness/config/project.json,
+ * then the file is removed — by shape, not by managed-list proof (it was always kit-generated).
+ */
+function retireGlobalManifest() {
   const rel = '.harness/state/manifest.json';
-  let data = readJson(rel);
+  const data = readJson(rel);
+  if (!existsSync(join(root, rel))) return;
   if (!data || !Array.isArray(data.active_slices)) {
-    note(data ? 'FIX' : 'WRITE', rel, 'global manifest');
-    data = {
-      schema_version: '3.0',
-      domain_model_version: data?.domain_model_version || '0.0.0',
-      active_slices: [],
-    };
-  } else if (data.schema_version !== '2.0' && data.schema_version !== '3.0') {
-    note('FIX', rel, `schema_version ${data.schema_version} → 3.0`);
-    data = { ...data, schema_version: '3.0' };
+    note('WARN', rel, 'unrecognized content — kept for manual reconciliation');
+    return;
   }
+  const projectRel = '.harness/config/project.json';
+  const project = readJson(projectRel);
+  if (project && data.domain_model_version && project.domain_model_version === undefined) {
+    project.domain_model_version = data.domain_model_version;
+    writeJson(projectRel, project);
+    note('MIGRATE', `${rel} → ${projectRel}`, `domain_model_version ${data.domain_model_version}`);
+  }
+  note('REMOVE', rel, 'superseded by generated registry.json');
+  if (!dryRun) rmSync(join(root, rel), { force: true });
+}
 
+/** Previous phase/status/mode per slice, from the generated index (was global manifest active_slices). */
+function registrySliceIndex(registry) {
   const byId = new Map();
-  for (const entry of data.active_slices) {
-    const id = typeof entry === 'string' ? entry : entry?.slice_id;
-    if (id) byId.set(id, typeof entry === 'string' ? { slice_id: id } : { ...entry });
+  for (const entry of registry?.slices ?? []) {
+    const s = typeof entry === 'string' ? { slice_id: entry } : entry;
+    if (s?.slice_id) byId.set(s.slice_id, s);
   }
-
-  const next = [];
-  for (const id of sliceIds) {
-    const prev = byId.get(id) || {};
-    next.push({
-      slice_id: id,
-      phase: PHASES.includes(prev.phase) ? prev.phase : 'discovery',
-      status: ['DONE', 'in_progress', 'PARKED', 'ABANDONED'].includes(prev.status) ? prev.status : 'in_progress',
-      mode: ['lite', 'hotfix', 'full', 'escalated'].includes(prev.mode) ? prev.mode : 'lite',
-      manifest: `.harness/state/slices/${id}/manifest.json`,
-      features: `.harness/features/${id}.features.json`,
-    });
-  }
-
-  const before = JSON.stringify(data.active_slices);
-  data.active_slices = onlySlice
-    ? [
-        ...data.active_slices
-          .map((e) => (typeof e === 'string' ? { slice_id: e } : e))
-          .filter((e) => e?.slice_id && e.slice_id !== onlySlice),
-        ...next,
-      ]
-    : next;
-  data.schema_version = data.schema_version === '2.0' ? '2.0' : '3.0';
-  if (before !== JSON.stringify(data.active_slices) || !existsSync(join(root, rel))) {
-    note('WRITE', rel, `${data.active_slices.length} active slice(s)`);
-    writeJson(rel, data);
-  }
-  return { data, byId };
+  return byId;
 }
 
 function runSync(sliceIds) {
@@ -301,9 +285,10 @@ if (!existsSync(join(root, '.harness'))) {
 
 for (const dir of SKELETON) ensureDir(dir);
 
-const preliminary = readJson('.harness/state/manifest.json');
+const preliminary = readJson('.harness/state/registry.json');
 const sliceIds = discoverSliceIds(preliminary);
-const { byId } = ensureGlobalManifest(sliceIds);
+const byId = registrySliceIndex(preliminary);
+retireGlobalManifest();
 
 for (const id of sliceIds) repairSlice(id, byId);
 

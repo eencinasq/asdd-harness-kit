@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-platform-contract-010",
+  "timestamp": "2026-11-14T10:30:00Z",
+  "agent": "devin",
+  "slice_id": "platform-contract",
+  "event_type": "checkpoint",
+  "phase": "qa",
+  "mode": "full",
+  "evidence": "v3 §6.2 tracking updated: G-16/D-11 flipped to [x] — contract side fully landed (source_root, files[] ship rows, ignore rows emit at install, EARS halves verified via git check-ignore, loadRegistry fail-closed invariant). DOM-11 annotated: re-pin target moved — lists now derive from contribution-points.json, not phases.mjs/versions.mjs spans. DOM-11 remains open by design (profiling lineage Phase-2 doc fix). Verified: git check-ignore ignores spans.jsonl (registry-derived row); telemetry.schema.json stays tracked.",
+  "concerns": [],
+  "scope_paths": [
+    "docs/knowledge-base/profiling-proposals/v2.md"
+  ]
+}

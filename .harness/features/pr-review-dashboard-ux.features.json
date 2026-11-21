@@ -27,7 +27,7 @@
         "tools/spec-drift/ui/shared/styles.css",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "85f330d383dc442a114b142e27445112f11e1a1bbdb70c801ab931f26ab54d63"
+      "evidence_hash": "048f8b05e057fbb08d9865bcbd1b7ab24c957b07a45214ab9495ff1db1427f34"
     },
     {
       "id": "TASK-002",
@@ -57,7 +57,7 @@
         "tools/spec-drift/ui/pr-review/main.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "0556508a0e66947b5047236cace862bedc1c35b2456e544e079150e748aed69d"
+      "evidence_hash": "5a0764dd4b910150756e4142ada6d4f604a701645ebf41396cabb0f4d97841f5"
     },
     {
       "id": "TASK-003",
@@ -82,7 +82,7 @@
         "tools/spec-drift/src/pr-review/architecture/architecture-scan.spec.ts",
         "tools/spec-drift/ui/pr-review/main.ts"
       ],
-      "evidence_hash": "38901a5d2d648c25234738c442976933cc177075a810f552e379911c67f966a5"
+      "evidence_hash": "bbea30fbc15e7fa9139015c1114eacab432e870aa3eeb99b09792703a6ea2856"
     },
     {
       "id": "TASK-004",
@@ -106,7 +106,7 @@
         "tools/spec-drift/ui/pr-review/main.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "82f232d6d31f76cf238328eeca443dd67cccf0703465de821d911072be03d6a0"
+      "evidence_hash": "8f403a691794ea2dbcf76e3bd4325079d77eca419a684083df163b9dbbb47ff6"
     },
     {
       "id": "TASK-005",
@@ -133,7 +133,7 @@
         "tools/spec-drift/ui/shared/styles.css",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "7aaf1c263d5894b10f1ba81df7427ca7f4df4bcc8ffdc05a8a1408e36a5fa289"
+      "evidence_hash": "048f8b05e057fbb08d9865bcbd1b7ab24c957b07a45214ab9495ff1db1427f34"
     },
     {
       "id": "TASK-006",
@@ -157,7 +157,7 @@
         "tools/spec-drift/ui/pr-review/main.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "8f7565c46add0c80d068570369533cc4e78d49fa5e8bbe11d641e921127a0bbe"
+      "evidence_hash": "8f403a691794ea2dbcf76e3bd4325079d77eca419a684083df163b9dbbb47ff6"
     },
     {
       "id": "TASK-007",
@@ -190,7 +190,7 @@
         "tools/spec-drift/ui/pr-review/main.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "aea58a563a21b2e29e736035eb69b06718ef664a95943be14538493486167f8c"
+      "evidence_hash": "6714ba77137cd97361bc167619ddad3a5148e3a95a01dbd42234bcd8514860fb"
     },
     {
       "id": "TASK-008",
@@ -213,7 +213,7 @@
         "tools/spec-drift/ui/pr-review/main.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "06841805d11196c66513a619ef72e605ec33c4992eed9e43ca27c320ff3beb9e"
+      "evidence_hash": "6abf676d55cb0a28ed00723b6e9d5e59783be8dd3073aa3860440e1218ea4a20"
     },
     {
       "id": "TASK-009",
@@ -237,7 +237,7 @@
         "tools/spec-drift/ui/pr-review/main.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "52a182204aaf0a3422cfc8a5e90b30a8b9915062f434b032179f2b9cffd9ccc7"
+      "evidence_hash": "8f403a691794ea2dbcf76e3bd4325079d77eca419a684083df163b9dbbb47ff6"
     },
     {
       "id": "TASK-010",
@@ -261,7 +261,7 @@
         "tools/spec-drift/ui/pr-review/main.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "0aa1f0c534700f3f52dc71562dec420e887e626305ed28a350ffdb9a16f29a4d"
+      "evidence_hash": "8f403a691794ea2dbcf76e3bd4325079d77eca419a684083df163b9dbbb47ff6"
     },
     {
       "id": "TASK-011",
@@ -285,7 +285,7 @@
         "tools/spec-drift/ui/shared/styles.css",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "d84021c692d41fec4bf5dec87c6163d0ee08eb87ca3b09a24798cce55dd6d088"
+      "evidence_hash": "96c7ba410983ef6805c4ac289ff90166228b723cb7e974416ae195869018f918"
     },
     {
       "id": "TASK-012",
@@ -310,7 +310,7 @@
         "tools/spec-drift/ui/pr-review/main.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "9022233c278e2e3d53d2641b1aa3b497ce3043dd876b673181036a1145cbb194"
+      "evidence_hash": "048f8b05e057fbb08d9865bcbd1b7ab24c957b07a45214ab9495ff1db1427f34"
     },
     {
       "id": "TASK-013",
@@ -342,7 +342,7 @@
         "tools/spec-drift/ui/pr-review/main.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "7cbc10de78403106c0bc9d240c6b2e7a90ce2f1716fe042596e2bd47d676793f"
+      "evidence_hash": "5a4897faa42179f391c866fbd94d6e4b36fa46a60415d9982bba8e7c259814c8"
     },
     {
       "id": "TASK-014",
@@ -369,7 +369,7 @@
         "tools/spec-drift/test/mcp.e2e-spec.ts",
         "tools/spec-drift/test/ui.e2e-spec.ts"
       ],
-      "evidence_hash": "1744e35be200c3cba640d141a068a13b6bf432b44350adb5152e4cb12184bdc0"
+      "evidence_hash": "bd0158fc004761a93f50973c03c4ef0ecb472aa51cff455e96b9bdf321966cdc"
     },
     {
       "id": "TASK-015",

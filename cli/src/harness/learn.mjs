@@ -27,9 +27,11 @@ import {
   KIT_REPO,
   compactSignals,
   exportLessons,
+  derivePatterns,
   ingestReviewMetrics,
   failureSignatures,
   nextProposalId,
+  readPatterns,
   writePatterns,
 } from './learning-lib.mjs';
 
@@ -37,7 +39,7 @@ const root = process.cwd();
 const argv = process.argv.slice(2);
 
 if (argv.includes('-h') || argv.includes('--help')) {
-  console.log('Usage: asdd learn [--all | --json | --summary | --signatures | --export [--out <file>] | --propose <LP-id>]');
+  console.log('Usage: asdd learn [--all | --json | --summary | --signatures | --check | --export [--out <file>] | --propose <LP-id>]');
   process.exit(0);
 }
 
@@ -45,6 +47,20 @@ if (argv.includes('--signatures')) {
   const sigs = failureSignatures(root);
   if (!sigs.length) console.log('(no signed failure-log entries yet)');
   for (const s of sigs) console.log(`  ×${String(s.entries).padEnd(3)} ${s.signature}`);
+  process.exit(0);
+}
+
+if (argv.includes('--check')) {
+  const { patterns, unsigned_failures } = derivePatterns(root);
+  const onDisk = readPatterns(root);
+  const stale = !onDisk
+    || JSON.stringify(onDisk.patterns) !== JSON.stringify(patterns)
+    || (onDisk.summary?.unsigned_failures ?? 0) !== unsigned_failures;
+  if (stale) {
+    console.error(`FAIL  ${PATTERNS_FILE} is stale — run asdd learn`);
+    process.exit(1);
+  }
+  console.log(`OK    ${PATTERNS_FILE} — ${patterns.length} patterns`);
   process.exit(0);
 }
 

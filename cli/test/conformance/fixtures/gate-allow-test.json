@@ -1,0 +1,10 @@
+{
+  "name": "gate-allow-test",
+  "setup": [
+    { "op": "install" },
+    { "op": "slice", "id": "demo" }
+  ],
+  "invoke": { "cmd": "gate", "stdin": "{\"command\":\"npm test\"}" },
+  "expect": { "exit": 0, "stdout_json": { "permission": "allow" }, "spans_tail": { "kind": "test", "status": "OK" } },
+  "normalize": ["ids", "timestamps", "durations"]
+}

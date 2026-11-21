@@ -1,0 +1,14 @@
+{
+ "schema_version": "1.0",
+ "session_id": "sess-microkernel-polish-004",
+ "timestamp": "2026-11-17T14:41:00.000Z",
+ "agent": "asdd-pipeline",
+ "human": "eencinas",
+ "slice_id": "microkernel-polish",
+ "event_type": "feature_started",
+ "phase": "implementation",
+ "feature_id": "TASK-002",
+ "evidence": "Wave 1 Task 1.2 — harness-telemetry contract subtype in checkExecutableShape ({id,description,emit}, append-only).",
+ "scope_paths": ["cli/src/install/registry.mjs","cli/test/registry.test.mjs","cli/registry/contribution-points.json"],
+ "concerns": []
+}

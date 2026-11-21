@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "name": "http-api",
+  "version": "1.0.0",
+  "description": "API & interface design skill + OpenAPI spec-drift adapter",
+  "engines": { "asdd": ">=3.12.0" },
+  "trust": "executable",
+  "activation": { "flag": "project.json modules.http-api" },
+  "contributes": {
+    "skills": [
+      { "path": "skills", "mount": ".agents/skills" }
+    ],
+    "adapters": [
+      { "path": "adapters", "mount": ".agents/mcp/adapters", "contract": "spec-drift-adapter" }
+    ]
+  }
+}

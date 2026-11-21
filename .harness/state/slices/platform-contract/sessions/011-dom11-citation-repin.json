@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-platform-contract-011",
+  "timestamp": "2026-11-14T11:00:00Z",
+  "agent": "devin",
+  "slice_id": "platform-contract",
+  "event_type": "checkpoint",
+  "phase": "qa",
+  "mode": "full",
+  "evidence": "DOM-11 citation re-pin landed in docs/knowledge-base/profiling-proposals/v2.md (~30 sites): install-into.sh/generate-versions.mjs refs → contribution-points.json (files[], ignore_patterns, generators, commands) + cli/src/{install,harness,kit}/ + cli/test/lifecycle.sh; quality-gates.md split refs → .exec/.learn; harness-script basenames → cli/src/harness/ paths with verified line anchors; telemetry.schema.json description strings re-pinned (check-invariants.mjs:115, command-gate.mjs:62-65). Substantive drift surfaced + annotated: .harness/scripts/ retired (asdd profile replaces script-path invocation), .harness/** unpackaged (G-TEL-7 premise dissolved — annotated moot), check-invariants now 10 validators, global state/manifest.json retired (P-1 row), 116→925 tracked state files, harness-profile generator run string flagged as stale placeholder. Sessions 009/010 schema fixed (slice_id/session_id/agent fields). Vault v3 §6.2 DOM-11 flipped to [x]. Final sweep: zero stale installer citations remain.",
+  "concerns": [],
+  "scope_paths": [
+    "docs/knowledge-base/profiling-proposals/v2.md",
+    "cli/scaffold/state/telemetry/telemetry.schema.json",
+    ".harness/state/telemetry/telemetry.schema.json",
+    "cli/versions.json"
+  ]
+}

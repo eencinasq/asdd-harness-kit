@@ -43,10 +43,10 @@ test('REQ-003 inventories MUST REQs when enabled', () => {
       JSON.stringify({ schema_version: '3.0', slice_id: 'demo', status: 'in_progress', phase: 'qa', mode: 'lite' }),
     );
     writeFileSync(
-      join(root, '.harness/state/manifest.json'),
+      join(root, '.harness/state/registry.json'),
       JSON.stringify({
         schema_version: '3.0',
-        active_slices: [{ slice_id: 'demo', features: '.harness/features/demo.features.json' }],
+        slices: [{ slice_id: 'demo', features: '.harness/features/demo.features.json' }],
       }),
     );
     writeFileSync(join(root, 'test/demo.test.mjs'), '// REQ-001\n');

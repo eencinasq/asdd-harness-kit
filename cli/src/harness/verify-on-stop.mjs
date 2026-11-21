@@ -54,10 +54,14 @@ function hookRuntime(payload) {
   return 'cli';
 }
 
-/** `check --live` attributes, only for a numeric exit status: exit_code and the count of `FAIL ` lines. */
+/** `check --live` attributes, only for a numeric exit status: exit_code, the count of `FAIL ` lines, and the failure signature. */
 function checkAttrs(result) {
   const lines = `${result.stdout || ''}\n${result.stderr || ''}`.split('\n');
-  return { exit_code: result.status, violations_count: lines.filter((line) => /^FAIL\s/.test(line)).length };
+  return {
+    exit_code: result.status,
+    violations_count: lines.filter((line) => /^FAIL\s/.test(line)).length,
+    ...(result.status !== 0 ? { failure_signature: 'hook:verify-on-stop' } : {}),
+  };
 }
 
 // Telemetry is best-effort and runs only after the payload is written (ADR-001): a missing or broken lib, a throw,

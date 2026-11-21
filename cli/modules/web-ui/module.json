@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "name": "web-ui",
+  "version": "1.0.0",
+  "description": "Frontend UI engineering + browser-testing skills",
+  "engines": { "asdd": ">=3.12.0" },
+  "trust": "declarative",
+  "activation": { "flag": "project.json modules.web-ui" },
+  "contributes": {
+    "skills": [
+      { "path": "skills", "mount": ".agents/skills" }
+    ]
+  }
+}

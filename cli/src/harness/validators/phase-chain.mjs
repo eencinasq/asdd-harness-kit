@@ -61,12 +61,13 @@ export function phaseChainFindings(sessions) {
 }
 
 export default function validate(ctx) {
-  const { root, warn, manifest } = ctx;
-  if (!manifest || !Array.isArray(manifest.active_slices)) return;
+  const { root, warn, registry } = ctx;
+  if (!registry || !Array.isArray(registry.slices)) return;
 
-  for (const entry of manifest.active_slices) {
+  for (const entry of registry.slices) {
     const sliceId = typeof entry === 'string' ? entry : entry?.slice_id;
     if (typeof sliceId !== 'string' || !sliceId.trim()) continue;
+    if (ctx.slice && sliceId !== ctx.slice) continue;
     const sliceDir = join(root, '.harness/state/slices', sliceId);
     if (!existsSync(join(sliceDir, 'sessions'))) continue; // legacy v2 slices
 

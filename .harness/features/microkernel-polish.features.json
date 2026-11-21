@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "microkernel-polish",
+  "source_tasks": ".harness/specs/microkernel-polish/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Runnable --check coverage across all 9 kit regen generators",
+      "user_visible_behavior": "asdd kit regen --check runs a real freshness check for every umbrella generator — versions (versions.json digests vs recomputed set), build (dist fingerprint), learn (patterns.json vs derivePatterns), sync-knowledge (knowledge JSONL vs scanKnowledge) — and reports zero skipped.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs kit regen --check",
+        "node --test cli/test/versions.test.mjs"
+      ],
+      "evidence": "re-verified under microkernel-polish: asdd kit regen --check: 9/9 generators, 0 skipped, exit 0 | registry+versions tests: 34+5 pass | asdd check: 0 FAIL",
+      "scope_paths": [
+        "cli/src/kit/versions.mjs",
+        "cli/src/harness/learn.mjs",
+        "cli/src/harness/sync-knowledge.mjs",
+        "cli/src/main.mjs",
+        "cli/registry/contribution-points.json",
+        "cli/test/versions.test.mjs"
+      ],
+      "evidence_hash": "223157bf6fa50b952d7a4bc30720b5241dec6da7503ed93df6e8327e4ecbc18e"
+    },
+    {
+      "id": "TASK-002",
+      "title": "harness-telemetry executable shape check (D-7/D-11)",
+      "user_visible_behavior": "checkExecutableShape validates per-contract export shape: spec-drift-adapter keeps {id, description, run} read-only; a harness-telemetry adapter must literal-export {id, description, emit} and may only append (no writeFileSync/mkdir/etc).",
+      "status": "passing",
+      "priority": 2,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-003"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/test/registry.test.mjs"
+      ],
+      "evidence": "node --test registry.test.mjs: 34 pass — 5 new shape tests (telemetry accept, missing emit, mutating call, spec-drift append ban, unknown contract); adapter.schema documents both subtypes",
+      "scope_paths": [
+        "cli/src/install/registry.mjs",
+        "cli/registry/contribution-points.json",
+        "cli/test/registry.test.mjs"
+      ],
+      "evidence_hash": "574d530641b728222edad024d4841d99494e14f901bf76e04a25228b5dfbf62c"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Ratify Q-NEW-1/Q-NEW-3: phases and commands permanently kernel-owned",
+      "user_visible_behavior": "Consumer contributes.phases and contributes.commands fail closed via KIT_INTERNAL, pinned by tests; the resolution is recorded in the slice intent and sessions.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-004"
+      ],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "node --test cli/test/registry.test.mjs"
+      ],
+      "evidence": "node --test registry.test.mjs: 34 pass — contributes.phases fails closed /kit-internal/ pinned (Q-NEW-1); commands already pinned (Q-NEW-3); resolution recorded in design.md + session 005",
+      "scope_paths": [
+        "cli/src/install/registry.mjs",
+        "cli/test/registry.test.mjs",
+        ".harness/specs/microkernel-polish/intent.md"
+      ],
+      "evidence_hash": "26c3b69ad831467f88472e5da55f59c0bfda9d366379564e24d088c2db17bbe1"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Fix stale harness-profile / profiling_rollup command strings",
+      "user_visible_behavior": "generators['harness-profile'].run and profiling_rollup.merge.regen read 'asdd profile --slice <id>' instead of the retired node script path.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "devin",
+      "req_ids": [
+        "REQ-005"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/test/registry.test.mjs",
+        "node cli/bin/asdd.mjs kit regen --check"
+      ],
+      "evidence": "registry diff: generators.harness-profile.run + profiling_rollup.merge.regen → \"asdd profile --slice <id>\" (declared Phase-2 CLI surface; old .harness/scripts path retired)",
+      "scope_paths": [
+        "cli/registry/contribution-points.json"
+      ],
+      "evidence_hash": "1c61e412cc5dabfb4d97fb671bef7a5e3f3fb46142f2284e68d59a5aa8cab311"
+    }
+  ]
+}

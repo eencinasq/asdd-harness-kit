@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-platform-contract-012",
+  "timestamp": "2026-11-14T17:45:00Z",
+  "agent": "devin",
+  "slice_id": "platform-contract",
+  "event_type": "checkpoint",
+  "phase": "qa",
+  "mode": "full",
+  "evidence": "First real cross-major consumer upgrade: ai-messager 3.3.0 → 3.12.0 via `asdd install --force --modules=all --rehome-colliding-skills --rehome-colliding-steering`. Migration machinery validated in the field: legacy installed-versions.json (3.3.0 format) correctly unparseable → provenance guard halted → --rehome-* flags resolved (12 customized skills → .agents/skills.local/, 21 modified steering → .harness/steering.local/); global state/manifest.json retired → registry.json generated; .harness/scripts/ surgically cleaned (kit files removed, 9 project scripts kept: check-domain-boundaries, lint-skills, jev-*, sprint-sync, etc.); project MCP fleet (codegraph/jev-gate/chrome-devtools/playwright/storybook) untouched; *.project.md bindings untouched; quality-gates split files + spec-drift.md landed; gitignore/GITATTR rows emitted; retired-path warnings preserved unmanaged files (codegraph.md, retired MCP servers, authored skills). Hard local package install: pnpm add -Dw file: → real copy in .pnpm store, `pnpm exec asdd` = 3.12.0, doctor all-ok (cli FAIL resolved). Their verify-phase DRIFT-01 FAILs are pre-existing repo state, not install damage.",
+  "concerns": [],
+  "scope_paths": [
+    "/Users/ougarte/Developer/github/efactory-llc/ai-messager/.harness/",
+    "/Users/ougarte/Developer/github/efactory-llc/ai-messager/.agents/",
+    "/Users/ougarte/Developer/github/efactory-llc/ai-messager/package.json"
+  ]
+}

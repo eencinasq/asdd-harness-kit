@@ -4,14 +4,11 @@ tags:
   - discovery
   - spec
   - validation
-  - domain
-  - design
   - task_planning
   - implementation
   - qa
   - knowledge
   - refactor
-  - lite
 classification: portable
 ---
 

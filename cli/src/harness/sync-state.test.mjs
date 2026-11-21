@@ -126,7 +126,13 @@ test('REQ-005 AC-004: sync-state writes PROGRESS.md from the registry; init-slic
   try {
     cpSync(dirname(fileURLToPath(import.meta.url)), join(root, '.harness/cli/src/harness'), { recursive: true });
     mkdirSync(join(root, '.harness/state/slices'), { recursive: true });
-    writeFileSync(join(root, '.harness/state/manifest.json'), JSON.stringify({ schema_version: '3.0', active_slices: [] }));
+    // An installed project carries the platform registry (phase/mode vocabulary lives there now, D-3).
+    mkdirSync(join(root, '.harness/config'), { recursive: true });
+    cpSync(
+      join(dirname(fileURLToPath(import.meta.url)), '../../registry/contribution-points.json'),
+      join(root, '.harness/config/contribution-points.json'),
+    );
+    writeFileSync(join(root, '.harness/state/registry.json'), JSON.stringify({ schema_version: '3.0', slices: [] }));
     writeFileSync(join(root, '.harness/PROGRESS.md'), 'hand edited\n');
     const run = (...args) => spawnSync(process.execPath, args, { cwd: root, encoding: 'utf8' });
     const a = run('.harness/cli/src/harness/init-slice.mjs', 'alpha');

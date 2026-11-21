@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "name": "playwright-e2e",
+  "version": "1.0.0",
+  "description": "Playwright end-to-end testing skill + e2e-tester agent",
+  "engines": { "asdd": ">=3.12.0" },
+  "trust": "declarative",
+  "activation": { "flag": "project.json modules.playwright-e2e" },
+  "contributes": {
+    "agents": [
+      { "path": "asdd-e2e-tester.md", "mount": ".agents/agents/asdd-e2e-tester.md" }
+    ],
+    "skills": [
+      { "path": "skills", "mount": ".agents/skills" }
+    ]
+  }
+}

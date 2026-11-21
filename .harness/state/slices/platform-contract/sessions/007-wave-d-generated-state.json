@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-platform-contract-007",
+  "timestamp": "2026-11-14T08:30:00Z",
+  "agent": "devin",
+  "slice_id": "platform-contract",
+  "event_type": "checkpoint",
+  "phase": "qa",
+  "mode": "full",
+  "evidence": "Wave D complete: generated-state migration + merge policy. Global .harness/state/manifest.json retired (RV1-AR-1): readers (check-invariants ctx, drift-lib listSlices, init-slice dup-check, repair discovery, validators features/phase-chain/lite-escalation) now read generated registry.json; writers removed — repair/init-slice no longer write it, install+repair migrate domain_model_version into project.json then remove the file by shape. AR-2 implemented: missing registry + state => FAIL 'run: asdd sync'; missing + zero-state => WARN legitimate; sessions-without-manifest and summaries-without-patterns fail with regen instructions; both index<->dir drift directions fail. .gitattributes merge-policy block (G-5/D-4) generated from registry attribute_globs + merge drivers inside a marked, user-content-preserving block with an inline conflict runbook; wired at both install sites (selfInstall + normal). cli/templates/manifest.json removed (no seed for generated state — fixes --pr leftover ?? .harness/). 42 generated files untracked via git rm --cached. manifest.md gained a compressed Git-merge-policy pointer (steering budget 36358 < 36500). Caught + fixed: features.mjs ctx.manifest regression (warned every features file), 8 test fixtures migrated to registry.json shape. npm test 217/217; install/lifecycle green; only pre-existing DRIFT-02/WARNs remain.",
+  "concerns": [],
+  "scope_paths": [
+    "cli/registry/contribution-points.json",
+    "cli/src/install/index.mjs",
+    "cli/src/install/phases.mjs",
+    "cli/src/install/registry.mjs",
+    "cli/src/harness/check-invariants.mjs",
+    "cli/src/harness/validators/manifest.mjs",
+    "cli/src/harness/validators/features.mjs",
+    "cli/src/harness/validators/phase-chain.mjs",
+    "cli/src/harness/validators/lite-escalation.mjs",
+    "cli/src/harness/drift-lib.mjs",
+    "cli/src/harness/init-slice.mjs",
+    "cli/src/harness/repair.mjs",
+    "cli/steering/manifest.md",
+    "cli/test/registry.test.mjs",
+    "cli/test/lifecycle.sh",
+    ".gitattributes",
+    ".gitignore"
+  ]
+}

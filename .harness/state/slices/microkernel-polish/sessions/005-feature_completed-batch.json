@@ -1,0 +1,14 @@
+{
+ "schema_version": "1.0",
+ "session_id": "sess-microkernel-polish-005",
+ "timestamp": "2026-11-17T15:05:00.000Z",
+ "agent": "asdd-pipeline",
+ "human": "eencinas",
+ "slice_id": "microkernel-polish",
+ "event_type": "feature_completed",
+ "phase": "implementation",
+ "feature_id": "TASK-002,TASK-003,TASK-004",
+ "evidence": "TASK-002: CONTRACT_SHAPES table in checkExecutableShape (spec-drift-adapter read-only / harness-telemetry append-only, unknown contract fails closed); 34 registry tests pass. TASK-003: contributes.phases kit-internal pin; Q-NEW-1+Q-NEW-3 ratified permanently kernel-owned — a consumer phase binds gates/agents/steering-tag allocation (contract change, not manifest row); commands needs a dispatcher entry in the kernel table (execution surface the microkernel keeps closed). TASK-004: both stale strings → asdd profile --slice <id> (declared Phase-2 surface).",
+ "scope_paths": ["cli/src/install/registry.mjs","cli/test/registry.test.mjs","cli/registry/contribution-points.json",".harness/specs/microkernel-polish/design.md"],
+ "concerns": ["microkernel-polish:TASK-001 re-verification pending (reopened by TASK-002 registry edit)", "11 sibling-slice features blocked pending re-verification"]
+}

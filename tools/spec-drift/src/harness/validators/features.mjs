@@ -172,7 +172,7 @@ export function validateFeatureExecution(data, rel, sliceId, fail, readJson, roo
 }
 
 export default function validate(ctx) {
-  const { root, fail, warn, readJson, manifest } = ctx;
+  const { root, fail, warn, readJson, registry } = ctx;
   const featuresDir = join(root, '.harness/features');
   if (!existsSync(featuresDir)) return;
 
@@ -181,20 +181,21 @@ export default function validate(ctx) {
     const rel = `.harness/features/${name}`;
     const data = readJson(rel);
     if (!data) continue;
+    if (ctx.slice && data.slice_id !== ctx.slice) continue;
     validateFeatureDocument(data, rel, fail, root, warn);
     const list = Array.isArray(data.features) ? data.features : [];
     const sliceId = data.slice_id;
     validateFeatureExecution(data, rel, sliceId, fail, readJson, root);
 
-    // Check features without a corresponding slice in global manifest
+    // Check features without a corresponding slice in the generated registry
     if (sliceId) {
       const knownSliceIds = new Set(
-        Array.isArray(manifest?.active_slices)
-          ? manifest.active_slices.map((s) => typeof s === 'string' ? s : s.slice_id)
+        Array.isArray(registry?.slices)
+          ? registry.slices.map((s) => typeof s === 'string' ? s : s.slice_id)
           : [],
       );
       if (!knownSliceIds.has(sliceId)) {
-        warn(`features file "${rel}" references slice "${sliceId}" not in global manifest`);
+        warn(`features file "${rel}" references slice "${sliceId}" not in registry.json`);
       }
     }
   }

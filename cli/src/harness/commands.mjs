@@ -1,84 +1,23 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 /**
- * The harness commands of the asdd CLI: `asdd <command> [args]` runs the script next to this file, in the project of
- * the current directory. One table for the dispatcher, `asdd help`, and the docs.
+ * The harness + kit commands of the asdd CLI (registry commands.* — kernel-owned tables; the consumer `commands`
+ * contribution type stays fail-closed). `asdd <command> [args]` runs the script next to this file, in the project of
+ * the current directory. One table for the dispatcher, `asdd help`, and the docs. Bundled registry only: command
+ * semantics are the running CLI's own contract (cli/registry/ ships in the package).
  */
-export const HARNESS_COMMANDS = {
-  check: { script: 'check-invariants.mjs', help: 'every harness invariant and spec drift (Verify-on-Stop runs it)' },
-  verify: { script: 'verify-on-stop.mjs', help: 'the Stop hook: runs check --live, blocks the session on FAIL (stdin: hook payload)' },
-  gate: { script: 'command-gate.mjs', help: 'the shell command hook: allow / deny (stdin: hook payload)' },
-  drift: { script: 'check-spec-drift.mjs', help: 'spec drift DRIFT-01…07 [--json] [--base <ref>] [--target <ref>] [--slice <id>] [--requirements]' },
-  'check-config': { script: 'check-project-config.mjs', help: '.harness/config/project.json against its schema' },
-  'skills-index': { script: 'check-skills-index.mjs', help: 'the skills index in skills.md [--write]' },
-  status: {
-    script: 'harness-status.mjs',
-    help: 'slices, phases, open learning patterns [--metrics] [--json] [--html]',
-  },
-  converge: {
-    script: 'converge.mjs',
-    help: 'cheap feature converge: req_ids, test mentions, evidence [--slice <id>] [--strict] [--json]',
-  },
-  'converge-eval': {
-    script: 'converge-eval.mjs',
-    help: 'score EARS/converge fixtures under cli/eval/converge-ears [--json] [--cases <dir>]',
-  },
-  'skill-eval': {
-    script: 'skill-eval.mjs',
-    help: 'score skill fixtures under cli/eval/skills [--skill <name>] [--baseline <ref>] [--json]',
-  },
-  waves: {
-    script: 'waves.mjs',
-    help: 'parallelism hints from feature owners/deps/scopes [--slice <id>] [--json]',
-  },
-  portfolio: {
-    script: 'portfolio.mjs',
-    help: 'read-only multi-repo summary from .harness/config/portfolio.json [--json]',
-  },
-  'tracker-sync': {
-    script: 'tracker-sync.mjs',
-    help: 'plan bi-directional tracker sync from handoff+sessions [--slice <id>] [--json] [--apply]',
-  },
-  intake: {
-    script: 'intake.mjs',
-    help: 'import a tracker Intent item as a slice: intake --from <file|-> --ref <url> [--accept-stale] [--dry-run] [--json]',
-  },
-  'spec-source': {
-    script: 'spec-source.mjs',
-    help: 'experimental REQ inventory (requires capabilities.spec_as_source) [--slice <id>] [--json]',
-  },
-  'init-flow': {
-    script: 'init-flow.mjs',
-    help: '15-minute brownfield path: install (if needed), one lite slice, minimal feature, asdd check',
-  },
-  sync: { script: 'sync-state.mjs', help: 'regenerate manifests, registry, PROGRESS.md, knowledge [--slice <id>]' },
-  repair: { script: 'repair.mjs', help: 'repair harness layout (slices, state, specs, features) then sync [--dry-run] [--slice <id>] [--json]' },
-  slice: {
-    sub: {
-      init: { script: 'init-slice.mjs', help: 'start a slice: slice init <id> [--full | --hotfix]' },
-      escalate: { script: 'escalate-slice.mjs', help: 'lite/hotfix → escalated: slice escalate <id> --reasons "E1,E4" [--by <owner>] [--note "why"]' },
-      amend: { script: 'amend-slice.mjs', help: 'reopen DONE slice: slice amend <id> [--note "…"] [--by <owner>]' },
-    },
-  },
-  knowledge: {
-    sub: {
-      sync: { script: 'sync-knowledge.mjs', help: 'rebuild the knowledge index [--status] [--embed] [--backend=jsonl|sqlite|auto]' },
-      search: { script: 'knowledge-query.mjs', pass: true, help: 'knowledge search "<query>" [--k 5] [--slice <id>]' },
-      trace: { script: 'knowledge-query.mjs', pass: true, help: 'knowledge trace <node-id> [--depth 2]' },
-      slice: { script: 'knowledge-query.mjs', pass: true, help: 'knowledge slice <slice-id>' },
-      status: { script: 'knowledge-query.mjs', pass: true, help: 'knowledge status' },
-      patterns: { script: 'knowledge-query.mjs', pass: true, help: 'knowledge patterns [--status <s>]' },
-    },
-  },
-  learn: { script: 'learn.mjs', help: 'learning patterns [--all|--json|--summary|--signatures|--export|--propose <LP-id>]' },
-  audit: { script: 'audit-codebase.mjs', help: 'codebase audit [--json] [--no-write] [--hotspots N] [--since 90.days]' },
-  triage: { script: 'audit-triage.mjs', help: 'TL triage: triage <finding-id> --dismiss --reason "…" | --confirm | --clear | --list' },
-  ui: { script: 'ui-server.mjs', help: 'read-only local harness UI on 127.0.0.1 [--port <n>]' },
-  'gate-decide': {
-    script: 'gate-decide.mjs',
-    help: 'Tech Lead override for a WARN gate: gate-decide <slice> --phase <phase> --note "…"',
-  },
-  profile: { script: 'harness-profile.mjs', help: 'read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation [--slice <id>] [--bottlenecks] [--json]' },
-  observe: { script: 'telemetry-observe.mjs', help: 'the load hook (fail-open): records a steering/skill load as an activation record (stdin: hook payload) <claude|cursor>' },
-};
+let REGISTRY;
+try {
+  REGISTRY = JSON.parse(
+    readFileSync(join(import.meta.dirname, '../../registry/contribution-points.json'), 'utf8'),
+  );
+} catch {
+  // A mangled package still answers --version/help and dispatch errors instead of dying at import.
+  REGISTRY = { commands: { harness: {}, kit: {} } };
+}
+export const HARNESS_COMMANDS = REGISTRY.commands.harness;
+export const KIT_COMMANDS = REGISTRY.commands.kit;
 
 /**
  * `asdd <args>` → { script, argv } for a harness command, or null when `args[0]` is not one.

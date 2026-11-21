@@ -162,7 +162,7 @@ The pre-CLI form `npx asdd-harness-kit /path/to/repo …` still installs. How `a
 
 An unknown module or runtime fails before anything is written.
 
-**Safe by default.** Project-owned files — bindings, `AGENTS.md`, slice state, specs, logs, and `mcp.json` — are created once and never overwritten. A kit file the project changed is left as it is on upgrade (`--force` takes the kit version), an interrupted install or an older kit is refused, and `asdd uninstall <dir>` removes only what the kit added and the project did not change ([`cli/README.md`](cli/README.md)). Kit tests and the kit's design notes stay in this repository.
+**Safe by default — kit artifacts vs project artifacts.** The kit only ever refreshes or deletes **kit artifacts**: the paths `.harness/config/installed-versions.json` records (`managed_files`, `kit_files` hashes). **Project artifacts** — bindings, `AGENTS.md`, slice state, specs, logs, `mcp.json`, and every other file — are created once and never overwritten or removed: an existing kit-path file the kit cannot prove it wrote is `SKIP`ped (no recorded hash), unproven retired paths are kept with a warning, and skill/steering/rule name collisions halt (`--rehome-colliding-*` preserves them). A kit file the project changed is left as it is on upgrade (`--force` restores the kit version — kit-owned paths are the kit's), an interrupted install or an older kit is refused, and `asdd uninstall <dir>` removes only what the kit added and the project did not change. `asdd doctor` reports the boundary: kit files carrying project edits, and files inside kit-owned dirs the kit never installed ([`cli/README.md`](cli/README.md)). Kit tests and the kit's design notes stay in this repository.
 
 ### How the kit maps to a product repo
 

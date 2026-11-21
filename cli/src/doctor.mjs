@@ -4,8 +4,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { delimiter, join, resolve } from 'node:path';
 
 import { describe, ignoreReport } from './install/ignored.mjs';
+import { fileHash, filesUnder } from './install/context.mjs';
+import { isKit, VERSION } from './paths.mjs';
 import { localAsdd, versionFit } from './pin.mjs';
-import { VERSION } from './paths.mjs';
 
 const MIN_NODE = 22;
 
@@ -104,6 +105,25 @@ export function checks(dir) {
     add('changed', 'warn', `${record.skipped_files.length} kit file(s) changed here were not updated: ${record.skipped_files.slice(0, 3).join(', ')}${record.skipped_files.length > 3 ? ', …' : ''} (asdd install --force takes the kit version)`);
   } else if (record && !record.kit_files) {
     add('changed', 'warn', 'this install predates file hashes; run asdd install once so changed kit files are protected and asdd uninstall works');
+  }
+  // The kit repo's .agents/ and cli/ are its sources, not installed artifacts — the ownership report is for projects.
+  if (record && !isKit(dir)) {
+    const managed = new Set(record.managed_files ?? []);
+    const seeded = new Set(Object.keys(record.seeded_files ?? {}));
+    const edited = Object.entries(record.kit_files ?? {})
+      .filter(([rel, hash]) => existsSync(join(dir, rel)) && fileHash(join(dir, rel)) !== hash)
+      .map(([rel]) => rel);
+    if (edited.length) {
+      add('kit-files', 'warn', `${edited.length} kit file(s) carry project edits: ${edited.slice(0, 3).join(', ')}${edited.length > 3 ? ', …' : ''} — asdd install leaves them, --force restores the kit version`);
+    }
+    const unmanaged = ['.agents/agents', '.agents/skills', '.agents/rules', '.agents/mcp']
+      .flatMap((d) => (existsSync(join(dir, d)) ? filesUnder(join(dir, d)).map((f) => `${d}/${f}`) : []))
+      .filter((rel) => !managed.has(rel) && !seeded.has(rel));
+    if (unmanaged.length) {
+      add('kit-dirs', 'warn', `${unmanaged.length} file(s) inside kit-owned dirs were never kit-installed: ${unmanaged.slice(0, 3).join(', ')}${unmanaged.length > 3 ? ', …' : ''} — they stay the project's; install collision guards may halt on them`);
+    } else {
+      add('kit-dirs', 'ok', 'every file inside kit-owned dirs is kit-installed or a project seed');
+    }
   }
   // asdd is a Node package, never copied into the project: its devDependency (pinned by the lockfile), or a global one.
   const installed = project.kit?.version ?? null;

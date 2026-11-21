@@ -130,9 +130,12 @@ function checkEnumerationDrift(ctx, entries) {
     }
   }
 
-  // runtimes/cursor/asdd-steering.mdc — kit-managed projection → fail on drift.
-  const mdc = join(root, 'runtimes/cursor/asdd-steering.mdc');
-  if (existsSync(mdc)) {
+  // The Cursor steering projection — installed copy (.cursor/rules/, projects + kit self-install) and, in the kit
+  // repo, the source under cli/runtimes/cursor/. Both are kit-managed → fail on drift.
+  const mdcPaths = ['.cursor/rules/asdd-steering.mdc', 'cli/runtimes/cursor/asdd-steering.mdc']
+    .map((rel) => join(root, rel))
+    .filter((p) => existsSync(p));
+  for (const mdc of mdcPaths) {
     const lines = readFileSync(mdc, 'utf8').split('\n');
     const alwaysLine = lines.find((l) => l.includes('always files'));
     if (alwaysLine) {

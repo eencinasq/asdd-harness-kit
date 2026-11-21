@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0",
+  "author": "osmar-ugarte",
+  "week": "2026-W47",
+  "signatures": {
+    "sensor:DRIFT-02": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T04:08:14.199Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T04:36:54.838Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-02 passing feature TASK-002 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification",
+        "DRIFT-02 passing feature TASK-003 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
+      ]
+    },
+    "warn:<path>: pseudo-always tag set (covers all N phases) — resolve per D-Nb: reclassi": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T04:08:14.199Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T04:44:10.286Z"
+        },
+        {
+          "at": "2026-11-17T11:56:45.691Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        ".harness/steering/knowledge.md: pseudo-always tag set (covers all 9 phases) — resolve per D-4b: reclassify \"always\" (recorded budget decision) or retag"
+      ]
+    },
+    "warn:<path>: coverage keys not reachable via tags (starvation, Phase-N backlog): vali": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T04:08:14.199Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T04:44:10.286Z"
+        },
+        {
+          "at": "2026-11-17T11:56:45.691Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        ".harness/steering/quality-gates.project.md: coverage keys not reachable via tags (starvation, Phase-2 backlog): validation"
+      ]
+    },
+    "warn:QG-DEC-09": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T04:08:14.199Z",
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-17T04:44:10.286Z"
+        },
+        {
+          "at": "2026-11-17T11:56:45.691Z",
+          "slice_id": "agents-use-scripts"
+        }
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded",
+        "QG-DEC-09 slice \"sensor-fixes\": spec completed (sess-sensor-fixes-008b) with no discovery gate recorded",
+        "QG-DEC-09 slice \"platform-contract\": qa completed (sess-platform-contract-013) while the implementation gate is WARN without a Tech Lead override"
+      ]
+    },
+    "warn:CONVERGE-02": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T04:08:14.199Z",
+          "slice_id": null,
+          "last_at": "2026-11-17T04:34:55.954Z"
+        }
+      ],
+      "examples": [
+        "CONVERGE-02 feature TASK-010 lists REQ-014 but no test file mentions it"
+      ]
+    },
+    "sensor:QG-LEARN-03:docs": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-17T04:32:48.213Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "QG-LEARN-03 docs/knowledge-base/steering-proposals/SP-004.md: control must name the guide or sensor file to change"
+      ]
+    },
+    "warn:slice \"*\" session \"*\" does not follow NNN-<slug>.json naming (AR-N)": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-17T04:34:55.954Z",
+          "slice_id": "sensor-fixes"
+        }
+      ],
+      "examples": [
+        "slice \"sensor-fixes\" session \"008b-phase_completed-spec.json\" does not follow NNN-<slug>.json naming (AR-3)"
+      ]
+    }
+  }
+}

@@ -186,7 +186,7 @@
         "npm test",
         "cd tools/knowledge && pnpm test"
       ],
-      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass + tools/knowledge pnpm test: 8 pass",
       "scope_paths": [
         "cli/src/harness/knowledge-store-sqlite.mjs",
         "cli/src/harness/knowledge-query.mjs",
@@ -208,7 +208,7 @@
         "tools/knowledge/README.md",
         "tools/spec-drift/src/audit/harness-libs.ts"
       ],
-      "evidence_hash": "a27cbfa5225386e9c5b425d601d75361186cb350239a39f6dc6a760d3825b7ee"
+      "evidence_hash": "301a9628f36fde396091037fde5707cd94f438e770934888f2ff25733e3bb2ae"
     },
     {
       "id": "TASK-009",
@@ -225,7 +225,7 @@
         "npm test",
         "cd tools/jev-gate && pnpm typecheck && pnpm lint && pnpm test"
       ],
-      "evidence": "re-verified 2026-11-16T20:50:36 (DRIFT-02): npm test exit 0 (210 tests); tools/jev-gate pnpm typecheck+lint+test exit 0",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass + tools/jev-gate pnpm typecheck+lint+test: 14 pass",
       "scope_paths": [
         "cli/src/install/**",
         "cli/src/harness/commands.mjs",
@@ -253,7 +253,7 @@
         ".github/workflows/harness-invariants.yml",
         ".harness/steering/structure.md"
       ],
-      "evidence_hash": "7aae13888e8330c243feff3c854fbcfa2334a9665e8ca2b2c56e1fbf99a99090"
+      "evidence_hash": "e41bc780fd2a0aa7e5d19f019564ee3df8d5e139b3e1c9f2baa0437c31e05207"
     },
     {
       "id": "TASK-010",
@@ -277,13 +277,13 @@
         "cli/src/install/ignored.mjs",
         "cli/test/cli.test.mjs"
       ],
-      "evidence_hash": "44c5a65d66f36190afc6ae2367c9491d38dcec222e1afd16c98f236832405549"
+      "evidence_hash": "68d6399e038682fe61c98e33e2873c3cb71889077507036d5dc40cb28adb0ce3"
     },
     {
       "id": "TASK-011",
       "title": "The CLI as a Node package only",
       "user_visible_behavior": "Projects get no copy of the CLI: asdd is installed once per machine (npm i -g, or npm pack from the repo) or as a devDependency; hooks find it and fail closed without it.",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": 11,
       "owner": "claude",
       "req_ids": [
@@ -296,7 +296,7 @@
         "npm test",
         "cd tools/spec-drift && pnpm typecheck && pnpm test"
       ],
-      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/spec-drift && pnpm typecheck && pnpm test` exits 0.",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `npm test && cd tools/spec-drift && pnpm typecheck && pnpm test` exits 0. | reopened by microkernel-polish: scope file(s) changed under DRIFT-02; pending re-verification | DRIFT-02 reopen: scope changed under microkernel-polish; re-run verification to restore passing",
       "scope_paths": [
         "cli/src/pin.mjs",
         "cli/src/main.mjs",
@@ -306,6 +306,7 @@
         "cli/src/install/context.mjs",
         "cli/src/install/index.mjs",
         "cli/src/install/modules.mjs",
+        "cli/src/install/options.mjs",
         "cli/src/uninstall.mjs",
         "cli/src/doctor.mjs",
         "cli/src/kit/versions.mjs",

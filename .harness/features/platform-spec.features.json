@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "platform-spec",
+  "source_tasks": ".harness/specs/platform-spec/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Vault _prompt.md + v0.md integrated platform proposal",
+      "user_visible_behavior": "platform/ holds a self-contained integrated proposal synthesizing all 7 problem records",
+      "status": "passing",
+      "priority": 1,
+      "req_ids": [
+        "REQ-001"
+      ],
+      "verification": [
+        "test -f /Users/ougarte/Developer/obsidian/efactory-llc/@asdd-harness-kit/proposals/platform/_prompt.md",
+        "test -f /Users/ougarte/Developer/obsidian/efactory-llc/@asdd-harness-kit/proposals/platform/v0.md && grep -q 'D-' /Users/ougarte/Developer/obsidian/efactory-llc/@asdd-harness-kit/proposals/platform/v0.md"
+      ],
+      "scope_paths": [
+        ".harness/specs/platform-spec/"
+      ],
+      "owner": "devin",
+      "depends_on": [],
+      "evidence": "_prompt.md + v0.md authored at @asdd-harness-kit/proposals/platform/ (7 records synthesized; D-8/D-9 resolutions recorded; B-1..B-8 revalidated against post-Wave-0-3 state)",
+      "evidence_hash": "ca4fb4843b2a62e4adaa438e6066acb0e0039ae649ee3cbcf1286a40d0316947"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Conformance spec + executable fixture suite",
+      "user_visible_behavior": "cli/test/conformance asserts exit codes, stable JSON output, state effects vs the Node reference",
+      "status": "passing",
+      "priority": 2,
+      "req_ids": [
+        "REQ-002"
+      ],
+      "verification": [
+        "node --test cli/test/conformance.test.mjs"
+      ],
+      "scope_paths": [
+        "cli/test/conformance/",
+        "cli/test/conformance.test.mjs",
+        "docs/spec/conformance-spec.md"
+      ],
+      "owner": "devin",
+      "depends_on": [],
+      "evidence": "docs/spec/conformance-spec.md + cli/test/conformance/{runner,7 fixtures,bench}.mjs + conformance.test.mjs — 8/8 fixtures pass; wired into npm test",
+      "evidence_hash": "e77cbb24356bf35c5ccbc4e02767e3df16f44a4ab35a8ad5873ff0bdc88cd335"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Benchmark harness + toolchain evaluation",
+      "user_visible_behavior": "bench.mjs emits evidence JSON for Node/go/rustc/clang spike cold starts on named hardware",
+      "status": "passing",
+      "priority": 3,
+      "req_ids": [
+        "REQ-003"
+      ],
+      "verification": [
+        "node cli/test/conformance/bench.mjs"
+      ],
+      "scope_paths": [
+        "cli/test/conformance/bench.mjs",
+        "docs/knowledge-base/platform-benchmarks/v0.md"
+      ],
+      "owner": "devin",
+      "depends_on": [
+        "TASK-002"
+      ],
+      "evidence": "bench.mjs executed on macOS arm64: Node gate p95 125.59ms / verify p50 592.14ms vs Go/Rust/C++ spikes ~3-4ms p50 — results recorded in docs/knowledge-base/platform-benchmarks/v0.md; 15ms hook budget confirmed infeasible for Node",
+      "evidence_hash": "709979c36f497a3064f5500b21b4d7388d3fe874deb075413df5f1e49694b968"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Cross-platform hooks + MCP disposition",
+      "user_visible_behavior": "runtime hooks launch the executor without POSIX syntax on Windows; MCP services dispositioned",
+      "status": "passing",
+      "priority": 4,
+      "req_ids": [
+        "REQ-004"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs kit self --check",
+        "npm test"
+      ],
+      "scope_paths": [
+        "cli/runtimes/cursor/",
+        "cli/scaffold/"
+      ],
+      "owner": "devin",
+      "depends_on": [
+        "TASK-001"
+      ],
+      "evidence": "phases.mjs RESOLVERS{posix,cmd,powershell} + hookShellFor + ctx.targetOs; options.mjs --target-os validated {win32,linux,darwin}; verified: win32 install writes cmd.exe hooks.json, POSIX unchanged; MCP disposition recorded in v0.md §8",
+      "evidence_hash": "994a6c9f7c5d3aa6e4f246b5039e326579b4b9356b5db909ec285ec1cfc45b96"
+    }
+  ]
+}

@@ -34,6 +34,8 @@ import {
   childOf,
   emit,
   guidanceTarget,
+  mintSpan,
+  synthesizePhaseSpans,
   readTail,
   skillTarget,
   startTrace,
@@ -41,6 +43,7 @@ import {
 } from './telemetry-lib.mjs';
 // TASK-011 exports are read through the namespace so a missing export fails its own cases only.
 import * as telemetryLib from './telemetry-lib.mjs';
+import { detectionSpan, evaluateHeuristics } from './telemetry-eval.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LIB_PATH = join(HERE, 'telemetry-lib.mjs');
@@ -256,6 +259,12 @@ test('REQ-005 reserved attributes and forbidden kinds return false', () => {
       assert.equal(silent(() => emit(sampleSpan({ kind }), { root })), false, kind);
     }
     assert.equal(existsSync(streamPath(root)), false);
+    for (const writer of ['asdd-span', 'runtime-hook']) {
+      for (const kind of ['turn', 'subagent']) {
+        assert.equal(silent(() => emit(sampleSpan({ kind, writer }), { root })), true, `${writer} ${kind}`);
+      }
+      assert.equal(silent(() => emit(sampleSpan({ kind: 'phase', writer }), { root })), false, `${writer} phase`);
+    }
     for (const kind of ['command', 'sensor', 'hook', 'sync', 'tool']) {
       assert.equal(silent(() => emit(sampleSpan({ kind }), { root })), true, kind);
     }
@@ -1433,4 +1442,143 @@ test('REQ-020 OI-2 no H-* heuristic weights or evaluation in the library', () =>
   assert.doesNotMatch(src, /\bH-[A-Z]+\b/);
   assert.doesNotMatch(src, /severity|weight/i);
   assert.doesNotMatch(src, /pipeline-metrics|sync-state\.mjs['"]/);
+});
+
+// ---- minted-span contract (telemetry-phase2): mintSpan/emit/builtin-validate/synthesize/evaluator ----
+
+const mkroot = () => {
+  const root = mkdtempSync(join(tmpdir(), 'tel-'));
+  mkdirSync(join(root, TELEMETRY_DIR), { recursive: true });
+  return root;
+};
+
+const base = (extra = {}) => mintSpan({
+  kind: 'command', process_name: 'test-producer', runtime: 'cli',
+  start_time_iso: '2026-11-17T10:00:00.000Z', end_time_iso: '2026-11-17T10:00:01.000Z',
+  duration_ms: 1000, status: 'OK', writer: 'unit-test', ...extra,
+}, { env: {} });
+
+test('emit appends one LF-terminated schema line and returns true', () => {
+  const root = mkroot();
+  assert.equal(emit(base(), { root }), true);
+  const text = readFileSync(join(root, TELEMETRY_DIR, 'spans.jsonl'), 'utf8');
+  const lines = text.trim().split('\n');
+  assert.equal(lines.length, 1);
+  const span = JSON.parse(lines[0]);
+  assert.equal(span.kind, 'command');
+  assert.equal(span.attributes.trace_source, 'self');
+  assert.equal(validateSpan(span).length, 0);
+  assert.ok(Buffer.byteLength(lines[0]) <= MAX_LINE_BYTES);
+});
+
+test('emit is fail-open: missing dir, malformed span, oversize span', () => {
+  const noDir = mkdtempSync(join(tmpdir(), 'tel-nodir-'));
+  assert.equal(emit(base(), { root: noDir }), false);
+  const root = mkroot();
+  assert.equal(emit({ kind: 'command' }, { root }), false); // malformed
+  const big = base({ attributes: { trace_source: 'self', pad: 'x'.repeat(5000) } });
+  assert.equal(emit(big, { root }), false); // oversize even after events drop
+  assert.equal(existsSync(join(root, TELEMETRY_DIR, 'spans.jsonl')), false);
+});
+
+test('mintSpan inherits env trace ids; absent env self-mints a root', () => {
+  const env = { HARNESS_TRACE_ID: 'a91f03c2d77e4b01', HARNESS_SPAN_ID: 'f04bd812' };
+  const child = mintSpan({ kind: 'command', process_name: 'p' }, { env });
+  assert.equal(child.trace_id, 'a91f03c2d77e4b01');
+  assert.equal(child.parent_span_id, 'f04bd812');
+  assert.equal(child.attributes.trace_source, 'env');
+  const rootSpan = mintSpan({ kind: 'turn', process_name: 'p' }, { env: {} });
+  assert.equal(rootSpan.parent_span_id, null);
+  assert.equal(rootSpan.attributes.trace_source, 'self');
+});
+
+test('validateSpan rejects producer-set reserved attrs and bad vocab', () => {
+  const reserved = base({ attributes: { trace_source: 'self', heuristic: 'H-LOOP' } });
+  assert.ok(validateSpan(reserved).some((p) => p.includes('reserved')));
+  const bad = base({ kind: 'nope' });
+  assert.ok(validateSpan(bad).some((p) => p.includes('kind')));
+  const extra = { ...base(), surprise: 1 };
+  assert.ok(validateSpan(extra).some((p) => p.includes('unknown top-level')));
+});
+
+test('emit never perturbs exitCode and p99 emit latency ≤ 50 ms', () => {
+  const root = mkroot();
+  const times = [];
+  for (let i = 0; i < 120; i += 1) {
+    const t0 = performance.now();
+    emit(base(), { root });
+    times.push(performance.now() - t0);
+  }
+  times.sort((a, b) => a - b);
+  const p99 = times[Math.floor(times.length * 0.99) - 1];
+  assert.ok(p99 <= 50, `p99 emit latency ${p99.toFixed(2)}ms exceeds 50ms`);
+  assert.ok(!process.exitCode, 'emit must never set process.exitCode');
+});
+
+test('readTail returns the bounded tail with line records', () => {
+  const root = mkroot();
+  const file = join(root, TELEMETRY_DIR, 'spans.jsonl');
+  for (let i = 0; i < 10; i += 1) writeFileSync(file, `${JSON.stringify(base())}\n`, { flag: 'a' });
+  const tail = readTail(root, { maxLines: 5 });
+  assert.equal(tail.lines.length, 5);
+  assert.equal(tail.fromStart, false);
+  assert.equal(tail.lines.every((l) => l.text.startsWith('{')), true);
+});
+
+test('synthesizePhaseSpans yields deterministic ids deduped by span_id', () => {
+  const root = mkroot();
+  const dir = join(root, '.harness/state/slices/s1/sessions');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, '001-s.json'), JSON.stringify({ event_type: 'phase_started', phase: 'implementation', timestamp: '2026-11-17T10:00:00.000Z', slice_id: 's1' }));
+  writeFileSync(join(dir, '002-c.json'), JSON.stringify({ event_type: 'phase_completed', phase: 'implementation', timestamp: '2026-11-17T10:30:00.000Z', slice_id: 's1' }));
+  const a = synthesizePhaseSpans(root, 's1');
+  const b = synthesizePhaseSpans(root, 's1');
+  assert.equal(a.length, 1);
+  assert.equal(a[0].span_id, b[0].span_id);
+  assert.equal(a[0].trace_id, b[0].trace_id);
+  assert.equal(a[0].duration_ms, 30 * 60000);
+  assert.equal(a[0].attributes.source, 'session_events');
+  assert.equal(validateSpan(a[0]).length, 0);
+});
+
+test('H-LOOP fires on 3 consecutive same-signature failures; dedup window applies', () => {
+  const err = (sig, id, t) => mintSpan({ kind: 'test', slice_id: 's1', phase: 'implementation', process_name: 'gate', start_time_iso: t, end_time_iso: t, duration_ms: 1, status: 'ERROR', writer: 'command-gate', attributes: { failure_signature: sig }, span_id: id });
+  const spans = [
+    err('test:a.spec', 'aaaa0001', '2026-11-17T10:00:00.000Z'),
+    err('test:a.spec', 'aaaa0002', '2026-11-17T10:01:00.000Z'),
+    err('test:a.spec', 'aaaa0003', '2026-11-17T10:02:00.000Z'),
+  ];
+  const findings = evaluateHeuristics(spans, { now: new Date('2026-11-17T10:05:00.000Z') });
+  const loop = findings.find((f) => f.heuristic === 'H-LOOP');
+  assert.ok(loop);
+  assert.equal(loop.failure_signature, 'test:a.spec');
+  assert.equal(loop.trigger_span_id, 'aaaa0003');
+  const det = detectionSpan(loop);
+  assert.equal(det.kind, 'sensor');
+  assert.equal(det.writer, 'heuristic-evaluator');
+  assert.equal(det.attributes.heuristic, 'H-LOOP');
+  assert.equal(validateSpan(det).length, 0);
+  // An OK on the signature resets the run.
+  const ok = mintSpan({ kind: 'test', slice_id: 's1', phase: 'implementation', process_name: 'gate', start_time_iso: '2026-11-17T10:01:30.000Z', end_time_iso: '2026-11-17T10:01:30.000Z', duration_ms: 1, status: 'OK', writer: 'command-gate', attributes: { failure_signature: 'test:a.spec' } });
+  const findings2 = evaluateHeuristics([spans[0], ok, spans[1], spans[2]], { now: new Date('2026-11-17T10:05:00.000Z') });
+  assert.equal(findings2.filter((f) => f.heuristic === 'H-LOOP').length, 0);
+});
+
+test('evaluator ignores heuristic-evaluator/harness-profile/validator writers', () => {
+  const det = mintSpan({ kind: 'sensor', slice_id: 's1', process_name: 'heuristic-evaluator', start_time_iso: '2026-11-17T10:00:00.000Z', end_time_iso: '2026-11-17T10:00:00.000Z', duration_ms: 0, status: 'ERROR', writer: 'heuristic-evaluator', attributes: { failure_signature: 'x', heuristic: 'H-LOOP' } });
+  assert.equal(validateSpan(det).length, 0); // evaluator may set heuristic
+  const findings = evaluateHeuristics([det, det, det], { now: new Date('2026-11-17T10:05:00.000Z') });
+  assert.equal(findings.filter((f) => f.heuristic === 'H-LOOP').length, 0);
+});
+
+test('H-SURGE fires on >80KB and on +50% delta; same-signature dedup within a run', () => {
+  const turn = (bytes, id, t) => mintSpan({ kind: 'turn', slice_id: 's1', phase: 'implementation', process_name: 'agent-turn', start_time_iso: t, end_time_iso: t, duration_ms: 1, status: 'OK', writer: 'runtime-hook', attributes: { context_bytes_loaded: bytes }, span_id: id });
+  // +52.5% delta fires; the later >80KB span shares the signature and dedups.
+  const findings = evaluateHeuristics([turn(40000, 'bbbb0001', '2026-11-17T10:00:00.000Z'), turn(61000, 'bbbb0002', '2026-11-17T10:01:00.000Z'), turn(90000, 'bbbb0003', '2026-11-17T10:02:00.000Z')]);
+  const surge = findings.filter((f) => f.heuristic === 'H-SURGE');
+  assert.equal(surge.length, 1);
+  assert.equal(surge[0].trigger_span_id, 'bbbb0002');
+  // >80 KB alone fires when no previous turn exists.
+  const alone = evaluateHeuristics([turn(90000, 'bbbb0003', '2026-11-17T10:02:00.000Z')]);
+  assert.equal(alone.filter((f) => f.heuristic === 'H-SURGE').length, 1);
 });

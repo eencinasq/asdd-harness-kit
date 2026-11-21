@@ -134,14 +134,30 @@ export function gateRuntime(input) {
 
 // Telemetry is best-effort and runs only after the verdict is written (ADR-001): a missing or broken lib, a throw,
 // or emit() returning false is a no-op.
-async function emitGateSpan(root, { runtime, start, end, status, attributes }) {
+// Gate-seam test classification (profiling v2 D-3): a test-runner command emits a `kind:"test"` span
+// (the only timing a pre-exec hook can honestly claim); all other commands emit `kind:"command"`.
+const TEST_LABEL = /^(npm\s+test|pnpm\s+(run\s+|exec\s+nx\s+)test|node\s+--test|npx\s+(nx|jest|vitest|mocha))/;
+
+function testRunner(text) {
+  if (/^npm\s+test/.test(text)) return 'npm-test';
+  if (/^node\s+--test/.test(text)) return 'node-test';
+  if (/jest/.test(text)) return 'jest';
+  if (/vitest/.test(text)) return 'vitest';
+  if (/mocha/.test(text)) return 'mocha';
+  if (/\bnx\b/.test(text)) return 'nx';
+  if (/^pnpm\b/.test(text)) return 'pnpm';
+  return 'other';
+}
+
+// Telemetry is best-effort and lazy: a missing lib must never change the verdict.
+async function emitGateSpan(root, { runtime, start, end, status, kind, attributes }) {
   const tel = await import('./telemetry-lib.mjs').catch(() => null);
   try {
     if (!tel) return;
     const where = root ?? process.cwd();
     const { slice_id, phase } = tel.attribute(where);
     const span = tel.buildSpan(tel.startTrace(), {
-      kind: 'command',
+      kind: kind ?? 'command',
       process_name: 'command-gate',
       runtime,
       slice_id,
@@ -244,12 +260,19 @@ export async function runHook({ readInput = readStdin, write = writeStdout, safe
   write(`${JSON.stringify(output)}\n`);
   const end = Date.now();
 
+  const runner = command && TEST_LABEL.test(String(command).trim()) ? testRunner(String(command).trim()) : null;
   await emitGateSpan(root, {
     runtime: gateRuntime(input),
     start: state.start,
     end,
     status: 'OK',
-    attributes: { verdict: verdict.allowed ? 'allow' : 'deny', command_label: state.label },
+    kind: runner ? 'test' : 'command',
+    attributes: {
+      verdict: verdict.allowed ? 'allow' : 'deny',
+      command_label: state.label,
+      ...(runner ? { test_runner: runner } : {}),
+      ...(!verdict.allowed ? { failure_signature: `command:${deniedLabel(command) ?? 'unknown'}` } : {}),
+    },
   });
 }
 

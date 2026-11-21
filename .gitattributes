@@ -1,0 +1,11 @@
+# --- asdd merge policy (generated from contribution-points registry — regen: asdd install) ---
+# conflicts: merge=ours rows regenerate (asdd sync / asdd kit versions); -merge rows are kit-owned — git checkout --ours <path>, then asdd install .
+.harness/PROGRESS.md merge=ours
+.harness/steering/** -merge
+.agents/** -merge
+.cursor/** -merge
+AGENTS.md -merge
+tools/*/src/harness/** -merge
+cli/versions.json merge=ours
+.harness/config/versions.json merge=ours
+# --- end asdd merge policy ---

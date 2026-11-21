@@ -1,0 +1,7 @@
+{
+  "name": "doctor-bare",
+  "setup": [],
+  "invoke": { "cmd": "doctor", "args": ["--json"] },
+  "expect": { "exit": 0, "stdout_json": { "ok": true }, "stdout_contains": ["\"checks\""] },
+  "normalize": ["paths"]
+}

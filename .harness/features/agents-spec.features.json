@@ -47,7 +47,7 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "re-verified 2026-11-16T20:50:36 (DRIFT-02): kit agents-lint exit 0; npm test exit 0 (210 tests)",
+      "evidence": "Reopened for the fleet fixes found while writing the sensor: refactor's handoff to QA removed (it closed a qa -> refactor -> qa handoff cycle, AL-301; the caller re-runs QA after a refactor PR); spike researcher's anti-hedging rule made explicit (A-018); scope path of the deleted spec-peer-review.md template now cli/steering/templates (DRIFT-05). kit agents-lint PASS (14 agents); agents-lint tests 10/10; npm test 131/131. | Re-verified with no content change: the hash moved when the deletion of cli/steering/templates/spec-peer-review.md was committed (c35127e): a directory scope lists files with git ls-files --cached, so before the commit the deleted file entered the hash as <missing> and after it does not (harness sensor noise, reported). asdd kit agents-lint PASS (14 agents); npm test 132/132. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/agents/asdd-implementation-agent.md",
         "cli/agents/asdd-qa-agent.md",
@@ -60,7 +60,7 @@
         "cli/steering/templates",
         "cli/scaffold/config/models.json"
       ],
-      "evidence_hash": "ee37e264cb7c7a86918a3735a1c88562aaa448a6a2a5b9751835def14acef968"
+      "evidence_hash": "45740a0beb24797755d9d7e27bc12aabd00c355f33349c8b333509cd6a47830c"
     },
     {
       "id": "TASK-003",
@@ -84,7 +84,7 @@
         "cli/modules/playwright-e2e",
         "cli/src/install/modules.mjs"
       ],
-      "evidence_hash": "6573b21cef12e9bbd1b4d0de9cf34505da5b9b6199c31608f0c54ec9999c27da"
+      "evidence_hash": "7afb2c8415a2b7843e05bb24a74bd429ec4cbf876936188d75167395afd7b748"
     },
     {
       "id": "TASK-004",
@@ -105,14 +105,14 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "New cli/src/install/agent-frontmatter.mjs parses the canonical agent frontmatter and renders per runtime: Claude Code (tools allowlist Read/Grep/Glob/Bash/Write/Edit, Agent only for the orchestrator; disallowedTools when mcp_tools is true so MCP tools stay; maxTurns), Cursor (readonly: true when write_tools is false), OpenCode (ordered permissions: edit deny * + allow write_paths, subagent deny * for non-orchestrators; steps). context.writeGenerated writes kit-owned generated files (replaces legacy links, keeps a project-edited copy unless --force, recorded in managed_files/kit_files so uninstall removes it). runtimes.mjs renders for cursor/claude/opencode; junie/devin/kiro/kimi keep links. Manual run: install into a temp repo (claude,cursor,opencode,junie, all modules): 42 RENDER, reinstall 0 RENDER/56 KEEP, asdd check exit 0, uninstall removed the rendered dirs. install.sh: new assertions (validation tools without Edit/Agent, implementation with Agent, e2e disallowedTools: Agent, maxTurns; OpenCode qa permissions; Cursor readonly only on the researcher) — bash cli/test/install.sh: OK asdd install smoke test (after kit versions registered the new files). | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS. | Re-verified 2026-11-16 after hotfixes npm-pack-json (cli/test/install.sh) and guidance-proposal-skip: every verification command exits 0 (npm test 195/195; install.sh OK; skills/agents lint PASS; kit guidance PASS; tools/knowledge and tools/jev-gate tests PASS on Node 24.22.3).",
+      "evidence": "New cli/src/install/agent-frontmatter.mjs parses the canonical agent frontmatter and renders per runtime: Claude Code (tools allowlist Read/Grep/Glob/Bash/Write/Edit, Agent only for the orchestrator; disallowedTools when mcp_tools is true so MCP tools stay; maxTurns), Cursor (readonly: true when write_tools is false), OpenCode (ordered permissions: edit deny * + allow write_paths, subagent deny * for non-orchestrators; steps). context.writeGenerated writes kit-owned generated files (replaces legacy links, keeps a project-edited copy unless --force, recorded in managed_files/kit_files so uninstall removes it). runtimes.mjs renders for cursor/claude/opencode; junie/devin/kiro/kimi keep links. Manual run: install into a temp repo (claude,cursor,opencode,junie, all modules): 42 RENDER, reinstall 0 RENDER/56 KEEP, asdd check exit 0, uninstall removed the rendered dirs. install.sh: new assertions (validation tools without Edit/Agent, implementation with Agent, e2e disallowedTools: Agent, maxTurns; OpenCode qa permissions; Cursor readonly only on the researcher) — bash cli/test/install.sh: OK asdd install smoke test (after kit versions registered the new files). | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/install/agent-frontmatter.mjs",
         "cli/src/install/runtimes.mjs",
         "cli/src/install/context.mjs",
         "cli/test/install.sh"
       ],
-      "evidence_hash": "e78102de56dcd174661f5a7d477212627a017c4c370678f34577bad24943c733"
+      "evidence_hash": "a1b00221c175ef1e0835c29950fc0508a1c1af91ca2cb3ab4153af7eca705e8b"
     },
     {
       "id": "TASK-005",
@@ -136,7 +136,7 @@
         "node cli/bin/asdd.mjs kit agents-lint",
         "npm test"
       ],
-      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
+      "evidence": "re-verified under microkernel-polish: asdd kit agents-lint: 14 agents PASS + npm test: 234 pass",
       "scope_paths": [
         "cli/src/kit/agents-lint.mjs",
         "cli/src/main.mjs",
@@ -145,7 +145,7 @@
         "cli/README.md",
         "cli/versions.json"
       ],
-      "evidence_hash": "e8768d8fa1f12849109eff5a16a1b9da9401c3606e92369e8052175a33f682ef"
+      "evidence_hash": "cbca98434767ede65e1ac72ca3edfab33a5659553bfdae3b0c779d628ffe26c0"
     }
   ]
 }

@@ -5,6 +5,7 @@ tags:
   - qa
   - task_planning
   - refactor
+  - validation
 classification: binding
 ---
 
@@ -51,7 +52,7 @@ Before Discovery, replace `unfilled` with `none`, or with a table of one row per
 Read by `drift-lib.mjs`, `asdd audit`, and the `spec-drift` MCP server. A slot left as `…` uses the default in parentheses, or reports `unconfigured`; it never counts as a pass.
 
 - Test file globs: `…` (default: `**/*.test.*`, `**/*.spec.*`, `**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/test-*.sh`)
-- Always-loaded steering budget: `36500` bytes (kit-only: `inclusion: always` steering plus `AGENTS.md`; checked by `asdd kit guidance`; lower it when the steering shrinks, never raise it without a decision. **Recorded decisions:** `32600`→`34000` per `docs/knowledge-base/steering-proposals/v1.md` `D-5`; `34000`→`36500` per that proposal's `G-9` slot retrofit — the profile's required NEGATIVE_SPACE/ENFORCEMENT/ESCALATION slots added ~3 KB of normative text to the always files, and the `D-5` effectively-always sensor tier (pseudo-always files + active-turn bytes) is now live in `cli/src/kit/guidance.mjs` (`asdd kit guidance`). Downward levers still open: the `D-14` `security-rules.md` inclusion decision and any sensor-gated `auto`→`always` reclassification, each of which requires its own recorded re-decision)
+- Always-loaded steering budget: `37500` bytes (kit-only: `inclusion: always` steering plus `AGENTS.md`; checked by `asdd kit guidance`; lower it when the steering shrinks, never raise it without a decision. **Recorded decisions:** `32600`→`34000` per `docs/knowledge-base/steering-proposals/v1.md` `D-5`; `34000`→`36500` per that proposal's `G-9` slot retrofit — the profile's required NEGATIVE_SPACE/ENFORCEMENT/ESCALATION slots added ~3 KB of normative text to the always files, and the `D-5` effectively-always sensor tier (pseudo-always files + active-turn bytes) is now live in `cli/src/kit/guidance.mjs` (`asdd kit guidance`); `36500`→`37500` per the `chore/asdd-architecture` rebase onto 3.12.0 — the union of both branches' always files added ~740 B of normative text (manifest.md git merge policy, session-loop.md dispatch-cap rule, skills.md negative-space block) and no duplicate wording exists to cut. Downward levers still open: the `D-14` `security-rules.md` inclusion decision and any sensor-gated `auto`→`always` reclassification, each of which requires its own recorded re-decision)
 - Drift base branch: `main` (default: `origin/HEAD`, then `main`, then `master`)
 - Audit commands: `deps=npm audit --omit=dev` (one `name=command` per backtick; unfilled → `unconfigured`)
 - Contract command: `…` (not applicable: the kit exposes no HTTP API and does not enable the `http-api` module)

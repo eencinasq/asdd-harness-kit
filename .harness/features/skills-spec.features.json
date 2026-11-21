@@ -139,7 +139,7 @@
         "cli/steering/security-rules.md",
         "cli/agents/asdd-design-agent.md"
       ],
-      "evidence_hash": "1bb997d8f3d76d45beb0ddf379306fb4e759d75b54aebfa455ddbe9f7434dece"
+      "evidence_hash": "5a87aafa77af95ed916906d4483f70e3e0cd9816e95911c79df40c61699ca81c"
     },
     {
       "id": "TASK-006",
@@ -166,7 +166,7 @@
         "node --test cli/test/skills-lint.test.mjs",
         "npm test"
       ],
-      "evidence": "re-verified 2026-11-16T20:39:45 (DRIFT-02 remediation): all verification commands exit 0 after shared-file changes on feat/skill-eval",
+      "evidence": "Re-verified after the 3.11.0 version bump and the playbook (slice kit-playbook): `node cli/bin/asdd.mjs kit skills-lint && node cli/bin/asdd.mjs kit guidance && node --test cli/test/skills-lint.test.mjs && npm test` exits 0. | Re-verified post-rebase onto 3.12.0: npm test 195/195 PASS; kit linters + guidance + converge-eval PASS; tools/knowledge 8/8, tools/jev-gate typecheck+lint+test PASS.",
       "scope_paths": [
         "cli/src/kit/skills-lint.mjs",
         "cli/src/main.mjs",
@@ -175,7 +175,7 @@
         "cli/test/install.sh",
         "cli/README.md"
       ],
-      "evidence_hash": "ebe0e93d8166e5199578bf75ecd037b26f35792347aaac4c53aa004ee6bba357"
+      "evidence_hash": "adecf35b5115152a2b7c16b95e3ce88db2bbae2e640184fb8539bbc742ba6d36"
     }
   ]
 }

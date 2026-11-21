@@ -1,0 +1,26 @@
+{
+ "schema_version": "1.0",
+ "session_id": "sess-platform-spec-002",
+ "timestamp": "2026-11-17T17:30:00.000Z",
+ "agent": "asdd-pipeline",
+ "human": "eencinas",
+ "slice_id": "platform-spec",
+ "event_type": "phase_completed",
+ "phase": "implementation",
+ "evidence": "Wave 4 complete: platform proposal _prompt.md + v0.md authored at @asdd-harness-kit/proposals/platform/ (7 problem records synthesized; D-8 hook portability + D-9 MCP dispositions resolved; B-1..B-8 revalidated against post-Wave-0-3 state). docs/spec/conformance-spec.md + cli/test/conformance/{runner,7 fixtures,bench}.mjs + conformance.test.mjs — 8/8 fixtures pass, wired into npm test. Compiled-executor benchmark with real macOS arm64 measurements: Node asdd gate p95 ~125.59ms, verify p50 ~592.14ms vs Go/Rust/C++ spike p50 ~3-4ms — 15ms hook budget confirmed infeasible for Node, recorded in docs/knowledge-base/platform-benchmarks/v0.md. Hook portability: RESOLVERS{posix,cmd,powershell} + hookShellFor + ctx.targetOs in phases.mjs; --target-os={win32,linux,darwin} validated in options.mjs; verified win32 install emits pure cmd.exe hooks.json, POSIX unchanged. profile.test.mjs added (6 tests). npm test 252 pass / 0 fail; asdd check 0 FAIL.",
+ "scope_paths": [
+  "docs/spec/conformance-spec.md",
+  "cli/test/conformance/",
+  "cli/test/conformance.test.mjs",
+  "cli/src/harness/profile.test.mjs",
+  "docs/knowledge-base/platform-benchmarks/v0.md",
+  "cli/src/install/phases.mjs",
+  "cli/src/install/options.mjs",
+  "package.json"
+ ],
+ "concerns": [
+  "DRIFT-02 cascade: 17 features across 14 slices re-verified and re-stamped; cli-harness:TASK-011 remains blocked on pre-existing tools/spec-drift failures (unchanged)",
+  "v0.md awaits adversarial review (v0.review.md) before v1 — proposal refinement convention",
+  "Native executor itself is future work — this wave produced the spec, conformance harness, and feasibility evidence (Node cannot meet 15ms p95)"
+ ]
+}

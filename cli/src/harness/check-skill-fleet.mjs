@@ -173,7 +173,7 @@ export function lintFleet(baseDir = root) {
       if (names.has(r)) {
         const target = bundles.find((x) => x.name === r);
         const back = target && target.forwardAll.includes(b.name);
-        if (!back) err('SL-307', b, `${b.name}: redirect → ${r} is illegal — no forward edge ${r} → ${b.name}`);
+        if (!back) err('SL-307', b, `${b.name}: redirect → ${r} is illegal — no forward edge ${r} → ${b.name} (redirect is a paired route; for a one-way escalation to a skill that cannot route back, use a conditional \`skill: ${r}\` reference instead)`);
       }
     }
   }

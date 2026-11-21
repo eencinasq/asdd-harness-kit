@@ -8,6 +8,7 @@ export default function validate(ctx) {
     includeContract: false,
     prBranch: process.env.HARNESS_PR_BRANCH,
     prBody: process.env.HARNESS_PR_BODY,
+    forSlice: ctx.slice,
   });
   for (const f of findings) (f.severity === 'fail' ? fail : warn)(`${f.check} ${f.message}`);
   for (const n of notes) warn(`spec drift: ${n}`);

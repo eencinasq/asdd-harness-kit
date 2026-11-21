@@ -6,7 +6,7 @@ import { existsSync, realpathSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { HARNESS_COMMANDS, resolveHarnessCommand } from './harness/commands.mjs';
+import { HARNESS_COMMANDS, KIT_COMMANDS, resolveHarnessCommand } from './harness/commands.mjs';
 import { CLI_ROOT, CliError, HARNESS_DIR, IS_FULL, isKit, VERSION } from './paths.mjs';
 import { localAsdd, projectKitVersion, versionFit } from './pin.mjs';
 import { err } from './ui.mjs';
@@ -45,15 +45,6 @@ In a project: npm i -D asdd-harness-kit (pinned by the lockfile; a global asdd h
 Install and upgrade with npx: npx asdd-harness-kit install <dir>  (or npx github:eencinasq/asdd-harness-kit install <dir>)
 `;
 
-const KIT_COMMANDS = {
-  versions: './kit/versions.mjs',
-  build: './kit/build.mjs',
-  vendor: './kit/vendor.mjs',
-  guidance: './kit/guidance.mjs',
-  'skills-lint': './kit/skills-lint.mjs',
-  'agents-lint': './kit/agents-lint.mjs',
-  self: './kit/self.mjs',
-};
 const FULL_ONLY = ['install', 'uninstall', 'kit'];
 
 /** The project the command runs on: the nearest folder up from `cwd` that has .harness/, else `cwd`. */
@@ -126,7 +117,7 @@ async function runHarness(args) {
 }
 
 async function kit([name, ...args]) {
-  if (!KIT_COMMANDS[name]) throw new CliError(`usage: asdd kit versions|build|vendor|guidance|skills-lint|agents-lint|self [options] (got ${name ?? 'nothing'})`, 2);
+  if (!KIT_COMMANDS[name]) throw new CliError(`usage: asdd kit ${Object.keys(KIT_COMMANDS).join('|')} [options] (got ${name ?? 'nothing'})`, 2);
   const { run } = await import(KIT_COMMANDS[name]);
   return run(args);
 }

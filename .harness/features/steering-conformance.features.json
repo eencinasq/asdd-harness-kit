@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "steering-conformance",
+  "source_tasks": ".harness/specs/steering-conformance/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Retag pseudo-always + starvation steering files",
+      "user_visible_behavior": "Zero steering-tags warnings in asdd check",
+      "status": "passing",
+      "priority": 1,
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs check 2>&1 | grep -c \"steering\"",
+        "npm test"
+      ],
+      "scope_paths": [
+        "cli/steering/knowledge.md",
+        "cli/steering/quality-gates.md",
+        ".harness/steering/quality-gates.project.md",
+        "cli/templates/bindings/quality-gates.project.md"
+      ],
+      "owner": "devin",
+      "depends_on": [],
+      "evidence": "asdd check: zero steering-tags warnings (pseudo-always+starvation+symmetry all clear); registry coverage narrowed scaffold+installed; 234 npm tests pass",
+      "evidence_hash": "c8a6755726810ea5416b6e4ee7b2fdfcc0cbf56545b39712f2b8d86a6364566d"
+    },
+    {
+      "id": "TASK-002",
+      "title": "skills.md Negative space slot",
+      "user_visible_behavior": "skills.md carries the kit_steering_rule Negative space slot",
+      "status": "passing",
+      "priority": 2,
+      "req_ids": [
+        "REQ-003"
+      ],
+      "verification": [
+        "grep -n \"## Negative\" cli/steering/skills.md",
+        "npm test"
+      ],
+      "scope_paths": [
+        "cli/steering/skills.md"
+      ],
+      "owner": "devin",
+      "depends_on": [],
+      "evidence": "cli/steering/skills.md gains ## Negative space (3 bullets); skills-lint PASS; guidance PASS at 36505<=37000 recorded decision",
+      "evidence_hash": "b79716349075903d0572e4cb6aa1ef99e8c93513d1fb3e2dc38ae88ec9c419b2"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Regen projections + ratify v1.md converged",
+      "user_visible_behavior": "Installed copies and runtime projection refreshed; proposal status converged",
+      "status": "passing",
+      "priority": 3,
+      "req_ids": [
+        "REQ-004",
+        "REQ-005"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs kit generate-runtime-steering --check",
+        "node cli/bin/asdd.mjs kit self --check",
+        "grep -m1 \"Status\" /Users/ougarte/Developer/obsidian/efactory-llc/@asdd-harness-kit/proposals/harness.steering/v1.md"
+      ],
+      "scope_paths": [
+        ".harness/steering/",
+        ".cursor/rules/asdd-steering.mdc"
+      ],
+      "owner": "devin",
+      "depends_on": [
+        "TASK-001",
+        "TASK-002"
+      ],
+      "evidence": "re-verified 2026-11-17 (platform-spec final regen)",
+      "evidence_hash": "fc0f6d48953c8143c02bd5d5967f1750de86eb216a6f182a566f23a7bc9257c8"
+    }
+  ]
+}

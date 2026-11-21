@@ -82,17 +82,22 @@ export function render(entries) {
   return text;
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+export function run(argv = []) {
   const next = render(jitEntries());
-  if (process.argv.includes('--check')) {
+  if (argv.includes('--check')) {
     const cur = readFileSync(TARGET, 'utf8');
     if (cur !== next) {
-      console.error('FAIL  asdd-steering.mdc is stale — run scripts/generate-runtime-steering.mjs');
-      process.exit(1);
+      console.error('FAIL  asdd-steering.mdc is stale — run: asdd kit generate-runtime-steering');
+      return 1;
     }
     console.log('PASS  runtime steering projection is current');
-  } else {
-    writeFileSync(TARGET, next);
-    console.log('WROTE  cli/runtimes/cursor/asdd-steering.mdc (registry-derived)');
+    return 0;
   }
+  writeFileSync(TARGET, next);
+  console.log('WROTE  cli/runtimes/cursor/asdd-steering.mdc (registry-derived)');
+  return 0;
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  process.exit(run(process.argv.slice(2)));
 }

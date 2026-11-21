@@ -183,6 +183,27 @@ async function main() {
     return;
   }
 
+  if (args.includes('--check')) {
+    const dir = join(root, KNOWLEDGE_DIR);
+    const missing = ['nodes.jsonl', 'edges.jsonl', 'chunks.jsonl'].filter((f) => !existsSync(join(dir, f)));
+    if (missing.length) {
+      console.error(`FAIL  ${KNOWLEDGE_DIR}/ missing ${missing.join(', ')} — run asdd knowledge sync`);
+      process.exit(1);
+    }
+    const { nodes, edges, chunks } = scanKnowledge(root);
+    const strip = (rows) => rows.map(({ embedding, ...rest }) => rest);
+    const stale = [];
+    if (JSON.stringify(readJsonl(join(dir, 'nodes.jsonl'))) !== JSON.stringify(nodes)) stale.push('nodes.jsonl');
+    if (JSON.stringify(readJsonl(join(dir, 'edges.jsonl'))) !== JSON.stringify(edges)) stale.push('edges.jsonl');
+    if (JSON.stringify(strip(readJsonl(join(dir, 'chunks.jsonl')))) !== JSON.stringify(chunks)) stale.push('chunks.jsonl');
+    if (stale.length) {
+      console.error(`FAIL  ${KNOWLEDGE_DIR}/ stale: ${stale.join(', ')} — run asdd knowledge sync`);
+      process.exit(1);
+    }
+    console.log(`OK    ${KNOWLEDGE_DIR}/ — ${nodes.length} nodes, ${edges.length} edges, ${chunks.length} chunks`);
+    return;
+  }
+
   const meta = await writeKnowledgeIndex(root, { embed: args.includes('--embed'), backend });
   console.log(
     `WRITE ${KNOWLEDGE_DIR}/ — ${meta.nodes} nodes, ${meta.edges} edges, ${meta.chunks} chunks, ${meta.embeddings.total} embedded [${(meta.backends ?? []).join('+')}]`

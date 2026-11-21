@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { appendFileSync, chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, test } from 'node:test';
@@ -88,6 +88,121 @@ test('an unedited kit file is updated when its version changes', () => {
   assert.equal(readFileSync(join(dir, '.harness/steering/controls.md'), 'utf8'), kitCopy);
 });
 
+test('a file at a kit path the kit cannot prove it wrote is skipped, never overwritten; --force restores', () => {
+  const dir = app('unproven');
+  assert.equal(asdd(['install', dir, '--skip-deps', '--json']).status, 0);
+  const versions = join(dir, '.harness/config/installed-versions.json');
+  const rel = '.harness/steering/controls.md';
+  // Simulate an install from before file hashes: the artifact version moved, but no kit_files entry proves the copy.
+  patch(versions, (v) => {
+    delete v.kit_files[rel];
+    v.artifacts['cli/steering/controls.md'] = '0.0.1';
+  });
+  appendFileSync(join(dir, rel), '\n<!-- local -->\n');
+  const res = json(asdd(['install', dir, '--skip-deps', '--json']));
+  assert.deepEqual(res.skipped, [rel]);
+  assert.match(readFileSync(join(dir, rel), 'utf8'), /<!-- local -->/);
+  // Still unproven: the file was not laundered into kit ownership.
+  assert.equal(JSON.parse(readFileSync(versions, 'utf8')).kit_files[rel], undefined);
+  const forced = json(asdd(['install', dir, '--skip-deps', '--force', '--json']));
+  assert.deepEqual(forced.skipped, []);
+  assert.doesNotMatch(readFileSync(join(dir, rel), 'utf8'), /<!-- local -->/);
+});
+
+test('an install that predates kit_files proves ownership by managed_files and refreshes changed kit files', () => {
+  const dir = app('prehash');
+  assert.equal(asdd(['install', dir, '--skip-deps', '--json']).status, 0);
+  const versions = join(dir, '.harness/config/installed-versions.json');
+  const rel = '.harness/steering/controls.md';
+  patch(versions, (v) => {
+    delete v.kit_files;
+    v.artifacts['cli/steering/controls.md'] = '0.0.1';
+  });
+  appendFileSync(join(dir, rel), '\n<!-- old kit copy -->\n');
+  const res = json(asdd(['install', dir, '--skip-deps', '--json']));
+  assert.deepEqual(res.skipped, []);
+  assert.doesNotMatch(readFileSync(join(dir, rel), 'utf8'), /<!-- old kit copy -->/);
+  const after = JSON.parse(readFileSync(versions, 'utf8'));
+  assert.ok(after.managed_files.includes(rel));
+  assert.ok(after.kit_files[rel]);
+});
+
+test('a rendered runtime agent file with no recorded render is kept unless --force', () => {
+  const dir = app('render');
+  assert.equal(asdd(['install', dir, '--runtime=cursor', '--skip-deps', '--json']).status, 0);
+  const versions = join(dir, '.harness/config/installed-versions.json');
+  const rel = '.cursor/agents/asdd-discovery-agent.md';
+  patch(versions, (v) => {
+    delete v.kit_files[rel];
+  });
+  writeFileSync(join(dir, rel), '# our agent\n');
+  const res = json(asdd(['install', dir, '--runtime=cursor', '--skip-deps', '--json']));
+  assert.deepEqual(res.skipped, [rel]);
+  assert.equal(readFileSync(join(dir, rel), 'utf8'), '# our agent\n');
+  const forced = json(asdd(['install', dir, '--runtime=cursor', '--skip-deps', '--force', '--json']));
+  assert.deepEqual(forced.skipped, []);
+  assert.notEqual(readFileSync(join(dir, rel), 'utf8'), '# our agent\n');
+});
+
+test('a real file where a runtime wants a link is kept unless the kit recorded it', () => {
+  const dir = app('linked');
+  assert.equal(asdd(['install', dir, '--skip-deps', '--json']).status, 0);
+  const rel = '.devin/agents/asdd-spec-agent.md';
+  mkdirSync(join(dir, '.devin/agents'), { recursive: true });
+  writeFileSync(join(dir, rel), '# our agent\n');
+  // devin links its agent files — a real file the kit cannot prove it wrote stays.
+  const res = json(asdd(['install', dir, '--runtime=devin', '--skip-deps', '--json']));
+  assert.deepEqual(res.skipped, [rel]);
+  assert.equal(readFileSync(join(dir, rel), 'utf8'), '# our agent\n');
+  const forced = json(asdd(['install', dir, '--runtime=devin', '--skip-deps', '--force', '--json']));
+  assert.deepEqual(forced.skipped, []);
+  assert.equal(lstatSync(join(dir, rel)).isSymbolicLink(), true);
+});
+
+test('retired and legacy paths go only when the manifest proves them kit-installed', () => {
+  const dir = app('owned-deletes');
+  assert.equal(asdd(['install', dir, '--skip-deps', '--json']).status, 0);
+  const versions = join(dir, '.harness/config/installed-versions.json');
+  const jev = '.harness/cli/src/harness/jev-gates.mjs';
+  const cliNote = '.harness/cli/notes.md';
+  const own = ['.agents/modules/loader/enable.md', 'scripts/enable-module.sh', '.harness/scripts/team-report.mjs'];
+  for (const rel of [...own, jev, cliNote]) {
+    mkdirSync(join(dir, rel, '..'), { recursive: true });
+    writeFileSync(join(dir, rel), '# ours\n');
+  }
+  const res = json(asdd(['install', dir, '--skip-deps', '--json']));
+  assert.equal(res.ok, true);
+  // None of them is recorded as kit-installed: every one stays (.harness/cli has no bin/asdd.mjs signature).
+  for (const rel of [...own, jev, cliNote]) assert.ok(existsSync(join(dir, rel)), `${rel} must be kept`);
+  // Prove the retired paths (an old kit recorded them); notes.md stays unmanaged, so .harness/cli survives.
+  patch(versions, (v) => {
+    v.managed_files.push(...own, jev);
+  });
+  assert.equal(asdd(['install', dir, '--skip-deps', '--json']).status, 0);
+  for (const rel of [jev, '.agents/modules', 'scripts/enable-module.sh']) {
+    assert.equal(existsSync(join(dir, rel)), false, `${rel} should be gone once proven`);
+  }
+  assert.ok(existsSync(join(dir, cliNote)), 'unproven notes.md keeps .harness/cli alive');
+  // team-report.mjs is not a kit script name — .harness/scripts keeps it as the project's own.
+  assert.ok(existsSync(join(dir, '.harness/scripts/team-report.mjs')));
+  // Fully prove .harness/cli (every file managed): the whole dir goes.
+  patch(versions, (v) => {
+    v.managed_files.push(cliNote);
+  });
+  assert.equal(asdd(['install', dir, '--skip-deps', '--json']).status, 0);
+  assert.equal(existsSync(join(dir, '.harness/cli')), false);
+});
+
+test('doctor reports project-edited kit files and unmanaged files inside kit-owned dirs', () => {
+  const dir = app('ownership-doctor');
+  assert.equal(asdd(['install', dir, '--skip-deps', '--json']).status, 0);
+  appendFileSync(join(dir, '.harness/steering/controls.md'), '\n# tweak\n');
+  writeFileSync(join(dir, '.agents/skills/notes.md'), '# ours\n');
+  const out = asdd(['doctor', dir]).stdout;
+  assert.match(out, /warn {2}kit-files: 1 kit file\(s\) carry project edits/);
+  assert.match(out, /warn {2}kit-dirs: .*never kit-installed/);
+});
+
 test('guards: an interrupted install and a downgrade are refused unless --force', () => {
   const dir = app('guards');
   asdd(['install', dir, '--skip-deps', '--json']);
@@ -120,7 +235,7 @@ test('--json: one object on stdout, for the result and for an error', () => {
   assert.deepEqual(Object.keys(json(bad)), ['ok', 'error']);
 });
 
-test('uninstall removes what the kit added and keeps the project changes', () => {
+test('uninstall (REQ-015): removes what the kit added and keeps the project changes', () => {
   const dir = app('uninstall');
   writeFileSync(join(dir, '.gitignore'), 'dist/\n');
   mkdirSync(join(dir, '.agents/mcp'), { recursive: true });

@@ -116,19 +116,28 @@ node cli/bin/asdd.mjs install /path/to/repo                      # from a clone 
 
 ## Ownership and safety
 
-`.harness/config/installed-versions.json` records the sha256 of every kit file as the kit wrote it (`kit_files`).
-On an upgrade, a kit file whose version changed is updated, unless the project changed it since: then it is skipped
-(`SKIP`, listed in the summary, in `skipped_files`, and by `asdd doctor`), and `--force` takes the kit version. While
-an install writes files, `.harness/.installing` exists; if a run is cut off, the next install refuses until `--force`
-(after a look at `git status`). An install older than the kit the project has (`project.json` `kit.version`) is refused;
-`--force` downgrades.
+The kit only ever refreshes or deletes **kit artifacts** — the paths `.harness/config/installed-versions.json`
+records (`managed_files`, `kit_files` sha256 of every kit file as the kit wrote it). A file the kit cannot prove it
+wrote is never overwritten or removed: an existing kit-path file without a recorded hash is `SKIP`ped, an unproven
+retired path is kept with a warning for manual reconciliation, a consumer file inside a kit namespace halts the
+collision guards (`--rehome-colliding-*` preserves it), and a real file where a runtime wants a link is kept.
+
+A kit file the project changed since the kit wrote it is skipped (`SKIP`, listed in the summary, in
+`skipped_files`, and by `asdd doctor`); `--force` restores the kit version — kit-owned paths are the kit's.
+Project-owned seeds (`create`: bindings, `AGENTS.md`, logs, `mcp.json`, `PROGRESS.md`, slice state) are written
+once and never overwritten or removed. While an install writes files, `.harness/.installing` exists; if a run is
+cut off, the next install refuses until `--force` (after a look at `git status`). An install older than the kit the
+project has (`project.json` `kit.version`) is refused; `--force` downgrades. `asdd uninstall <dir>` removes only
+what the kit added and the project did not change.
 
 ## What install does
 
-Kit-owned files (`refresh`) are copied when missing, when their version in `.harness/config/versions.json` changed, or
-with `--force`. Project-owned seeds (`create`: bindings, `AGENTS.md`, logs, `mcp.json`, `PROGRESS.md`) are written once
-and never overwritten. `.harness/config/installed-versions.json` records what the project received: the versions, the
-kit-owned files (spec drift exempts them), and the hash of each seed (exempt only while unedited). The phases, in order:
+Kit-owned files (`refresh`) are copied when missing, when their version changed, or with `--force` — but only a file
+still provably the kit's copy is refreshed: one the project edited since the kit wrote it, or one the kit cannot
+prove it wrote, is `SKIP`ped (`--force` restores either). Project-owned seeds (`create`: bindings, `AGENTS.md`,
+logs, `mcp.json`, `PROGRESS.md`) are written once and never overwritten. `.harness/config/installed-versions.json`
+records what the project received: the versions, the kit-owned files (spec drift exempts them), and the hash of
+each seed (exempt only while unedited). The phases, in order:
 1. portable steering and binding stubs;
 2. the removal of an older kit's CLI copy (`.harness/cli/`) and its files in `.harness/scripts/`;
 3. `project.json`;

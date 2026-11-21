@@ -1,0 +1,13 @@
+{
+ "schema_version": "1.0",
+ "session_id": "sess-telemetry-phase2-004",
+ "timestamp": "2026-11-17T20:30:00.000Z",
+ "agent": "asdd-pipeline",
+ "human": "eencinas",
+ "slice_id": "telemetry-phase2",
+ "event_type": "phase_completed",
+ "phase": "implementation",
+ "evidence": "Wave 3 telemetry+profiling implemented: telemetry-lib (mintSpan/validateSpan/emit≤4KB/readTail bounded/synthesizePhaseSpans/evaluateHeuristics H-BOOT,H-LOOP,H-SURGE,H-STALL,H-PHANTOM/detectionSpan/measureCommand), emit-span seam (asdd span stdin→span, writer defaulted), profile.mjs (--slice/--bottlenecks/--json, exit 0/3/2, profiling.json rollup), validators/telemetry.mjs warn-only, seam instrumentation command-gate/verify-on-stop/check-invariants(--live-gated)/sync-state with trace inheritance, _runtime-template telemetry rule, lifecycle.sh smoke row, project.json commands.profile+capabilities.telemetry+schema. v2.md converged repo+vault. Verified: npm test 244/0, regen --check 9/9, check 0 FAIL, jev-gate+knowledge suites green. Design note: check-invariants sensor span gated on --live/--record/HARNESS_JEV_LIVE (PR-checkout .gitignore leak discovered by install-lifecycle test). 24 DRIFT-02 features re-verified+re-stamped; cli-harness:TASK-011 stays blocked on pre-existing tools/spec-drift failures.",
+ "scope_paths": ["cli/src/harness/telemetry-lib.mjs","cli/src/harness/emit-span.mjs","cli/src/harness/profile.mjs","cli/src/harness/validators/telemetry.mjs","cli/src/harness/command-gate.mjs","cli/src/harness/verify-on-stop.mjs","cli/src/harness/check-invariants.mjs","cli/src/harness/sync-state.mjs","cli/agents/_runtime-template.md","cli/registry/contribution-points.json","cli/test/lifecycle.sh","cli/test/registry.test.mjs",".harness/config/project.json","cli/scaffold/config/project.schema.json",".harness/config/project.schema.json","package.json","docs/knowledge-base/profiling-proposals/v2.md"],
+ "concerns": ["E1-scope-spread advisory (telemetry inherently spans cli+tools+.harness)", "cli-harness:TASK-011 remains blocked on pre-existing tools/spec-drift failures", "H-STALL needs ≥15min silence — fires on next profile run after quiet period", "AR-4 checkpoint emission + AR-6 CI thresholds deferred per guardrails"]
+}

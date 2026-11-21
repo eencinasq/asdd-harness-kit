@@ -58,6 +58,10 @@ Each session is a single JSON file written once, never modified.
 
 **Event types:** `phase_started`, `phase_completed`, `phase_blocked`, `feature_started`, `feature_completed`, `feature_blocked`, `dissent`, `override`, `checkpoint`.
 
+## Git merge policy
+
+Generated views are untracked — regen `asdd sync`. `.gitattributes` (installer-maintained; regen `asdd install`) sets `merge=ours` on generated docs and `-merge` on kit-owned paths — the block carries the conflict runbook.
+
 ## Rules (invariants)
 
 - **MAN-01.** **Resolve the slice** from the registry or user prompt, then work under `paths.specs`.

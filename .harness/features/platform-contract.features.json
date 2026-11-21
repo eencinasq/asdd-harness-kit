@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "platform-contract",
+  "source_tasks": ".harness/specs/platform-contract/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Phase-2 declaration layer: 26-class registry + module manifests",
+      "user_visible_behavior": "cli/registry/contribution-points.json defines the 26-class artifact registry; core modules declare module.json; manifest loader validates fail-closed before copy.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "devin",
+      "req_ids": [],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/test/registry.test.mjs"
+      ],
+      "evidence": "re-verified under microkernel-polish: node --test cli/test/registry.test.mjs: 34 pass",
+      "scope_paths": [
+        "cli/registry/contribution-points.json",
+        "cli/modules/bruno/module.json",
+        "cli/modules/http-api/module.json",
+        "cli/modules/playwright-e2e/module.json",
+        "cli/modules/web-ui/module.json",
+        "cli/src/install/registry.mjs"
+      ],
+      "evidence_hash": "a373f05b7ffb0084a38ca6e075d8e7b254d64c77b2354272c16c3a7ecf3aa066"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Wave A: Registry files table as enumeration SoT",
+      "user_visible_behavior": "HARNESS_FILES, BINDINGS, FOLDER_READMES, SELF_COPIES, installAgentsCore, and installDocsRoot derive from registry files[]; enableOne is manifest-driven.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "devin",
+      "req_ids": [],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "npm test"
+      ],
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass",
+      "scope_paths": [
+        "cli/registry/contribution-points.json",
+        "cli/src/install/phases.mjs",
+        "cli/src/install/modules.mjs"
+      ],
+      "evidence_hash": "8034392133a7c166262753c7257d1eebeaf2745c31a7980e311db7acafe8dea3"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Wave B: Ignore, stamp, runtime, and retired enumerations derive from registry",
+      "user_visible_behavior": "COMMITTED_PATHS, RUNTIME_PATHS, RUNTIMES, RUNTIME_DIRS, KIT_TOOL_SERVERS, and RETIRED_* derive from contribution-points.json.",
+      "status": "passing",
+      "priority": 3,
+      "owner": "devin",
+      "req_ids": [],
+      "depends_on": [
+        "TASK-002"
+      ],
+      "verification": [
+        "npm test"
+      ],
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass",
+      "scope_paths": [
+        "cli/registry/contribution-points.json",
+        "cli/src/install/ignored.mjs",
+        "cli/src/install/options.mjs",
+        "cli/src/install/phases.mjs"
+      ],
+      "evidence_hash": "bce9e9800b37aceddf96ef9e0610857590d45217a6d8446438d33c3db2ed5ede"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Wave C: Dynamic vocabulary-driven PHASES/modes and commands section",
+      "user_visible_behavior": "PHASES and SLICE_MODES derive from registry vocabulary; commands section drives HARNESS_COMMANDS and KIT_COMMANDS.",
+      "status": "passing",
+      "priority": 4,
+      "owner": "devin",
+      "req_ids": [],
+      "depends_on": [
+        "TASK-003"
+      ],
+      "verification": [
+        "npm test"
+      ],
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass",
+      "scope_paths": [
+        "cli/registry/contribution-points.json",
+        "cli/src/harness/sync-state.mjs",
+        "cli/src/harness/repair.mjs",
+        "cli/src/harness/commands.mjs"
+      ],
+      "evidence_hash": "cc2068f7e80be0ebd70ef27ec8226c9baffbfa9bd2c0be28f4e7f9514fa9c65e"
+    },
+    {
+      "id": "TASK-005",
+      "title": "Wave D: Generated-state migration and .gitattributes/.gitignore generation",
+      "user_visible_behavior": "Global state/manifest.json retired in favor of registry.json; 42 generated files untracked; .gitattributes and .gitignore rules generated from registry.",
+      "status": "passing",
+      "priority": 5,
+      "owner": "devin",
+      "req_ids": [],
+      "depends_on": [
+        "TASK-004"
+      ],
+      "verification": [
+        "npm test"
+      ],
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass",
+      "scope_paths": [
+        "cli/registry/contribution-points.json",
+        "cli/src/install/registry.mjs",
+        ".gitattributes",
+        ".gitignore"
+      ],
+      "evidence_hash": "2ef5d51b3a4bba7f41a18daeae7cfdcec1e6a707a0f8ed9dbc3e9916518a34ef"
+    },
+    {
+      "id": "TASK-006",
+      "title": "Wave E: Generator umbrella asdd kit regen & guardrails",
+      "user_visible_behavior": "asdd kit regen runs registered generators; checkExecutableShape validates adapter exports; G-16 source_root invariant enforced; DOM-11 re-pinned.",
+      "status": "passing",
+      "priority": 6,
+      "owner": "devin",
+      "req_ids": [],
+      "depends_on": [
+        "TASK-005"
+      ],
+      "verification": [
+        "npm test",
+        "node cli/bin/asdd.mjs kit regen --check"
+      ],
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass + asdd kit regen --check: 9/9 generators, 0 skipped, exit 0",
+      "scope_paths": [
+        "cli/src/kit/regen.mjs",
+        "cli/src/install/registry.mjs",
+        "cli/registry/contribution-points.json",
+        "docs/knowledge-base/profiling-proposals/v2.md"
+      ],
+      "evidence_hash": "7126b18f2628e5ee6e993c34f84ca31c61f6fec5b51297f80b59224d06243523"
+    }
+  ]
+}

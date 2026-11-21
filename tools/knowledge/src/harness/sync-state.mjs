@@ -18,7 +18,7 @@
  * telemetry-lib.mjs (ADR-001). A telemetry failure never changes stdout, stderr, the exit code, or a generated file.
  * Only the CLI block emits: the exported functions (used by the MCP servers) never do.
  */
-import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -63,8 +63,34 @@ function readSessions(sliceDir) {
 
 export { readSessions };
 
-// Ordered pipeline. 'refactor' is optional and handled in derivePhase.
-export const PHASES = ['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'knowledge'];
+/**
+ * Phase + mode vocabulary comes from the platform registry (D-3), not constants. Lookup order: the project's
+ * installed copy (pin fidelity — the kit version the project runs), then the registry bundled with this CLI copy
+ * (kit repo, npm package; vendored tools/<name>/src/harness copies resolve tools/<name>/registry, which is absent).
+ * Absent vocabulary falls back to the built-in pipeline literals so `asdd sync` never writes degraded phase/mode state.
+ */
+function platformVocabulary() {
+  for (const p of [
+    join(root, '.harness/config/contribution-points.json'),
+    join(import.meta.dirname, '../../registry/contribution-points.json'),
+  ]) {
+    const r = readJson(p);
+    if (r?.vocabulary) return r.vocabulary;
+  }
+  return null;
+}
+const VOCAB = platformVocabulary();
+// The missing-registry warning lives on the CLI path (main), not at import: library importers (learning-lib via
+// recordDenial, telemetry attribute()) must never write to stderr.
+function warnRegistryMissing() {
+  if (!VOCAB && existsSync(join(root, '.harness'))) {
+    console.error('asdd: .harness/config/contribution-points.json missing — run `asdd install` to install the platform registry');
+  }
+}
+
+// Ordered pipeline (registry vocabulary.phases, by `order`). 'refactor' is optional and handled in derivePhase.
+const FALLBACK_PHASES = ['discovery', 'spec', 'validation', 'domain', 'design', 'task_planning', 'implementation', 'qa', 'knowledge'];
+export const PHASES = (VOCAB?.phases?.length ? [...VOCAB.phases].sort((a, b) => a.order - b.order).map((p) => p.id) : FALLBACK_PHASES);
 
 export function derivePhase(sessions) {
   const phaseEvents = sessions.filter((s) =>
@@ -81,7 +107,7 @@ export function derivePhase(sessions) {
   return latest.phase;
 }
 
-export const SLICE_MODES = ['lite', 'hotfix', 'full', 'escalated'];
+export const SLICE_MODES = VOCAB?.modes?.length ? VOCAB.modes : ['lite', 'hotfix', 'full', 'escalated'];
 
 /** Serial modes: at most one in_progress feature; escalation signals block DONE. */
 export function isSerialMode(mode) {
@@ -345,8 +371,9 @@ function generateRegistry(sliceManifests) {
       phase: m.phase,
       status: m.status,
       mode: m.mode,
-      active_features: m.active_features.length,
-      escalation_signals: m.escalation_signals.length,
+      // Legacy/foreign manifests may lack the v3 derived arrays — never crash the whole sync on one.
+      active_features: (m.active_features ?? []).length,
+      escalation_signals: (m.escalation_signals ?? []).length,
       escalation_required: m.escalation_required,
       escalated_from_lite: m.escalated_from_lite,
       open_dissents: m.open_dissents,
@@ -372,12 +399,55 @@ function writeProgress(registry) {
   writeFileSync(join(root, '.harness/PROGRESS.md'), text);
 }
 
+/**
+ * AR-3 collision resolution (K-6): when two session files share a sequence
+ * number, the earliest timestamp keeps the number; later ones are renamed to
+ * the next free sequences. Deterministic and content-preserving — the rename
+ * is recorded in the sync output so the coordinator sees it.
+ */
+function resolveSessionCollisions(sliceId, sliceDir) {
+  const sessionsDir = join(sliceDir, 'sessions');
+  if (!existsSync(sessionsDir)) return;
+  const SESSION_RE = /^(\d+)-(.+\.json)$/;
+  const files = readdirSync(sessionsDir).filter((n) => SESSION_RE.test(n));
+  const bySeq = new Map();
+  for (const f of files) {
+    const seq = Number(SESSION_RE.exec(f)[1]);
+    const list = bySeq.get(seq) ?? [];
+    list.push(f);
+    bySeq.set(seq, list);
+  }
+  const timestampOf = (f) => {
+    try {
+      const data = JSON.parse(readFileSync(join(sessionsDir, f), 'utf8'));
+      return Date.parse(data.timestamp) || 0;
+    } catch {
+      return 0;
+    }
+  };
+  const used = new Set(bySeq.keys());
+  let next = Math.max(0, ...used) + 1;
+  for (const [, group] of bySeq) {
+    if (group.length < 2) continue;
+    group.sort((a, b) => timestampOf(a) - timestampOf(b) || a.localeCompare(b));
+    for (const loser of group.slice(1)) {
+      while (used.has(next)) next += 1;
+      const target = `${String(next).padStart(3, '0')}-${SESSION_RE.exec(loser)[2]}`;
+      renameSync(join(sessionsDir, loser), join(sessionsDir, target));
+      console.log(`SYNC  ${sliceId} renamed ${loser} → ${target} (AR-3 collision)`);
+      used.add(next);
+      next += 1;
+    }
+  }
+}
+
 function syncSlice(sliceId) {
   const sliceDir = join(slicesDir, sliceId);
   if (!existsSync(sliceDir)) {
     console.error(`FAIL  slice directory not found: ${sliceDir}`);
     return null;
   }
+  resolveSessionCollisions(sliceId, sliceDir);
   const sessions = readSessions(sliceDir);
   const manifest = generateSliceManifest(sliceId, sessions);
   writeJson(join(sliceDir, 'manifest.json'), manifest);
@@ -515,6 +585,7 @@ async function main(run = null) {
   const args = process.argv.slice(2);
   const sliceArg = args.indexOf('--slice');
   const targetSlice = sliceArg >= 0 ? args[sliceArg + 1] : null;
+  warnRegistryMissing();
   await stampEvidence(root, { only: targetSlice });
 
   if (!existsSync(slicesDir)) {

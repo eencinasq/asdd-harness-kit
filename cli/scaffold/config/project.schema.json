@@ -85,6 +85,14 @@
         "spec_as_source": {
           "type": "boolean",
           "description": "Experimental: enable asdd spec-source inventory (not default SoT)."
+        },
+        "telemetry": {
+          "type": "object",
+          "description": "Fail-open telemetry (profiling v2): spans.jsonl producer instrumentation is on when present.",
+          "properties": {
+            "enabled": { "type": "boolean" }
+          },
+          "additionalProperties": true
         }
       },
       "additionalProperties": true

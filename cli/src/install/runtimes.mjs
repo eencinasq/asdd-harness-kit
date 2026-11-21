@@ -9,10 +9,13 @@ import { isSymlink } from './context.mjs';
 import { list, RUNTIMES } from './options.mjs';
 import { asddCommand, claudeHook, KIT_BIN, LEGACY_PROJECT_BIN, observeCommand } from './phases.mjs';
 
-/** Hook commands for this install target: the asdd resolver in a project, cli/ in the kit repo. */
-const hookCmds = (ctx) => {
-  const verify = asddCommand(ctx, 'verify');
-  const gate = asddCommand(ctx, 'gate');
+/**
+ * Hook commands for this install target: the asdd resolver in a project, cli/ in the kit repo. `shell` overrides the
+ * OS shell family for runtimes that always run hooks in one shell (Claude Code: bash, Git Bash on Windows).
+ */
+const hookCmds = (ctx, shell) => {
+  const verify = asddCommand(ctx, 'verify', shell);
+  const gate = asddCommand(ctx, 'gate', shell);
   return {
     verify,
     gate,
@@ -62,12 +65,27 @@ function realAgentsDir(ctx, runtimeDir) {
   return dir;
 }
 
+/**
+ * One agent file as a link into a runtime dir. A real file already there is replaced only when the kit can prove it
+ * wrote it (a recorded render/copy, or --force); a symlink is always safe to retarget — it holds no content.
+ */
+function linkAgentFile(ctx, source, path) {
+  const rel = ctx.rel(path);
+  if (existsSync(path) && !isSymlink(path) && ctx.kitHashes[rel] === undefined && !ctx.force) {
+    ctx.stats.skipped += 1;
+    ctx.skipped.push(rel);
+    warn(`${rel} is not recorded as kit-installed — kept (--force replaces it with a link)`);
+    return;
+  }
+  ctx.link(source, path);
+  ctx.recordManaged(path);
+  log(`${c.blue('LINK')}  ${path}`);
+}
+
 function linkAgentFiles(ctx, runtimeDir) {
   const dir = realAgentsDir(ctx, runtimeDir);
   for (const base of agentFiles(ctx)) {
-    ctx.link(`../../.agents/agents/${base}`, join(dir, base));
-    ctx.recordManaged(join(dir, base));
-    log(`${c.blue('LINK')}  ${join(dir, base)}`);
+    linkAgentFile(ctx, `../../.agents/agents/${base}`, join(dir, base));
   }
 }
 
@@ -81,8 +99,7 @@ function renderAgentFiles(ctx, runtimeDir, runtime) {
     const source = `.agents/agents/${base}`;
     const parsed = parseAgent(readFileSync(join(ctx.target, source), 'utf8'));
     if (!parsed) {
-      ctx.link(`../../${source}`, join(dir, base));
-      ctx.recordManaged(join(dir, base));
+      linkAgentFile(ctx, `../../${source}`, join(dir, base));
       warn(`${source}: no frontmatter; linked instead of rendered`);
       continue;
     }
@@ -164,8 +181,9 @@ function installCursorVerifyHook(ctx) {
 
 function installClaudeHooks(ctx) {
   // Claude Code hooks start at the project root (claude-hook-cwd): blocking hooks exit 2 when that fails, observe 0.
-  const verify = claudeHook(hookCmds(ctx).verify);
-  const gate = claudeHook(hookCmds(ctx).gate);
+  // claudeHook prepends a POSIX cd, so the resolver must be POSIX too on every OS (never mixed with cmd syntax).
+  const verify = claudeHook(hookCmds(ctx, 'posix').verify);
+  const gate = claudeHook(hookCmds(ctx, 'posix').gate);
   const observe = claudeHook(observeCommand(ctx, 'claude'), 0);
   const dest = join(ctx.target, '.claude/settings.json');
   if (ctx.dryRun) {

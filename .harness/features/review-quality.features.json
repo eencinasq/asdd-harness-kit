@@ -66,7 +66,7 @@
       "verification": [
         "npm test"
       ],
-      "evidence": "re-verified 2026-11-16T20:49:13 (DRIFT-02): npm test exit 0 (210 tests) after learn-eval-gate learning-lib/validator changes",
+      "evidence": "re-verified under microkernel-polish: npm test: 234 pass",
       "scope_paths": [
         "cli/src/harness/learning-lib.mjs",
         "cli/src/harness/learning-lib.test.mjs",
@@ -77,7 +77,7 @@
         "cli/steering/quality-gates.md",
         ".harness/steering/quality-gates.md"
       ],
-      "evidence_hash": "b72206a6bd1fdda2579aa1016d68cc7066ca530d0a640cb150c3a230d4fe13c5"
+      "evidence_hash": "6a663fa5f78102c8bfe887c7375bd82f6aeb87ff9858ba345f70f9b2578eb55c"
     },
     {
       "id": "TASK-004",

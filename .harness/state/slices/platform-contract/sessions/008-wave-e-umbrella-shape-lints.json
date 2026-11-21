@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-platform-contract-008",
+  "timestamp": "2026-11-14T09:10:00Z",
+  "agent": "devin",
+  "slice_id": "platform-contract",
+  "event_type": "checkpoint",
+  "phase": "qa",
+  "mode": "full",
+  "evidence": "Wave E complete — every deferred §6.2 guardrail now landed or recorded. D-6/G-4: `asdd kit regen [scope] [--check] [--json]` umbrella over registry generators (ORDERed fleet minus project-side install/harness-profile; scope = generator id or contribution class; check mode runs registered checks, note-style checks skipped). `generate-runtime-steering` registered in commands.kit + refactored to run(argv) contract (was unreachable — its generator check now executes). steering-tags.mjs dead-path fixed: checks .cursor/rules/asdd-steering.mdc + cli/runtimes/cursor source (was runtimes/cursor/ — matched nothing). G-13/D-7: checkExecutableShape — literal `export default {id, description, run}` + fs-write-call scan, fail-closed at validateModules (sync — no async ripple into runInstall); non-literal exports fail closed keeping adapters statically auditable. AR-3/AR-1: session naming lint — non-NNN-<slug> filenames + duplicate sequence numbers warn (rename-resolve, never merge); surfaced real legacy collision cli-harness:016×2 (pre-existing data, warn = contract working). Q-R3 recorded in registry generators.vendor.notes (keep vendoring, D-4c — bundle restructure declined). cli/modules/README.md gained the module.json authoring section (manifest fields, trust tiers, engines, mounts, contribution types). Kit commands now 9 (was 7). npm test 221/221; only pre-existing DRIFT-02/WARNs + the new legitimate AR-3 warn remain. DOM-11 stays deferred — profiling lineage doc fix, not this repo.",
+  "concerns": [],
+  "scope_paths": [
+    "cli/src/kit/regen.mjs",
+    "cli/src/kit/generate-runtime-steering.mjs",
+    "cli/src/install/registry.mjs",
+    "cli/src/harness/validators/manifest.mjs",
+    "cli/src/harness/validators/steering-tags.mjs",
+    "cli/registry/contribution-points.json",
+    "cli/modules/README.md",
+    "cli/test/registry.test.mjs"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "profile-no-spans",
+  "setup": [
+    { "op": "install" },
+    { "op": "slice", "id": "demo" }
+  ],
+  "invoke": { "cmd": "profiling", "args": ["--slice", "never-synced"] },
+  "expect": { "exit": 3 },
+  "normalize": ["paths"]
+}

@@ -29,7 +29,7 @@ test -f .harness/state/slices/demo-slice/sessions/001-initial.json
 test -f .harness/state/slices/demo-slice/manifest.json
 test -f .harness/features/demo-slice.features.json
 test -f .harness/specs/demo-slice/tasks.md
-grep -q '"slice_id": "demo-slice"' .harness/state/manifest.json
+grep -q '"slice_id": "demo-slice"' .harness/state/registry.json
 grep -q '| demo-slice |' .harness/PROGRESS.md
 
 echo "== lite-first: default mode is lite, --full opts in =="
@@ -402,6 +402,21 @@ grep -q 'DRIFT-02 passing feature g1 changed after its verification' /tmp/asdd-l
 if grep -q 'DRIFT-01 src/api/file.js' /tmp/asdd-lifecycle-neg.log; then echo "a mapped file still reported as DRIFT-01" >&2; exit 1; fi
 rm src/api/file.js
 asdd check >/dev/null
+
+echo "== telemetry (profiling v2): span seam emits, profile readout derives, validator warns never fails =="
+SPAN='{"kind":"command","process_name":"smoke-cmd","runtime":"cli","slice_id":"demo-slice","phase":"implementation","start_time_iso":"2026-01-01T00:00:00.000Z","end_time_iso":"2026-01-01T00:00:01.000Z","duration_ms":1000,"status":"OK","attributes":{"command_label":"smoke","exit_code":0}}'
+echo "$SPAN" | asdd span >/dev/null
+tail -1 .harness/state/telemetry/spans.jsonl | grep -q '"kind": "command"\|"kind":"command"'
+asdd profiling --slice demo-slice >/dev/null
+test -f .harness/state/telemetry/slices/demo-slice/profiling.json
+asdd profiling --bottlenecks >/dev/null
+asdd profiling --slice no-such-slice >/dev/null 2>&1 && exit 1 || test "$?" = 3
+# malformed span → warn-only: check still passes
+echo '{"kind":"bogus"}' >> .harness/state/telemetry/spans.jsonl
+asdd check >/tmp/asdd-lifecycle-neg.log 2>&1
+grep -q 'WARN.*spans.jsonl' /tmp/asdd-lifecycle-neg.log
+if grep -q 'FAIL.*spans.jsonl' /tmp/asdd-lifecycle-neg.log; then echo "telemetry validator emitted a FAIL" >&2; exit 1; fi
+
 rm -rf .git src
 
 echo "OK lifecycle e2e test"
