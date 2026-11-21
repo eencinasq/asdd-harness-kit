@@ -16,10 +16,11 @@ import { isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { readBinding } from './drift-lib.mjs';
 
 /**
- * Config files, then the rule folder the spec-drift analyzer and the generate-architecture-rules prompt use
- * (`.semgrep/architecture/`, selected only when it holds a YAML file).
+ * Config files, then the rules folder the spec-drift analyzer and the generate-architecture-rules prompt use
+ * (`.semgrep/`, selected only when it holds a YAML file). The whole folder is one config, so every rule set in it
+ * (`architecture/`, `standards/`, …) runs, as in the spec-drift analyzer.
  */
-const CONFIG_CANDIDATES = ['.semgrep.yml', '.semgrep.yaml', 'semgrep.yml', '.semgrep/architecture.yml', '.semgrep/architecture'];
+const CONFIG_CANDIDATES = ['.semgrep.yml', '.semgrep.yaml', 'semgrep.yml', '.semgrep'];
 
 /** The rules folder: its rule test fixtures are not code. */
 const RULES_FOLDER = '.semgrep';
@@ -235,8 +236,10 @@ export function boundaryRows(sources) {
 export function languagesFrom(text) {
   if (!text) return [];
   const found = [];
+  // The whole cell, not only its backticked values: "JavaScript (`.mjs`) …; TypeScript for …" names languages in prose.
   const add = (cell) => {
-    const value = cellValues(cell).join(' ');
+    const value = String(cell ?? '').replace(/`/g, '').trim();
+    if (UNFILLED.has(value.toLowerCase())) return;
     if (!value) return;
     for (const [language, re] of LANGUAGE_PATTERNS) {
       if (re.test(value) && !found.includes(language)) found.push(language);
@@ -338,10 +341,19 @@ function selectedConfig(root, sources) {
   return null;
 }
 
-/** Select a project config, else generate YAML from the specs. Does not write the repo. */
+/**
+ * The project's rules (binding or a config candidate) plus YAML generated from the specs' boundary tables: both run,
+ * so a boundary added to the specs is enforced without hand-writing a rule. Does not write the repo.
+ */
 export function resolveSemgrepConfig(root, sources) {
   const selected = selectedConfig(root, sources);
-  if (selected) return selected;
+  if (selected?.status === 'unconfigured') return selected;
+  const yaml = generateSemgrepYaml(sources);
+  if (selected) {
+    return yaml
+      ? { ...selected, source: 'selected+generated', yaml, message: 'Project rules plus rules generated from the architecture specs (not written to the repo).' }
+      : selected;
+  }
   const rows = boundaryRows(sources);
   const languages = languagesFrom(sources.find((s) => s.id === 'tech')?.text);
   if (rows.length && !languages.length) {
@@ -351,12 +363,11 @@ export function resolveSemgrepConfig(root, sources) {
       message: 'A boundary table is filled in, but tech.md does not name a Language Semgrep can scan.',
     };
   }
-  const yaml = generateSemgrepYaml(sources);
   if (!yaml) {
     return {
       status: 'unconfigured',
       source: 'none',
-      message: 'No .semgrep.yml, no .semgrep/architecture/ rules, and no "Paths | Must not import" rows in the architecture specs.',
+      message: 'No .semgrep.yml, no .semgrep/ rules, and no "Paths | Must not import" rows in the architecture specs.',
     };
   }
   return {
@@ -449,11 +460,11 @@ export function runSemgrepScan({ root, sources, paths = [], bin = 'semgrep', spa
     return { status: config.status, source: config.source, path: config.path, findings: [], message: config.message };
   }
   let tmpDir = null;
-  let configPath = config.path ? join(root, config.path) : null;
+  const configPaths = config.path ? [join(root, config.path)] : [];
   if (config.yaml) {
     tmpDir = mkdtempSync(join(tmpdir(), 'harness-semgrep-'));
-    configPath = join(tmpDir, '.semgrep.yml');
-    writeFileSync(configPath, config.yaml);
+    configPaths.push(join(tmpDir, '.semgrep.yml'));
+    writeFileSync(configPaths.at(-1), config.yaml);
   }
   // Rule test fixtures live in .semgrep/ and violate the rules on purpose: never code. Semgrep does not apply
   // --exclude to explicit targets, so they are dropped here too (spec-drift rule-coverage REQ-003).
@@ -467,7 +478,7 @@ export function runSemgrepScan({ root, sources, paths = [], bin = 'semgrep', spa
   try {
     const r = spawn(bin, [
       'scan', '--json', '--quiet', '--metrics=off', '--disable-version-check',
-      '--config', configPath,
+      ...configPaths.flatMap((c) => ['--config', c]),
       '--exclude', RULES_FOLDER,
       ...targets,
     ], { cwd: root, encoding: 'utf8', timeout: 120000, maxBuffer: 16 * 1024 * 1024 });

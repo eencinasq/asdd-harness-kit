@@ -40,10 +40,7 @@ const repo = (withKit: boolean): string => {
 	writeFileSync(path.join(root, 'src/a.ts'), 'export const a = 1;\n');
 	if (withKit) {
 		mkdirSync(path.join(root, '.harness/state'), { recursive: true });
-		writeFileSync(
-			path.join(root, '.harness/state/manifest.json'),
-			'{ "schema_version": "3.0", "active_slices": [] }\n',
-		);
+		writeFileSync(path.join(root, '.harness/state/registry.json'), '{ "slices": [] }\n');
 	}
 	return root;
 };

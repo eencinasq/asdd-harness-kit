@@ -7,7 +7,7 @@
  * 1. Spec drift over all active slices (requirement checks forced).
  * 2. Unowned code: tracked product files (tests excluded) no slice maps or owns.
  * 3. Audit commands (quality-gates.project.md) and the domain Gate command, or "unconfigured".
- * 4. Semgrep over the repo (selected .semgrep.yml, or rules generated from the architecture specs).
+ * 4. Semgrep over the repo (selected .semgrep.yml or .semgrep/ rule sets, plus rules generated from the architecture specs).
  * 5. Churn hotspots ranked by churn, requirement links, and findings.
  * 5. Writes .harness/audits/<timestamp>.json; carries first_seen/occurrences from the previous report.
  *

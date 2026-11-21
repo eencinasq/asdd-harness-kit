@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, existsSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { findingsFromSemgrep, generateSemgrepYaml, resolveSemgrepConfig, runSemgrepScan } from './semgrep-lib.mjs';
+import { findingsFromSemgrep, generateSemgrepYaml, languagesFrom, resolveSemgrepConfig, runSemgrepScan } from './semgrep-lib.mjs';
 
 const sources = [
   { id: 'domain-layer', path: '.harness/steering/domain-layer.md', filled: true, text: '# Domain\n\nBusiness rules stay in the domain.\n' },
@@ -70,16 +70,37 @@ test('generateSemgrepYaml is null for kit stubs', () => {
   assert.equal(generateSemgrepYaml(stubs), null);
 });
 
-test('resolveSemgrepConfig selects .semgrep.yml and does not generate', () => {
+test('resolveSemgrepConfig unions the selected .semgrep.yml with rules generated from the specs', () => {
   const root = mkdtempSync(join(tmpdir(), 'semgrep-select-'));
   writeFileSync(join(root, '.semgrep.yml'), 'rules: []\n');
   const config = resolveSemgrepConfig(root, sources);
-  assert.equal(config.source, 'selected');
+  assert.equal(config.source, 'selected+generated');
   assert.equal(config.path, '.semgrep.yml');
-  assert.equal(config.yaml, undefined);
+  assert.match(config.yaml, /harness-arch-/);
+  const stub = sources.map((s) => (s.id === 'domain-layer.project' ? { ...s, text: '# Layers\n' } : s));
+  const only = resolveSemgrepConfig(root, stub);
+  assert.equal(only.source, 'selected', 'no boundary rows: the selected config alone');
+  assert.equal(only.yaml, undefined);
 });
 
-test('spec-drift-empty REQ-003: resolveSemgrepConfig selects the .semgrep/architecture folder once it holds rules', () => {
+test('runSemgrepScan passes the selected rules and the generated rules as two --config flags', () => {
+  const root = mkdtempSync(join(tmpdir(), 'semgrep-union-'));
+  mkdirSync(join(root, '.semgrep/standards'), { recursive: true });
+  writeFileSync(join(root, '.semgrep/standards/js.yml'), 'rules: []\n');
+  let args = [];
+  const spawn = (_bin, a) => {
+    args = a;
+    return { status: 0, stdout: '{"results":[],"errors":[]}', stderr: '' };
+  };
+  const res = runSemgrepScan({ root, sources, spawn });
+  assert.equal(res.status, 'pass');
+  const configs = args.flatMap((a, i) => (a === '--config' ? [args[i + 1]] : []));
+  assert.equal(configs.length, 2);
+  assert.equal(configs[0], join(root, '.semgrep'));
+  assert.match(configs[1], /\.semgrep\.yml$/);
+});
+
+test('spec-drift-empty REQ-003: resolveSemgrepConfig selects the .semgrep folder (every rule set) once it holds rules', () => {
   const root = mkdtempSync(join(tmpdir(), 'semgrep-folder-'));
   mkdirSync(join(root, '.semgrep/architecture'), { recursive: true });
   const stub = sources.map((s) => (s.id === 'domain-layer.project' ? { ...s, text: '# Layers\n' } : s));
@@ -88,7 +109,7 @@ test('spec-drift-empty REQ-003: resolveSemgrepConfig selects the .semgrep/archit
   writeFileSync(join(root, '.semgrep/architecture/boundaries/01.yml'), 'rules: []\n');
   const config = resolveSemgrepConfig(root, stub);
   assert.equal(config.source, 'selected');
-  assert.equal(config.path, '.semgrep/architecture');
+  assert.equal(config.path, '.semgrep');
   writeFileSync(join(root, '.semgrep.yml'), 'rules: []\n');
   assert.equal(resolveSemgrepConfig(root, stub).path, '.semgrep.yml', 'a config file still wins');
 });
@@ -208,4 +229,10 @@ test('REQ-002 (drift-consistency): the "requires login" placeholder is replaced 
   assert.equal(multi.code, 'import axios from "axios";\nexport const f = () => axios;');
   assert.equal(real.code, 'import axios from "axios";');
   assert.equal(missing.code, undefined);
+});
+
+test('languagesFrom reads languages named in prose next to backticked values', () => {
+  const tech = '| Layer | Technology |\n|-------|------------|\n| Language | JavaScript (ES modules, `.mjs`) and Bash for the CLI; TypeScript for the MCP servers in `tools/` |\n';
+  assert.deepEqual(languagesFrom(tech), ['typescript', 'javascript']);
+  assert.deepEqual(languagesFrom('| Layer | Technology |\n|---|---|\n| Language | … |\n'), []);
 });
