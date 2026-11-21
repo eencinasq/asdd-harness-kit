@@ -146,11 +146,13 @@
         },
         {
           "at": "2026-11-21T01:26:46.766Z",
-          "slice_id": "sensor-fixes"
+          "slice_id": "sensor-fixes",
+          "last_at": "2026-11-21T01:39:11.150Z"
         }
       ],
       "examples": [
-        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded"
+        "QG-DEC-09 slice \"sensor-fixes\": validation completed (sess-sensor-fixes-009) with no spec gate recorded",
+        "QG-DEC-09 slice \"agents-use-scripts\": qa completed (sess-agents-use-scripts-009) with no implementation gate recorded"
       ]
     },
     "sensor:DRIFT-01:.harness/steering": {
@@ -292,7 +294,8 @@
       "episodes": [
         {
           "at": "2026-11-21T01:26:46.766Z",
-          "slice_id": null
+          "slice_id": null,
+          "last_at": "2026-11-21T01:39:11.150Z"
         }
       ],
       "examples": [
@@ -304,7 +307,8 @@
       "episodes": [
         {
           "at": "2026-11-21T01:26:46.766Z",
-          "slice_id": null
+          "slice_id": null,
+          "last_at": "2026-11-21T01:39:11.150Z"
         }
       ],
       "examples": [
@@ -316,7 +320,8 @@
       "episodes": [
         {
           "at": "2026-11-21T01:26:46.766Z",
-          "slice_id": null
+          "slice_id": null,
+          "last_at": "2026-11-21T01:39:11.150Z"
         }
       ],
       "examples": [
