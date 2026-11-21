@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-cli-args-008",
+  "timestamp": "2026-11-21T19:58:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "cli-args",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Closed after the PR #13 review amendment. Lesson: a hook's silence contract (profiling §12.3) outranks a new usage-error convention; dispatcher-side validation keeps hooks parser-free.",
+  "concerns": []
+}

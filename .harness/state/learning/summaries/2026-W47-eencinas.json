@@ -157,6 +157,11 @@
           "at": "2026-11-21T17:48:13.305Z",
           "slice_id": "agents-use-scripts",
           "last_at": "2026-11-21T18:29:36.118Z"
+        },
+        {
+          "at": "2026-11-21T19:17:13.730Z",
+          "slice_id": "agents-use-scripts",
+          "last_at": "2026-11-21T19:31:59.932Z"
         }
       ],
       "examples": [
@@ -332,6 +337,11 @@
           "at": "2026-11-21T17:48:13.305Z",
           "slice_id": null,
           "last_at": "2026-11-21T18:29:36.118Z"
+        },
+        {
+          "at": "2026-11-21T19:17:13.730Z",
+          "slice_id": null,
+          "last_at": "2026-11-21T19:31:59.932Z"
         }
       ],
       "examples": [
@@ -354,6 +364,11 @@
           "at": "2026-11-21T17:48:13.305Z",
           "slice_id": null,
           "last_at": "2026-11-21T18:29:36.118Z"
+        },
+        {
+          "at": "2026-11-21T19:17:13.730Z",
+          "slice_id": null,
+          "last_at": "2026-11-21T19:31:59.932Z"
         }
       ],
       "examples": [
@@ -418,6 +433,29 @@
         "added": 0
       },
       "by_rule": {}
+    },
+    "13@1": {
+      "at": "2026-11-21T19:32:12.390Z",
+      "pr": 13,
+      "revision": 1,
+      "mode": "submitted",
+      "event": "COMMENT",
+      "suggested_event": "REQUEST_CHANGES",
+      "comments": {
+        "drafted": 1,
+        "kept": 1,
+        "edited": 0,
+        "removed": 0,
+        "added": 0
+      },
+      "by_rule": {
+        "default.maintainability": {
+          "drafted": 1,
+          "kept": 1,
+          "edited": 0,
+          "removed": 0
+        }
+      }
     }
   }
 }

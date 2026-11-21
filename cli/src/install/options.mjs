@@ -2,7 +2,6 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { commandHelp, parseCommand } from '../harness/commands.mjs';
 import { CliError } from '../paths.mjs';
 import { runtimeMap } from './registry.mjs';
 
@@ -16,8 +15,9 @@ export const MODULES = Object.freeze(
     .sort(),
 );
 
-/** `asdd install --help`: generated from the registry entry, plus the modules and runtimes this kit ships. */
-export const INSTALL_HELP = `${commandHelp('install')}
+/** `asdd install --help`: the registry's generated help (main.mjs passes it in) plus the modules and runtimes this kit ships. */
+export const installHelp = (registryHelp) => `${registryHelp.trimEnd()}
+
 Modules:  ${MODULES.join(', ')} (or all)
 Runtimes: ${RUNTIMES.join(', ')} (or none)
 `;
@@ -44,11 +44,13 @@ const OPTION_OF = {
   'target-os': 'targetOs',
 };
 
-/** @returns {Record<string, any>} the parsed options; `help: true` when help was asked for. */
-export function parseInstallArgs(argv) {
-  const { values, args } = parseCommand('install', argv);
+/**
+ * The install options from a parsed command line ({ values, args } of parseCommand('install', …), which main.mjs
+ * runs: the Installer layer depends on Shared only, not on the Harness parser).
+ * @returns {Record<string, any>}
+ */
+export function installOptions({ values, args }) {
   const o = { modules: '', runtimes: '', kitDir: '', target: args.dir ?? '' };
-  if (values.help) return { ...o, help: true };
   for (const [flag, option] of Object.entries(OPTION_OF)) if (values[flag] !== undefined) o[option] = values[flag];
   if (values['kit-dir'] === '') throw new CliError('--kit-dir needs a path');
   if (o.targetOs && !['win32', 'linux', 'darwin'].includes(o.targetOs)) {

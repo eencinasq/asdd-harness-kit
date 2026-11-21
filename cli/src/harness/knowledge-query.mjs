@@ -238,7 +238,7 @@ export async function patterns(root, { status: wanted } = {}) {
 }
 
 // asdd CLI: `asdd kit vendor` drops everything from this line down in the MCP servers' copies.
-import { parseCommand, runMain } from './commands.mjs';
+import { commandHelp, parseCommand, runMain, wantsHelp } from './commands.mjs';
 
 const QUERY_COMMANDS = ['status', 'search', 'trace', 'slice', 'patterns'];
 
@@ -251,6 +251,11 @@ export async function run(argv = process.argv.slice(2)) {
     return 1;
   };
   if (!QUERY_COMMANDS.includes(command)) return usage(command ? `unknown command: ${command}` : '');
+  // runMain cannot know the subcommand (one script serves five): a direct `node knowledge-query.mjs <sub> --help`.
+  if (wantsHelp(rest)) {
+    process.stdout.write(commandHelp(`knowledge ${command}`));
+    return 0;
+  }
   const { values, positionals } = parseCommand(`knowledge ${command}`, rest);
   const positional = positionals.join(' ').trim();
   const root = process.cwd();

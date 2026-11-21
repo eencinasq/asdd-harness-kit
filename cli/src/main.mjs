@@ -14,6 +14,7 @@ import {
   allCommands,
   commandHelp,
   completion,
+  parseCommand,
   resolveHarnessCommand,
   usage,
   wantsHelp,
@@ -68,6 +69,13 @@ const real = (p) => {
   }
 };
 
+/**
+ * Hooks whose scripts import no parser (they must answer whatever else in the package is broken): the dispatcher
+ * validates their command line instead. observe is fail-open and silent (profiling design §12.3): a bad command line
+ * still answers the runtime and exits 0 with no output.
+ */
+const PARSER_FREE_HOOKS = new Set(['gate', 'verify', 'span']);
+
 /** Signals passed on to a delegated asdd, so a hook timeout or Ctrl-C that reaches this one also stops it. */
 const FORWARDED = ['SIGINT', 'SIGTERM', 'SIGHUP'];
 
@@ -110,6 +118,7 @@ async function runHarness(args) {
     process.stdout.write(commandHelp(command.name));
     return 0;
   }
+  if (PARSER_FREE_HOOKS.has(command.name)) parseCommand(command.name, command.argv);
   const script = join(HARNESS_DIR, command.script);
   if (!existsSync(script)) {
     throw new CliError(
@@ -133,14 +142,20 @@ async function kit([name, ...args]) {
   return run(args);
 }
 
+/** `asdd install --help`: the registry's help plus the modules and runtimes the kit ships. */
+async function installHelpText() {
+  const { installHelp } = await import('./install/options.mjs');
+  return installHelp(commandHelp('install'));
+}
+
 /** `asdd help [command…]`: the overview, or one command's generated help. */
-function help(words) {
+async function help(words) {
   if (!words.length) {
     process.stdout.write(HELP());
     return 0;
   }
   const name = words.join(' ');
-  const text = commandHelp(name);
+  const text = name === 'install' ? await installHelpText() : commandHelp(name);
   if (!text) {
     const group = HARNESS_COMMANDS[name]?.sub ?? (name === 'kit' ? KIT_COMMANDS : null);
     if (!group) throw new CliError(`unknown command: ${name} (run: asdd help)`, 2);
@@ -155,8 +170,8 @@ function help(words) {
 export async function main(argv) {
   let [command, ...args] = argv;
   try {
-    if (!command || command === '--help' || command === '-h') return help([]);
-    if (command === 'help') return help(args);
+    if (!command || command === '--help' || command === '-h') return await help([]);
+    if (command === 'help') return await help(args);
     if (command === 'completion') {
       process.stdout.write(completion(args[0]));
       return 0;
@@ -173,9 +188,8 @@ export async function main(argv) {
       args = [command, ...args];
       command = 'install';
     }
-    // install prints its own help (the registry's, plus the modules and runtimes this kit ships).
-    if (CONTROL_COMMANDS[command] && command !== 'install' && wantsHelp(args)) {
-      process.stdout.write(commandHelp(command));
+    if (CONTROL_COMMANDS[command] && wantsHelp(args)) {
+      process.stdout.write(command === 'install' ? await installHelpText() : commandHelp(command));
       return 0;
     }
     if (FULL_ONLY.includes(command) && !IS_FULL) {
@@ -183,8 +197,9 @@ export async function main(argv) {
     }
     switch (command) {
       case 'install': {
+        // Parsed here: the Installer layer depends on Shared only (domain-layer.project.md), not on the Harness parser.
         const { install } = await import('./install/index.mjs');
-        return await install(args);
+        return await install(parseCommand('install', args), { help: await installHelpText() });
       }
       case 'uninstall': {
         const { uninstall } = await import('./uninstall.mjs');

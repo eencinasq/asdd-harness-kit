@@ -149,7 +149,7 @@ export async function run(argv = process.argv.slice(2)) {
     const { parseCommand } = await import('./commands.mjs');
     runtime = parseCommand('observe', argv).args.runtime;
   } catch {
-    /* fail-open: keep the raw first argument */
+    // Fail-open and silent (profiling design §12.3): keep the raw first argument and still answer the runtime.
   }
   await runObserveCli([runtime]);
 }

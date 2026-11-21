@@ -153,7 +153,8 @@ export function parseCommand(name, argv) {
     parsed = parseArgs({ args: argv, options, allowPositionals: true, strict: true });
   } catch (error) {
     if (!String(error?.code).startsWith('ERR_PARSE_ARGS')) throw error;
-    const option = error.message.match(/'(-[^' ]+)/)?.[1];
+    // Node names an option with a short alias as '-f, --file <value>': report the long name.
+    const option = error.message.match(/'(?:-\w, )?(--?[^' ,]+)/)?.[1];
     if (error.code === 'ERR_PARSE_ARGS_UNKNOWN_OPTION' && option) throw fail(`unknown option: ${option}`);
     if (error.code === 'ERR_PARSE_ARGS_INVALID_OPTION_VALUE' && option) {
       throw fail(/does not take an argument/.test(error.message) ? `${option} takes no value` : `${option} needs a value`);

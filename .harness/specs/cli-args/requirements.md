@@ -5,12 +5,16 @@
   `parseArgs`.
 - **REQ-002.** When a command line has an unknown option, an option without its value, a value on a boolean flag, a
   missing required argument, or an extra argument, the CLI shall print the problem and the command's usage on stderr
-  and exit 2.
+  and exit 2. The parser-free hooks (`gate`, `verify`, `span`) are validated by the dispatcher; `observe` is
+  fail-open and silent (profiling design §12.3): it exits 0 with no output.
 - **REQ-003.** When `asdd <command> --help`, `asdd <command> -h`, or `asdd help <command>` runs, the CLI shall print
-  help generated from the registry entry (summary, usage, arguments, options, stdin, environment) and exit 0.
+  help generated from the registry entry (summary, usage, arguments, options, stdin, environment) and exit 0, whatever
+  other options the command line carries.
 - **REQ-004.** When `asdd completion bash|zsh|fish` runs, the CLI shall print a completion script generated from the
   registry that completes commands, subcommands, and each command's flags.
 - **REQ-005.** Each harness script shall export `run(argv)` returning its exit status, and the dispatcher shall call it
-  in-process; a direct `node <script>` run (hooks, tests, sibling scripts) shall behave the same.
+  in-process; a direct `node <script>` run (hooks, tests, sibling scripts) shall behave the same, `--help` included.
 - **REQ-006.** The hook commands (`gate`, `verify`, `span`, `observe`) shall not depend on the argument parser or the
   registry to answer, and the MCP servers' vendored copies shall not include any script's CLI tail.
+- **REQ-007.** The Installer layer (`cli/src/install/**`) shall depend on Shared modules only: the CLI entry parses the
+  install command line and passes the parsed values and the help text to the installer.

@@ -21,7 +21,7 @@
         "node --test cli/test/cli.test.mjs cli/test/registry.test.mjs",
         "npm test"
       ],
-      "evidence": "cli.test 16 pass (parseCommand, help, completion incl. bash -n); registry.test 35 pass (every entry well-formed); npm test 502 pass.",
+      "evidence": "cli.test 16 pass (parseCommand, help, completion incl. bash -n); registry.test 35 pass (every entry well-formed); npm test 502 pass. Re-verified after the PR #13 review fixes: npm test 503 pass + full-pipeline OK.",
       "scope_paths": [
         "cli/registry/contribution-points.json",
         "cli/src/harness/commands.mjs",
@@ -34,7 +34,7 @@
         ".harness/config/installed-versions.json",
         ".harness/config/project.json"
       ],
-      "evidence_hash": "34268dd5f113673c66347f119c484f59c36971df0616fb5949bb56c5e0949f76"
+      "evidence_hash": "531feb0e29c8c03591c0a34dbacbad8fe4d49198aac215be3af4ddcb6b3acbba"
     },
     {
       "id": "TASK-002",
@@ -58,7 +58,7 @@
         "cd tools/knowledge && npm run typecheck && npm test",
         "cd tools/spec-drift && npm run typecheck && npm test && npm run test:e2e"
       ],
-      "evidence": "npm test 502 pass (gate/verify/observe fail-open and fail-closed proofs, sync-state and telemetry fixtures with the package layout); vendor --check OK; jev-gate 14, knowledge 8, spec-drift 292 unit + 145 e2e pass; asdd gate 34 ms/run before and after.",
+      "evidence": "npm test 502 pass (gate/verify/observe fail-open and fail-closed proofs, sync-state and telemetry fixtures with the package layout); vendor --check OK; jev-gate 14, knowledge 8, spec-drift 292 unit + 145 e2e pass; asdd gate 34 ms/run before and after. Re-verified after the PR #13 review fixes: npm test 503 pass + full-pipeline OK.",
       "scope_paths": [
         "cli/src/harness/amend-slice.mjs",
         "cli/src/harness/audit-codebase.mjs",
@@ -100,7 +100,7 @@
         "tools/knowledge/src/harness",
         "tools/spec-drift/src/harness"
       ],
-      "evidence_hash": "fded9b2383d501af2333238aead341f55ffad59ebf6324ece289cdd893ad8366"
+      "evidence_hash": "dd2f0998adf0fc881b6208fcf8773825543085336608b44bfdd6bb2b5f8c067d"
     },
     {
       "id": "TASK-003",
@@ -120,7 +120,7 @@
         "node --test cli/test/cli.test.mjs cli/test/skills-lint.test.mjs cli/test/agents-lint.test.mjs",
         "npm test"
       ],
-      "evidence": "cli/skills-lint/agents-lint tests pass; install.sh and lifecycle.sh pass; npm test 502 pass.",
+      "evidence": "cli/skills-lint/agents-lint tests pass; install.sh and lifecycle.sh pass; npm test 502 pass. Re-verified after the PR #13 review fixes: npm test 503 pass + full-pipeline OK.",
       "scope_paths": [
         "cli/src/install/options.mjs",
         "cli/src/uninstall.mjs",
@@ -134,7 +134,37 @@
         "cli/src/kit/skills-lint.mjs",
         "cli/src/kit/versions.mjs"
       ],
-      "evidence_hash": "eaa87fc19236986d0c143c8f5c46bc36660169331d03880ea380339d29cad137"
+      "evidence_hash": "246a5d6c20ad9743211c63fab3785263fdec35a4282a5756dbffa120c22c0749"
+    },
+    {
+      "id": "TASK-004",
+      "title": "PR #13 review fixes",
+      "user_visible_behavior": "asdd install --bogus --help prints help; node knowledge-query.mjs <sub> --help prints help; asdd gate/verify/span reject a bad command line with exit 2 (observe stays silent and fail-open); a missing value names the long flag; the installer imports Shared only.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002",
+        "REQ-003",
+        "REQ-005",
+        "REQ-007"
+      ],
+      "depends_on": [
+        "TASK-001",
+        "TASK-002",
+        "TASK-003"
+      ],
+      "verification": [
+        "node --test cli/test/cli.test.mjs cli/src/harness/telemetry-observe.test.mjs",
+        "spec-drift analyze_architecture paths=cli/src severity=ERROR (dep-layer)",
+        "npm test"
+      ],
+      "evidence": "cli.test 17 + telemetry-observe 36 pass (review #13 test: install help over a bad option, direct knowledge-query help, gate/verify/span exit 2, observe silent, no Harness import under cli/src/install); analyze_architecture cli/src: 0 findings, dep-layer clean; npm test 503 pass + full-pipeline OK.",
+      "scope_paths": [
+        "cli/src/install/index.mjs",
+        ".harness/specs/cli-args/amendments/2026-11-21T19-34-09-099Z.md"
+      ],
+      "evidence_hash": "ec4e05b151ef5aab442cad42362550cbdfdf6cad116e391e827bae080644adf7"
     }
   ]
 }

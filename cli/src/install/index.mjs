@@ -10,7 +10,7 @@ import { c, info, isTty, log, ok, prompter, section, setQuiet, warn } from '../u
 import { fileHash, InstallContext } from './context.mjs';
 import { describe, ignoreReport } from './ignored.mjs';
 import { enableModules, retireJev } from './modules.mjs';
-import { INSTALL_HELP, list, MODULES, parseInstallArgs, RUNTIMES } from './options.mjs';
+import { installOptions, list, MODULES, RUNTIMES } from './options.mjs';
 import { gitattributeLines, gitignoreLines, runtimeMap } from './registry.mjs';
 import { guardRuleCollisions } from './rule-collisions.mjs';
 import { guardSkillCollisions } from './skill-collisions.mjs';
@@ -436,13 +436,14 @@ export function runInstall(o, kit) {
   };
 }
 
-/** @returns {Promise<number>} exit status */
-export async function install(argv) {
-  const o = parseInstallArgs(argv);
-  if (o.help) {
-    process.stdout.write(INSTALL_HELP);
-    return 0;
-  }
+/**
+ * @param {{ values: object, args: object }} parsed parseCommand('install', argv), run by main.mjs
+ * @param {{ help: string }} text the help printed when the target is missing
+ * @returns {Promise<number>} exit status
+ */
+export async function install(parsed, { help }) {
+  const o = installOptions(parsed);
+  o.helpText = help;
   if (o.json) {
     setQuiet(true);
     try {
@@ -463,7 +464,7 @@ export async function install(argv) {
 async function installOnce(o) {
   if (!o.noInteractive && !o.target && !o.interactive) {
     if (!isTty()) {
-      process.stdout.write(INSTALL_HELP);
+      process.stdout.write(o.helpText);
       throw new CliError('target directory required (or use --interactive in a TTY)');
     }
     o.interactive = true;
@@ -476,7 +477,7 @@ async function installOnce(o) {
     const kit = resolveKit(o, cleanup);
     if (o.interactive) await runInteractive(o, ask);
     if (!o.target) {
-      if (!o.json) process.stdout.write(INSTALL_HELP);
+      if (!o.json) process.stdout.write(o.helpText);
       throw new CliError('target directory required');
     }
     if (!isDir(resolve(o.target))) throw new CliError(`target not found: ${o.target}`);

@@ -19,7 +19,7 @@
         "node cli/bin/asdd.mjs kit regen --check",
         "node --test cli/test/versions.test.mjs"
       ],
-      "evidence": "re-verified under microkernel-polish: asdd kit regen --check: 9/9 generators, 0 skipped, exit 0 | registry+versions tests: 34+5 pass | asdd check: 0 FAIL Re-verified 2026-11-21 after cli-args (registry args/flags, run(argv) on parseArgs): verification commands pass (registry 35, versions 5, conformance 8, semgrep-lib+audit 18, init-flow 2, telemetry-lib+command-gate 99, validators/telemetry 12, profile 6; npm test 502).",
+      "evidence": "re-verified under microkernel-polish: asdd kit regen --check: 9/9 generators, 0 skipped, exit 0 | registry+versions tests: 34+5 pass | asdd check: 0 FAIL Re-verified 2026-11-21 after cli-args (registry args/flags, run(argv) on parseArgs): verification commands pass (registry 35, versions 5, conformance 8, semgrep-lib+audit 18, init-flow 2, telemetry-lib+command-gate 99, validators/telemetry 12, profile 6; npm test 502). Re-verified after PR #13 review fixes (main.mjs / project.json): versions 5 + profile 6 pass, npm test 503 pass + full-pipeline OK.",
       "scope_paths": [
         "cli/src/kit/versions.mjs",
         "cli/src/harness/learn.mjs",
@@ -28,7 +28,7 @@
         "cli/registry/contribution-points.json",
         "cli/test/versions.test.mjs"
       ],
-      "evidence_hash": "cda7630e17afbc244273f98dd62d9888a349cfdb6ebee194175f27e178c18dd8"
+      "evidence_hash": "ba2939deff510dc5076468f236b5128aa09723b32b832802377e9206772ae129"
     },
     {
       "id": "TASK-002",
