@@ -26,6 +26,8 @@ export const EXEMPT_PREFIXES = [
   // Append-only harness logs any slice writes at session close (SP-006); other docs/ files stay mapped.
   'docs/agent-failure-log.md',
   'docs/dissent-log.md',
+  // Scaffolded by `asdd learn --propose` from a learning pattern; decided through the proposal workflow, not a slice.
+  'docs/knowledge-base/steering-proposals',
 ];
 
 const SPEC_DOCS = ['intent.md', 'design.md', 'tasks.md', 'spec.md'];
@@ -400,8 +402,10 @@ export function runDrift(opts) {
     ];
     const isTest = testFileMatcher(root);
     const reqIds = [...new Set(editSlices.flatMap((s) => parseRequirements(root, s.slice_id).map((r) => r.id)))];
+    // Vendored copies (`asdd kit vendor`) are generated from cli/src/harness: mapped when their source is.
+    const source = (f) => f.replace(/^tools\/[^/]+\/src\/harness\//, 'cli/src/harness/');
     let unmapped = changedProduct.filter((f) =>
-      !mapped.some((m) => matchesPath(f, m)) &&
+      !mapped.some((m) => matchesPath(f, m) || matchesPath(source(f), m)) &&
       !(isTest(f) && mentionedRequirementIds(root, [f], reqIds).size > 0));
     if (forSliceObj) {
       const surface = surfaceDirs(mappedPaths(root, forSliceObj));

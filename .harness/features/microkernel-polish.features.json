@@ -52,7 +52,7 @@
         "cli/registry/contribution-points.json",
         "cli/test/registry.test.mjs"
       ],
-      "evidence_hash": "c867a14c21f0bb043a02d14bdd24cf397e2ef359d9566c5e79cb7c04b78cae4a"
+      "evidence_hash": "574d530641b728222edad024d4841d99494e14f901bf76e04a25228b5dfbf62c"
     },
     {
       "id": "TASK-003",
@@ -76,7 +76,7 @@
         "cli/test/registry.test.mjs",
         ".harness/specs/microkernel-polish/intent.md"
       ],
-      "evidence_hash": "65dd4229c014ed60f6d36f89fd4911e93d90fddd20d944e7085a325ce590e65e"
+      "evidence_hash": "26c3b69ad831467f88472e5da55f59c0bfda9d366379564e24d088c2db17bbe1"
     },
     {
       "id": "TASK-004",
