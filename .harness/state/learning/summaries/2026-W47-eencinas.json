@@ -147,7 +147,7 @@
         {
           "at": "2026-11-21T01:26:46.766Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-21T01:39:11.150Z"
+          "last_at": "2026-11-21T01:45:49.093Z"
         }
       ],
       "examples": [
@@ -308,7 +308,7 @@
         {
           "at": "2026-11-21T01:26:46.766Z",
           "slice_id": null,
-          "last_at": "2026-11-21T01:39:11.150Z"
+          "last_at": "2026-11-21T01:45:49.093Z"
         }
       ],
       "examples": [
@@ -321,7 +321,7 @@
         {
           "at": "2026-11-21T01:26:46.766Z",
           "slice_id": null,
-          "last_at": "2026-11-21T01:39:11.150Z"
+          "last_at": "2026-11-21T01:45:49.093Z"
         }
       ],
       "examples": [
@@ -358,6 +358,22 @@
           "removed": 0
         }
       }
+    },
+    "10@2": {
+      "at": "2026-11-21T01:47:37.008Z",
+      "pr": 10,
+      "revision": 2,
+      "mode": "submitted",
+      "event": "APPROVE",
+      "suggested_event": "COMMENT",
+      "comments": {
+        "drafted": 0,
+        "kept": 0,
+        "edited": 0,
+        "removed": 0,
+        "added": 0
+      },
+      "by_rule": {}
     }
   }
 }
