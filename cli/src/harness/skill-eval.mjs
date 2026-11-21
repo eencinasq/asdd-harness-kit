@@ -13,23 +13,24 @@
 import { join } from 'node:path';
 
 import { PROJECT_FIXTURES_REL, formatSkillEvalReport, runSkillEval } from './skill-eval-lib.mjs';
+import { parseCommand, runMain } from './commands.mjs';
 
-const argv = process.argv.slice(2);
-const wantJson = argv.includes('--json');
-const opt = (name) => {
-  const i = argv.indexOf(name);
-  return i >= 0 ? argv[i + 1] : undefined;
-};
+export async function run(argv = process.argv.slice(2)) {
+  const { values } = parseCommand('skill-eval', argv);
+  const wantJson = values.json;
 
-const root = process.cwd();
-const fixturesDir = opt('--fixtures');
-const suite = runSkillEval({
-  root,
-  skill: opt('--skill'),
-  baseline: opt('--baseline'),
-  fixturesDir,
-  projectFixturesDir: fixturesDir ? undefined : join(root, PROJECT_FIXTURES_REL),
-});
-if (wantJson) process.stdout.write(`${JSON.stringify(suite, null, 2)}\n`);
-else process.stdout.write(formatSkillEvalReport(suite));
-process.exit(suite.ok ? 0 : 1);
+  const root = process.cwd();
+  const fixturesDir = values.fixtures;
+  const suite = runSkillEval({
+    root,
+    skill: values.skill,
+    baseline: values.baseline,
+    fixturesDir,
+    projectFixturesDir: fixturesDir ? undefined : join(root, PROJECT_FIXTURES_REL),
+  });
+  if (wantJson) process.stdout.write(`${JSON.stringify(suite, null, 2)}\n`);
+  else process.stdout.write(formatSkillEvalReport(suite));
+  return suite.ok ? 0 : 1;
+}
+
+await runMain(import.meta.url, run);

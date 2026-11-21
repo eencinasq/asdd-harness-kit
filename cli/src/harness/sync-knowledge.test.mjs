@@ -349,7 +349,8 @@ test('knowledge-query.mjs answers status, search, trace, slice and patterns from
 
     assert.equal(query('patterns').status, 0);
     assert.equal(query('patterns', '--status', 'bogus').status, 1);
-    assert.equal(query('search').status, 1);
+    // A missing required argument is a usage error (exit 2), like every asdd command line.
+    assert.equal(query('search').status, 2);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { readBinding } from '../harness/drift-lib.mjs';
 import { PHASES } from '../harness/sync-state.mjs';
 import { parseSteeringFrontmatter } from '../harness/validators/steering-tags.mjs';
+import { parseCommand } from '../harness/commands.mjs';
 
 const KIT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const BUDGET_LABEL = 'Always-loaded steering budget';
@@ -162,9 +163,9 @@ const CHECKS = { stale: checkStale, cutoffs: checkCutoffs, budget: checkBudget, 
 
 /** `asdd kit guidance [--only a,b] [dir]`: exit status 1 on any finding. */
 export function run(argv) {
-  const onlyIdx = argv.indexOf('--only');
-  const only = onlyIdx >= 0 ? argv[onlyIdx + 1].split(',') : Object.keys(CHECKS);
-  const dir = resolve(argv.find((a, i) => !a.startsWith('--') && argv[i - 1] !== '--only') ?? '.');
+  const { values, args } = parseCommand('kit guidance', argv);
+  const only = values.only !== undefined ? values.only.split(',') : Object.keys(CHECKS);
+  const dir = resolve(args.dir ?? '.');
   const findings = only.flatMap((name) => {
     if (!CHECKS[name]) throw new Error(`unknown check "${name}" (stale, cutoffs, budget, asserts)`);
     return CHECKS[name](dir);

@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-cli-args-006",
+  "timestamp": "2026-11-21T19:34:09.099Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "cli-args",
+  "event_type": "checkpoint",
+  "status": "in_progress",
+  "amend": true,
+  "phase": "implementation",
+  "evidence": "PR #13 review: install layer violation, help parity (install, knowledge-query), hook argv validation (REQ-002), short-alias error message",
+  "amendment_path": ".harness/specs/cli-args/amendments/2026-11-21T19-34-09-099Z.md",
+  "concerns": []
+}

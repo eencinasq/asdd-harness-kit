@@ -581,10 +581,7 @@ export async function stampEvidence(rootDir = root, { only = null } = {}) {
   return changedCount;
 }
 
-async function main(run = null) {
-  const args = process.argv.slice(2);
-  const sliceArg = args.indexOf('--slice');
-  const targetSlice = sliceArg >= 0 ? args[sliceArg + 1] : null;
+async function main(run = null, targetSlice = null) {
   warnRegistryMissing();
   await stampEvidence(root, { only: targetSlice });
 

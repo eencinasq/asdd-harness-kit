@@ -237,37 +237,43 @@ export async function patterns(root, { status: wanted } = {}) {
   };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const [command, ...rest] = process.argv.slice(2);
-  const flag = (name) => {
-    const i = rest.indexOf(name);
-    return i >= 0 ? rest[i + 1] : undefined;
-  };
-  const positional = rest.filter((a, i) => !a.startsWith('--') && !rest[i - 1]?.startsWith('--')).join(' ').trim();
+// asdd CLI: `asdd kit vendor` drops everything from this line down in the MCP servers' copies.
+import { commandHelp, parseCommand, runMain, wantsHelp } from './commands.mjs';
+
+const QUERY_COMMANDS = ['status', 'search', 'trace', 'slice', 'patterns'];
+
+/** `run(['search', 'auth flow', '--k', '3'])`: the subcommand name first, as `asdd knowledge <sub> …` passes it. */
+export async function run(argv = process.argv.slice(2)) {
+  const [command, ...rest] = argv;
   const usage = (message) => {
     if (message) console.error(message);
-    console.error(
-      'Usage: asdd knowledge status | search "<query>" [--k N] [--slice <id>] | trace <id> [--depth N] | slice <slice-id> | patterns [--status <s>]'
-    );
-    process.exit(1);
+    console.error(`Usage: asdd knowledge ${QUERY_COMMANDS.join(' | ')} … (asdd knowledge <command> --help)`);
+    return 1;
   };
+  if (!QUERY_COMMANDS.includes(command)) return usage(command ? `unknown command: ${command}` : '');
+  // runMain cannot know the subcommand (one script serves five): a direct `node knowledge-query.mjs <sub> --help`.
+  if (wantsHelp(rest)) {
+    process.stdout.write(commandHelp(`knowledge ${command}`));
+    return 0;
+  }
+  const { values, positionals } = parseCommand(`knowledge ${command}`, rest);
+  const positional = positionals.join(' ').trim();
   const root = process.cwd();
   let answer;
   if (command === 'status') answer = await status(root);
   else if (command === 'search') {
-    if (!positional) usage('search needs a query');
-    answer = await search(root, positional, { k: clampK(flag('--k')), sliceId: flag('--slice') });
+    answer = await search(root, positional, { k: clampK(values.k), sliceId: values.slice });
   } else if (command === 'trace') {
-    if (!positional) usage('trace needs a node id');
-    answer = await trace(root, positional, { depth: clampDepth(flag('--depth')) });
+    answer = await trace(root, positional, { depth: clampDepth(values.depth) });
   } else if (command === 'slice') {
-    if (!positional) usage('slice needs a slice id');
     answer = await slice(root, positional);
-  } else if (command === 'patterns') {
-    const wanted = flag('--status');
-    if (wanted && !PATTERN_STATUSES.includes(wanted)) usage(`--status must be one of: ${PATTERN_STATUSES.join(', ')}`);
+  } else {
+    const wanted = values.status;
+    if (wanted && !PATTERN_STATUSES.includes(wanted)) return usage(`--status must be one of: ${PATTERN_STATUSES.join(', ')}`);
     answer = await patterns(root, { status: wanted });
-  } else usage(command ? `unknown command: ${command}` : '');
+  }
   console.log(JSON.stringify(answer.payload, null, 2));
-  process.exit(answer.failed ? 1 : 0);
+  return answer.failed ? 1 : 0;
 }
+
+await runMain(import.meta.url, run, null);

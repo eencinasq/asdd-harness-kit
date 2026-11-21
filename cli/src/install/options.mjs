@@ -15,95 +15,44 @@ export const MODULES = Object.freeze(
     .sort(),
 );
 
-export const INSTALL_HELP = `Install or upgrade asdd-harness-kit in an existing repository.
+/** `asdd install --help`: the registry's generated help (main.mjs passes it in) plus the modules and runtimes this kit ships. */
+export const installHelp = (registryHelp) => `${registryHelp.trimEnd()}
 
-Usage:
-  asdd install <target-dir> [options]
-  asdd install --interactive
-
-Options:
-  -i, --interactive       Prompt for target, runtimes, modules (default in TTY)
-  --no-interactive        Never prompt, even in TTY
-  --from-git              Clone the kit into a temp dir and install from it
-  --kit-dir <path>        Kit source (default: the kit this CLI belongs to)
-  --modules=<list>        ${MODULES.join(',')} — or "all"
-  --runtime=<name>        cursor | claude | opencode | kimi | junie | devin | kiro
-                          comma-separated values or none (default: none)
-  --force                 Overwrite portable kit files that already exist
-  --force-bindings        Overwrite product/structure/tech/*.project.md (DANGEROUS)
-  --force-mcp             Replace .agents/mcp/mcp.json with the empty project seed (tools/* MCP servers stay in the kit)
-  --skip-bindings         Do not create binding stubs
-  --skip-docs             Skip AGENTS.md / docs copy
-  --skip-deps             No effect (kept for scripts): the harness installs no npm packages
-  --rehome-colliding-skills
-                          Recovery UX for skill collisions: move consumer-authored
-                          skill dirs that collide with kit names to
-                          .agents/skills.local/<name>/ (preserved, not scanned),
-                          then proceed. Never overwrites consumer files.
-  --rehome-colliding-steering
-                          Recovery UX for steering collisions: move consumer-authored
-                          steering files that collide with kit names to
-                          .harness/steering.local/ (preserved, not scanned),
-                          then proceed. Never overwrites consumer files.
-  --dry-run               Print actions only
-  --pr                    In a git repository: install on a new branch from origin's default branch,
-                          commit, push, and open a pull request with gh (the working tree must be clean)
-  --json                  Print one JSON object on stdout (the result, or the error) instead of progress lines
-  -h, --help              Show help
-
-Ownership contract: the kit only ever refreshes or deletes kit artifacts — the
-paths installed-versions.json records (managed_files, kit_files). A file the kit
-cannot prove it wrote is never overwritten or removed: existing kit-path files
-without a recorded hash are SKIPped, unproven retired paths are kept with a
-warning, and skill/steering/rule collisions halt (rehome with --rehome-*).
-Project artifacts — bindings, PROGRESS, slice state, specs, mcp.json — are
-seeded once and never touched again. Kit files refresh on version change; one
-the project changed since the kit wrote it is skipped (--force restores it).
-An older kit than the one installed is refused (--force downgrades).
-Bindings still kept unless --force-bindings. Undo with: asdd uninstall <dir>.
+Modules:  ${MODULES.join(', ')} (or all)
+Runtimes: ${RUNTIMES.join(', ')} (or none)
 `;
 
-const FLAGS = {
-  '-i': 'interactive',
-  '--interactive': 'interactive',
-  '--no-interactive': 'noInteractive',
-  '--dry-run': 'dryRun',
-  '--from-git': 'fromGit',
-  '--force': 'force',
-  '--force-bindings': 'forceBindings',
-  '--force-mcp': 'forceMcp',
-  '--skip-bindings': 'skipBindings',
-  '--skip-docs': 'skipDocs',
-  '--skip-deps': 'skipDeps',
-  '--rehome-colliding-skills': 'rehomeColliding',
-  '--rehome-colliding-steering': 'rehomeSteering',
-  '--pr': 'pr',
-  '--json': 'json',
+/** Registry flag name → the install option it sets. */
+const OPTION_OF = {
+  interactive: 'interactive',
+  'no-interactive': 'noInteractive',
+  'dry-run': 'dryRun',
+  'from-git': 'fromGit',
+  force: 'force',
+  'force-bindings': 'forceBindings',
+  'force-mcp': 'forceMcp',
+  'skip-bindings': 'skipBindings',
+  'skip-docs': 'skipDocs',
+  'skip-deps': 'skipDeps',
+  'rehome-colliding-skills': 'rehomeColliding',
+  'rehome-colliding-steering': 'rehomeSteering',
+  pr: 'pr',
+  json: 'json',
+  'kit-dir': 'kitDir',
+  modules: 'modules',
+  runtime: 'runtimes',
+  'target-os': 'targetOs',
 };
-const VALUES = { '--kit-dir': 'kitDir', '--modules': 'modules', '--runtime': 'runtimes', '--target-os': 'targetOs' };
 
-/** @returns {Record<string, any>} the parsed options; `help: true` when help was asked for. */
-export function parseInstallArgs(argv) {
-  const o = { modules: '', runtimes: '', kitDir: '', target: '' };
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    if (arg === '-h' || arg === '--help') return { ...o, help: true };
-    if (FLAGS[arg]) {
-      o[FLAGS[arg]] = true;
-      continue;
-    }
-    const eq = arg.indexOf('=');
-    const name = eq > 0 ? arg.slice(0, eq) : arg;
-    if (VALUES[name]) {
-      const value = eq > 0 ? arg.slice(eq + 1) : argv[(i += 1)];
-      if (!value && (eq < 0 || name === '--kit-dir')) throw new CliError(`${name} needs a ${name === '--kit-dir' ? 'path' : 'value'}`);
-      o[VALUES[name]] = value ?? '';
-      continue;
-    }
-    if (arg.startsWith('-')) throw new CliError(`unknown option: ${arg}`);
-    if (o.target) throw new CliError(`unexpected argument: ${arg}`);
-    o.target = arg;
-  }
+/**
+ * The install options from a parsed command line ({ values, args } of parseCommand('install', …), which main.mjs
+ * runs: the Installer layer depends on Shared only, not on the Harness parser).
+ * @returns {Record<string, any>}
+ */
+export function installOptions({ values, args }) {
+  const o = { modules: '', runtimes: '', kitDir: '', target: args.dir ?? '' };
+  for (const [flag, option] of Object.entries(OPTION_OF)) if (values[flag] !== undefined) o[option] = values[flag];
+  if (values['kit-dir'] === '') throw new CliError('--kit-dir needs a path');
   if (o.targetOs && !['win32', 'linux', 'darwin'].includes(o.targetOs)) {
     throw new CliError(`unknown --target-os: ${o.targetOs} (expected win32, linux, or darwin)`);
   }

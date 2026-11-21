@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-cli-args-003",
+  "timestamp": "2026-11-21T18:09:27.355Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "cli-args",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "cli/ and tools/ (generated vendored copies); ~50 files; no new domain terms, no dissent",
+  "concerns": []
+}

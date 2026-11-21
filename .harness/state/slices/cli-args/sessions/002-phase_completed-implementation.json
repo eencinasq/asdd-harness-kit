@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-cli-args-002",
+  "timestamp": "2026-11-21T18:30:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "cli-args",
+  "event_type": "phase_completed",
+  "phase": "implementation",
+  "mode": "lite",
+  "evidence": "TASK-001..003 passing: npm test 502 pass; vendor --check OK; jev-gate 14, knowledge 8, spec-drift 292 unit + 145 e2e pass; asdd gate latency unchanged (34 ms/run).",
+  "scope_paths": ["cli/registry/contribution-points.json", "cli/src/harness", "cli/src/kit", "cli/src/install/options.mjs", "cli/src/main.mjs", "cli/src/uninstall.mjs", "cli/src/doctor.mjs", "tools/jev-gate/src/harness", "tools/knowledge/src/harness", "tools/spec-drift/src/harness"],
+  "concerns": [
+    "Scope spans cli/ and tools/ (the tools/ files are generated vendored copies) and touches ~50 files: wider than lite's 3-file guideline; escalate if the TL wants the full pipeline.",
+    "Usage errors now exit 2 everywhere (knowledge search without a query exited 1)."
+  ]
+}

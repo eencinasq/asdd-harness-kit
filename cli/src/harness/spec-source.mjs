@@ -4,14 +4,18 @@
  * Usage: asdd spec-source [--slice <id>] [--json]
  */
 import { buildSpecSourceInventory, formatSpecSourceInventory } from './spec-source-lib.mjs';
+import { parseCommand, runMain } from './commands.mjs';
 
-const root = process.cwd();
-const argv = process.argv.slice(2);
-const wantJson = argv.includes('--json');
-const sliceIdx = argv.indexOf('--slice');
-const sliceId = sliceIdx >= 0 ? argv[sliceIdx + 1] : null;
+export async function run(argv = process.argv.slice(2)) {
+  const root = process.cwd();
+  const { values } = parseCommand('spec-source', argv);
+  const wantJson = values.json;
+  const sliceId = values.slice ?? null;
 
-const inv = buildSpecSourceInventory(root, { sliceId });
-if (wantJson) process.stdout.write(`${JSON.stringify(inv, null, 2)}\n`);
-else process.stdout.write(formatSpecSourceInventory(inv));
-process.exit(inv.enabled ? 0 : 1);
+  const inv = buildSpecSourceInventory(root, { sliceId });
+  if (wantJson) process.stdout.write(`${JSON.stringify(inv, null, 2)}\n`);
+  else process.stdout.write(formatSpecSourceInventory(inv));
+  return inv.enabled ? 0 : 1;
+}
+
+await runMain(import.meta.url, run);

@@ -16,6 +16,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { envelope, parseAgent } from '../install/agent-frontmatter.mjs';
 import { section } from './skills-lint.mjs';
+import { parseCommand } from '../harness/commands.mjs';
 
 const TIERS = ['executor', 'researcher', 'specialist', 'auditor', 'orchestrator'];
 const VACUOUS = new Set(['agent', 'helper', 'assistant', 'default']);
@@ -155,9 +156,9 @@ export function lintAgents(root) {
 
 /** `asdd kit agents-lint [--only a,b] [dir]`: exit status 1 on any error. */
 export function run(argv) {
-  const onlyIdx = argv.indexOf('--only');
-  const only = onlyIdx >= 0 ? new Set(argv[onlyIdx + 1].split(',')) : null;
-  const dir = resolve(argv.find((a, i) => !a.startsWith('--') && argv[i - 1] !== '--only') ?? '.');
+  const { values, args } = parseCommand('kit agents-lint', argv);
+  const only = values.only !== undefined ? new Set(values.only.split(',')) : null;
+  const dir = resolve(args.dir ?? '.');
   const result = lintAgents(dir);
   const errors = result.errors.filter((f) => !only || only.has(f.agent));
   for (const f of errors) console.error(`FAIL  ${f.id} ${f.agent}: ${f.msg}`);

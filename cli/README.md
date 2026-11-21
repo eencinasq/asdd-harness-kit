@@ -40,7 +40,11 @@ removes both (a project's own scripts in `.harness/scripts/` stay) and moves the
 
 Which command to run when: [the playbook](../docs/PLAYBOOK.md).
 
-They run on the nearest folder up that has `.harness/`. `asdd help` lists every name. Older installs had them as
+They run on the nearest folder up that has `.harness/`. `asdd help` lists every name; `asdd <command> --help` (or
+`asdd help <command>`) lists its arguments and options. Each command's arguments and flags are declared once, in
+`commands` of [`registry/contribution-points.json`](registry/contribution-points.json): its script parses them with
+`node:util` `parseArgs` in `run(argv)`, and the help and `asdd completion bash|zsh|fish` are generated from the same
+entry. An unknown option, a missing value, or a missing argument exits 2 with the usage. Older installs had them as
 `node .harness/scripts/<name>.mjs`, then as a copy in `.harness/cli/`; `asdd install` removes both, rewrites the kit
 hooks and the `project.json` commands, and keeps a project's own scripts in `.harness/scripts/`.
 `asdd repair` restores a consistent harness layout (dirs, sessions, specs, features) and then runs `sync`.
@@ -110,7 +114,8 @@ node cli/bin/asdd.mjs install /path/to/repo                      # from a clone 
 | `asdd kit guidance [--only stale,cutoffs,budget,asserts] [dir]` | Kit repo only: stale mechanisms in shipped guidance, numeric cutoffs in agent prompts, the always-loaded steering budget, bare `!` asserts in kit tests. |
 | `asdd kit skills-lint [--only a,b] [dir]` | The skill grammar (`skill.spec` `S-*`: `Use when` and `Do NOT use` in the description, `metadata.tier`, operational boundary, typed Input / Output Contract, steps with Action / Target / Assertion, Verification Gate with a negative check, Escalation Gate, Handoff & Convergence, size caps, no absolute paths), the fleet rules (`SL-103`, `SL-105` duplicated blocks, `SL-301` handoff cycles, `SL-302` dangling references — a core skill may name only core skills), and `R-004`/`R-005` on `AGENTS.md` and the always-loaded steering. In the kit: `cli/skills` and `cli/modules/*/skills`; in a project: `.agents/skills`. `npm test` runs it. |
 | `asdd kit agents-lint [--only a,b] [dir]` | The agent grammar (`agent.spec` `A-*`: `Use when` and `Do NOT use`, `metadata.tier`, `capabilities`, `limits.max_turns`, guarantees, Operational and Quarantine Boundary, Decision Rights, Pre-Flight Reading & Ground Truth (Tier 1–3), typed Delegation & I/O Contract with a verdict, Negative Space with `file:line` and anti-hedging, Convergence gate with a negative check, Escalation Gate, provenance, 20 KB cap, no manifest writes) and the fleet rules (`AL-103` tier vs capabilities: only an orchestrator spawns sub-agents, an auditor never edits, a researcher never writes; `AL-301` handoff cycles; `AL-302` dangling or cross-module names and unknown mounted skills). `asdd install` renders these capabilities into Claude Code, Cursor, and OpenCode agent files. `npm test` runs it. |
-| `asdd --version`, `asdd help` | The kit version, and every command. |
+| `asdd --version`, `asdd help [command]` | The kit version, and every command (or one command's arguments and options; same as `asdd <command> --help`). |
+| `asdd completion bash\|zsh\|fish` | Shell completion generated from the registry: `source <(asdd completion zsh)`, or `asdd completion fish \| source`. |
 
 `npx asdd-harness-kit <dir> [options]` and `npx asdd-harness-kit --interactive` (the form before the CLI) still install.
 

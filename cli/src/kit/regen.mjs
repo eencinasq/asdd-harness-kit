@@ -10,6 +10,7 @@ import { err, ok, section, warn } from '../ui.mjs';
 
 const BIN = join(KIT_ROOT, 'cli/bin/asdd.mjs');
 import { join } from 'node:path';
+import { parseCommand } from '../harness/commands.mjs';
 
 // Project-side or session-driven entries are registry-visible but not part of the umbrella: install needs a
 // target dir, harness-profile a slice id. Everything else regenerates kit artifacts in dependency order.
@@ -19,9 +20,10 @@ const ORDER = ['build', 'skills-index', 'runtime-steering', 'vendor', 'self', 'v
 const RUNNABLE = /^(asdd|npx|node|npm|bash|sh)\b/;
 
 export function run(argv = []) {
-  const jsonMode = argv.includes('--json');
-  const checkMode = argv.includes('--check');
-  const scope = argv.find((a) => !a.startsWith('-'));
+  const { values, args } = parseCommand('kit regen', argv);
+  const jsonMode = values.json;
+  const checkMode = values.check;
+  const scope = args.scope;
 
   const registry = loadRegistry(KIT_ROOT);
   const generators = registry.generators ?? {};

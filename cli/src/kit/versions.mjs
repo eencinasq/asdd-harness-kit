@@ -15,6 +15,7 @@ import { existsSync, readFileSync, statSync, writeFileSync, readdirSync } from '
 import { join, relative } from 'node:path';
 
 import { registryFiles } from '../install/registry.mjs';
+import { parseCommand } from '../harness/commands.mjs';
 
 /** The kit checkout this CLI belongs to. */
 const KIT = join(import.meta.dirname, '../../..');
@@ -170,10 +171,11 @@ export function checkVersions(root = KIT) {
 }
 
 /** `asdd kit versions [bump <version>] [--check]` */
-export function run(args = []) {
+export function run(argv = []) {
   const outPath = join(KIT, 'cli/versions.json');
+  const { values, positionals: args } = parseCommand('kit versions', argv);
 
-  if (args.includes('--check')) {
+  if (values.check) {
     const problems = checkVersions();
     if (problems.length) {
       for (const p of problems) console.error(`FAIL  ${p}`);

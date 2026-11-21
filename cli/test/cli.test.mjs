@@ -6,7 +6,8 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 
-import { list, parseInstallArgs } from '../src/install/options.mjs';
+import { UsageError, parseCommand } from '../src/harness/commands.mjs';
+import { installOptions, list } from '../src/install/options.mjs';
 import { fingerprint } from '../src/kit/fingerprint.mjs';
 import { suggestProjectName } from '../src/install/phases.mjs';
 import { runtimeNames } from '../src/install/runtimes.mjs';
@@ -16,6 +17,7 @@ const BIN = join(import.meta.dirname, '../bin/asdd.mjs');
 const asdd = (...args) => spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8', stdin: 'ignore' });
 
 test('install options: flags, = and space values, one target', () => {
+  const parseInstallArgs = (argv) => installOptions(parseCommand('install', argv));
   const o = parseInstallArgs(['app', '--dry-run', '--modules=http-api,web-ui', '--runtime', 'cursor', '--kit-dir', '/kit', '--skip-deps']);
   assert.equal(o.target, 'app');
   assert.equal(o.dryRun, true);
@@ -23,7 +25,6 @@ test('install options: flags, = and space values, one target', () => {
   assert.equal(o.modules, 'http-api,web-ui');
   assert.equal(o.runtimes, 'cursor');
   assert.equal(o.kitDir, '/kit');
-  assert.equal(parseInstallArgs(['--help']).help, true);
   assert.throws(() => parseInstallArgs(['--nope']), /unknown option: --nope/);
   assert.throws(() => parseInstallArgs(['a', 'b']), /unexpected argument: b/);
   assert.throws(() => parseInstallArgs(['--modules']), /--modules needs a value/);
@@ -56,6 +57,78 @@ test('dispatch: version, help, unknown command, kit usage', () => {
   assert.match(unknown.stderr, /unknown command: frobnicate/);
   assert.equal(asdd('kit', 'nope').status, 2);
   assert.equal(asdd('migrate', 'nope').status, 2);
+});
+
+test('parseCommand: registry flags through node:util parseArgs', async () => {
+  const drift = parseCommand('drift', ['--json', '--base=main', '--slice', 'a', '--slice', 'b']);
+  assert.equal(drift.values.json, true);
+  assert.equal(drift.values.base, 'main');
+  assert.deepEqual(drift.values.slice, ['a', 'b']);
+  // A flag the script defaults stays undefined: the registry default only documents it.
+  assert.equal(parseCommand('audit', []).values.since, undefined);
+  const init = parseCommand('slice init', ['alpha', '--full']);
+  assert.equal(init.args['slice-id'], 'alpha');
+  assert.deepEqual(parseCommand('knowledge search', ['auth', 'flow', '--k', '3']).args.query, ['auth', 'flow']);
+  assert.throws(() => parseCommand('drift', ['--nope']), (e) => e instanceof UsageError && /unknown option: --nope/.test(e.message));
+  assert.throws(() => parseCommand('drift', ['--base']), /--base needs a value/);
+  assert.throws(() => parseCommand('drift', ['--json=yes']), /--json takes no value/);
+  assert.throws(() => parseCommand('slice init', []), /missing <slice-id>/);
+  assert.throws(() => parseCommand('waves', ['extra']), /unexpected argument: extra/);
+  // A string flag with a short alias: Node names it '-i, --interactive'; the message names the long flag.
+  assert.throws(() => parseCommand('install', ['--kit-dir']), /Error: --kit-dir needs a value\n/);
+});
+
+test('review #13: help parity, hook command lines, and the installer layer', () => {
+  // install: --help wins over a bad option, like every other command (main.mjs intercepts it).
+  const help = asdd('install', '--bogus', '--help');
+  assert.equal(help.status, 0);
+  assert.match(help.stdout, /Runtimes: .*claude/);
+  // A direct run of the shared knowledge script prints its subcommand's help.
+  const direct = spawnSync(process.execPath, [join(import.meta.dirname, '../src/harness/knowledge-query.mjs'), 'search', '--help'], { encoding: 'utf8' });
+  assert.equal(direct.status, 0, direct.stderr);
+  assert.match(direct.stdout, /asdd knowledge search <query>…/);
+  // Parser-free hooks: the dispatcher validates their command line (REQ-002).
+  for (const hook of ['gate', 'verify', 'span']) {
+    const r = spawnSync(process.execPath, [BIN, hook, '--bogus'], { encoding: 'utf8', input: '{}' });
+    assert.equal(r.status, 2, `${hook}: ${r.stderr}`);
+    assert.match(r.stderr, /unknown option: --bogus/);
+  }
+  // observe is fail-open and silent (profiling design §12.3): a bad command line exits 0 with no stderr.
+  const observe = spawnSync(process.execPath, [BIN, 'observe', 'claude', '--bogus'], { encoding: 'utf8', input: '{}' });
+  assert.equal(observe.status, 0);
+  assert.equal(observe.stderr, '');
+  // Installer depends on Shared only (domain-layer.project.md): no Harness import under cli/src/install.
+  for (const file of readdirSync(join(import.meta.dirname, '../src/install'))) {
+    assert.doesNotMatch(readFileSync(join(import.meta.dirname, '../src/install', file), 'utf8'), /from '\.\.\/harness\//, file);
+  }
+});
+
+test('help: generated per command, and asdd help <command>', () => {
+  const drift = asdd('drift', '--help');
+  assert.equal(drift.status, 0);
+  assert.match(drift.stdout, /Usage:\n {2}asdd drift \[options\]/);
+  assert.match(drift.stdout, /--slice <id> +check this slice \(repeatable\)/);
+  assert.equal(asdd('help', 'slice', 'init').stdout, asdd('slice', 'init', '-h').stdout);
+  assert.match(asdd('kit', 'build', '--help').stdout, /--obfuscate/);
+  assert.match(asdd('doctor', '--help').stdout, /asdd doctor \[<dir>\] \[options\]/);
+  assert.match(asdd('install', '--help').stdout, /Modules: .*http-api/);
+  const bad = asdd('waves', '--nope');
+  assert.equal(bad.status, 2);
+  assert.match(bad.stderr, /unknown option: --nope\nusage: asdd waves \[options\]/);
+  assert.equal(asdd('help', 'frobnicate').status, 2);
+});
+
+test('completion: bash, zsh, and fish scripts from the registry', () => {
+  const bash = asdd('completion', 'bash');
+  assert.equal(bash.status, 0);
+  assert.match(bash.stdout, /complete -o default -F _asdd_complete asdd/);
+  assert.match(bash.stdout, /drift\) words="--json --base --target --slice --requirements --pr-branch --pr-body --help -h"/);
+  assert.match(bash.stdout, /init\) words="--full --hotfix --source-json --help -h"/);
+  const syntax = spawnSync('bash', ['-n'], { input: bash.stdout, encoding: 'utf8' });
+  assert.equal(syntax.status, 0, syntax.stderr);
+  assert.match(asdd('completion', 'zsh').stdout, /bashcompinit/);
+  assert.match(asdd('completion', 'fish').stdout, /complete -c asdd -n '__fish_seen_subcommand_from kit; and __fish_seen_subcommand_from build' -l obfuscate/);
+  assert.equal(asdd('completion', 'tcsh').status, 2);
 });
 
 test('repair restores missing slice sessions, specs, and features', () => {

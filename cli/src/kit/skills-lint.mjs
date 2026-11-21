@@ -16,6 +16,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { parseSteeringFrontmatter } from '../harness/validators/steering-tags.mjs';
+import { parseCommand } from '../harness/commands.mjs';
 
 const NAME_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const ABSOLUTE_PATH_RE = /(?:^|[\s`'"(=])(\/(?:Users|home|tmp|var|private|root)\/[^\s`'")]*)/gm;
@@ -260,10 +261,10 @@ export function lint(root) {
 
 /** `asdd kit skills-lint [--warn] [--only a,b] [dir]`: exit status 1 on any error (or warning with --warn). */
 export function run(argv) {
-  const strict = argv.includes('--warn');
-  const onlyIdx = argv.indexOf('--only');
-  const only = onlyIdx >= 0 ? new Set(argv[onlyIdx + 1].split(',')) : null;
-  const dir = resolve(argv.find((a, i) => !a.startsWith('--') && argv[i - 1] !== '--only') ?? '.');
+  const { values, args } = parseCommand('kit skills-lint', argv);
+  const strict = values.warn;
+  const only = values.only !== undefined ? new Set(values.only.split(',')) : null;
+  const dir = resolve(args.dir ?? '.');
   const result = lint(dir);
   // --only keeps the findings that name one of the listed skills (fleet findings are computed over the whole fleet).
   const keep = (f) => !only || f.skill.split(' & ').some((n) => only.has(n));

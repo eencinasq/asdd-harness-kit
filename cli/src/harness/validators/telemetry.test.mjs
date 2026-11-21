@@ -312,9 +312,11 @@ const CHECK_ENV_DROP = ['HARNESS_JEV_LIVE', 'HARNESS_RUNTIME', 'HARNESS_DRIFT_BA
  * exit code is decided only by the wiring under test. lib/validator: working | throw | deleted | call-throw.
  */
 function harnessCopy({ lib = 'working', validator = 'working', baselineFail = false } = {}) {
-  const dir = mkdtempSync(join(tmpdir(), 'tel-chk-h-'));
+  // The package layout (cli/src/harness next to cli/registry): the commands read their arguments from the registry.
+  const dir = join(mkdtempSync(join(tmpdir(), 'tel-chk-h-')), 'cli/src/harness');
   // The whole harness, so the real learning-lib (writeSensorSignal under --live) and its imports load.
   cpSync(HARNESS, dir, { recursive: true, filter: (src) => !src.endsWith('.test.mjs') });
+  cpSync(join(HARNESS, '../../registry'), join(dir, '../../registry'), { recursive: true });
   // Neutral default exports; named exports stay (other libs import them, e.g. drift-lib ← features).
   for (const name of ['paths', 'manifest', 'features', 'skills', 'steering-tags', 'steering-profile', 'lite-escalation', 'phase-chain', 'spec-drift', 'learning']) {
     const file = join(dir, 'validators', `${name}.mjs`);
@@ -425,7 +427,7 @@ test('TASK-007 ADR-006/REQ-006: check --live with telemetry WARNs records no lea
   } finally {
     cleanup(telRoot);
     cleanup(quietRoot);
-    rmSync(harness, { recursive: true, force: true });
+    rmSync(join(harness, '../../..'), { recursive: true, force: true });
   }
 });
 
@@ -442,6 +444,6 @@ test('TASK-007 control: a shared (non-telemetry) WARN under --live is still reco
     assert.ok(existsSync(join(root, '.harness/state/learning')), 'control signal written');
   } finally {
     cleanup(root);
-    rmSync(harness, { recursive: true, force: true });
+    rmSync(join(harness, '../../..'), { recursive: true, force: true });
   }
 });

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-cli-args-007",
+  "timestamp": "2026-11-21T19:57:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "cli-args",
+  "event_type": "phase_completed",
+  "phase": "qa",
+  "evidence": "REQ-001..007 pinned: cli.test (parseCommand, help incl. install over a bad option and direct knowledge-query help, completion, hook argv exit 2, observe silent, installer layer), registry.test, hook/fixture tests, full-pipeline.sh; npm test 503 pass; dep-layer clean.",
+  "concerns": []
+}

@@ -19,7 +19,7 @@
         "node --test cli/src/harness/semgrep-lib.test.mjs cli/src/harness/audit-codebase.test.mjs",
         "npm test"
       ],
-      "evidence": "semgrep-lib + audit-codebase tests: 18 pass (union: two --config flags; .semgrep folder selected; languagesFrom reads prose). npm test 495 pass. Live scan of the kit: selected+generated, .semgrep sets + 2 generated rules, 1 finding (audit.service.ts:144, fixed by TASK-003).",
+      "evidence": "semgrep-lib + audit-codebase tests: 18 pass (union: two --config flags; .semgrep folder selected; languagesFrom reads prose). npm test 495 pass. Live scan of the kit: selected+generated, .semgrep sets + 2 generated rules, 1 finding (audit.service.ts:144, fixed by TASK-003). Re-verified 2026-11-21 after cli-args (registry args/flags, run(argv) on parseArgs): verification commands pass (registry 35, versions 5, conformance 8, semgrep-lib+audit 18, init-flow 2, telemetry-lib+command-gate 99, validators/telemetry 12, profile 6; npm test 502).",
       "scope_paths": [
         "cli/src/harness/semgrep-lib.mjs",
         "cli/src/harness/semgrep-lib.test.mjs",
@@ -27,7 +27,7 @@
         "cli/steering/spec-drift.md",
         "tools/spec-drift/src/harness/semgrep-lib.mjs"
       ],
-      "evidence_hash": "30a81bb832102856e73cab8c58d93549a70f68637d58bac725564cacd0c86460"
+      "evidence_hash": "c1c776afea10ed6162c3c7ea3c0bbe7249b19bec36112e114a3e96190b82d206"
     },
     {
       "id": "TASK-002",
@@ -44,11 +44,11 @@
         "node --test cli/src/harness/init-flow.test.mjs",
         "semgrep scan --config p/default cli/src/harness/init-flow.mjs (0 parse errors)"
       ],
-      "evidence": "init-flow test: 1 pass; semgrep parse errors 0",
+      "evidence": "init-flow test: 1 pass; semgrep parse errors 0 Re-verified 2026-11-21 after cli-args (registry args/flags, run(argv) on parseArgs): verification commands pass (registry 35, versions 5, conformance 8, semgrep-lib+audit 18, init-flow 2, telemetry-lib+command-gate 99, validators/telemetry 12, profile 6; npm test 502).",
       "scope_paths": [
         "cli/src/harness/init-flow.mjs"
       ],
-      "evidence_hash": "e725b6a67a84c25654c7bdd8b24e5fbaa21b998df3d7a36f861d4716de09747e"
+      "evidence_hash": "facbb37bf45d8419ee99f9ee3ebdb71430ea4e68a06e77dfab29e6752cba42b0"
     },
     {
       "id": "TASK-003",

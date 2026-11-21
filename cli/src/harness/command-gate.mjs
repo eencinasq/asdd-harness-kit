@@ -302,6 +302,23 @@ export async function runHookCli(deps = {}) {
   });
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// asdd CLI: `asdd kit vendor` drops everything from this line down in the MCP servers' copies.
+import { realpathSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+
+/**
+ * `asdd gate`: the hook payload comes on stdin; the command takes no arguments. A hook imports nothing it does not
+ * need (not even the argument parser): it must deny on its own whatever else in the package is broken.
+ */
+export async function run() {
   await runHookCli();
 }
+
+const isEntry = () => {
+  try {
+    return Boolean(process.argv[1]) && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href;
+  } catch {
+    return false;
+  }
+};
+if (isEntry()) await run();

@@ -1,0 +1,170 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "cli-args",
+  "source_tasks": ".harness/specs/cli-args/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Registry-declared arguments, generated help and completion",
+      "user_visible_behavior": "asdd <command> --help / asdd help <command> print each command's arguments and options from the registry; asdd completion bash|zsh|fish prints a completion script; a wrong command line exits 2 with the usage.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/test/cli.test.mjs cli/test/registry.test.mjs",
+        "npm test"
+      ],
+      "evidence": "cli.test 16 pass (parseCommand, help, completion incl. bash -n); registry.test 35 pass (every entry well-formed); npm test 502 pass. Re-verified after the PR #13 review fixes: npm test 503 pass + full-pipeline OK.",
+      "scope_paths": [
+        "cli/registry/contribution-points.json",
+        "cli/src/harness/commands.mjs",
+        "cli/src/main.mjs",
+        "cli/test/cli.test.mjs",
+        "cli/test/registry.test.mjs",
+        "cli/README.md",
+        "docs/spec/conformance-spec.md",
+        ".harness/config/contribution-points.json",
+        ".harness/config/installed-versions.json",
+        ".harness/config/project.json"
+      ],
+      "evidence_hash": "531feb0e29c8c03591c0a34dbacbad8fe4d49198aac215be3af4ddcb6b3acbba"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Harness scripts run(argv) on parseCommand",
+      "user_visible_behavior": "Every harness command behaves as before; options also accept --flag=value; hooks answer even with a broken package; MCP server copies carry no CLI code.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-005",
+        "REQ-006"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs kit vendor --check",
+        "npm test",
+        "cd tools/jev-gate && npm run typecheck && npm test",
+        "cd tools/knowledge && npm run typecheck && npm test",
+        "cd tools/spec-drift && npm run typecheck && npm test && npm run test:e2e"
+      ],
+      "evidence": "npm test 502 pass (gate/verify/observe fail-open and fail-closed proofs, sync-state and telemetry fixtures with the package layout); vendor --check OK; jev-gate 14, knowledge 8, spec-drift 292 unit + 145 e2e pass; asdd gate 34 ms/run before and after. Re-verified after the PR #13 review fixes: npm test 503 pass + full-pipeline OK.",
+      "scope_paths": [
+        "cli/src/harness/amend-slice.mjs",
+        "cli/src/harness/audit-codebase.mjs",
+        "cli/src/harness/audit-triage.mjs",
+        "cli/src/harness/check-invariants.mjs",
+        "cli/src/harness/check-project-config.mjs",
+        "cli/src/harness/check-skills-index.mjs",
+        "cli/src/harness/check-spec-drift.mjs",
+        "cli/src/harness/command-gate.mjs",
+        "cli/src/harness/converge-eval.mjs",
+        "cli/src/harness/converge.mjs",
+        "cli/src/harness/emit-span.mjs",
+        "cli/src/harness/escalate-slice.mjs",
+        "cli/src/harness/gate-decide.mjs",
+        "cli/src/harness/harness-profile.mjs",
+        "cli/src/harness/harness-status.mjs",
+        "cli/src/harness/init-flow.mjs",
+        "cli/src/harness/init-slice.mjs",
+        "cli/src/harness/intake.mjs",
+        "cli/src/harness/knowledge-query.mjs",
+        "cli/src/harness/learn.mjs",
+        "cli/src/harness/portfolio.mjs",
+        "cli/src/harness/profile.mjs",
+        "cli/src/harness/repair.mjs",
+        "cli/src/harness/skill-eval.mjs",
+        "cli/src/harness/spec-source.mjs",
+        "cli/src/harness/sync-knowledge.mjs",
+        "cli/src/harness/sync-state.mjs",
+        "cli/src/harness/telemetry-observe.mjs",
+        "cli/src/harness/tracker-sync.mjs",
+        "cli/src/harness/ui-server.mjs",
+        "cli/src/harness/verify-on-stop.mjs",
+        "cli/src/harness/waves.mjs",
+        "cli/src/harness/sync-knowledge.test.mjs",
+        "cli/src/harness/sync-state.test.mjs",
+        "cli/src/harness/validators/telemetry.test.mjs",
+        "cli/src/kit/vendor.mjs",
+        "tools/jev-gate/src/harness",
+        "tools/knowledge/src/harness",
+        "tools/spec-drift/src/harness"
+      ],
+      "evidence_hash": "dd2f0998adf0fc881b6208fcf8773825543085336608b44bfdd6bb2b5f8c067d"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Kit, install, uninstall and doctor on parseCommand",
+      "user_visible_behavior": "asdd kit <command>, install, uninstall and doctor take the same options, validated and documented from the registry; asdd install --help also lists the modules and runtimes the kit ships.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/test/cli.test.mjs cli/test/skills-lint.test.mjs cli/test/agents-lint.test.mjs",
+        "npm test"
+      ],
+      "evidence": "cli/skills-lint/agents-lint tests pass; install.sh and lifecycle.sh pass; npm test 502 pass. Re-verified after the PR #13 review fixes: npm test 503 pass + full-pipeline OK.",
+      "scope_paths": [
+        "cli/src/install/options.mjs",
+        "cli/src/uninstall.mjs",
+        "cli/src/doctor.mjs",
+        "cli/src/kit/agents-lint.mjs",
+        "cli/src/kit/build.mjs",
+        "cli/src/kit/generate-runtime-steering.mjs",
+        "cli/src/kit/guidance.mjs",
+        "cli/src/kit/regen.mjs",
+        "cli/src/kit/self.mjs",
+        "cli/src/kit/skills-lint.mjs",
+        "cli/src/kit/versions.mjs"
+      ],
+      "evidence_hash": "246a5d6c20ad9743211c63fab3785263fdec35a4282a5756dbffa120c22c0749"
+    },
+    {
+      "id": "TASK-004",
+      "title": "PR #13 review fixes",
+      "user_visible_behavior": "asdd install --bogus --help prints help; node knowledge-query.mjs <sub> --help prints help; asdd gate/verify/span reject a bad command line with exit 2 (observe stays silent and fail-open); a missing value names the long flag; the installer imports Shared only.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002",
+        "REQ-003",
+        "REQ-005",
+        "REQ-007"
+      ],
+      "depends_on": [
+        "TASK-001",
+        "TASK-002",
+        "TASK-003"
+      ],
+      "verification": [
+        "node --test cli/test/cli.test.mjs cli/src/harness/telemetry-observe.test.mjs",
+        "spec-drift analyze_architecture paths=cli/src severity=ERROR (dep-layer)",
+        "npm test"
+      ],
+      "evidence": "cli.test 17 + telemetry-observe 36 pass (review #13 test: install help over a bad option, direct knowledge-query help, gate/verify/span exit 2, observe silent, no Harness import under cli/src/install); analyze_architecture cli/src: 0 findings, dep-layer clean; npm test 503 pass + full-pipeline OK.",
+      "scope_paths": [
+        "cli/src/install/index.mjs",
+        ".harness/specs/cli-args/amendments/2026-11-21T19-34-09-099Z.md"
+      ],
+      "evidence_hash": "ec4e05b151ef5aab442cad42362550cbdfdf6cad116e391e827bae080644adf7"
+    }
+  ]
+}

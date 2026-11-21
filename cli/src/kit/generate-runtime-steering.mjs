@@ -19,6 +19,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { loadSteeringRegistry, parseSteeringFrontmatter } from '../harness/validators/steering-tags.mjs';
+import { parseCommand } from '../harness/commands.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const TARGET = join(ROOT, 'cli/runtimes/cursor/asdd-steering.mdc');
@@ -83,8 +84,9 @@ export function render(entries) {
 }
 
 export function run(argv = []) {
+  const { check } = parseCommand('kit generate-runtime-steering', argv).values;
   const next = render(jitEntries());
-  if (argv.includes('--check')) {
+  if (check) {
     const cur = readFileSync(TARGET, 'utf8');
     if (cur !== next) {
       console.error('FAIL  asdd-steering.mdc is stale — run: asdd kit generate-runtime-steering');

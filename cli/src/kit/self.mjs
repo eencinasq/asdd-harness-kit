@@ -3,9 +3,10 @@
 import { runInstall } from '../install/index.mjs';
 import { KIT_ROOT } from '../paths.mjs';
 import { setQuiet } from '../ui.mjs';
+import { parseCommand } from '../harness/commands.mjs';
 
 export function run(argv = []) {
-  const check = argv.includes('--check');
+  const { check } = parseCommand('kit self', argv).values;
   if (check) setQuiet(true);
   const result = runInstall({ target: KIT_ROOT, dryRun: check, noInteractive: true, modules: '', removeModules: '', runtimes: '' }, KIT_ROOT);
   if (!check) return 0;

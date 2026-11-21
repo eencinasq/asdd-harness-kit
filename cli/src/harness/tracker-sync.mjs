@@ -4,21 +4,25 @@
  * Usage: asdd tracker-sync [--slice <id>] [--json] [--apply]
  */
 import { buildTrackerSyncPlan, applyTrackerSyncPlan, formatTrackerSyncPlan } from './tracker-sync-lib.mjs';
+import { parseCommand, runMain } from './commands.mjs';
 
-const root = process.cwd();
-const argv = process.argv.slice(2);
-const wantJson = argv.includes('--json');
-const wantApply = argv.includes('--apply');
-const sliceIdx = argv.indexOf('--slice');
-const sliceId = sliceIdx >= 0 ? argv[sliceIdx + 1] : null;
+export async function run(argv = process.argv.slice(2)) {
+  const root = process.cwd();
+  const { values } = parseCommand('tracker-sync', argv);
+  const wantJson = values.json;
+  const wantApply = values.apply;
+  const sliceId = values.slice ?? null;
 
-const plan = buildTrackerSyncPlan({ root, sliceId });
-let receipt = null;
-if (wantApply) receipt = applyTrackerSyncPlan(root, plan);
+  const plan = buildTrackerSyncPlan({ root, sliceId });
+  let receipt = null;
+  if (wantApply) receipt = applyTrackerSyncPlan(root, plan);
 
-if (wantJson) {
-  process.stdout.write(`${JSON.stringify({ plan, receipt }, null, 2)}\n`);
-} else {
-  process.stdout.write(formatTrackerSyncPlan(plan));
-  if (receipt) console.log(`APPLY  ${receipt.receipt_path}`);
+  if (wantJson) {
+    process.stdout.write(`${JSON.stringify({ plan, receipt }, null, 2)}\n`);
+  } else {
+    process.stdout.write(formatTrackerSyncPlan(plan));
+    if (receipt) console.log(`APPLY  ${receipt.receipt_path}`);
+  }
 }
+
+await runMain(import.meta.url, run);

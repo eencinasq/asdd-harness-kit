@@ -936,19 +936,76 @@
     "harness": {
       "check": {
         "script": "check-invariants.mjs",
-        "help": "every harness invariant and spec drift (Verify-on-Stop runs it)"
+        "help": "every harness invariant and spec drift (Verify-on-Stop runs it)",
+        "flags": {
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "gate one slice: drop findings that name another slice"
+          },
+          "live": {
+            "type": "boolean",
+            "help": "the Verify-on-Stop path: record FAIL and WARN lines as learning signals"
+          },
+          "record": {
+            "type": "boolean",
+            "help": "record FAIL and WARN lines as learning signals"
+          }
+        },
+        "env": {
+          "HARNESS_JEV_LIVE": "1: same as --live (older hook configs)",
+          "HARNESS_RUNTIME": "the runtime recorded with signals (default cli)"
+        }
       },
       "verify": {
         "script": "verify-on-stop.mjs",
-        "help": "the Stop hook: runs check --live, blocks the session on FAIL (stdin: hook payload)"
+        "help": "the Stop hook: runs check --live, blocks the session on FAIL",
+        "stdin": "the runtime hook payload (JSON)"
       },
       "gate": {
         "script": "command-gate.mjs",
-        "help": "the shell command hook: allow / deny (stdin: hook payload)"
+        "help": "the shell command hook: allow / deny",
+        "stdin": "the runtime hook payload (JSON)"
       },
       "drift": {
         "script": "check-spec-drift.mjs",
-        "help": "spec drift DRIFT-01…07 [--json] [--base <ref>] [--target <ref>] [--slice <id>] [--requirements]"
+        "help": "spec drift DRIFT-01…07; exit 1 on any FAIL",
+        "flags": {
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          },
+          "base": {
+            "type": "string",
+            "value": "ref",
+            "help": "diff from this git ref"
+          },
+          "target": {
+            "type": "string",
+            "value": "ref",
+            "help": "diff to this git ref"
+          },
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "check this slice",
+            "multiple": true
+          },
+          "requirements": {
+            "type": "boolean",
+            "help": "also run the requirement checks"
+          },
+          "pr-branch": {
+            "type": "string",
+            "value": "name",
+            "help": "PR branch name (default: HARNESS_PR_BRANCH)"
+          },
+          "pr-body": {
+            "type": "string",
+            "value": "text",
+            "help": "PR body (default: HARNESS_PR_BODY)"
+          }
+        }
       },
       "check-config": {
         "script": "check-project-config.mjs",
@@ -956,61 +1013,267 @@
       },
       "skills-index": {
         "script": "check-skills-index.mjs",
-        "help": "the skills index in skills.md [--write]"
+        "help": "the skills index in skills.md (exit 1 when stale)",
+        "flags": {
+          "write": {
+            "type": "boolean",
+            "help": "rewrite the index instead of checking it"
+          }
+        }
       },
       "status": {
         "script": "harness-status.mjs",
-        "help": "slices, phases, open learning patterns [--metrics] [--json] [--html]"
+        "help": "slices, phases, open learning patterns",
+        "flags": {
+          "metrics": {
+            "type": "boolean",
+            "help": "pipeline metrics"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "pipeline metrics as JSON"
+          },
+          "html": {
+            "type": "boolean",
+            "help": "the pipeline report as HTML on stdout"
+          }
+        }
       },
       "converge": {
         "script": "converge.mjs",
-        "help": "cheap feature converge: req_ids, test mentions, evidence [--slice <id>] [--strict] [--json]"
+        "help": "cheap feature converge: req_ids, test mentions, evidence",
+        "flags": {
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "only this slice"
+          },
+          "strict": {
+            "type": "boolean",
+            "help": "treat warnings as failures"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "converge-eval": {
         "script": "converge-eval.mjs",
-        "help": "score EARS/converge fixtures under cli/eval/converge-ears [--json] [--cases <dir>]"
+        "help": "score EARS/converge fixtures under cli/eval/converge-ears",
+        "flags": {
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          },
+          "cases": {
+            "type": "string",
+            "value": "dir",
+            "help": "fixtures directory"
+          }
+        }
       },
       "waves": {
         "script": "waves.mjs",
-        "help": "parallelism hints from feature owners/deps/scopes [--slice <id>] [--json]"
+        "help": "parallelism hints from feature owners/deps/scopes",
+        "flags": {
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "only this slice"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "portfolio": {
         "script": "portfolio.mjs",
-        "help": "read-only multi-repo summary from .harness/config/portfolio.json [--json]"
+        "help": "read-only multi-repo summary from .harness/config/portfolio.json",
+        "flags": {
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "tracker-sync": {
         "script": "tracker-sync.mjs",
-        "help": "plan bi-directional tracker sync from handoff+sessions [--slice <id>] [--json] [--apply]"
+        "help": "plan bi-directional tracker sync from handoff+sessions",
+        "flags": {
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "only this slice"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          },
+          "apply": {
+            "type": "boolean",
+            "help": "write the plan locally (a receipt), not only print it"
+          }
+        }
       },
       "spec-source": {
         "script": "spec-source.mjs",
-        "help": "experimental REQ inventory (requires capabilities.spec_as_source) [--slice <id>] [--json]"
+        "help": "experimental REQ inventory (requires capabilities.spec_as_source)",
+        "flags": {
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "only this slice"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "init-flow": {
         "script": "init-flow.mjs",
-        "help": "15-minute brownfield path: install (if needed), one lite slice, minimal feature, asdd check"
+        "help": "15-minute brownfield path: install (if needed), one lite slice, minimal feature, asdd check",
+        "args": [
+          {
+            "name": "dir",
+            "help": "the project (default: the current directory)"
+          }
+        ],
+        "flags": {
+          "runtime": {
+            "type": "string",
+            "value": "name",
+            "help": "runtime to install",
+            "default": "cursor"
+          },
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "the sample slice",
+            "default": "hello"
+          },
+          "no-check": {
+            "type": "boolean",
+            "help": "skip the final asdd check"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "sync": {
         "script": "sync-state.mjs",
-        "help": "regenerate manifests, registry, PROGRESS.md, knowledge [--slice <id>]"
+        "help": "regenerate manifests, registry, PROGRESS.md, knowledge",
+        "flags": {
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "sync this slice only (merged into the registry)"
+          }
+        }
       },
       "repair": {
         "script": "repair.mjs",
-        "help": "repair harness layout (slices, state, specs, features) then sync [--dry-run] [--slice <id>] [--json]"
+        "help": "repair harness layout (slices, state, specs, features) then sync",
+        "flags": {
+          "dry-run": {
+            "type": "boolean",
+            "help": "print the repairs only"
+          },
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "only this slice"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "slice": {
         "sub": {
           "init": {
             "script": "init-slice.mjs",
-            "help": "start a slice: slice init <id> [--full | --hotfix]"
+            "help": "start a slice (lite by default)",
+            "args": [
+              {
+                "name": "slice-id",
+                "required": true,
+                "help": "lowercase letters, digits, - and _"
+              }
+            ],
+            "flags": {
+              "full": {
+                "type": "boolean",
+                "help": "the full pipeline"
+              },
+              "hotfix": {
+                "type": "boolean",
+                "help": "a hotfix slice"
+              },
+              "source-json": {
+                "type": "string",
+                "value": "json",
+                "help": "the slice source, a JSON object (asdd intake passes it)"
+              }
+            }
           },
           "escalate": {
             "script": "escalate-slice.mjs",
-            "help": "lite/hotfix → escalated: slice escalate <id> --reasons \"E1,E4\" [--by <owner>] [--note \"why\"]"
+            "help": "lite/hotfix → escalated",
+            "args": [
+              {
+                "name": "slice-id",
+                "required": true,
+                "help": "the slice"
+              }
+            ],
+            "flags": {
+              "reasons": {
+                "type": "string",
+                "value": "list",
+                "help": "escalation reasons, e.g. \"E1-scope-spread,E4-dissent\" (required)"
+              },
+              "by": {
+                "type": "string",
+                "value": "owner",
+                "help": "who escalates",
+                "default": "harness"
+              },
+              "note": {
+                "type": "string",
+                "value": "text",
+                "help": "why"
+              }
+            }
           },
           "amend": {
             "script": "amend-slice.mjs",
-            "help": "reopen DONE slice: slice amend <id> [--note \"…\"] [--by <owner>]"
+            "help": "reopen a DONE slice for an amendment",
+            "args": [
+              {
+                "name": "slice-id",
+                "required": true,
+                "help": "the slice"
+              }
+            ],
+            "flags": {
+              "note": {
+                "type": "string",
+                "value": "text",
+                "help": "what the amendment is for"
+              },
+              "by": {
+                "type": "string",
+                "value": "owner",
+                "help": "who amends",
+                "default": "harness"
+              }
+            }
           }
         }
       },
@@ -1018,90 +1281,626 @@
         "sub": {
           "sync": {
             "script": "sync-knowledge.mjs",
-            "help": "rebuild the knowledge index [--status] [--check] [--embed] [--backend=jsonl|sqlite|auto]"
+            "help": "rebuild the knowledge index",
+            "flags": {
+              "status": {
+                "type": "boolean",
+                "help": "print the index metadata"
+              },
+              "check": {
+                "type": "boolean",
+                "help": "exit 1 when the index is missing or stale"
+              },
+              "embed": {
+                "type": "boolean",
+                "help": "also compute embeddings"
+              },
+              "backend": {
+                "type": "string",
+                "value": "auto|jsonl|sqlite",
+                "help": "index store",
+                "default": "auto"
+              }
+            }
           },
           "search": {
             "script": "knowledge-query.mjs",
             "pass": true,
-            "help": "knowledge search \"<query>\" [--k 5] [--slice <id>]"
+            "help": "search the knowledge index",
+            "args": [
+              {
+                "name": "query",
+                "required": true,
+                "help": "search words",
+                "variadic": true
+              }
+            ],
+            "flags": {
+              "k": {
+                "type": "string",
+                "value": "n",
+                "help": "results",
+                "default": "5"
+              },
+              "slice": {
+                "type": "string",
+                "value": "id",
+                "help": "only this slice"
+              }
+            }
           },
           "trace": {
             "script": "knowledge-query.mjs",
             "pass": true,
-            "help": "knowledge trace <node-id> [--depth 2]"
+            "help": "a node and its edges",
+            "args": [
+              {
+                "name": "node-id",
+                "required": true,
+                "help": "e.g. REQ-001 or a file path",
+                "variadic": true
+              }
+            ],
+            "flags": {
+              "depth": {
+                "type": "string",
+                "value": "n",
+                "help": "edge hops",
+                "default": "2"
+              }
+            }
           },
           "slice": {
             "script": "knowledge-query.mjs",
             "pass": true,
-            "help": "knowledge slice <slice-id>"
+            "help": "everything the index holds for one slice",
+            "args": [
+              {
+                "name": "slice-id",
+                "required": true,
+                "help": "the slice"
+              }
+            ]
           },
           "status": {
             "script": "knowledge-query.mjs",
             "pass": true,
-            "help": "knowledge status"
+            "help": "index status (what was indexed, when)"
           },
           "patterns": {
             "script": "knowledge-query.mjs",
             "pass": true,
-            "help": "knowledge patterns [--status <s>]"
+            "help": "learning patterns, computed live",
+            "flags": {
+              "status": {
+                "type": "string",
+                "value": "status",
+                "help": "only patterns with this status"
+              }
+            }
           }
         }
       },
       "learn": {
         "script": "learn.mjs",
-        "help": "learning patterns [--all|--json|--summary|--signatures|--check|--export|--propose <LP-id>]"
+        "help": "learning patterns: derive, list, export, propose",
+        "flags": {
+          "all": {
+            "type": "boolean",
+            "help": "every pattern, including watching/verified"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "patterns.json content"
+          },
+          "summary": {
+            "type": "boolean",
+            "help": "the summary only, as JSON"
+          },
+          "signatures": {
+            "type": "boolean",
+            "help": "failure-log signatures in use"
+          },
+          "check": {
+            "type": "boolean",
+            "help": "exit 1 when patterns.json is stale"
+          },
+          "export": {
+            "type": "boolean",
+            "help": "lessons on kit-owned controls, for an upstream issue"
+          },
+          "out": {
+            "type": "string",
+            "value": "file",
+            "help": "with --export: write here instead of stdout"
+          },
+          "propose": {
+            "type": "string",
+            "value": "LP-id",
+            "help": "scaffold a steering proposal for this pattern"
+          }
+        },
+        "env": {
+          "HARNESS_AUTHOR": "the author of the weekly summary (CI: ci)"
+        }
       },
       "audit": {
         "script": "audit-codebase.mjs",
-        "help": "codebase audit [--json] [--no-write] [--hotspots N] [--since 90.days]"
+        "help": "codebase audit: churn hotspots, drift, Semgrep",
+        "flags": {
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          },
+          "no-write": {
+            "type": "boolean",
+            "help": "do not write the report under .harness/audits"
+          },
+          "hotspots": {
+            "type": "string",
+            "value": "n",
+            "help": "hotspots to rank",
+            "default": "10"
+          },
+          "since": {
+            "type": "string",
+            "value": "period",
+            "help": "git churn window",
+            "default": "90.days"
+          }
+        }
       },
       "triage": {
         "script": "audit-triage.mjs",
-        "help": "TL triage: triage <finding-id> --dismiss --reason \"…\" | --confirm | --clear | --list"
+        "help": "Tech Lead triage of an audit finding",
+        "args": [
+          {
+            "name": "finding-id",
+            "help": "AUD-xxxxxxxx"
+          }
+        ],
+        "flags": {
+          "dismiss": {
+            "type": "boolean",
+            "help": "dismiss the finding (needs --reason)"
+          },
+          "confirm": {
+            "type": "boolean",
+            "help": "confirm the finding"
+          },
+          "clear": {
+            "type": "boolean",
+            "help": "remove the decision"
+          },
+          "reason": {
+            "type": "string",
+            "value": "why",
+            "help": "the reason (cite an ADR or decision)"
+          },
+          "by": {
+            "type": "string",
+            "value": "who",
+            "help": "who decides",
+            "default": "tl"
+          },
+          "list": {
+            "type": "boolean",
+            "help": "print every decision"
+          }
+        }
       },
       "skill-eval": {
         "script": "skill-eval.mjs",
-        "help": "score skill fixtures under cli/eval/skills [--skill <name>] [--baseline <ref>] [--json]"
+        "help": "score skill fixtures under cli/eval/skills",
+        "flags": {
+          "skill": {
+            "type": "string",
+            "value": "name",
+            "help": "only this skill"
+          },
+          "baseline": {
+            "type": "string",
+            "value": "ref",
+            "help": "re-score against the skill body at this git ref"
+          },
+          "fixtures": {
+            "type": "string",
+            "value": "dir",
+            "help": "evaluate only this fixtures directory"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "intake": {
         "script": "intake.mjs",
-        "help": "import a tracker Intent item as a slice: intake --from <file|-> --ref <url> [--accept-stale] [--dry-run] [--json]"
+        "help": "import a tracker Intent item as a slice",
+        "flags": {
+          "from": {
+            "type": "string",
+            "value": "file|-",
+            "help": "the item text (- for stdin) (required)"
+          },
+          "ref": {
+            "type": "string",
+            "value": "url",
+            "help": "the item URL (required)"
+          },
+          "accept-stale": {
+            "type": "boolean",
+            "help": "proceed when grounding refs are stale"
+          },
+          "dry-run": {
+            "type": "boolean",
+            "help": "print the plan only"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "ui": {
         "script": "ui-server.mjs",
-        "help": "read-only local harness UI on 127.0.0.1 [--port <n>]"
+        "help": "read-only local harness UI on 127.0.0.1",
+        "flags": {
+          "port": {
+            "type": "string",
+            "value": "n",
+            "help": "port (0: any free port)",
+            "default": "7474"
+          }
+        }
       },
       "gate-decide": {
         "script": "gate-decide.mjs",
-        "help": "Tech Lead override for a WARN gate: gate-decide <slice> --phase <phase> --note \"…\""
+        "help": "Tech Lead override for a WARN gate",
+        "args": [
+          {
+            "name": "slice-id",
+            "required": true,
+            "help": "the slice"
+          }
+        ],
+        "flags": {
+          "phase": {
+            "type": "string",
+            "value": "phase",
+            "help": "the gated phase (required)"
+          },
+          "note": {
+            "type": "string",
+            "value": "text",
+            "help": "why the WARN is accepted (required)"
+          }
+        }
       },
       "profile": {
         "script": "harness-profile.mjs",
-        "help": "read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation [--slice <id>] [--bottlenecks] [--json]"
+        "help": "read-only telemetry report: phase durations, gate/hook/sync latency, guidance activation",
+        "flags": {
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "only this slice"
+          },
+          "bottlenecks": {
+            "type": "boolean",
+            "help": "rank slices by bottleneck score"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "profiling": {
         "script": "profile.mjs",
-        "help": "per-slice profile report: phase durations, H-* findings, bottleneck scores [--slice <id>|--bottlenecks|--json]"
+        "help": "per-slice profile report: phase durations, H-* findings, bottleneck scores",
+        "flags": {
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "only this slice"
+          },
+          "bottlenecks": {
+            "type": "boolean",
+            "help": "rank surfaces by bottleneck score"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
       },
       "observe": {
         "script": "telemetry-observe.mjs",
-        "help": "the load hook (fail-open): records a steering/skill load as an activation record (stdin: hook payload) <claude|cursor>"
+        "help": "the load hook (fail-open): records a steering/skill load as an activation record",
+        "args": [
+          {
+            "name": "runtime",
+            "required": true,
+            "help": "claude or cursor"
+          }
+        ],
+        "stdin": "the runtime hook payload (JSON)"
       },
       "span": {
         "script": "emit-span.mjs",
-        "help": "append one telemetry span (stdin JSON) — the agent dispatch seam"
+        "help": "append one telemetry span (the agent dispatch seam)",
+        "stdin": "one span object (JSON)"
       }
     },
     "kit": {
-      "versions": "./kit/versions.mjs",
-      "build": "./kit/build.mjs",
-      "vendor": "./kit/vendor.mjs",
-      "guidance": "./kit/guidance.mjs",
-      "skills-lint": "./kit/skills-lint.mjs",
-      "agents-lint": "./kit/agents-lint.mjs",
-      "self": "./kit/self.mjs",
-      "regen": "./kit/regen.mjs",
-      "generate-runtime-steering": "./kit/generate-runtime-steering.mjs"
+      "versions": {
+        "module": "./kit/versions.mjs",
+        "help": "regenerate cli/versions.json (what install ships, by version)",
+        "args": [
+          {
+            "name": "action",
+            "help": "bump"
+          },
+          {
+            "name": "version",
+            "help": "with bump: the new version, e.g. 3.6.0"
+          }
+        ],
+        "flags": {
+          "check": {
+            "type": "boolean",
+            "help": "exit 1 when cli/versions.json is stale"
+          }
+        }
+      },
+      "build": {
+        "module": "./kit/build.mjs",
+        "help": "compile cli/src → cli/dist (projects and npm ship dist only)",
+        "flags": {
+          "obfuscate": {
+            "type": "boolean",
+            "help": "obfuscate the output"
+          },
+          "check": {
+            "type": "boolean",
+            "help": "exit 1 when dist/ is stale"
+          }
+        }
+      },
+      "vendor": {
+        "module": "./kit/vendor.mjs",
+        "help": "copy cli/src/harness libs into tools/*/src/harness",
+        "flags": {
+          "check": {
+            "type": "boolean",
+            "help": "exit 1 when a copy is stale"
+          }
+        }
+      },
+      "guidance": {
+        "module": "./kit/guidance.mjs",
+        "help": "stale guidance, cutoffs, steering budget, test asserts",
+        "args": [
+          {
+            "name": "dir",
+            "help": "the kit (default) or an installed project"
+          }
+        ],
+        "flags": {
+          "only": {
+            "type": "string",
+            "value": "list",
+            "help": "stale,cutoffs,budget,asserts"
+          }
+        }
+      },
+      "skills-lint": {
+        "module": "./kit/skills-lint.mjs",
+        "help": "skill grammar (S-*), fleet routing (SL-*), rule size (R-004/005)",
+        "args": [
+          {
+            "name": "dir",
+            "help": "the kit (default) or an installed project"
+          }
+        ],
+        "flags": {
+          "warn": {
+            "type": "boolean",
+            "help": "fail on judgment warnings too"
+          },
+          "only": {
+            "type": "string",
+            "value": "list",
+            "help": "only findings naming these skills"
+          }
+        }
+      },
+      "agents-lint": {
+        "module": "./kit/agents-lint.mjs",
+        "help": "agent grammar (A-*), tier/capability envelope and handoffs (AL-*)",
+        "args": [
+          {
+            "name": "dir",
+            "help": "the kit (default) or an installed project"
+          }
+        ],
+        "flags": {
+          "only": {
+            "type": "string",
+            "value": "list",
+            "help": "only findings naming these agents"
+          }
+        }
+      },
+      "self": {
+        "module": "./kit/self.mjs",
+        "help": "copy what cli/ ships into the kit's own .harness/",
+        "flags": {
+          "check": {
+            "type": "boolean",
+            "help": "change nothing; exit 1 while a copy is stale"
+          }
+        }
+      },
+      "regen": {
+        "module": "./kit/regen.mjs",
+        "help": "run the registry generators (all, or one scope)",
+        "args": [
+          {
+            "name": "scope",
+            "help": "a generator id or contribution class"
+          }
+        ],
+        "flags": {
+          "check": {
+            "type": "boolean",
+            "help": "run each staleness check instead"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
+      },
+      "generate-runtime-steering": {
+        "module": "./kit/generate-runtime-steering.mjs",
+        "help": "regenerate the runtime steering adapters from the steering registry",
+        "flags": {
+          "check": {
+            "type": "boolean",
+            "help": "exit 1 when the committed file is stale"
+          }
+        }
+      }
+    },
+    "control": {
+      "install": {
+        "module": "./install/index.mjs",
+        "help": "install or upgrade the kit in an existing repository",
+        "args": [
+          {
+            "name": "dir",
+            "help": "the repository (prompted for in a TTY when missing)"
+          }
+        ],
+        "description": "Ownership contract: the kit only ever refreshes or deletes kit artifacts — the paths installed-versions.json\nrecords (managed_files, kit_files). A file the kit cannot prove it wrote is never overwritten or removed: existing\nkit-path files without a recorded hash are SKIPped, unproven retired paths are kept with a warning, and\nskill/steering/rule collisions halt (rehome with --rehome-*). Project artifacts — bindings, PROGRESS, slice state,\nspecs, mcp.json — are seeded once and never touched again. Kit files refresh on version change; one the project\nchanged since the kit wrote it is skipped (--force restores it). An older kit than the one installed is refused\n(--force downgrades). Bindings are kept unless --force-bindings. Undo with: asdd uninstall <dir>.",
+        "flags": {
+          "interactive": {
+            "type": "boolean",
+            "short": "i",
+            "help": "prompt for target, runtimes, modules (default in a TTY)"
+          },
+          "no-interactive": {
+            "type": "boolean",
+            "help": "never prompt, even in a TTY"
+          },
+          "from-git": {
+            "type": "boolean",
+            "help": "clone the kit into a temp dir and install from it"
+          },
+          "kit-dir": {
+            "type": "string",
+            "value": "path",
+            "help": "kit source (default: the kit this CLI belongs to)"
+          },
+          "modules": {
+            "type": "string",
+            "value": "list",
+            "help": "comma-separated modules, or all"
+          },
+          "runtime": {
+            "type": "string",
+            "value": "list",
+            "help": "comma-separated runtimes, or none (default: none)"
+          },
+          "target-os": {
+            "type": "string",
+            "value": "os",
+            "help": "win32, linux, or darwin (default: this one)"
+          },
+          "force": {
+            "type": "boolean",
+            "help": "overwrite portable kit files that already exist"
+          },
+          "force-bindings": {
+            "type": "boolean",
+            "help": "overwrite product/structure/tech/*.project.md (DANGEROUS)"
+          },
+          "force-mcp": {
+            "type": "boolean",
+            "help": "replace .agents/mcp/mcp.json with the empty project seed"
+          },
+          "skip-bindings": {
+            "type": "boolean",
+            "help": "do not create binding stubs"
+          },
+          "skip-docs": {
+            "type": "boolean",
+            "help": "skip the AGENTS.md / docs copy"
+          },
+          "skip-deps": {
+            "type": "boolean",
+            "help": "no effect (kept for scripts): the harness installs no npm packages"
+          },
+          "rehome-colliding-skills": {
+            "type": "boolean",
+            "help": "move consumer skills that collide with kit names to .agents/skills.local/, then proceed"
+          },
+          "rehome-colliding-steering": {
+            "type": "boolean",
+            "help": "move consumer steering that collides with kit names to .harness/steering.local/, then proceed"
+          },
+          "dry-run": {
+            "type": "boolean",
+            "help": "print actions only"
+          },
+          "pr": {
+            "type": "boolean",
+            "help": "install on a new branch and open a pull request (git + gh; clean working tree)"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "one JSON object on stdout (the result, or the error) instead of progress lines"
+          }
+        }
+      },
+      "uninstall": {
+        "module": "./uninstall.mjs",
+        "help": "remove what install added and the project did not change",
+        "args": [
+          {
+            "name": "dir",
+            "help": "the project (default: the current directory)"
+          }
+        ],
+        "flags": {
+          "dry-run": {
+            "type": "boolean",
+            "help": "print the plan only"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
+      },
+      "doctor": {
+        "module": "./doctor.mjs",
+        "help": "check Node, git, npm, codegraph, semgrep, gh, and the project's install",
+        "args": [
+          {
+            "name": "dir",
+            "help": "the project (default: the current directory)"
+          }
+        ],
+        "flags": {
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
+      }
     }
   }
 }

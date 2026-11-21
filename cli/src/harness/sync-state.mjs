@@ -581,10 +581,7 @@ export async function stampEvidence(rootDir = root, { only = null } = {}) {
   return changedCount;
 }
 
-async function main(run = null) {
-  const args = process.argv.slice(2);
-  const sliceArg = args.indexOf('--slice');
-  const targetSlice = sliceArg >= 0 ? args[sliceArg + 1] : null;
+async function main(run = null, targetSlice = null) {
   warnRegistryMissing();
   await stampEvidence(root, { only: targetSlice });
 
@@ -638,15 +635,21 @@ async function main(run = null) {
   await syncDerived(run);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const run = { start: Date.now(), steps: [] };
+// asdd CLI: `asdd kit vendor` drops everything from this line down in the MCP servers' copies.
+import { parseCommand, runMain } from './commands.mjs';
+
+export async function run(argv = process.argv.slice(2)) {
+  const { values } = parseCommand('sync', argv);
+  const steps = { start: Date.now(), steps: [] };
   let failed = false;
   try {
-    await main(run);
+    await main(steps, values.slice ?? null);
   } catch (error) {
     failed = true;
     throw error;
   } finally {
-    await emitSyncSpans(run, failed);
+    await emitSyncSpans(steps, failed);
   }
 }
+
+await runMain(import.meta.url, run);

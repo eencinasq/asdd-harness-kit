@@ -6,7 +6,8 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { parseCommand, runMain } from './commands.mjs';
 
 /**
  * @param {string} root
@@ -18,19 +19,6 @@ export function resolveDecidedBy(root) {
   const r = spawnSync('git', ['config', 'user.name'], { cwd: root, encoding: 'utf8' });
   if (r.status === 0 && r.stdout.trim()) return r.stdout.trim();
   return 'local';
-}
-
-function parseArgs(argv) {
-  const out = { sliceId: null, phase: null, note: null };
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a === '--phase' && argv[i + 1]) out.phase = argv[++i];
-    else if (a.startsWith('--phase=')) out.phase = a.slice('--phase='.length);
-    else if (a === '--note' && argv[i + 1]) out.note = argv[++i];
-    else if (a.startsWith('--note=')) out.note = a.slice('--note='.length);
-    else if (!a.startsWith('-') && !out.sliceId) out.sliceId = a;
-  }
-  return out;
 }
 
 function nextSessionName(sessionsDir, phase) {
@@ -134,8 +122,10 @@ export function runGateDecide(opts) {
   };
 }
 
-async function main(argv) {
-  const { sliceId, phase, note } = parseArgs(argv);
+export async function run(argv = process.argv.slice(2)) {
+  const { values, args } = parseCommand('gate-decide', argv);
+  const { phase = null, note = null } = values;
+  const sliceId = args['slice-id'] ?? null;
   if (!sliceId || !phase) {
     console.error('Usage: asdd gate-decide <slice-id> --phase <phase> --note "<text>"');
     process.exit(2);
@@ -144,18 +134,13 @@ async function main(argv) {
   if (!result.ok) {
     console.error(`FAIL  ${result.error}`);
     if (result.output) process.stderr.write(result.output);
-    process.exit(1);
+    return 1;
   }
   console.log(
     `OK  override ${result.slice_id}/${result.phase} by ${result.decided_by} → ${result.session_file}`,
   );
   if (result.output) process.stdout.write(result.output);
+  return 0;
 }
 
-const isMain = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
-if (isMain) {
-  main(process.argv.slice(2)).catch((err) => {
-    console.error(err?.message || err);
-    process.exit(1);
-  });
-}
+await runMain(import.meta.url, run);

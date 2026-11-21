@@ -4,7 +4,7 @@
 
 ## 1. Consumer command surface
 
-The consumer surface is the kernel-owned `commands.harness` table in `cli/registry/contribution-points.json` (23 commands at authoring). `commands.kit` is maintainer tooling — out of native-parity scope. `install`/`uninstall`/`doctor` are control-plane entries.
+The consumer surface is the kernel-owned `commands.harness` table in `cli/registry/contribution-points.json` (23 commands at authoring). `commands.kit` is maintainer tooling — out of native-parity scope. `install`/`uninstall`/`doctor` are control-plane entries (`commands.control`). Each entry declares its `args` and `flags`; they are the argument contract a conforming implementation parses.
 
 Each command contract fixes: command ID, args/defaults, cwd/env behavior, stdin payload grammar, exit status, stable machine output fields, diagnostics, side effects, and idempotence.
 

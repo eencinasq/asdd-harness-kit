@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "pipeline-e2e",
+  "source_tasks": ".harness/specs/pipeline-e2e/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Full-pipeline e2e in npm test",
+      "user_visible_behavior": "npm test fails when a phase, a gate, a runtime hook, or a registry command stops working end to end.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "bash cli/test/full-pipeline.sh",
+        "npm test"
+      ],
+      "evidence": "full-pipeline.sh OK (~11 s): claude+cursor hooks allow/deny/release, observe fail-open; 9 phases → DONE, check --live and drift pass; skipped phase → QG-DEC-09; 48 commands --help, every harness command ran with expected exits. npm test 502 pass. Restamped for 3.14.0: npm test 502 pass + full-pipeline OK.",
+      "scope_paths": [
+        "cli/test/full-pipeline.sh",
+        "package.json"
+      ],
+      "evidence_hash": "4d5c6de2a5fc4356cf8c87a68aabe984c8ec66561b64fad6fb32ea61606d4797"
+    }
+  ]
+}
