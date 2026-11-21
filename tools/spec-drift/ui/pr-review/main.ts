@@ -92,6 +92,8 @@ const cancelPublishBtn = $<HTMLButtonElement>('cancel-publish');
 const sendAgentBtn = $<HTMLButtonElement>('send-agent');
 const generateRulesBtn = $<HTMLButtonElement>('generate-rules');
 const generateSecurityRulesBtn = $<HTMLButtonElement>('generate-security-rules');
+const startGuidedAuditBtn = $<HTMLButtonElement>('start-guided-audit');
+const syncGuidedAuditBtn = $<HTMLButtonElement>('sync-guided-audit');
 const generateCodeCoverageBtn = $<HTMLButtonElement>('generate-code-coverage');
 const rescanSecurityBtn = $<HTMLButtonElement>('rescan-security');
 const rescanCodeCoverageBtn = $<HTMLButtonElement>('rescan-code-coverage');
@@ -587,29 +589,36 @@ const resolveRepoSecurity = (view: PrReviewView): RepoSecurityView | undefined =
 const renderSecurity = (view: PrReviewView): void => {
 	const builtin = view.architecture?.builtinSecurity;
 	const repo = resolveRepoSecurity(view);
+	const guided = view.guidedAudit;
 	const card = securityCard;
 	card.classList.remove('tone-danger', 'tone-warning', 'tone-success');
 
-	const findingTotal = (builtin?.findingCount ?? 0) + (repo?.status === 'scanned' ? repo.findingCount : 0);
+	const guidedCount = guided?.findingCount ?? 0;
+	const findingTotal =
+		(builtin?.findingCount ?? 0) + (repo?.status === 'scanned' ? repo.findingCount : 0) + guidedCount;
 	$('count-security').textContent = String(findingTotal);
 	generateSecurityRulesBtn.hidden = !(repo?.status === 'missing' && Boolean(repo.generatePrompt));
+	syncGuidedAuditBtn.hidden = !guided?.runId;
 
-	if (!view.architecture) {
+	if (!view.architecture && !guided?.runId) {
 		$('kpi-security').textContent = '—';
 		$('kpi-security-hint').textContent = 'Not scanned';
 		securitySummary.innerHTML = emptyState(
 			'No security scan yet',
-			'It runs with the architecture scan when the review starts.',
+			'It runs with the architecture scan when the review starts. Use Ask the agent to audit PR files for a guided audit.',
 		);
 		securityList.innerHTML = '';
 		return;
 	}
 
-	const hasError = builtin?.status === 'error' || repo?.status === 'error';
+	const hasError = builtin?.status === 'error' || repo?.status === 'error' || guided?.status === 'error';
 	const hasFindings = findingTotal > 0;
 	$('kpi-security').textContent = hasError && !hasFindings ? '—' : String(findingTotal);
-	$('kpi-security-hint').textContent =
-		repo?.status === 'missing'
+	$('kpi-security-hint').textContent = guided?.runId
+		? guidedCount
+			? `Guided ${guided.runId} · ${guidedCount} confirmed · open tab`
+			: `Guided ${guided.runId} · open tab`
+		: repo?.status === 'missing'
 			? builtin
 				? 'Built-in · open tab to generate repo rules'
 				: 'No repo security set — open tab to generate'
@@ -622,70 +631,100 @@ const renderSecurity = (view: PrReviewView): void => {
 					: 'Security scan · open tab';
 	card.classList.add(hasError ? 'tone-danger' : hasFindings ? 'tone-warning' : 'tone-success');
 
-	const blocks: string[] = [];
+	const chip = (label: string, detail: string, tone: 'success' | 'warning' | 'danger' | 'muted' | ''): string =>
+		`<span class="status-chip${tone ? ` tone-${tone}` : ''}"><span class="chip-label">${escapeHtml(label)}</span> ${escapeHtml(detail)}</span>`;
 
-	// REQ-005 / REQ-008: built-in section first (always on Semgrep when scannable).
+	const chips: string[] = [];
+	const actions: string[] = [];
+
+	// REQ-005 / REQ-008: built-in — compact chip; full callout only on error.
 	if (builtin) {
 		if (builtin.status === 'error') {
-			blocks.push(`<div class="callout tone-danger">
+			actions.push(`<div class="callout tone-danger">
 				<p class="callout-title">Built-in security pack</p>
 				<p>${inlineMarkdown(builtin.message)}</p>
 			</div>`);
 		} else {
-			blocks.push(`<div class="callout">
-				<p class="callout-title">Built-in security pack</p>
-				<p class="muted">${inlineMarkdown(builtin.message)}</p>
-			</div>`);
+			const n = builtin.findingCount;
+			chips.push(chip('Built-in', n ? `${n} finding${n === 1 ? '' : 's'}` : 'clean', n ? 'warning' : 'success'));
 		}
-	} else {
-		blocks.push(`<div class="callout">
-			<p class="callout-title">Built-in security pack</p>
-			<p class="muted">Skipped — engine is not Semgrep, or this PR has no scannable files.</p>
-		</div>`);
+	} else if (view.architecture) {
+		chips.push(chip('Built-in', 'skipped', 'muted'));
 	}
 
-	// REQ-006 / REQ-007 / REQ-009: repository security set next (legacy scans without repoSecurity → missing).
-	if (!repo) {
-		blocks.push(`<div class="callout">
-			<p class="callout-title">Repository security rules</p>
-			<p class="muted">Not available on this scan.</p>
-		</div>`);
-	} else if (repo.status === 'missing') {
-		blocks.push(`<div class="callout tone-warning">
-			<p class="callout-title">Repository security rules</p>
-			<p>${inlineMarkdown(repo.message)} Use <strong>Ask the agent to write security rules</strong>, then <strong>Rescan</strong>.</p>
-		</div>`);
-	} else if (repo.status === 'error') {
-		blocks.push(`<div class="callout tone-danger">
-			<p class="callout-title">Repository security rules</p>
-			<p>${inlineMarkdown(repo.message)}</p>
-		</div>`);
-	} else {
-		blocks.push(`<div class="callout">
-			<p class="callout-title">Repository security rules</p>
-			<p class="muted">${inlineMarkdown(repo.message)}</p>
-		</div>`);
+	// REQ-006 / REQ-007 / REQ-009: repo rules — chip when scanned; callout when missing/error.
+	if (view.architecture) {
+		if (!repo) {
+			chips.push(chip('Repo rules', 'n/a', 'muted'));
+		} else if (repo.status === 'missing') {
+			actions.push(`<div class="callout tone-warning">
+				<p class="callout-title">Repository security rules</p>
+				<p>${inlineMarkdown(repo.message)} Use <strong>Ask the agent to write security rules</strong>, then <strong>Rescan</strong>.</p>
+			</div>`);
+		} else if (repo.status === 'error') {
+			actions.push(`<div class="callout tone-danger">
+				<p class="callout-title">Repository security rules</p>
+				<p>${inlineMarkdown(repo.message)}</p>
+			</div>`);
+		} else {
+			const n = repo.findingCount;
+			const rules = plural(repo.configFiles.length, 'rule');
+			chips.push(
+				chip(
+					'Repo rules',
+					n ? `${n} finding${n === 1 ? '' : 's'} · ${rules}` : `clean · ${rules}`,
+					n ? 'warning' : 'success',
+				),
+			);
+		}
 	}
 
-	securitySummary.innerHTML = blocks.join('');
+	// REQ-027 / REQ-028: guided audit — chip when linked; no idle callout (the CTA button is enough).
+	if (guided?.status === 'error') {
+		actions.push(`<div class="callout tone-danger">
+			<p class="callout-title">Guided audit${guided.runId ? ` (${escapeHtml(guided.runId)})` : ''}</p>
+			<p>${inlineMarkdown(guided.message)}</p>
+		</div>`);
+	} else if (guided && guided.status !== 'idle') {
+		const cov = guided.coverage ? `${guided.coverage.reviewed}/${guided.coverage.total}` : '';
+		const detail = guided.findingCount
+			? `${guided.findingCount} confirmed${cov ? ` · ${cov}` : ''}`
+			: guided.status === 'in_progress'
+				? `in progress${cov ? ` · ${cov}` : ''}`
+				: `complete${cov ? ` · ${cov}` : ''} · 0 confirmed`;
+		const tone = guided.status === 'in_progress' ? 'warning' : guided.findingCount ? 'warning' : 'success';
+		chips.push(chip(`Guided ${guided.runId ?? ''}`, detail.trim(), tone));
+	} else {
+		chips.push(chip('Guided audit', 'not started — use Ask the agent', 'muted'));
+	}
+
+	securitySummary.innerHTML = [
+		chips.length ? `<div class="status-strip" role="list">${chips.join('')}</div>` : '',
+		...actions,
+	].join('');
 
 	const items: string[] = [];
-	if (builtin?.status === 'scanned') {
-		items.push(
-			...(builtin.findings.length
-				? builtin.findings.map(securityFindingItem)
-				: [
-						`<li>${emptyState('No built-in findings', 'The built-in pack found nothing on the PR files.', 'success')}</li>`,
-					]),
-		);
+	if (builtin?.status === 'scanned' && builtin.findings.length) {
+		items.push(...builtin.findings.map(securityFindingItem));
 	}
-	if (repo?.status === 'scanned') {
+	if (repo?.status === 'scanned' && repo.findings.length) {
+		items.push(...repo.findings.map(securityFindingItem));
+	}
+	if (guided && guided.status !== 'idle' && guided.findings.length) {
+		items.push(...guided.findings.map(securityFindingItem));
+	}
+	if (!items.length) {
+		const guidedWaiting = guided?.status === 'in_progress';
 		items.push(
-			...(repo.findings.length
-				? repo.findings.map(securityFindingItem)
-				: [
-						`<li>${emptyState('No repository security findings', 'The repo security rules found nothing on the PR files.', 'success')}</li>`,
-					]),
+			`<li>${emptyState(
+				hasFindings ? 'Findings hidden' : guidedWaiting ? 'Guided audit in progress' : 'No security findings',
+				guidedWaiting
+					? 'Submit confirmed findings with the agent, then Sync or Reload.'
+					: hasError
+						? 'Fix the scan error above, then Rescan.'
+						: 'Built-in, repo rules, and guided audit reported nothing on the PR paths.',
+				hasError || guidedWaiting ? 'neutral' : 'success',
+			)}</li>`,
 		);
 	}
 	securityList.innerHTML = items.join('');
@@ -852,6 +891,7 @@ const inboxItemsFor = (view: PrReviewView) =>
 			view.architecture?.builtinSecurity?.status === 'scanned' ? view.architecture.builtinSecurity.findings : [],
 		repoSecurityFindings:
 			view.architecture?.repoSecurity?.status === 'scanned' ? view.architecture.repoSecurity.findings : [],
+		guidedAuditFindings: view.guidedAudit?.findings,
 		requirements: view.requirements,
 	});
 
@@ -1244,6 +1284,8 @@ const setActionsDisabled = (disabled: boolean): void => {
 	importArchitectureAllBtn.disabled = disabled;
 	generateRulesBtn.disabled = disabled;
 	generateSecurityRulesBtn.disabled = disabled;
+	startGuidedAuditBtn.disabled = disabled;
+	syncGuidedAuditBtn.disabled = disabled;
 	generateCodeCoverageBtn.disabled = disabled;
 	attachTicketBtn.disabled = disabled;
 	rescanSecurityBtn.disabled = disabled;
@@ -1470,6 +1512,31 @@ generateSecurityRulesBtn.addEventListener('click', () => {
 		askAgent(prompt, 'Asked the agent to write security rules. Rescan when it is done.'),
 	);
 });
+
+startGuidedAuditBtn.addEventListener('click', () => {
+	if (!current) {
+		setStatus('No review loaded yet.', 'danger');
+		return;
+	}
+	run(startGuidedAuditBtn, 'Starting…', async () => {
+		const ok = await callTool('pr_review_start_guided_audit', prArgs(), 'Could not start guided audit');
+		if (!ok || !current) return;
+		selectTab('security');
+		const prompt = current.guidedAudit?.auditPrompt ?? current.prompt;
+		if (!prompt) {
+			setStatus('Guided audit started but no prompt was returned.', 'danger');
+			return;
+		}
+		await askAgent(prompt, 'Asked the agent to run the guided audit. Sync or Reload when it submits findings.');
+	});
+});
+
+syncGuidedAuditBtn.addEventListener('click', () =>
+	run(syncGuidedAuditBtn, 'Syncing…', async () => {
+		const ok = await callTool('pr_review_sync_guided_audit', prArgs(), 'Could not sync guided audit');
+		if (ok) selectTab('security');
+	}),
+);
 
 rescanSecurityBtn.addEventListener('click', () =>
 	run(rescanSecurityBtn, 'Scanning…', () => callTool('pr_review_architecture_rescan', prArgs(), 'Rescan failed')),

@@ -162,6 +162,17 @@ describe('PR review with a ticket (acceptance criteria + definition of done)', {
 		assert.match((resource.contents[0] as { text: string }).text, /"status": "done"/);
 	});
 
+	test('unmet ticket criteria with path:line evidence import via pr_review_import_findings', async () => {
+		const before = (await view('pr_review_status')).parsed?.comments.length ?? 0;
+		const v = await view('pr_review_import_findings', { keys: ['ticket:AC-2'] });
+		assert.ok((v.parsed?.comments.length ?? 0) > before, 'pinned unmet criterion as inline');
+		assert.ok(
+			v.parsed?.comments.some((c) => /^Ticket: AC-2\./.test(c.body) && c.path === 'src/app.ts'),
+			JSON.stringify(v.parsed?.comments.map((c) => ({ path: c.path, body: c.body.slice(0, 100) }))),
+		);
+		assert.match(v.message, /Imported 1 finding/);
+	});
+
 	test('a human can change a verdict; only the summary block changes', async () => {
 		const status = await view('pr_review_status');
 		assert.match(status.commentsMarkdown ?? '', /Delivers parsing, but error handling is missing\./);

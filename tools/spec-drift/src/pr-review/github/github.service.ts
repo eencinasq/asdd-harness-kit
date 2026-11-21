@@ -26,6 +26,10 @@ export const repoSlugFromPrUrl = (url: string): string => {
 	return url.replace(/^https:\/\/github\.com\//, '').replace(/\/pull\/\d+.*/, '');
 };
 
+/** GitHub's refusal of a diff over its line limit (`gh pr diff` → HTTP 406 `too_large`). */
+export const isDiffTooLarge = (error: unknown): boolean =>
+	error instanceof Error && /too_large|exceeded the maximum number of lines/i.test(error.message);
+
 /** GitHub and git access through the authenticated `gh` / `git` CLIs. */
 @Injectable()
 export class GithubService {
@@ -70,8 +74,40 @@ export class GithubService {
 		return { number: data.number, title: data.title ?? '', body: data.body ?? '', url: data.url ?? '' };
 	}
 
-	fetchPrDiff(pr: number, repoRoot: string): Promise<string> {
-		return this.process.runOrThrow('gh', ['pr', 'diff', String(pr)], { cwd: repoRoot });
+	/**
+	 * The PR's unified diff from GitHub. GitHub refuses diffs over 20,000 lines (HTTP 406 `too_large`); then, when
+	 * `local` is given, the same three-dot diff is built from git (base merge-base → PR head, fetched if needed).
+	 */
+	async fetchPrDiff(
+		pr: number,
+		repoRoot: string,
+		local?: { readonly baseSha: string; readonly headSha: string },
+	): Promise<string> {
+		try {
+			return await this.process.runOrThrow('gh', ['pr', 'diff', String(pr)], { cwd: repoRoot });
+		} catch (error) {
+			if (!local || !isDiffTooLarge(error)) throw error;
+			return this.localPrDiff(pr, repoRoot, local.baseSha, local.headSha);
+		}
+	}
+
+	/** `git diff <base>...<head>` in gh's format (a/ b/ prefixes, no color, no external diff, renames). */
+	async localPrDiff(pr: number, repoRoot: string, baseSha: string, headSha: string): Promise<string> {
+		await this.ensurePrCommit(repoRoot, pr, headSha);
+		return this.process.runOrThrow(
+			'git',
+			[
+				'diff',
+				'--no-color',
+				'--no-ext-diff',
+				'--no-textconv',
+				'-M',
+				'--src-prefix=a/',
+				'--dst-prefix=b/',
+				`${baseSha}...${headSha}`,
+			],
+			{ cwd: repoRoot },
+		);
 	}
 
 	/** Fetch origin and resolve the base branch to a commit SHA. */

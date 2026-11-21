@@ -23,3 +23,31 @@ describe('validateEnv', () => {
 		]);
 	});
 });
+
+// What Claude Desktop passes when it does not expand its own variable: a literal, not a template.
+// biome-ignore lint/suspicious/noTemplateCurlyInString: the unexpanded placeholder is the input under test
+const UNEXPANDED = '${workspaceFolder}';
+
+describe('validateEnv — repo roots', () => {
+	test('treats an unexpanded client placeholder as unset, so the root is resolved at run time', () => {
+		const env = validateEnv({
+			ANALYSIS_REPO_ROOT: UNEXPANDED,
+			HARNESS_ROOT: UNEXPANDED,
+			PR_REVIEW_REPO: UNEXPANDED,
+		});
+		assert.equal(env.ANALYSIS_REPO_ROOT, undefined);
+		assert.equal(env.HARNESS_ROOT, undefined);
+		assert.equal(env.PR_REVIEW_REPO, undefined);
+	});
+
+	test('leaves the roots unset when nothing is configured', () => {
+		const env = validateEnv({});
+		assert.equal(env.ANALYSIS_REPO_ROOT, undefined);
+		assert.equal(env.HARNESS_ROOT, undefined);
+	});
+
+	test('keeps an explicit root, resolved to an absolute path', () => {
+		assert.equal(validateEnv({ ANALYSIS_REPO_ROOT: '/repos/app' }).ANALYSIS_REPO_ROOT, '/repos/app');
+		assert.equal(validateEnv({ SEMGREP_REPO_ROOT: '/repos/legacy' }).ANALYSIS_REPO_ROOT, '/repos/legacy');
+	});
+});

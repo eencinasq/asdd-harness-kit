@@ -42,7 +42,11 @@
         {
           "at": "2026-11-17T21:52:14.894Z",
           "slice_id": null,
-          "last_at": "2026-11-17T22:14:55.572Z"
+          "last_at": "2026-11-17T22:21:40.272Z"
+        },
+        {
+          "at": "2026-11-21T01:26:46.766Z",
+          "slice_id": null
         }
       ],
       "examples": [
@@ -88,7 +92,11 @@
         {
           "at": "2026-11-17T21:52:14.894Z",
           "slice_id": null,
-          "last_at": "2026-11-17T22:14:55.572Z"
+          "last_at": "2026-11-17T22:21:40.272Z"
+        },
+        {
+          "at": "2026-11-21T01:26:46.766Z",
+          "slice_id": null
         }
       ],
       "examples": [
@@ -134,7 +142,11 @@
         {
           "at": "2026-11-17T21:52:14.894Z",
           "slice_id": "sensor-fixes",
-          "last_at": "2026-11-17T22:14:55.572Z"
+          "last_at": "2026-11-17T22:21:40.272Z"
+        },
+        {
+          "at": "2026-11-21T01:26:46.766Z",
+          "slice_id": "sensor-fixes"
         }
       ],
       "examples": [
@@ -274,6 +286,73 @@
       "examples": [
         "hotfix slice \"ci-npm-ci\" cannot complete with open escalation signals (E1-scope-spread) — run: asdd slice escalate ci-npm-ci --reasons \"E1-scope-spread\""
       ]
+    },
+    "sensor:DRIFT-02": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-21T01:26:46.766Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "DRIFT-02 passing feature TASK-001 changed after its verification (scope_paths no longer match evidence_hash); set it back to in_progress and rerun verification"
+      ]
+    },
+    "warn:DRIFT-04": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-21T01:26:46.766Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "DRIFT-04 no test file mentions REQ-026"
+      ]
+    },
+    "warn:CONVERGE-02": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-21T01:26:46.766Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "CONVERGE-02 feature TASK-014 lists REQ-026 but no test file mentions it"
+      ]
+    }
+  },
+  "reviews": {
+    "10@1": {
+      "at": "2026-11-21T01:27:20.806Z",
+      "pr": 10,
+      "revision": 1,
+      "mode": "submitted",
+      "event": "REQUEST_CHANGES",
+      "suggested_event": "REQUEST_CHANGES",
+      "comments": {
+        "drafted": 8,
+        "kept": 8,
+        "edited": 0,
+        "removed": 0,
+        "added": 0
+      },
+      "by_rule": {
+        "default.correctness": {
+          "drafted": 2,
+          "kept": 2,
+          "edited": 0,
+          "removed": 0
+        },
+        "ts_js_tsx_jsx.code-quality-checks": {
+          "drafted": 6,
+          "kept": 6,
+          "edited": 0,
+          "removed": 0
+        }
+      }
     }
   }
 }

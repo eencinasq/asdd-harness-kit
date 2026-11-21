@@ -1,6 +1,7 @@
 import { type DynamicModule, Module, type Type } from '@nestjs/common';
 
 import { whenToolset } from '../config/toolsets.ts';
+import { WorkspaceModule } from '../workspace/workspace.module.ts';
 import { AnalysisPrompts } from './analysis.prompts.ts';
 import { AnalysisService } from './analysis.service.ts';
 import { AnalysisTools } from './analysis.tools.ts';
@@ -27,7 +28,7 @@ export class AnalysisModule {
 		return {
 			module: AnalysisModule,
 			global: true,
-			imports: [engine],
+			imports: [WorkspaceModule, engine],
 			providers: [
 				AnalysisService,
 				// Background scans live in this process (spec-drift-depth REQ-004).

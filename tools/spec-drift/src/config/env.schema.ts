@@ -18,6 +18,17 @@ const commaList = z
 			.filter(Boolean),
 	);
 
+// A client that does not expand its own variables (Claude Desktop with `${workspaceFolder}`) passes them through
+// literally. Such a value names no folder, so it counts as unset and the root is resolved at run time instead.
+const UNEXPANDED_PLACEHOLDER = /\$\{[^}]*\}/;
+
+const optionalRoot = z
+	.string()
+	.optional()
+	.transform((value) =>
+		value === undefined || value.trim() === '' || UNEXPANDED_PLACEHOLDER.test(value) ? undefined : path.resolve(value),
+	);
+
 /**
  * Every environment variable the server reads, validated once at startup
  * (see `ConfigModule.forRoot({ validate })` in app.module.ts).
@@ -59,26 +70,21 @@ export const EnvSchema = z
 				}
 			}),
 
-		/** Repo whose rule packs (e.g. `.semgrep/`) the analysis dashboard tools run. Alias: SEMGREP_REPO_ROOT. */
-		ANALYSIS_REPO_ROOT: z
-			.string()
-			.min(1)
-			.default(process.cwd())
-			.transform((value) => path.resolve(value)),
+		/**
+		 * Repo whose rule packs (e.g. `.semgrep/`) the analysis dashboard tools run. Alias: SEMGREP_REPO_ROOT. Unset, the
+		 * repo is the project the MCP client reports as its root, else the working directory (see WorkspaceRoot).
+		 */
+		ANALYSIS_REPO_ROOT: optionalRoot,
 
-		/** Repo with the asdd-harness-kit installed (`.harness/`), for the audit tools. Defaults to the working directory. */
-		HARNESS_ROOT: z
-			.string()
-			.min(1)
-			.default(process.cwd())
-			.transform((value) => path.resolve(value)),
+		/** Repo with the asdd-harness-kit installed (`.harness/`), for the audit tools. Unset, resolved like ANALYSIS_REPO_ROOT. */
+		HARNESS_ROOT: optionalRoot,
 		/** Semgrep binary for verify_architecture_rules. */
 		HARNESS_SEMGREP: z.string().min(1).default('semgrep'),
 		/** Timeout for the bound architecture Gate command, in seconds. */
 		HARNESS_GATE_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(120),
 
-		/** Git repo to review when a tool call omits `repoPath` (defaults to the working directory). */
-		PR_REVIEW_REPO: z.string().min(1).optional(),
+		/** Git repo to review when a tool call omits `repoPath`. Unset, resolved like ANALYSIS_REPO_ROOT. */
+		PR_REVIEW_REPO: optionalRoot,
 		/** Where PR review artifacts go when the repo has no `.pr-review/` dir. */
 		PR_REVIEW_ROOT: z.string().min(1).optional(),
 		/** XDG state dir, used for the PR review fallback root when PR_REVIEW_ROOT is unset. */

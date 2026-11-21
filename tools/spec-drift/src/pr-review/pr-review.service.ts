@@ -10,6 +10,7 @@ import { FileLock } from '../common/concurrency/file-lock.ts';
 import { KeyedMutex } from '../common/concurrency/keyed-mutex.ts';
 import { mcpRequestContext } from '../common/mcp/mcp-request-context.ts';
 import { evidenceLocations, locationProblems, prSecurityFindingProblem } from '../security/lens.ts';
+import { SecurityAuditService } from '../security/security.service.ts';
 import type { ArchitectureReviewView } from './architecture/architecture.types.ts';
 import { mergeArchitectureComments } from './architecture/architecture-import.ts';
 import { architectureReportSection, withArchitectureSection } from './architecture/architecture-report.ts';
@@ -61,6 +62,8 @@ import {
 import { findingsToSarif, SARIF_FILE } from './engine/sarif.ts';
 import { collectInboxItems, inboxItemToReviewFinding, resolveInboxKeys } from './findings/findings-inbox.ts';
 import { GithubService, repoSlugFromPrUrl } from './github/github.service.ts';
+import type { GuidedAuditView } from './guided-audit/guided-audit.types.ts';
+import { buildGuidedAuditHostPrompt, mapConfirmedGuidedFindings } from './guided-audit/guided-audit-map.ts';
 import { CALLS_FILE, costSummary, parseCalls, reviewCost } from './metrics/review-cost.ts';
 import { buildPublishMetrics, parseMetricsLog, summarizeMetrics } from './metrics/review-metrics.ts';
 import type {
@@ -121,9 +124,17 @@ const ARTIFACT_MIME_TYPES: Readonly<Record<string, string>> = {
 	'units.json': 'application/json',
 	'architecture.json': 'application/json',
 	'code-coverage.json': 'application/json',
+	'guided-audit.json': 'application/json',
 	'requirements.json': 'application/json',
 	[SARIF_FILE]: 'application/sarif+json',
 };
+
+const idleGuidedAudit = (): GuidedAuditView => ({
+	status: 'idle',
+	findingCount: 0,
+	findings: [],
+	message: 'No guided audit yet. Use Ask the agent to audit PR files.',
+});
 
 /** What the agent should do next, given the coverage state. */
 const nextStep = (
@@ -167,6 +178,7 @@ export class PrReviewService {
 		@Inject(ArchitectureScanService) private readonly architectureScan: ArchitectureScanService,
 		@Inject(CodeCoverageScanService) private readonly codeCoverageScan: CodeCoverageScanService,
 		@Inject(TicketService) private readonly tickets: TicketService,
+		@Inject(SecurityAuditService) private readonly securityAudit: SecurityAuditService,
 	) {}
 
 	// ── public API: one call per PR at a time (state on disk is read-modify-write) ──
@@ -210,6 +222,16 @@ export class PrReviewService {
 	/** Findings inbox → comments.md (architecture / security / ticket evidence). */
 	importFindings(input: ImportFindingsInput): Promise<PrReviewView> {
 		return this.exclusive(input, () => this.importFindingsUnlocked(input));
+	}
+
+	/** Start a PR-scoped guided security audit and return the host prompt (REQ-027). */
+	startGuidedAudit(input: PrInput): Promise<PrReviewView> {
+		return this.exclusive(input, () => this.startGuidedAuditUnlocked(input));
+	}
+
+	/** Refresh confirmed guided-audit findings from the security run (REQ-028). */
+	syncGuidedAudit(input: PrInput & { readonly runId?: string }): Promise<PrReviewView> {
+		return this.exclusive(input, () => this.syncGuidedAuditUnlocked(input));
 	}
 
 	/** Model path: never submits a visible review, only a pending draft the author must submit. */
@@ -328,10 +350,9 @@ export class PrReviewService {
 		const metadata = await this.github.fetchPrMetadata(pr, paths.repoRoot);
 		// Resolve the ticket first: a bad ticket argument fails before the slow steps.
 		const resolvedTicket = ticket ? await this.tickets.resolve(ticket, paths.repoRoot) : undefined;
-		const [diff, baseSha] = await Promise.all([
-			this.github.fetchPrDiff(pr, paths.repoRoot),
-			this.github.resolveBaseSha(metadata.baseRefName, paths.repoRoot),
-		]);
+		// Base first: the too-large fallback diffs against it locally (and one `git fetch` at a time).
+		const baseSha = await this.github.resolveBaseSha(metadata.baseRefName, paths.repoRoot);
+		const diff = await this.github.fetchPrDiff(pr, paths.repoRoot, { baseSha, headSha: metadata.headRefOid });
 		await this.artifacts.writeText(paths.diff, diff);
 
 		await call.reportProgress(1, 4, 'Splitting the diff into review groups');
@@ -706,6 +727,7 @@ export class PrReviewService {
 		const progress = await this.artifacts.loadProgress(paths);
 		const architecture = await this.artifacts.loadArchitecture(paths);
 		const codeCoverage = await this.artifacts.loadCodeCoverage(paths);
+		const guidedAudit = await this.refreshGuidedAudit(paths);
 		const requirements = await this.artifacts.loadRequirements(paths);
 		const risk = await this.artifacts.loadRisk(paths);
 		const base = {
@@ -718,6 +740,7 @@ export class PrReviewService {
 			units,
 			architecture,
 			codeCoverage,
+			guidedAudit,
 			requirements,
 			risk,
 			progress: progress ? toLiveProgress(progress) : undefined,
@@ -837,13 +860,18 @@ export class PrReviewService {
 	private async importFindingsUnlocked({ pr, repoPath, keys }: ImportFindingsInput): Promise<PrReviewView> {
 		const paths = await this.workspace.resolve({ pr, repoPath });
 		const state = await this.workspace.loadState(paths.state);
+		if (!state.current.head_sha) {
+			throw new BadRequestException('Call pr_review_start first before importing findings.');
+		}
 		const architecture = await this.artifacts.loadArchitecture(paths);
 		const requirements = await this.artifacts.loadRequirements(paths);
+		const guidedAudit = await this.refreshGuidedAudit(paths);
 		const inbox = collectInboxItems({
 			architectureFindings: architecture?.status === 'scanned' ? architecture.findings : [],
 			builtinSecurityFindings:
 				architecture?.builtinSecurity?.status === 'scanned' ? architecture.builtinSecurity.findings : [],
 			repoSecurityFindings: architecture?.repoSecurity?.status === 'scanned' ? architecture.repoSecurity.findings : [],
+			guidedAuditFindings: guidedAudit.findings,
 			requirements,
 		});
 		const { selected, unknown } = resolveInboxKeys(keys, inbox);
@@ -889,6 +917,7 @@ export class PrReviewService {
 				architecture,
 				requirements,
 				codeCoverage: await this.artifacts.loadCodeCoverage(paths),
+				guidedAudit,
 				units,
 				progress: progress ? toLiveProgress(progress) : undefined,
 				reportMarkdown,
@@ -910,6 +939,151 @@ export class PrReviewService {
 						'.',
 					'Open the Comments tab, edit if needed, then Publish.',
 				].join(' '),
+			},
+			units ? progress : undefined,
+			units,
+		);
+	}
+
+	private prChangedFiles(units: ReviewUnitsView | undefined): string[] {
+		const files = [...(units?.groups.flatMap((g) => [...g.files]) ?? []), ...(units?.skipped.map((s) => s.path) ?? [])];
+		return [...new Set(files)];
+	}
+
+	/** Load guided-audit.json and, when a runId is present, refresh confirmed findings from the security run. */
+	private async refreshGuidedAudit(paths: ResolvedPaths): Promise<GuidedAuditView> {
+		const saved = await this.artifacts.loadGuidedAudit(paths);
+		if (!saved?.runId) return saved ?? idleGuidedAudit();
+		try {
+			return await this.syncGuidedAuditFromRun(paths, saved.runId, saved.auditPrompt);
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			const errored: GuidedAuditView = {
+				...saved,
+				status: 'error',
+				message: `Could not refresh guided audit ${saved.runId}: ${message}`,
+			};
+			await this.artifacts.saveGuidedAudit(paths, errored);
+			return errored;
+		}
+	}
+
+	private async syncGuidedAuditFromRun(
+		paths: ResolvedPaths,
+		runId: string,
+		auditPrompt?: string,
+	): Promise<GuidedAuditView> {
+		const run = await this.securityAudit.getRun(runId);
+		const findings = mapConfirmedGuidedFindings(run.findings);
+		const reviewed = run.ledger.filter((e) => e.status === 'reviewed').length;
+		const total = run.ledger.length;
+		const complete = total > 0 && reviewed >= total;
+		const view: GuidedAuditView = {
+			status: findings.length || reviewed ? 'synced' : 'in_progress',
+			runId,
+			findingCount: findings.length,
+			findings,
+			coverage: { reviewed, total },
+			message: findings.length
+				? `${findings.length} confirmed finding(s) with file:line · checklists ${reviewed}/${total}.`
+				: complete
+					? `Checklists complete (${reviewed}/${total}). No confirmed findings with file:line.`
+					: `In progress · checklists ${reviewed}/${total}. Confirmed findings appear after submit + Sync.`,
+			auditPrompt,
+		};
+		await this.artifacts.saveGuidedAudit(paths, view);
+		return view;
+	}
+
+	private async startGuidedAuditUnlocked({ pr, repoPath }: PrInput): Promise<PrReviewView> {
+		const paths = await this.workspace.resolve({ pr, repoPath });
+		const state = await this.workspace.loadState(paths.state);
+		if (!state.current.head_sha) {
+			throw new BadRequestException('Call pr_review_start first before starting a guided security audit.');
+		}
+		const units = await this.artifacts.loadReviewUnits(paths);
+		const focus = this.prChangedFiles(units);
+		const { run, prompt: methodologyPrompt } = await this.securityAudit.start({
+			paths: focus.slice(0, 50),
+		});
+		const auditPrompt = buildGuidedAuditHostPrompt({
+			pr,
+			runId: run.id,
+			paths: focus,
+			methodologyPrompt,
+		});
+		const guidedAudit: GuidedAuditView = {
+			status: 'in_progress',
+			runId: run.id,
+			findingCount: 0,
+			findings: [],
+			coverage: { reviewed: 0, total: run.ledger.length },
+			message: `Started guided audit ${run.id} on ${focus.length || 'PR'} path(s). Ask the agent to work the checklists.`,
+			auditPrompt,
+		};
+		await this.artifacts.saveGuidedAudit(paths, guidedAudit);
+		const progress = await this.artifacts.loadProgress(paths);
+		return withNextGroup(
+			{
+				kind: 'pr-review',
+				pr,
+				phase: progress && !progress.complete ? 'reviewing' : 'draft',
+				paths,
+				state,
+				units,
+				architecture: await this.artifacts.loadArchitecture(paths),
+				codeCoverage: await this.artifacts.loadCodeCoverage(paths),
+				guidedAudit,
+				requirements: await this.artifacts.loadRequirements(paths),
+				progress: progress ? toLiveProgress(progress) : undefined,
+				reportMarkdown: await this.artifacts.readText(paths.report),
+				commentsMarkdown: await this.artifacts.readText(paths.comments),
+				diff: await this.artifacts.readText(paths.diff),
+				prompt: auditPrompt,
+				message: guidedAudit.message,
+			},
+			units ? progress : undefined,
+			units,
+		);
+	}
+
+	private async syncGuidedAuditUnlocked({
+		pr,
+		repoPath,
+		runId,
+	}: PrInput & { readonly runId?: string }): Promise<PrReviewView> {
+		const paths = await this.workspace.resolve({ pr, repoPath });
+		const state = await this.workspace.loadState(paths.state);
+		if (!state.current.head_sha) {
+			throw new BadRequestException('Call pr_review_start first before syncing a guided security audit.');
+		}
+		const saved = await this.artifacts.loadGuidedAudit(paths);
+		const id = runId ?? saved?.runId;
+		if (!id) {
+			throw new BadRequestException(
+				'No guided audit run linked to this PR. Call pr_review_start_guided_audit first (or pass runId).',
+			);
+		}
+		const guidedAudit = await this.syncGuidedAuditFromRun(paths, id, saved?.auditPrompt);
+		const units = await this.artifacts.loadReviewUnits(paths);
+		const progress = await this.artifacts.loadProgress(paths);
+		return withNextGroup(
+			{
+				kind: 'pr-review',
+				pr,
+				phase: progress && !progress.complete ? 'reviewing' : 'draft',
+				paths,
+				state,
+				units,
+				architecture: await this.artifacts.loadArchitecture(paths),
+				codeCoverage: await this.artifacts.loadCodeCoverage(paths),
+				guidedAudit,
+				requirements: await this.artifacts.loadRequirements(paths),
+				progress: progress ? toLiveProgress(progress) : undefined,
+				reportMarkdown: await this.artifacts.readText(paths.report),
+				commentsMarkdown: await this.artifacts.readText(paths.comments),
+				diff: await this.artifacts.readText(paths.diff),
+				message: guidedAudit.message,
 			},
 			units ? progress : undefined,
 			units,

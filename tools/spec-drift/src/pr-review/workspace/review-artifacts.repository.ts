@@ -9,6 +9,7 @@ import type { ArchitectureReviewView } from '../architecture/architecture.types.
 import type { CodeCoverageView } from '../code-coverage/code-coverage.types.ts';
 import type { ExistingComment } from '../context/review-context.ts';
 import type { ReviewProgress } from '../coverage/coverage.ts';
+import type { GuidedAuditView } from '../guided-audit/guided-audit.types.ts';
 import type { ResolvedPaths, ReviewUnitsView } from '../pr-review.types.ts';
 import type { RequirementsState } from '../requirements/requirements.types.ts';
 import type { PrRisk } from '../risk/file-risk.ts';
@@ -100,6 +101,14 @@ export class ReviewArtifactsRepository {
 
 	saveCodeCoverage(paths: ResolvedPaths, coverage: CodeCoverageView): Promise<void> {
 		return writeJson(paths.codeCoverage, coverage);
+	}
+
+	loadGuidedAudit(paths: ResolvedPaths): Promise<GuidedAuditView | undefined> {
+		return this.readJson<GuidedAuditView>(paths.guidedAudit);
+	}
+
+	saveGuidedAudit(paths: ResolvedPaths, audit: GuidedAuditView): Promise<void> {
+		return writeJson(paths.guidedAudit, audit);
 	}
 
 	/** Delete the whole PR workspace. */

@@ -36,7 +36,8 @@ where to paste it. Nothing to edit by hand:
 
 - **Cursor:** without `--project`, the roots are `${workspaceFolder}`, so one config follows the open folder.
 - **Claude Code:** it prints a `claude mcp add …` command; run it inside the project (`$PWD` is the root).
-- **Claude Desktop:** pass `--project /path/to/repo`, or leave it out and let the agent pass `repoPath`.
+- **Claude Desktop:** leave `--project` out: the server follows the project the client reports (MCP roots). Pass
+  `--project /path/to/repo` only to pin one repo.
 - **Fewer tools:** `--toolsets analysis,review` loads only those jobs ([Toolsets](#toolsets)).
 
 Restart the client (Cursor: Settings → MCP, toggle the server). The sections under [Connect a client](#connect-a-client)
@@ -188,7 +189,7 @@ removed them.
 
 ### Harness audit
 
-Over the repo at `HARNESS_ROOT` (default: the working directory). All read-only: these tools write nothing to the
+Over the repo at `HARNESS_ROOT` (default: the client's project, see [Which repo it works on](#connect-a-client)). All read-only: these tools write nothing to the
 repository. Each except `audit_query` opens the audit dashboard (`ui://spec-drift/audit-dashboard.html`) and returns
 the same JSON as text.
 
@@ -428,8 +429,13 @@ points tsx at this project's `tsconfig.json` (needed for Nest decorators) and ke
 protocol. `node bin/spec-drift.mjs config --client <client>` writes these blocks for you with the paths resolved; the
 examples below show their shape (`/path/to/spec-drift` is this directory).
 
-**Which repo it works on.** Clients start the server outside your project, so tell it which repo to use:
-`PR_REVIEW_REPO` (PR review) and `ANALYSIS_REPO_ROOT` (analysis), or let the agent pass `repoPath`.
+**Which repo it works on.** Clients start the server outside your project (often in `/`), and one server can serve
+every project a client opens. So before each stdio call the server asks the client for its roots (MCP `roots/list`)
+and works on the first `file://` root: the project the session is in, on this machine or any other. An explicit
+`ANALYSIS_REPO_ROOT` / `HARNESS_ROOT` / `PR_REVIEW_REPO` pins a repo instead (a call's `repoPath` still wins for
+the PR review). A value the client did not expand, such as a literal `${workspaceFolder}`, counts as unset. With no
+roots (a client without the capability, HTTP, or protocol 2026-07-28) the server falls back to its working
+directory and logs a warning once.
 
 ### Cursor
 
@@ -479,11 +485,14 @@ quit and reopen Claude:
 	"mcpServers": {
 		"spec-drift": {
 			"command": "/path/to/spec-drift/bin/mcp-stdio",
-			"env": { "PR_REVIEW_REPO": "/path/to/repo", "ANALYSIS_REPO_ROOT": "/path/to/repo" }
+			"env": { "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin" }
 		}
 	}
 }
 ```
+
+No repo variables: the server works on the project of the session that calls it (see above). Add
+`"ANALYSIS_REPO_ROOT"` / `"HARNESS_ROOT"` / `"PR_REVIEW_REPO"` only to pin one repo for every session.
 
 Logs: `~/Library/Logs/Claude/mcp-server-spec-drift.log`.
 
@@ -557,13 +566,14 @@ node bin/spec-drift.mjs record --repo /path/to/repo             # .semgrep/histo
 
 ## Configuration
 
-Validated at startup (`src/config/env.schema.ts`); an invalid value stops the server with a clear error.
+Validated at startup (`src/config/env.schema.ts`); an invalid value stops the server with a clear error. "Client's
+project" is the first `file://` root the MCP client reports, else the working directory.
 
 | Variable                       | Default                     | Purpose                                                                             |
 | ------------------------------ | --------------------------- | ----------------------------------------------------------------------------------- |
-| `PR_REVIEW_REPO`               | working directory           | Repo reviewed when a call omits `repoPath`                                          |
-| `ANALYSIS_REPO_ROOT`           | working directory           | Repo whose `.semgrep/` packs the analysis tools run (old name `SEMGREP_REPO_ROOT`)  |
-| `HARNESS_ROOT`                 | working directory           | Repo with `.harness/` that the audit tools check                                    |
+| `PR_REVIEW_REPO`               | client's project            | Repo reviewed when a call omits `repoPath`                                          |
+| `ANALYSIS_REPO_ROOT`           | client's project            | Repo whose `.semgrep/` packs the analysis tools run (old name `SEMGREP_REPO_ROOT`)  |
+| `HARNESS_ROOT`                 | client's project            | Repo with `.harness/` that the audit tools check                                    |
 | `HARNESS_SEMGREP`              | `semgrep`                   | Semgrep binary for `verify_architecture_rules`                                      |
 | `HARNESS_GATE_TIMEOUT_SECONDS` | `120`                       | Kill the bound architecture Gate command after this long                            |
 | `PR_REVIEW_ROOT`               | `$XDG_STATE_HOME/pr-review` | Review artifacts when the repo has no `.pr-review/`; metrics                        |

@@ -5,6 +5,8 @@ import { ConfigService } from '@nestjs/config';
 
 import type { Env } from '../config/env.schema.ts';
 import { whenToolset } from '../config/toolsets.ts';
+import { WorkspaceModule } from '../workspace/workspace.module.ts';
+import { WorkspaceRoot } from '../workspace/workspace-root.ts';
 import { SECURITY_OPTIONS, SecurityAuditService, type SecurityOptions } from './security.service.ts';
 import { SecurityTools } from './security.tools.ts';
 
@@ -13,12 +15,16 @@ import { SecurityTools } from './security.tools.ts';
  * `security` toolset. Run state lives under `$XDG_STATE_HOME/spec-drift/security/` (design ADR-002).
  */
 @Module({
+	imports: [WorkspaceModule],
 	providers: [
 		{
 			provide: SECURITY_OPTIONS,
-			inject: [ConfigService],
-			useFactory: (config: ConfigService<Env, true>): SecurityOptions => ({
-				repoRoot: config.get('ANALYSIS_REPO_ROOT', { infer: true }),
+			inject: [ConfigService, WorkspaceRoot],
+			useFactory: (config: ConfigService<Env, true>, workspace: WorkspaceRoot): SecurityOptions => ({
+				// A getter: the repo is the client's current project, which can change after startup.
+				get repoRoot() {
+					return workspace.analysisRoot();
+				},
 				stateRoot: path.join(config.get('XDG_STATE_HOME', { infer: true }), 'spec-drift', 'security'),
 			}),
 		},

@@ -4,6 +4,7 @@
  */
 import type { ArchitectureFinding } from '../architecture/architecture.types.ts';
 import type { FindingSeverity, ReviewFinding } from '../engine/types.ts';
+import type { GuidedAuditFinding } from '../guided-audit/guided-audit.types.ts';
 import { INLINE_WORD_LIMIT } from '../pr-review.types.ts';
 import type { CriterionResult, RequirementsState } from '../requirements/requirements.types.ts';
 
@@ -101,10 +102,26 @@ export const ticketPinItems = (requirements: RequirementsState | undefined): rea
 	return items;
 };
 
+const fromGuidedFinding = (f: GuidedAuditFinding): InboxItem => {
+	const severity = analyzerSeverityToFinding(f.severity);
+	return {
+		key: `sec-audit:${f.fingerprint}`,
+		source: 'security',
+		severity,
+		path: f.path,
+		startLine: f.startLine,
+		endLine: f.endLine || f.startLine,
+		title: f.checkId,
+		message: f.message,
+		defaultChecked: isHighSeverity(severity),
+	};
+};
+
 export const collectInboxItems = (options: {
 	readonly architectureFindings?: readonly ArchitectureFinding[];
 	readonly builtinSecurityFindings?: readonly ArchitectureFinding[];
 	readonly repoSecurityFindings?: readonly ArchitectureFinding[];
+	readonly guidedAuditFindings?: readonly GuidedAuditFinding[];
 	readonly requirements?: RequirementsState;
 }): readonly InboxItem[] => {
 	const items: InboxItem[] = [];
@@ -116,6 +133,9 @@ export const collectInboxItems = (options: {
 	}
 	for (const [i, f] of (options.repoSecurityFindings ?? []).entries()) {
 		items.push(fromArchFinding('security', 'sec-repo', i, f));
+	}
+	for (const f of options.guidedAuditFindings ?? []) {
+		items.push(fromGuidedFinding(f));
 	}
 	items.push(...ticketPinItems(options.requirements));
 	return items;
