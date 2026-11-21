@@ -1,0 +1,24 @@
+rules:
+  - id: arch.tools-no-cli-import
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      MCP servers under tools/ must not import the CLI (cli/) or a project's harness copy (.harness/scripts):
+      they run the GENERATED copies in their own src/harness/ (asdd kit vendor), so chat, CI and Verify-on-Stop
+      share one implementation without the server depending on the CLI tree (structure.md).
+    metadata:
+      category: architecture
+      adr: structure.md#root-layout
+    paths:
+      include: ["/tools/*/src/**"]
+      exclude: ["*.spec.ts", "/tools/*/src/harness/**"]
+    patterns:
+      - pattern-either:
+          - pattern: import "$MOD"
+          - pattern: import $X from "$MOD"
+          - pattern: import { $...X } from "$MOD"
+          - pattern: import * as $X from "$MOD"
+          - pattern: import("$MOD")
+      - metavariable-regex:
+          metavariable: $MOD
+          regex: ^(.*/)?(cli/(src|bin|modules|registry|steering|skills|agents)/|\.harness/scripts/)

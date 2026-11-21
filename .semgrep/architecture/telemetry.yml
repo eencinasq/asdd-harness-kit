@@ -1,0 +1,54 @@
+rules:
+  - id: arch.telemetry-guarded-import
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Producers load telemetry-lib.mjs with a guarded dynamic import (`await import('./telemetry-lib.mjs').catch(() => null)`)
+      so a missing or broken telemetry library never changes a gate, hook or sync result (telemetry-emitters ADR-001).
+      Only the telemetry modules themselves may import it statically.
+    metadata:
+      category: architecture
+      adr: telemetry-emitters/ADR-001
+    paths:
+      include: ["/cli/src/**"]
+      exclude:
+        - "*.test.mjs"
+        - "/cli/src/harness/telemetry-lib.mjs"
+        - "/cli/src/harness/telemetry-eval.mjs"
+        - "/cli/src/harness/emit-span.mjs"
+        - "/cli/src/harness/profile.mjs"
+        - "/cli/src/harness/harness-profile.mjs"
+        - "/cli/src/harness/ui-server-insights.mjs"
+        - "/cli/src/harness/validators/telemetry.mjs"
+    patterns:
+      - pattern-either:
+          - pattern: import "$MOD"
+          - pattern: import $X from "$MOD"
+          - pattern: import { $...X } from "$MOD"
+          - pattern: import * as $X from "$MOD"
+      - metavariable-regex:
+          metavariable: $MOD
+          regex: ^(.*/)?telemetry-lib\.mjs$
+
+  - id: arch.telemetry-lib-builtins-only
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      telemetry-lib.mjs imports only node: built-ins (telemetry-emitters REQ-004) and never sync-state.mjs
+      (import-cycle rule): every producer, including sync-state and the vendored MCP copies, loads it.
+    metadata:
+      category: architecture
+      adr: telemetry-emitters/REQ-004
+    paths:
+      include: ["/cli/src/harness/telemetry-lib.mjs"]
+    patterns:
+      - pattern-either:
+          - pattern: import "$MOD"
+          - pattern: import $X from "$MOD"
+          - pattern: import { $...X } from "$MOD"
+          - pattern: import * as $X from "$MOD"
+          - pattern: import $X, { $...Y } from "$MOD"
+          - pattern: import("$MOD")
+      - metavariable-regex:
+          metavariable: $MOD
+          regex: ^(?!node:)

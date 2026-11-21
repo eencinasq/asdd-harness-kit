@@ -10,7 +10,7 @@
 			<header class="header">
 				<div class="header-text">
 					<p class="eyebrow" id="engine-label">Static analysis</p>
-					<h1>Architecture &amp; standards</h1>
+					<h1 id="scan-title">Architecture &amp; standards</h1>
 					<p class="meta" id="scan-meta">Waiting for the scan…</p>
 				</div>
 				<div class="toolbar">
@@ -19,7 +19,9 @@
 						<option value="spec-drift">All rule packs</option>
 						<option value="architecture">Architecture only</option>
 						<option value="standards">Standards only</option>
+						<option value="security">Security only</option>
 					</select>
+					<button type="button" id="generate-rules" class="btn" title="Ask the agent to write rules for this rule set; existing rules keep running" hidden>Generate rules</button>
 					<button type="button" id="rescan" class="btn btn-primary">Re-scan</button>
 				</div>
 			</header>

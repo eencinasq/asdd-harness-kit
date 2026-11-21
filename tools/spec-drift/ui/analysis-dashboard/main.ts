@@ -35,6 +35,7 @@ const SEVERITIES = ['ERROR', 'WARNING', 'INFO'] as const;
 
 const appRoot = $('app');
 const engineLabel = $('engine-label');
+const scanTitle = $('scan-title');
 const scanMeta = $('scan-meta');
 const loading = $('loading');
 const failure = $('failure');
@@ -58,6 +59,7 @@ const panelAdrs = $('panel-adrs');
 const panelTrend = $('panel-trend');
 const modeSelect = $<HTMLSelectElement>('mode');
 const rescanBtn = $<HTMLButtonElement>('rescan');
+const generateRulesBtn = $<HTMLButtonElement>('generate-rules');
 const setStatus = createStatus($('status'));
 
 let current: ScanSummary | null = null;
@@ -426,6 +428,19 @@ const renderAdrs = (s: ScanSummary): number => {
 
 // ── Whole view ───────────────────────────────────────────────────────────────
 
+/** One dashboard serves analyze_architecture / _standards / _security / _spec_drift: the heading names the mode. */
+const MODE_TITLES: Record<string, string> = {
+	architecture: 'Architecture',
+	standards: 'Standards',
+	security: 'Security',
+};
+const showMode = (mode: string | undefined): void => {
+	const title = (mode && MODE_TITLES[mode]) || 'Architecture & standards';
+	scanTitle.textContent = title;
+	document.title = title;
+	modeSelect.value = !mode || mode === 'all' ? 'spec-drift' : mode;
+};
+
 const render = (s: ScanSummary): void => {
 	current = s;
 	visibleLimit = PAGE_SIZE;
@@ -438,7 +453,10 @@ const render = (s: ScanSummary): void => {
 		`<span>${escapeHtml(plural(s.packs.length, 'pack'))}</span>`,
 		`<span class="dot"></span><time datetime="${escapeHtml(s.scannedAt)}" title="${escapeHtml(new Date(s.scannedAt).toLocaleString())}">Scanned ${escapeHtml(formatWhen(s.scannedAt))}</time>`,
 	].join('');
-	modeSelect.value = s.mode === 'all' ? 'spec-drift' : s.mode;
+	showMode(s.mode);
+	generateRulesBtn.hidden = !s.generatePrompt;
+	const set = MODE_TITLES[s.mode];
+	generateRulesBtn.textContent = set ? `Generate ${set.toLowerCase()} rules` : 'Generate rules';
 
 	const empty = noRulesView(s);
 	noRules.hidden = !empty;
@@ -542,14 +560,15 @@ const sendToAgent = async (finding: Finding, button: HTMLButtonElement): Promise
 };
 
 /** The agent writes the rules in the host, at the user's request; the server writes nothing (spec-drift-empty ADR-002). */
-const askForRules = (): Promise<void> =>
-	withBusyButton(askRulesBtn, 'Sending…', async () => {
+const askForRules = (button: HTMLButtonElement = askRulesBtn): Promise<void> =>
+	withBusyButton(button, 'Sending…', async () => {
 		const prompt = current?.generatePrompt;
 		if (!prompt) return;
 		try {
 			const result = await app.sendMessage({ role: 'user', content: [{ type: 'text', text: prompt }] });
 			if (result.isError) setStatus('The host did not accept the message. Copy the prompt instead.', 'danger');
-			else setStatus('Asked the agent to write rules. Re-scan when they exist.', 'success');
+			else
+				setStatus('Asked the agent to write rules; it re-runs this scan with the new and existing rules.', 'success');
 		} catch (error) {
 			setStatus(errorMessage(error), 'danger');
 		}
@@ -582,6 +601,7 @@ panelDrift.addEventListener('click', (event) => {
 });
 
 askRulesBtn.addEventListener('click', () => void askForRules());
+generateRulesBtn.addEventListener('click', () => void askForRules(generateRulesBtn));
 copyRulesBtn.addEventListener('click', () => {
 	void navigator.clipboard
 		.writeText(current?.generatePrompt ?? '')
@@ -652,7 +672,7 @@ const app = new App({ name: 'Architecture & standards', version: '1.0.0' });
 
 app.ontoolinput = (params) => {
 	const mode = (params.arguments as { mode?: string } | undefined)?.mode;
-	if (mode) modeSelect.value = mode === 'all' ? 'spec-drift' : mode;
+	if (mode) showMode(mode);
 	setStatus('Scanning…', 'busy');
 };
 

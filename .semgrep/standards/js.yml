@@ -1,0 +1,113 @@
+rules:
+  - id: std.lib-no-process-exit
+    languages: [javascript]
+    severity: WARNING
+    message: >-
+      Libraries (*-lib.mjs), validators and the harness files vendored into the MCP servers (asdd kit vendor:
+      cli/src/kit/vendor.mjs VENDORED and their imports) return results; only a command's CLI block — the
+      `import.meta.url === file://argv[1]` guard or its main() — decides the exit code. In a server process.exit kills it.
+    metadata:
+      category: standards
+      adr: structure.md#root-layout
+    paths:
+      include:
+        - "/cli/src/harness/*-lib.mjs"
+        - "/cli/src/harness/validators/*.mjs"
+        - "/cli/src/harness/command-gate.mjs"
+        - "/cli/src/harness/env-loader.mjs"
+        - "/cli/src/harness/knowledge-query.mjs"
+        - "/cli/src/harness/knowledge-store.mjs"
+        - "/cli/src/harness/knowledge-store-sqlite.mjs"
+        - "/cli/src/harness/pipeline-metrics.mjs"
+        - "/cli/src/harness/sync-knowledge.mjs"
+        - "/cli/src/harness/sync-state.mjs"
+      exclude: ["*.test.mjs"]
+    patterns:
+      - pattern: process.exit(...)
+      - pattern-not-inside: |
+          if (import.meta.url === $MAIN) { ... }
+      - pattern-not-inside: |
+          async function main(...) { ... }
+      - pattern-not-inside: |
+          function main(...) { ... }
+
+  - id: std.validator-read-only
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Validators run inside `asdd check` and the Verify-on-Stop hook and must not mutate the project:
+      report through ctx.fail / ctx.warn; regeneration belongs to `asdd sync` / `asdd repair`.
+    metadata:
+      category: standards
+      adr: quality-gates.md#verify-on-stop
+    paths:
+      include: ["/cli/src/harness/validators/**"]
+      exclude: ["*.test.mjs"]
+    patterns:
+      - pattern-either:
+          - pattern: $FN(...)
+          - pattern: $OBJ.$FN(...)
+      - metavariable-regex:
+          metavariable: $FN
+          regex: ^(writeFileSync|appendFileSync|rmSync|unlinkSync|mkdirSync|renameSync|copyFileSync|cpSync|truncateSync)$
+
+  - id: std.node-protocol-imports
+    languages: [javascript]
+    severity: INFO
+    message: Import Node built-ins with the `node:` prefix (repo convention), e.g. `node:fs`, `node:path`.
+    metadata:
+      category: standards
+      adr: tech.md#languages--runtimes
+    paths:
+      include: ["/cli/**"]
+      exclude: ["*.test.mjs", "/cli/dist/**"]
+    patterns:
+      - pattern-either:
+          - pattern: import "$MOD"
+          - pattern: import $X from "$MOD"
+          - pattern: import { $...X } from "$MOD"
+          - pattern: import * as $X from "$MOD"
+          - pattern: import $X, { $...Y } from "$MOD"
+          - pattern: require("$MOD")
+      - metavariable-regex:
+          metavariable: $MOD
+          regex: ^(fs|path|child_process|crypto|os|url|util|events|stream|http|https|zlib|readline|assert|net|tty|worker_threads|module|process|buffer|timers)(/.*)?$
+
+  - id: std.no-shell-true
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      `shell: true` is reserved for the runners of a project's bound commands (audit-codebase, skill-eval-lib,
+      kit regen, the http-api adapter's contract command, and spec-drift's audit Gate command).
+      Elsewhere spawn the binary with an argv array.
+    metadata:
+      category: standards
+      adr: security-rules.md
+    paths:
+      include: ["/cli/**", "/tools/*/src/**"]
+      exclude:
+        - "*.test.mjs"
+        - "*.spec.ts"
+        - "/cli/dist/**"
+        - "/tools/*/src/harness/**"
+        - "/cli/src/harness/audit-codebase.mjs"
+        - "/cli/src/harness/skill-eval-lib.mjs"
+        - "/cli/src/kit/regen.mjs"
+        - "/cli/modules/http-api/adapters/openapi.mjs"
+        - "/tools/spec-drift/src/audit/audit.service.ts"
+    pattern-either:
+      - pattern: '$F(..., {..., shell: true, ...})'
+
+  - id: std.no-eval
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Never evaluate strings as code (eval / new Function).
+    metadata:
+      category: standards
+      adr: security-rules.md
+    paths:
+      include: ["/cli/**", "/tools/*/src/**", "/tools/*/ui/**"]
+      exclude: ["*.test.mjs", "*.spec.ts", "/cli/dist/**", "/tools/spec-drift/src/security/semgrep/**"]
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)

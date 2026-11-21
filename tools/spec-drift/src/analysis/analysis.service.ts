@@ -153,10 +153,16 @@ export class AnalysisService {
 		const adrCoverage = await this.adrCoverage(available).catch(() => null);
 		const packs = this.selectPacks(options, available);
 		if (!packs?.length)
-			return { summary: { ...this.noRules(options.mode, packs === null), adrCoverage }, findings: [] };
+			return {
+				summary: { ...this.noRules(options.mode, packs === null, available.length > 0), adrCoverage },
+				findings: [],
+			};
 		await context.reportProgress(0, 3, `Running ${engine.name} (${packs.map((p) => p.id).join(', ') || 'no packs'})`);
 
 		const rules = await this.analyzer.loadRules(packs);
+		// The repo's own rules (a built-in starter pack is not the repo's): "Generate rules" extends only those.
+		const ownPacks = packs.filter((p) => !path.relative(this.repoRoot, p.path).startsWith('..'));
+		const ownRules = ownPacks.length === packs.length ? rules : await this.analyzer.loadRules(ownPacks);
 		// The rules folder holds test fixtures that violate the rules on purpose: never scanned as code (REQ-003). Semgrep
 		// does not apply --exclude to explicit targets, so named paths are filtered too.
 		const paths = options.paths?.filter((p) => !isRulesPath(engine.rulesDir, p));
@@ -209,6 +215,15 @@ export class AnalysisService {
 				ruleTests,
 				baseline,
 				trend: this.analysisTrendForDashboard(),
+				// A repo with its own security set (`.semgrep/security/`) gets no "Generate security rules" offer.
+				generatePrompt:
+					options.mode === 'security' && existsSync(path.join(this.repoRoot, engine.rulesDir, 'security'))
+						? undefined
+						: this.rulesPrompt(
+								this.repoRoot,
+								options.mode,
+								ownRules.map((r) => r.id),
+							),
 			},
 		};
 	}
@@ -472,20 +487,27 @@ export class AnalysisService {
 		});
 	}
 
-	/** The prompt that asks the host agent to write a first rule set for a repo (spec-drift-empty REQ-002). */
-	rulesPrompt(repoRoot: string = this.repoRoot): string {
+	/**
+	 * The prompt that asks the host agent to write rules (spec-drift-empty REQ-002): a first rule set, or, with `existing`,
+	 * the rules the mode's set still misses. Its Done step re-runs the same analyze tool, so new and existing rules run.
+	 */
+	rulesPrompt(repoRoot: string = this.repoRoot, mode: ScanMode = 'all', existing: readonly string[] = []): string {
+		const set = mode === 'architecture' || mode === 'standards' || mode === 'security' ? mode : undefined;
+		const tool = set ? `analyze_${set}` : 'analyze_spec_drift';
 		return buildRulesPrompt({
 			repoRoot,
 			project: path.basename(repoRoot),
 			engine: this.analyzer.engine,
 			guide: this.analyzer.authoringGuide(),
 			harness: existsSync(path.join(repoRoot, '.harness')),
-			done: 'After creating the rules, call `analyze_spec_drift` to scan with them (and `verify_architecture_rules` when the repo uses the asdd harness).',
+			set,
+			existing,
+			done: `After creating the rules, call \`${tool}\` to scan with them (and \`verify_architecture_rules\` when the repo uses the asdd harness).`,
 		});
 	}
 
 	/** Nothing to analyze for this mode (spec-drift-empty REQ-001): not an error, and never a pass. */
-	private noRules(mode: ScanMode, missingSet: boolean): ScanSummary {
+	private noRules(mode: ScanMode, missingSet: boolean, hasRules: boolean): ScanSummary {
 		const { engine } = this.analyzer;
 		const what = missingSet ? `no \`${engine.rulesDir}/${mode}/\` rules` : `no rules under \`${engine.rulesDir}/\``;
 		return {
@@ -496,7 +518,8 @@ export class AnalysisService {
 			packs: [],
 			status: 'no-rules',
 			message: `${path.basename(this.repoRoot)} has ${what}: nothing was analyzed (this is not a pass).`,
-			generatePrompt: this.rulesPrompt(),
+			// A repo with no rules at all gets a first rule set for the whole rules dir; otherwise the mode's missing set.
+			generatePrompt: this.rulesPrompt(this.repoRoot, hasRules ? mode : 'all'),
 			exitCode: 0,
 			findingCount: 0,
 			bySeverity: {},

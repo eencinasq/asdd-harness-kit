@@ -1,0 +1,40 @@
+rules:
+  - id: arch.hook-input-to-shell
+    languages: [javascript]
+    severity: ERROR
+    mode: taint
+    message: >-
+      Untrusted input reaches a shell: hook payloads on stdin (command gate, Verify-on-Stop, observe) and PR metadata
+      (HARNESS_PR_BODY / HARNESS_PR_BRANCH) are written by agents and PR authors. Pass them as argv to spawnSync
+      without `shell: true`, never into execSync/exec or a shell string.
+    metadata:
+      category: security
+      adr: security-review/command-gate
+    paths:
+      include: ["/cli/src/**"]
+      exclude: ["*.test.mjs"]
+    pattern-sources:
+      - pattern: readFileSync(0, ...)
+      - pattern: $FS.readFileSync(0, ...)
+      # telemetry-observe reads the hook payload as a stream: for await (const chunk of process.stdin)
+      - pattern: process.stdin
+      - pattern: process.env.HARNESS_PR_BODY
+      - pattern: process.env.HARNESS_PR_BRANCH
+    # Stream readers collect chunks into an array before parsing.
+    pattern-propagators:
+      - pattern: $ARR.push($CHUNK)
+        from: $CHUNK
+        to: $ARR
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: execSync($CMD, ...)
+              - pattern: exec($CMD, ...)
+              - pattern: $CP.execSync($CMD, ...)
+              - pattern: $CP.exec($CMD, ...)
+          - focus-metavariable: $CMD
+      - patterns:
+          - pattern-either:
+              - pattern: 'spawnSync($CMD, ..., {..., shell: true, ...})'
+              - pattern: 'spawn($CMD, ..., {..., shell: true, ...})'
+          - focus-metavariable: $CMD

@@ -1,0 +1,128 @@
+# Copied from spec-drift's built-in starter pack (tools/spec-drift/src/security/semgrep/javascript.yml, security-review REQ-006 / ADR-003): a repo
+# .semgrep/security/ set replaces the built-in pack, so its rules live here to keep that coverage. Ids are unchanged.
+# Tuned for this repo: the built-in pack's own test fixtures are excluded, dom-xss reports only raw values (the UIs
+# build HTML through escapeHtml/renderMarkdown templates), and truncated SHA-1 ids are not a security use.
+rules:
+  - id: security.js.command-injection
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      A shell command is built from a dynamic value. If that value can come from a request, a file or another untrusted
+      source, it can run arbitrary commands. Pass an argument array to execFile/spawn instead of a shell string.
+    metadata:
+      category: security
+      cwe: 'CWE-78: OS Command Injection'
+      checklist: web-protocol-and-auth
+    paths:
+      exclude: ["/tools/spec-drift/src/security/semgrep/**", "*.test.mjs", "*.spec.ts"]
+    patterns:
+      - pattern-either:
+          - pattern: $F(`...${$X}...`, ...)
+          - pattern: $F($A + $B, ...)
+      - metavariable-regex:
+          metavariable: $F
+          regex: ^((child_process|cp|childProcess)\.)?(exec|execSync)$
+
+  - id: security.js.code-injection
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      Code is evaluated from a non-literal value (eval / new Function). Untrusted input reaching it executes as code.
+    metadata:
+      category: security
+      cwe: 'CWE-95: Eval Injection'
+      checklist: attack-classes
+    paths:
+      exclude: ["/tools/spec-drift/src/security/semgrep/**", "*.test.mjs", "*.spec.ts"]
+    patterns:
+      - pattern-either:
+          - pattern: eval($X)
+          - pattern: new Function(..., $X)
+      - pattern-not: eval("...")
+      - pattern-not: new Function(..., "...")
+
+  - id: security.js.dom-xss
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      HTML is written into the DOM from a raw value. If any part comes from the URL, storage, a tool result or an API,
+      it is a cross-site scripting sink. Build the HTML with escapeHtml()/renderMarkdown(), or use textContent.
+    metadata:
+      category: security
+      cwe: 'CWE-79: Cross-site Scripting'
+      checklist: client-side
+    paths:
+      exclude: ["/tools/spec-drift/src/security/semgrep/**", "*.test.mjs", "*.spec.ts"]
+    patterns:
+      - pattern-either:
+          - pattern: $EL.innerHTML = $X
+          - pattern: $EL.outerHTML = $X
+          - pattern: $EL.insertAdjacentHTML($POS, $X)
+          - pattern: document.write($X)
+      # The repo's convention: HTML comes from templates whose values go through escapeHtml(), or from helpers
+      # (renderMarkdown, emptyState, …) that escape. Report raw values only.
+      - metavariable-pattern:
+          metavariable: $X
+          patterns:
+            - pattern-not: "`...`"
+            - pattern-not: '"..."'
+            - pattern-not: $F(...)
+            - pattern-not: $O.$F(...)
+            - pattern-not: "$C ? $A : $B"
+      # Restoring an element's own earlier markup (withBusyButton) is not new HTML.
+      - pattern-not-inside: |
+          $SAVED = $EL.innerHTML;
+          ...
+  - id: security.js.sql-injection
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      A SQL query is built with string interpolation. Use parameters ($1, ?) so request data cannot change the query.
+    metadata:
+      category: security
+      cwe: 'CWE-89: SQL Injection'
+      checklist: data-isolation-and-lifecycle
+    paths:
+      exclude: ["/tools/spec-drift/src/security/semgrep/**", "*.test.mjs", "*.spec.ts"]
+    pattern-either:
+      - pattern: $DB.query(`...${$X}...`, ...)
+      - pattern: $DB.query("..." + $X, ...)
+      - pattern: $DB.raw(`...${$X}...`, ...)
+
+  - id: security.js.weak-hash
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      MD5 and SHA-1 are broken for security uses (passwords, signatures, integrity). Use SHA-256 or better, and a
+      password hash (argon2, scrypt, bcrypt) for passwords.
+    metadata:
+      category: security
+      cwe: 'CWE-327: Broken or Risky Cryptographic Algorithm'
+      checklist: attack-classes
+    paths:
+      exclude: ["/tools/spec-drift/src/security/semgrep/**", "*.test.mjs", "*.spec.ts"]
+    patterns:
+      - pattern-either:
+          - pattern: $C.createHash("md5")
+          - pattern: $C.createHash("sha1")
+          - pattern: createHash("md5")
+          - pattern: createHash("sha1")
+      # A short id derived from a hash (e.g. learning pattern ids LP-xxxxxxxx) is not a security use.
+      - pattern-not-inside: $H.update($D).digest($ENC).slice(...)
+
+  - id: security.js.tls-verification-disabled
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      TLS certificate verification is turned off, so any network attacker can impersonate the server. Remove
+      rejectUnauthorized: false (or NODE_TLS_REJECT_UNAUTHORIZED=0) and trust the right CA instead.
+    metadata:
+      category: security
+      cwe: 'CWE-295: Improper Certificate Validation'
+      checklist: protocols-rpc-and-messaging
+    paths:
+      exclude: ["/tools/spec-drift/src/security/semgrep/**", "*.test.mjs", "*.spec.ts"]
+    pattern-either:
+      - pattern: |
+          {..., rejectUnauthorized: false, ...}
+      - pattern: process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"

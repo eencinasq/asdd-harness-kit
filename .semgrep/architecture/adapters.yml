@@ -1,0 +1,20 @@
+rules:
+  - id: arch.adapter-read-only
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Module adapters implement the spec-drift adapter contract, which is stateless and read-only (platform-contract D-7):
+      no filesystem writes, removals or renames. Return findings; let the caller persist them.
+    metadata:
+      category: architecture
+      adr: platform-contract/D-7
+    paths:
+      include: ["/cli/modules/*/adapters/**"]
+      exclude: ["*.test.mjs"]
+    patterns:
+      - pattern-either:
+          - pattern: $FN(...)
+          - pattern: $OBJ.$FN(...)
+      - metavariable-regex:
+          metavariable: $FN
+          regex: ^(writeFileSync|writeFile|appendFileSync|appendFile|rmSync|rm|rmdirSync|unlinkSync|unlink|mkdirSync|mkdir|renameSync|rename|copyFileSync|copyFile|cpSync|truncateSync|createWriteStream)$

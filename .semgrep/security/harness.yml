@@ -1,0 +1,87 @@
+rules:
+  - id: sec.local-server-loopback-only
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Local harness servers (asdd ui) bind 127.0.0.1 only: a listen() without a host, or on 0.0.0.0 / ::, exposes the
+      project's harness state and the gate-decide endpoint to the network. Pass a loopback host explicitly.
+    metadata:
+      category: security
+      adr: security-review/ui-insights-host-guard
+    paths:
+      include: ["/cli/src/**"]
+      exclude: ["*.test.mjs"]
+    patterns:
+      - pattern-either:
+          - pattern: $SERVER.listen($PORT)
+          - pattern: $SERVER.listen($PORT, () => {...})
+          - pattern: $SERVER.listen($PORT, function () {...})
+          - patterns:
+              - pattern: $SERVER.listen($PORT, $HOST, ...)
+              - metavariable-regex:
+                  metavariable: $HOST
+                  regex: ^['"`](0\.0\.0\.0|::|\[::\]|)['"`]$
+      - metavariable-regex:
+          metavariable: $SERVER
+          regex: ^(server|srv|app|httpServer|\w*[Ss]erver)$
+
+  - id: sec.ui-path-traversal
+    languages: [javascript]
+    severity: ERROR
+    mode: taint
+    message: >-
+      A request path reaches a file read without safeJoin(): `..` segments or an absolute path can read any file the
+      user can (source, .env.local, SSH keys). Resolve it with safeJoin(root, path) and reject a null result.
+    metadata:
+      category: security
+      adr: security-review/asdd-ui
+    paths:
+      include: ["/cli/src/**"]
+      exclude: ["*.test.mjs"]
+    # Request-derived values only: `import.meta.url` (the module's own location) is not a request.
+    pattern-sources:
+      - patterns:
+          - pattern: $REQ.url
+          - metavariable-regex:
+              metavariable: $REQ
+              regex: ^(req|request|incoming|message)$
+      - patterns:
+          - pattern-either:
+              - pattern: $URL.pathname
+              - pattern: $URL.searchParams.get(...)
+          - metavariable-regex:
+              metavariable: $URL
+              regex: ^(url|u|reqUrl|requestUrl|parsed|parsedUrl)$
+    pattern-sanitizers:
+      - pattern: safeJoin(...)
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: readFileSync($P, ...)
+              - pattern: $FS.readFileSync($P, ...)
+              - pattern: createReadStream($P, ...)
+              - pattern: $FS.createReadStream($P, ...)
+              - pattern: readFile($P, ...)
+              - pattern: $FS.readFile($P, ...)
+              - pattern: serveFile($RES, $P)
+          - focus-metavariable: $P
+
+  - id: sec.span-no-command-text
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Telemetry spans carry a command label from the closed set, never the command text, stdin or a prompt: hook payloads
+      can hold secrets and the span stream is kept on disk (telemetry-emitters REQ-007, AMB-009). Use command_label.
+    metadata:
+      category: security
+      adr: telemetry-emitters/REQ-007
+    paths:
+      include: ["/cli/src/harness/**"]
+      exclude: ["*.test.mjs"]
+    patterns:
+      - pattern-either:
+          - pattern: "{..., attributes: {..., $KEY: $V, ...}, ...}"
+      - metavariable-regex:
+          metavariable: $KEY
+          regex: ^['"]?(command|cmd|command_text|stdin|prompt|payload)['"]?$
+      - focus-metavariable: $KEY

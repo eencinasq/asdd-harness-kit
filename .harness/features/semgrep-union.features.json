@@ -71,6 +71,54 @@
         "tools/spec-drift/test/output-schemas.e2e-spec.ts"
       ],
       "evidence_hash": "c9c442669c93d9e5a4262e7ed4d2e6582bc00de1f997141b3dfe37144efcc703"
+    },
+    {
+      "id": "TASK-004",
+      "title": "Analysis dashboard: mode title and Generate rules button",
+      "user_visible_behavior": "The analysis dashboard heading names the mode (Security / Architecture / Standards), the rule-set selector offers Security, and a header button asks the agent to write rules for the mode's set: with existing rules it extends them (they keep running) and re-runs the same analyze tool. In security mode the button is hidden when the repo already has its own .semgrep/security/ set.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "cd tools/spec-drift && pnpm typecheck && pnpm lint && pnpm build && node --import tsx --test 'src/**/*.spec.ts' 'ui/**/*.spec.ts' && node --import tsx --test --test-concurrency=1 test/*.e2e-spec.ts"
+      ],
+      "evidence": "typecheck, lint, build OK; unit 292 pass (incl. rules-prompt.spec.ts); e2e 145 pass (node v22.23.3); re-verified after hiding Generate security rules when .semgrep/security/ exists",
+      "scope_paths": [
+        "tools/spec-drift/src/analysis/analysis.service.ts",
+        "tools/spec-drift/src/analysis/domain/rules-prompt.ts",
+        "tools/spec-drift/src/analysis/domain/rules-prompt.spec.ts",
+        "tools/spec-drift/ui/analysis-dashboard.html",
+        "tools/spec-drift/ui/analysis-dashboard/main.ts"
+      ],
+      "evidence_hash": "fafaef3945c4ade55b756ea88f3fa5a0a29fad9073b26e96ce489d1af57ddd77"
+    },
+    {
+      "id": "TASK-005",
+      "title": "Project-accurate .semgrep rule sets",
+      "user_visible_behavior": "The repo's .semgrep/ architecture, standards and security sets scan this codebase with 0 false positives: built-in pack fixtures excluded, dom-xss limited to raw values, truncated-hash ids allowed, Python rules dropped; hook stdin streams, vendored-file exits and TypeScript servers are covered.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-006"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "semgrep --test .semgrep",
+        "semgrep scan --config .semgrep --exclude .semgrep --json . (0 findings, 0 errors)",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "evidence": "semgrep --test: 23/23 pass; full-repo scan 79 -> 0 findings, 0 parse errors; harness scan selected+generated: pass, 0 findings",
+      "scope_paths": [
+        ".semgrep"
+      ],
+      "evidence_hash": "fe594d870fdd62d8381f921d63b3a4d075bd43b5208ca67e4269b4441c5977a0"
     }
   ]
 }

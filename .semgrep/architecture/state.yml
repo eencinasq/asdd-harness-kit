@@ -1,0 +1,21 @@
+rules:
+  - id: arch.no-global-manifest
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      .harness/state/manifest.json is retired (RV1-AR-1): the slice index is the generated
+      .harness/state/registry.json, plus .harness/state/slices/<id>/ when it is absent (fresh clone).
+      Only the migration code (repair.mjs, install/phases.mjs) may name the old file.
+    metadata:
+      category: architecture
+      adr: platform-contract/RV1-AR-1
+    paths:
+      include: ["/cli/src/**", "/tools/*/src/**"]
+      exclude:
+        - "*.test.mjs"
+        - "*.spec.ts"
+        - "/cli/src/harness/repair.mjs"
+        - "/cli/src/install/phases.mjs"
+        - "/tools/*/src/harness/**"
+    pattern-regex: |-
+      ['"`]\.harness/state/manifest\.json['"`]
