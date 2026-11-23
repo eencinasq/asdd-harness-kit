@@ -1,0 +1,40 @@
+{
+  "id": "equivalent-is-marked",
+  "task": "mutation-testing REQ-012: a survivor that changes no observable behavior",
+  "expect": "the skill marks it with the tool disable comment and a reason, cited in evidence",
+  "probes": [
+    {
+      "id": "p1",
+      "run": "{asdd} mutate --help",
+      "cwd": "repo"
+    }
+  ],
+  "assertions": [
+    {
+      "type": "exit_code",
+      "probe": "p1",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "p1",
+      "pattern": "--feature <TASK-NNN>"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "equivalent — the mutant changes no behavior a caller can observe"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "Stryker disable next-line <mutator>: <reason>"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "# pragma: no mutate"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "cite its\n  `file:line`"
+    }
+  ]
+}

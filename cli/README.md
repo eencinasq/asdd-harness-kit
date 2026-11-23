@@ -57,6 +57,7 @@ Roadmap P0–P4 shipped these session-facing commands (see [`docs/ASDD-ROADMAP.m
 | `asdd init-flow` | 15-minute brownfield: install if needed, one lite slice, check |
 | `asdd converge [--slice] [--strict] [--json]` | Cheap REQ / test-mention / evidence sensor (also in `asdd check`) |
 | `asdd converge-eval` | Score `cli/eval/converge-ears/` fixtures |
+| `asdd mutate --slice <id> [--feature <TASK-NNN>] [--json]` | Mutation testing on a slice's feature files through the `Mutation command` binding: `pass`, `survivors`, `unconfigured` (not a pass), `no-files`, or `error`. Opt-in (not in `asdd check`); the `mutation-testing` skill acts on survivors and QA weighs the result (`QG-SPEC-11`). |
 | `asdd slice init <id> [--hotfix\|--full]` | Presets: hotfix / lite (default) / full |
 | `asdd slice amend <id>` | Reopen DONE with `amendments/<stamp>.md` |
 | `asdd slice escalate <id> --reasons "…"` | Lite/hotfix → escalated |

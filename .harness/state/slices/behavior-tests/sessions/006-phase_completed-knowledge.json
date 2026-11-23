@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-behavior-tests-006",
+  "timestamp": "2026-11-23T22:07:09.409Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "behavior-tests",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Lesson: the rule now gates its own siblings — mutation-testing's tests were rewritten twice to drop vacuous assertions.",
+  "concerns": []
+}

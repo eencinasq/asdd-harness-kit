@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "attack-the-premise",
+  "source_tasks": ".harness/specs/attack-the-premise/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Attack-the-premise guidance in both agents and session-loop",
+      "user_visible_behavior": "After a second same-signature failure the implementation and lite agents write a premise checkpoint before a third attempt.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/validators/premise.test.mjs",
+        "node cli/bin/asdd.mjs kit guidance",
+        "node cli/bin/asdd.mjs kit agents-lint",
+        "node cli/bin/asdd.mjs kit self --check"
+      ],
+      "evidence": "GREEN 2026-11-23: premise.test.mjs REQ-001 pins the rule in both agents and the session-loop clause (8/8 pass); kit guidance PASS (always-loaded 36619 bytes, below the 36627 REQ-013 cap); agents-lint PASS 15 agents; kit self --check OK.",
+      "scope_paths": [
+        "cli/agents/asdd-implementation-agent.md",
+        "cli/agents/asdd-lite-agent.md",
+        "cli/steering/session-loop.md"
+      ],
+      "evidence_hash": "b9aa66c20f0fdbf82ba1c230bd30cc06a7827b6f1ea7d44a4211f6a55495a1b9"
+    },
+    {
+      "id": "TASK-002",
+      "title": "PREMISE-01 sensor and session fields",
+      "user_visible_behavior": "asdd check WARNs PREMISE-01 on an in_progress slice with two same-signature failures on one feature and no premise checkpoint; session files accept failure_signature, premise, removes.",
+      "status": "passing",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/validators/premise.test.mjs",
+        "npm test",
+        "node cli/bin/asdd.mjs check"
+      ],
+      "evidence": "GREEN 2026-11-23: premise.test.mjs 8/8 (fires on 2 same-signature failures, 3rd attempt without premise; silent with premise checkpoint, closed slice, different signature/feature; schema accepts/rejects failure_signature/premise/removes); npm test 511/511 + install/lifecycle/full-pipeline OK; asdd check PASS. Re-verified 2026-11-23 after integrating mutation-testing, attack-the-premise and behavior-tests: npm test 525 pass + full-pipeline OK; semgrep --test 23/23 and scan 0 findings; kit self/generate-runtime-steering --check OK; premise 8, skill-eval-lib+agents-lint 29, versions+registry 40, telemetry-lib+profile 86 pass.",
+      "scope_paths": [
+        "cli/src/harness/validators/premise.mjs",
+        "cli/src/harness/validators/premise.test.mjs",
+        "cli/src/harness/validators/manifest.mjs",
+        "cli/src/harness/check-invariants.mjs",
+        "package.json"
+      ],
+      "evidence_hash": "2b17fcca3d0e936c6e830f76e3df24447325f9b6bd4d8d11b07600f56cb59590"
+    }
+  ]
+}

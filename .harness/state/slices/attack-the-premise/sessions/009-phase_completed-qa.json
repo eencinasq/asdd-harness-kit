@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-attack-the-premise-009",
+  "timestamp": "2026-11-23T22:07:09.276Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "attack-the-premise",
+  "event_type": "phase_completed",
+  "phase": "qa",
+  "evidence": "QA-light: REQ-001..005 pinned by validators/premise.test.mjs (8 pass: WARN on 2 same-signature failures, silent with premise checkpoint, closed slices and other signatures silent, session field validation, rule text in both agents + session-loop); npm test 525 pass; asdd check PASS.",
+  "concerns": []
+}

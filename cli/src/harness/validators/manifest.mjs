@@ -43,6 +43,11 @@ function validateSessionFile(data, rel, fail) {
   if (data.feature_id !== undefined && (typeof data.feature_id !== 'string' || !data.feature_id.trim())) {
     fail(`${rel}: feature_id must be a non-empty string`);
   }
+  for (const key of ['failure_signature', 'premise', 'removes']) {
+    if (data[key] !== undefined && (typeof data[key] !== 'string' || !data[key].trim())) {
+      fail(`${rel}: ${key} must be a non-empty string`);
+    }
+  }
   if (data.evidence !== undefined && typeof data.evidence !== 'string') {
     fail(`${rel}: evidence must be a string`);
   }

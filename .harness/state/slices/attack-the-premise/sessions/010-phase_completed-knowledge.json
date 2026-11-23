@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-attack-the-premise-010",
+  "timestamp": "2026-11-23T22:07:09.322Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "attack-the-premise",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "Closed after E1 escalation. Lesson: an implementing agent skipped feature_started sessions to keep E1 quiet; the orchestrator backfilled them and escalated — never shape session evidence to avoid a sensor.",
+  "concerns": []
+}

@@ -78,7 +78,7 @@ rules:
     severity: WARNING
     message: >-
       `shell: true` is reserved for the runners of a project's bound commands (audit-codebase, skill-eval-lib,
-      kit regen, the http-api adapter's contract command, and spec-drift's audit Gate command).
+      kit regen, asdd mutate, the http-api adapter's contract command, and spec-drift's audit Gate command).
       Elsewhere spawn the binary with an argv array.
     metadata:
       category: standards
@@ -92,6 +92,7 @@ rules:
         - "/tools/*/src/harness/**"
         - "/cli/src/harness/audit-codebase.mjs"
         - "/cli/src/harness/skill-eval-lib.mjs"
+        - "/cli/src/harness/mutate.mjs"
         - "/cli/src/kit/regen.mjs"
         - "/cli/modules/http-api/adapters/openapi.mjs"
         - "/tools/spec-drift/src/audit/audit.service.ts"

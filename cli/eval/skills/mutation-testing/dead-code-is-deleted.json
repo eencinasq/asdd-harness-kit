@@ -1,0 +1,36 @@
+{
+  "id": "dead-code-is-deleted",
+  "task": "mutation-testing REQ-011: a survivor in code no requirement or caller needs",
+  "expect": "the skill deletes the dead code, and classifies equivalent before dead before missing test (AMB-009)",
+  "probes": [
+    {
+      "id": "p1",
+      "run": "{asdd} mutate --help",
+      "cwd": "repo"
+    }
+  ],
+  "assertions": [
+    {
+      "type": "exit_code",
+      "probe": "p1",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "p1",
+      "pattern": "--feature <TASK-NNN>"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "dead code — no requirement or caller needs"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "delete the dead code"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "classify it in this order: (c)"
+    }
+  ]
+}

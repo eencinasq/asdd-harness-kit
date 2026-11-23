@@ -1073,6 +1073,27 @@
           }
         }
       },
+      "mutate": {
+        "script": "mutate.mjs",
+        "help": "mutation testing on a slice's feature files: pass, survivors, unconfigured, no-files, or error",
+        "description": "Runs the `Mutation command` binding (quality-gates.project.md) once, with {files} replaced by the selected\nfeatures' non-test source files; the bound command exits non-zero when a mutant survives. Exit 0 pass, unconfigured\n(not a pass), no-files; 1 survivors; 2 usage error or error (cannot start, or over 30 min).",
+        "flags": {
+          "slice": {
+            "type": "string",
+            "value": "id",
+            "help": "the slice (required)"
+          },
+          "feature": {
+            "type": "string",
+            "value": "TASK-NNN",
+            "help": "only this feature, whatever its status (default: in_progress and passing features)"
+          },
+          "json": {
+            "type": "boolean",
+            "help": "print JSON instead of text"
+          }
+        }
+      },
       "waves": {
         "script": "waves.mjs",
         "help": "parallelism hints from feature owners/deps/scopes",

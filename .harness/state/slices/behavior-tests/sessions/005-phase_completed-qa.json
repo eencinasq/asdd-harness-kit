@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-behavior-tests-005",
+  "timestamp": "2026-11-23T22:07:09.366Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "behavior-tests",
+  "event_type": "phase_completed",
+  "phase": "qa",
+  "evidence": "QA-light: REQ-001..004 pinned: skill-eval test-driven-development 1/1 (behavior-not-implementation), skill-eval-lib.test fails all 5 assertions on a body without the rule, agents-lint.test asserts the QA rule; npm test 525 pass.",
+  "concerns": []
+}

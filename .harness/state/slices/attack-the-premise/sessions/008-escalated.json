@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-attack-the-premise-008",
+  "timestamp": "2026-11-23T22:06:58.920Z",
+  "agent": "eencinas",
+  "human": "eencinas",
+  "slice_id": "attack-the-premise",
+  "event_type": "checkpoint",
+  "mode": "escalated",
+  "escalation_reasons": [
+    "E1-scope-spread"
+  ],
+  "evidence": "validator + root package.json test list; no domain terms beyond session fields, no dissent",
+  "concerns": []
+}

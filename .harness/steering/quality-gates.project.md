@@ -56,6 +56,7 @@ Read by `drift-lib.mjs`, `asdd audit`, and the `spec-drift` MCP server. A slot l
 - Drift base branch: `main` (default: `origin/HEAD`, then `main`, then `master`)
 - Audit commands: `deps=npm audit --omit=dev` (one `name=command` per backtick; unfilled → `unconfigured`)
 - Contract command: `…` (not applicable: the kit exposes no HTTP API and does not enable the `http-api` module)
+- Mutation command: `…` (unconfigured: no mutation tool as a kit devDependency; `asdd mutate` reports unconfigured)
 - OpenAPI spec: `…` (not applicable: no HTTP API)
 
 ## Related project paths

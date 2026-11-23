@@ -40,7 +40,9 @@ the test configuration of the repository unless the task is about it.
 
 - **Action:** write one test for the next behavior (for a bug, the test that shows it). In a slice, put the `REQ-NNN`
   it verifies in the test name: `it('REQ-004 rejects a deposit above the limit', …)` — `DRIFT-04` looks for that
-  token, and spec compliance counts only requirements a test names.
+  token, and spec compliance counts only requirements a test names. Test behavior, not implementation: call the code
+  through the public entry point its user or caller uses and assert the result that user would see. Do not mock the
+  unit's own collaborators, assert internal calls or private state, or snapshot internals.
 - **Target:** the test file, by the repository's naming convention.
 - **Assertion:** the focused-test command fails, and fails for the expected reason (not a syntax or import error).
 
@@ -73,7 +75,9 @@ the test configuration of the repository unless the task is about it.
    `grep -rl 'REQ-<nnn>' <test dirs>` finds each of `req_ids`.
 3. A bug fix: the reproduction test is in the diff (`git diff --name-only` lists a test file).
 4. No test is skipped or disabled by the change: `git diff -U0` adds no `.skip`, `xit`, `@Disabled`, or `pytest.mark.skip`.
-5. Negative check: `git diff --name-only` lists only the feature's `scope_paths`, test files, and the features file.
+5. Negative check: no new test would still pass if the implementation returned nothing or an empty value (vacuous),
+   and none asserts only internal calls or private state; rewrite such a test against the observable result.
+6. Negative check: `git diff --name-only` lists only the feature's `scope_paths`, test files, and the features file.
 
 ## Escalation Gate
 

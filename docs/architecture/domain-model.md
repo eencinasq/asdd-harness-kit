@@ -104,3 +104,18 @@ The boundary rule: anything in Distribution that describes the kit itself never 
 - **Turn** for a Session: a turn is one agent invocation; a Session is one append-only state file. Turn spans are deferred.
 - **Not loaded**: use the Activation state values.
 - **DOM-003** without a qualifier: v2.md DOM-003 (telemetry never forges session events) is not steering `DOM-03` of `domain-layer.md` (explicit exceptions). Cite it as "v2.md DOM-003" or TEL-3.
+
+## Mutation testing (added by `mutation-testing`, Domain phase)
+
+> Bounded context: **Process (shipped)**. Source: `.harness/specs/mutation-testing/requirements.md` 1.1.0.
+
+| Term | Definition | Key attributes | Relationships |
+|---|---|---|---|
+| **Mutation command** | A `quality-gates.project.md` Binding slot (optional) that runs the project's mutation tool on `{files}` and exits non-zero when a mutant survives | value (first backtick), `{files}` placeholder | read by `asdd mutate`; unfilled → `unconfigured` |
+| **Mutant** | A copy of the code with one small change made by the mutation tool | file, line, mutator | produced by the Mutation command for a Feature's files |
+| **Surviving mutant** | A Mutant the tests do not fail on — a defect the tests would not notice | file, line, mutator | leaves the Requirements of its Feature uncovered (`QG-SPEC-11`) until killed |
+| **Equivalent mutant** | A Mutant that changes no behavior a caller can observe; marked in the source with the tool's disable comment and a reason, never tested | file:line, reason | cited in the Feature's `evidence`; listed by QA in the coverage report |
+
+Value object — **Mutation result**: `pass | survivors | unconfigured | no-files | error` (`asdd mutate`; exit 0, 1, 0, 0, 2).
+Invariants: an `unconfigured` result is never a pass and never a block (INFO); an Equivalent mutant without a reason
+does not count as killed.

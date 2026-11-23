@@ -15,6 +15,8 @@
 | asdd-p4 | escalated | knowledge | DONE | 0 |
 | asdd-roadmap | lite | knowledge | DONE | 0 |
 | asdd-ui | escalated | knowledge | DONE | 0 |
+| attack-the-premise | escalated | knowledge | DONE | 0 |
+| behavior-tests | lite | knowledge | DONE | 0 |
 | ci-npm-ci | escalated | knowledge | DONE | 0 |
 | claude-hook-cwd | escalated | knowledge | DONE | 0 |
 | cli-args | escalated | knowledge | DONE | 0 |
@@ -41,6 +43,7 @@
 | metrics-data-quality | hotfix | knowledge | DONE | 0 |
 | microkernel-polish | lite | qa | in_progress | 1 |
 | modules-top-level | escalated | qa | ABANDONED | 0 |
+| mutation-testing | full | knowledge | DONE | 0 |
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
 | pipeline-e2e | lite | knowledge | DONE | 0 |
 | platform-contract | full | knowledge | DONE | 0 |

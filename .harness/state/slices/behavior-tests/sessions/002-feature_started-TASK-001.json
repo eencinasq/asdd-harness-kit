@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-behavior-tests-002",
+  "timestamp": "2026-11-23T21:50:00.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "behavior-tests",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "mode": "lite",
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/skills/test-driven-development/SKILL.md",
+    "cli/agents/asdd-qa-agent.md",
+    "cli/eval/skills/test-driven-development/behavior-not-implementation.json",
+    "cli/src/harness/skill-eval-lib.test.mjs",
+    "cli/test/agents-lint.test.mjs"
+  ],
+  "evidence": "RED: skill-eval --baseline HEAD scores behavior-not-implementation as failing on the HEAD skill body (5 skill_contains assertions missing).",
+  "concerns": []
+}

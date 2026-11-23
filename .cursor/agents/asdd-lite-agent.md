@@ -125,7 +125,8 @@ Execute tasks one at a time:
 2. **GREEN** — implement minimal code to pass.
 3. **REFACTOR** — clean up, keep tests green.
 4. **Verify** — run the verification command; record evidence.
-5. **Update** — flip the feature to `passing` with `evidence` in `.features.json`, then run `asdd sync` (it records `evidence_hash`; no commit needed). Every feature carries `scope_paths` from `spec.md`.
+5. **Attack the premise** — record each failed attempt as a session with `feature_id` and `failure_signature`. After the second failure with the same signature, write a `checkpoint` session with `feature_id`, `premise` (the shared premise, one sentence), and `removes` (what you will remove) before a third attempt; a third failure → `blocked` + `docs/agent-failure-log.md` and `phase_blocked`.
+6. **Update** — flip the feature to `passing` with `evidence` in `.features.json`, then run `asdd sync` (it records `evidence_hash`; no commit needed). Every feature carries `scope_paths` from `spec.md`.
 
 After all tasks pass:
 

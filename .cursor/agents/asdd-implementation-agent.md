@@ -45,7 +45,7 @@ You guarantee that no feature reaches `passing` without its verification output 
 
 | Decide Autonomously | Always Escalate |
 | :--- | :--- |
-| Wave order, which ready task to dispatch next, serializing tasks whose scopes overlap, re-spawning a sub-agent after drift | A task that needs a design change, a failing test outside the task's scope, a repeated failure (`blocked` + failure log) |
+| Wave order, which ready task to dispatch next, serializing tasks whose scopes overlap, re-spawning a sub-agent after drift | A task that needs a design change, a failing test outside the task's scope, a third same-signature failure after the premise checkpoint (`blocked` + failure log) |
 
 ## Pre-Flight Reading & Ground Truth
 
@@ -132,7 +132,8 @@ Per `.harness/steering/session-loop.md` and root `AGENTS.md`:
 - Work from eligible `TASK-*` entries in `.harness/features/<slice_id>.features.json`; dependencies must be passing.
 - Default to one active feature. Parallelize independent tasks only when each has a unique `owner`, and non-empty, non-overlapping `scope_paths`. Set ownership/status before dispatch. Workers modify only owned task paths and return verification evidence; the coordinator audits the combined diff and alone updates the feature tracker and writes sessions. Prefer isolated worktrees when available.
 - After verification passes, the coordinator sets `passing`, writes `evidence` (command + result), and runs `asdd sync`, which records `evidence_hash` (no commit needed; developers commit when they finish). Never mark `passing` without running verification. Before asking for `passing`, run `asdd drift` and fix every `fail`.
-- On repeated failure, set `blocked` and append `docs/agent-failure-log.md` with a `**Signature:**` line; reuse the existing signature when the same failure is already logged (QG-DEB-05).
+- **Attack the premise.** Record each failed attempt as a session with `feature_id` and `failure_signature` (the failure-log signature). When two fixes fail the same gate with the same signature, write that shared premise in one sentence before a third attempt: a `checkpoint` session with `feature_id`, `premise`, and `removes` (the assignment or assumption you will remove). Do not start another fix until you have done that (`asdd check` WARNs `PREMISE-01`).
+- On a third failure with the same signature, set `blocked` and append `docs/agent-failure-log.md` with a `**Signature:**` line; reuse the existing signature when the same failure is already logged (QG-DEB-05).
 - Write a session file and run `asdd sync --slice <slice_id>` (it regenerates the manifest, registry, and `PROGRESS.md`).
 
 **Waves and DAG execution:** Treat each task as a DAG node; dispatch only nodes whose `depends_on` features are `passing`. Same-wave tasks may run concurrently only when their declared file scopes are disjoint and ownership is explicit. Project tasks, dependencies, and scopes into the feature tracker before dispatch. Keep a barrier before dependent tasks. If paths overlap, scope is missing, or a conflict appears, serialize those tasks. The coordinator alone writes the feature tracker and sessions.

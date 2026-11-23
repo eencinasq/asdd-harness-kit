@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-mutation-testing-023",
+  "timestamp": "2026-11-23T22:15:28.122Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "mutation-testing",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "TASK-001 reopened for QA run 2 UNCOV-004..006",
+  "concerns": [],
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/src/harness/mutate.test.mjs"
+  ]
+}

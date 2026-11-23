@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-behavior-tests-004",
+  "timestamp": "2026-11-23T22:05:30.000Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "behavior-tests",
+  "event_type": "phase_completed",
+  "phase": "implementation",
+  "mode": "lite",
+  "evidence": "TASK-001 passing: TDD RED drives the public entry point and asserts the observable result; Verification Gate rejects vacuous and implementation-only tests; QA agent reports them as UNCOV-NNN; fixture behavior-not-implementation pins REQ-001/002/004, agents-lint test pins REQ-003. npm test 505/505; skill-eval 1/1 (baseline HEAD improved).",
+  "scope_paths": [
+    "cli/skills/test-driven-development/SKILL.md",
+    "cli/agents/asdd-qa-agent.md",
+    "cli/eval/skills/test-driven-development/behavior-not-implementation.json",
+    "cli/src/harness/skill-eval-lib.test.mjs",
+    "cli/test/agents-lint.test.mjs"
+  ],
+  "concerns": []
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-mutation-testing-013",
+  "timestamp": "2026-11-23T21:58:46.721Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "mutation-testing",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "TASK-002 skill + eval fixtures",
+  "concerns": [],
+  "feature_id": "TASK-002",
+  "scope_paths": [
+    "cli/skills/mutation-testing/SKILL.md",
+    "cli/eval/skills/mutation-testing",
+    "cli/test/mutation-testing.test.mjs"
+  ]
+}

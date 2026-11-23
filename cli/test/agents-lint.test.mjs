@@ -211,3 +211,13 @@ test('agents-spec REQ-006: in a project the sensor lints .agents/agents; --only 
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('behavior-tests REQ-003 the QA agent reports a vacuous or implementation-only test as UNCOV, not coverage', () => {
+  const text = readFileSync(join(KIT_ROOT, 'cli/agents/asdd-qa-agent.md'), 'utf8');
+  const rule = text.split('\n').find((l) => l.includes('vacuous test'));
+  assert.ok(rule, 'QA agent names the vacuous-test rule');
+  assert.match(rule, /^- \*\*Do not count\*\*/);
+  assert.match(rule, /returned nothing or an empty value/);
+  assert.match(rule, /only internal calls or private state/);
+  assert.match(rule, /`UNCOV-NNN` with that reason/);
+});

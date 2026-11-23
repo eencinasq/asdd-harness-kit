@@ -161,7 +161,7 @@
         {
           "at": "2026-11-21T19:17:13.730Z",
           "slice_id": "agents-use-scripts",
-          "last_at": "2026-11-21T19:31:59.932Z"
+          "last_at": "2026-11-21T19:55:15.924Z"
         }
       ],
       "examples": [
@@ -341,7 +341,7 @@
         {
           "at": "2026-11-21T19:17:13.730Z",
           "slice_id": null,
-          "last_at": "2026-11-21T19:31:59.932Z"
+          "last_at": "2026-11-21T19:55:15.924Z"
         }
       ],
       "examples": [
@@ -368,7 +368,7 @@
         {
           "at": "2026-11-21T19:17:13.730Z",
           "slice_id": null,
-          "last_at": "2026-11-21T19:31:59.932Z"
+          "last_at": "2026-11-21T19:55:15.924Z"
         }
       ],
       "examples": [
@@ -456,6 +456,22 @@
           "removed": 0
         }
       }
+    },
+    "13@2": {
+      "at": "2026-11-21T19:47:58.141Z",
+      "pr": 13,
+      "revision": 2,
+      "mode": "submitted",
+      "event": "COMMENT",
+      "suggested_event": "APPROVE",
+      "comments": {
+        "drafted": 0,
+        "kept": 0,
+        "edited": 0,
+        "removed": 0,
+        "added": 0
+      },
+      "by_rule": {}
     }
   }
 }

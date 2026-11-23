@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-mutation-testing-031",
+  "timestamp": "2026-11-23T23:42:26.682Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "mutation-testing",
+  "event_type": "phase_completed",
+  "phase": "knowledge",
+  "evidence": "lessons.md: QA needed 4 runs (8→3→1 surviving hand mutants, one real bug); hand mutants as stand-in when unbound; CON-001 shape feeds SP-013; always-loaded budget met by folding, not raising",
+  "concerns": []
+}

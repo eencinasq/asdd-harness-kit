@@ -1,0 +1,27 @@
+{
+  "id": "behavior-not-implementation",
+  "task": "Write a RED test for a requirement that pins behavior, not implementation (behavior-tests REQ-001, REQ-002)",
+  "expect": "The skill tells RED to drive the public entry point and assert the observable result, and its Verification Gate rejects vacuous tests and tests that assert only internal calls",
+  "assertions": [
+    {
+      "type": "skill_contains",
+      "pattern": "Test behavior, not implementation"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "public entry point its user or caller uses"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "assert the result that user would see"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "would still pass if the implementation returned nothing or an empty value (vacuous)"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "asserts only internal calls or private state"
+    }
+  ]
+}

@@ -270,3 +270,14 @@ test('skill-eval-portable REQ-005 unmet requires are skipped with a reason, neve
   const onlySkipped = makeProject({ fixtures: { 'n.json': { ...PASS_FIXTURE, requires: ['command:definitely-not-a-real-tool-xyz'] } } });
   assert.equal(runSkillEval(onlySkipped).ok, false, 'a run where nothing executed is not a pass');
 });
+
+test('behavior-tests REQ-001 REQ-002 REQ-004 the shipped TDD fixture passes on the kit skill and fails when the behavior rule is gone', () => {
+  const kitRoot = join(import.meta.dirname, '../../..');
+  const kit = runSkillEval({ root: kitRoot, skill: 'test-driven-development' });
+  assert.equal(kit.ok, true, formatSkillEvalReport(kit));
+  const fixture = JSON.parse(readFileSync(join(kitRoot, 'cli/eval/skills/test-driven-development/behavior-not-implementation.json'), 'utf8'));
+  const stripped = makeProject({ skillBody: '# TDD\n\nWrite a failing test first; RED must fail for the expected reason.\n', fixtures: { 'b.json': fixture } });
+  const suite = runSkillEval(stripped);
+  assert.equal(suite.ok, false);
+  assert.equal(suite.skills[0].results[0].failures.length, fixture.assertions.length);
+});

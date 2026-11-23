@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-attack-the-premise-004",
+  "timestamp": "2026-11-23T22:06:50.775Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "attack-the-premise",
+  "event_type": "feature_started",
+  "phase": "implementation",
+  "evidence": "TASK-001 guidance (backfilled)",
+  "concerns": [],
+  "feature_id": "TASK-001",
+  "scope_paths": [
+    "cli/agents/asdd-implementation-agent.md",
+    "cli/agents/asdd-lite-agent.md",
+    "cli/steering/session-loop.md"
+  ]
+}
