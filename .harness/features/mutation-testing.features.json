@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "mutation-testing",
+  "source_tasks": ".harness/specs/mutation-testing/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "asdd mutate sensor",
+      "user_visible_behavior": "asdd mutate --slice <id> [--feature] [--json] runs the bound Mutation command on the feature files: pass / survivors / unconfigured / no-files / error with exits 0/1/0/0/2.",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-005",
+        "REQ-006",
+        "REQ-007",
+        "REQ-008",
+        "REQ-009"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node --test cli/src/harness/mutate.test.mjs",
+        "bash cli/test/full-pipeline.sh",
+        "npm test"
+      ],
+      "scope_paths": [
+        "cli/src/harness/mutate.mjs",
+        "cli/src/harness/mutate.test.mjs",
+        "cli/registry/contribution-points.json",
+        "cli/test/full-pipeline.sh",
+        ".semgrep/standards/js.yml",
+        "cli/README.md"
+      ],
+      "evidence": "node --test cli/src/harness/mutate.test.mjs: 8 pass (REQ-001..008); 7 hand mutants of mutate.mjs all killed (flip pass, keep tests, all statuses, no unconfigured, survivors exit 0, keep docs, no quoting); full-pipeline.sh OK (49 commands, mutate smoke run REQ-009); semgrep standards 0 findings on mutate.mjs, semgrep --test 5/5.",
+      "evidence_hash": "4de8e1833a2d18caec19ca5b3602f81216c6d6e44432b81f69d1f9d408f9fa96"
+    },
+    {
+      "id": "TASK-002",
+      "title": "Skill mutation-testing and eval fixtures",
+      "user_visible_behavior": "Agents get a skill that classifies each surviving mutant (equivalent, dead code, missing test) and loops until asdd mutate reports pass.",
+      "status": "not_started",
+      "priority": 2,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-010",
+        "REQ-011",
+        "REQ-012",
+        "REQ-013",
+        "REQ-016"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node cli/bin/asdd.mjs kit skills-lint --only mutation-testing",
+        "node cli/bin/asdd.mjs skill-eval --skill mutation-testing",
+        "node --test cli/test/mutation-testing.test.mjs"
+      ],
+      "scope_paths": [
+        "cli/skills/mutation-testing/SKILL.md",
+        "cli/eval/skills/mutation-testing",
+        "cli/test/mutation-testing.test.mjs"
+      ]
+    },
+    {
+      "id": "TASK-003",
+      "title": "QG-SPEC-11, QA rule, Mutation command binding",
+      "user_visible_behavior": "QA counts a MUST requirement as covered only when asdd mutate passes (or unconfigured as INFO) and lists inline disables; projects get an optional Mutation command slot.",
+      "status": "not_started",
+      "priority": 3,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-014",
+        "REQ-015"
+      ],
+      "depends_on": [
+        "TASK-001"
+      ],
+      "verification": [
+        "node --test cli/test/mutation-testing.test.mjs",
+        "node cli/bin/asdd.mjs kit agents-lint",
+        "npm test"
+      ],
+      "scope_paths": [
+        "cli/steering/quality-gates.exec.md",
+        "cli/agents/asdd-qa-agent.md",
+        "cli/templates/bindings/quality-gates.project.md"
+      ]
+    }
+  ]
+}

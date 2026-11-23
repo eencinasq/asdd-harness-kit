@@ -163,7 +163,7 @@ const bin = `${root}/cli/bin/asdd.mjs`;
 // A real run per harness command: read-only or idempotent arguments, with the exits each may legitimately give.
 const RUNS = {
   check: [[], [0]], drift: [['--json'], [0]], 'check-config': [[], [0, 1]], 'skills-index': [[], [0]],
-  status: [[], [0]], converge: [['--json'], [0]], 'converge-eval': [['--json'], [0, 1]], waves: [['--json'], [0]],
+  status: [[], [0]], converge: [['--json'], [0]], mutate: [['--slice', 'invoice-export', '--json'], [0]], 'converge-eval': [['--json'], [0, 1]], waves: [['--json'], [0]],
   portfolio: [['--json'], [0]], 'tracker-sync': [['--json'], [0]], 'spec-source': [['--json'], [0, 1]],
   sync: [[], [0]], repair: [['--dry-run', '--json'], [0]], 'knowledge sync': [[], [0]],
   'knowledge status': [[], [0]], 'knowledge search': [['invoice'], [0]], 'knowledge trace': [['REQ-001'], [0, 1]],

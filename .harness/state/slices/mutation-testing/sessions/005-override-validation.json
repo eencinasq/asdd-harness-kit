@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-mutation-testing-005",
+  "timestamp": "2026-11-23T21:51:22.101Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "mutation-testing",
+  "event_type": "override",
+  "phase": "validation",
+  "evidence": "TL decisions on the validation BLOCK: CON-002 → new QG-SPEC-11 in quality-gates.exec.md; CON-003 → optional slot, unconfigured = INFO.",
+  "concerns": []
+}

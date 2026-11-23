@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "author": "eencinas",
+  "week": "2026-W48",
+  "signatures": {
+    "sensor:DRIFT-01:asdd-harness-kit-3.14.0.tgz": {
+      "source": "sensor",
+      "episodes": [
+        {
+          "at": "2026-11-23T21:16:05.843Z",
+          "slice_id": null
+        }
+      ],
+      "examples": [
+        "DRIFT-01 asdd-harness-kit-3.14.0.tgz changed but is not mapped by microkernel-polish, platform-spec, pr-review-dashboard-ux, semgrep-union, steering-conformance, telemetry-phase2 (intent/design/tasks/spec or scope_paths)"
+      ]
+    },
+    "warn:QG-DEC-09": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-23T21:16:05.843Z",
+          "slice_id": "agents-use-scripts",
+          "last_at": "2026-11-23T21:47:39.313Z"
+        }
+      ],
+      "examples": [
+        "QG-DEC-09 slice \"agents-use-scripts\": qa completed (sess-agents-use-scripts-009) with no implementation gate recorded"
+      ]
+    },
+    "warn:DRIFT-04": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-23T21:16:05.843Z",
+          "slice_id": null,
+          "last_at": "2026-11-23T21:47:39.313Z"
+        }
+      ],
+      "examples": [
+        "DRIFT-04 no test file mentions REQ-026"
+      ]
+    },
+    "warn:CONVERGE-02": {
+      "source": "warn",
+      "episodes": [
+        {
+          "at": "2026-11-23T21:16:05.843Z",
+          "slice_id": null,
+          "last_at": "2026-11-23T21:47:39.313Z"
+        }
+      ],
+      "examples": [
+        "CONVERGE-02 feature TASK-014 lists REQ-026 but no test file mentions it"
+      ]
+    }
+  }
+}

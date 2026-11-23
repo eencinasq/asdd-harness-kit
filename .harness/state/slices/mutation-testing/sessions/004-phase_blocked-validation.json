@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-mutation-testing-004",
+  "timestamp": "2026-11-23T21:49:17.138Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "mutation-testing",
+  "event_type": "phase_blocked",
+  "phase": "validation",
+  "evidence": "spec-validation-report.md: BLOCK (CON-001 BLOCKING; CON-002..004, AMB-001/002 HIGH; 8 MEDIUM, 2 LOW). Back to spec.",
+  "concerns": [
+    "CON-001 equivalents vs exit-code contract",
+    "CON-002/003 steering decisions"
+  ]
+}

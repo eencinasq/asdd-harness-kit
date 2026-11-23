@@ -41,6 +41,7 @@
 | metrics-data-quality | hotfix | knowledge | DONE | 0 |
 | microkernel-polish | lite | qa | in_progress | 1 |
 | modules-top-level | escalated | qa | ABANDONED | 0 |
+| mutation-testing | full | implementation | in_progress | 0 |
 | npm-pack-json | hotfix | knowledge | DONE | 0 |
 | pipeline-e2e | lite | knowledge | DONE | 0 |
 | platform-contract | full | knowledge | DONE | 0 |
