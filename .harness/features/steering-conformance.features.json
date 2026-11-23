@@ -73,8 +73,8 @@
         "TASK-001",
         "TASK-002"
       ],
-      "evidence": "re-verified 2026-11-21 (domain-layer.project.md: Dependency layers + .semgrep rules): generate-runtime-steering --check PASS, kit self --check OK; proposal Status grep not runnable on this machine",
-      "evidence_hash": "7fd025dc8e18ff4dd46bd34e93a6a5b57a108a32aeb1a684d9603c10156513c4"
+      "evidence": "re-verified 2026-11-21 (domain-layer.project.md: Dependency layers + .semgrep rules): generate-runtime-steering --check PASS, kit self --check OK; proposal Status grep not runnable on this machine Re-verified 2026-11-23 after attack-the-premise (PREMISE-01 validator wired into check-invariants, session-loop clause, package.json test list): generate-runtime-steering --check PASS, kit self --check OK, telemetry-lib+command-gate+validators/telemetry+profile tests pass, asdd profile --json exit 0, v2.md status: converged, npm test 511/511 + full-pipeline OK.",
+      "evidence_hash": "d6b186f96ef2cd32048ce356362a11293bebd4e05dc0d044013de40a85079841"
     }
   ]
 }

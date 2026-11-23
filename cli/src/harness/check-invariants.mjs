@@ -18,6 +18,7 @@
  * - Phase chain QG-DEC-09 (WARN; validators/phase-chain.mjs)
  * - Learning loop QG-LEARN-* (validators/learning.mjs)
  * - Intent grounding evidence INTENT-EVIDENCE (validators/intent-evidence.mjs; drift.intent_evidence warn|fail)
+ * - Attack the premise PREMISE-01 (WARN; validators/premise.mjs)
  * - Telemetry TEL-W1…W3 (WARN only, never a learning signal; validators/telemetry.mjs, ADR-006)
  * - Orphan slice detection
  * - Registry consistency
@@ -36,6 +37,7 @@ import validateSpecDrift from './validators/spec-drift.mjs';
 import validateLearning from './validators/learning.mjs';
 import validateStale from './validators/stale.mjs';
 import validateIntentEvidence from './validators/intent-evidence.mjs';
+import validatePremise from './validators/premise.mjs';
 import { parseCommand, runMain } from './commands.mjs';
 
 export async function run(argv = process.argv.slice(2)) {
@@ -91,6 +93,7 @@ export async function run(argv = process.argv.slice(2)) {
   validateLearning(ctx);
   validateStale(ctx);
   validateIntentEvidence(ctx);
+  validatePremise(ctx);
 
   // P1.3: converge FAILs for passing features (short path before session close)
   try {
