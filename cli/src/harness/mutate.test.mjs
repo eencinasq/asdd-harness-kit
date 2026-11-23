@@ -6,7 +6,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { runMutation } from './mutate.mjs';
+import { TIMEOUT_MS, runMutation } from './mutate.mjs';
 
 const BIN = join(import.meta.dirname, '../../bin/asdd.mjs');
 
@@ -63,6 +63,63 @@ test('REQ-001 the bound command runs once on the quoted feature files: exit 0 �
   });
 });
 
+const cliIn = (root, ...args) => spawnSync(process.execPath, [BIN, 'mutate', '--slice', 's1', ...args], { cwd: root, encoding: 'utf8' });
+
+test('REQ-001 REQ-004 REQ-006 exit codes through the CLI: pass 0, no-files 0, error 2', () => {
+  withProject('`true {files}`', (root) => {
+    const r = cliIn(root, '--json');
+    assert.equal(r.status, 0, r.stderr);
+    assert.equal(JSON.parse(r.stdout).status, 'pass');
+    writeFileSync(join(root, '.harness/features/s1.features.json'), JSON.stringify({ features: [{ id: 'TASK-001', status: 'passing', scope_paths: ['src/README.md'] }] }));
+    const none = cliIn(root, '--json');
+    assert.equal(none.status, 0, none.stderr);
+    assert.equal(JSON.parse(none.stdout).status, 'no-files');
+  });
+  withProject("`sh -c 'kill -9 $$' {files}`", (root) => {
+    const r = cliIn(root, '--json');
+    assert.equal(r.status, 2, r.stderr);
+    assert.equal(JSON.parse(r.stdout).status, 'error');
+  });
+});
+
+test('REQ-006 the time limit is 30 minutes', () => {
+  assert.equal(TIMEOUT_MS, 30 * 60 * 1000);
+});
+
+test('REQ-001 selection: in_progress features count, harness paths never reach the tool, every {files} is filled', () => {
+  withProject('`mut {files} -- {files}`', (root) => {
+    const w = (rel, text) => {
+      mkdirSync(join(root, rel, '..'), { recursive: true });
+      writeFileSync(join(root, rel), text);
+    };
+    w('src/c.mjs', 'export const c = 3;\n');
+    w('.harness/hooks/x.mjs', 'export const x = 1;\n');
+    writeFileSync(join(root, '.harness/features/s1.features.json'), JSON.stringify({ features: [
+      { id: 'TASK-001', status: 'passing', scope_paths: ['src/a.mjs', '.harness/hooks/x.mjs', '.harness'] },
+      { id: 'TASK-003', status: 'in_progress', scope_paths: ['src/c.mjs'] },
+    ] }));
+    const f = fake(0);
+    const r = runMutation({ root, sliceId: 's1', exec: f.exec });
+    assert.deepEqual(r.features, ['TASK-001', 'TASK-003']);
+    // No file under .harness/ — named directly or through a directory scope — is handed to the tool.
+    assert.deepEqual(r.files, ['src/a.mjs', 'src/c.mjs']);
+    assert.deepEqual(f.calls, ["mut 'src/a.mjs' 'src/c.mjs' -- 'src/a.mjs' 'src/c.mjs'"]);
+  });
+});
+
+test('REQ-001 selection: files the kit installer manages are never handed to the tool, outside .harness/ too', () => {
+  withProject('`mut {files}`', (root) => {
+    mkdirSync(join(root, 'scripts'), { recursive: true });
+    writeFileSync(join(root, 'scripts/kit.mjs'), 'export const kit = 1;\n');
+    writeFileSync(join(root, 'scripts/own.mjs'), 'export const own = 1;\n');
+    mkdirSync(join(root, '.harness/config'), { recursive: true });
+    writeFileSync(join(root, '.harness/config/installed-versions.json'), JSON.stringify({ managed_files: ['scripts/kit.mjs'] }));
+    writeFileSync(join(root, '.harness/features/s1.features.json'), JSON.stringify({ features: [{ id: 'TASK-001', status: 'passing', scope_paths: ['scripts'] }] }));
+    const r = runMutation({ root, sliceId: 's1', exec: fake(0).exec });
+    assert.deepEqual(r.files, ['scripts/own.mjs']);
+  });
+});
+
 test('REQ-002 --feature selects one feature whatever its status', () => {
   withProject('`mut {files}`', (root) => {
     const f = fake(0);
@@ -100,6 +157,7 @@ test('REQ-005 missing --slice, an unknown slice, or an unknown feature exits 2 w
       const r = cli(...args);
       assert.equal(r.status, 2, `${args.join(' ')}: ${r.stderr}`);
       assert.match(r.stderr, /missing --slice|unknown slice: nope|unknown feature: TASK-009/);
+      assert.match(r.stderr, /usage: asdd mutate --slice <id> \[options\]/, `${args.join(' ')}: no usage`);
     }
   });
 });
@@ -135,6 +193,14 @@ test('REQ-008 --json: every field, null when nothing ran, same exit codes', () =
     assert.equal(out.status, 'survivors');
     assert.equal(out.exit_code, 3);
     assert.match(out.output_tail, /survived/);
+    // The command after {files} is filled in, as it ran.
+    assert.equal(out.command, `sh -c "echo survived; exit 3" 'src/a.mjs' 'src/it'\\''s.mjs'`);
+  });
+  // output_tail: stdout, a newline, then stderr, keeping the last 4000 characters.
+  withProject(`\`node -e "process.stdout.write('x'.repeat(5000)); process.stderr.write('END-MARK'); process.exit(1)" {files}\``, (root) => {
+    const out = JSON.parse(spawnSync(process.execPath, [BIN, 'mutate', '--slice', 's1', '--json'], { cwd: root, encoding: 'utf8' }).stdout);
+    assert.equal(out.output_tail.length, 4000);
+    assert.ok(out.output_tail.endsWith('x\nEND-MARK'), out.output_tail.slice(-20));
   });
   withProject('`…`', (root) => {
     const out = JSON.parse(spawnSync(process.execPath, [BIN, 'mutate', '--slice', 's1', '--json'], { cwd: root, encoding: 'utf8' }).stdout);

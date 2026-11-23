@@ -16,6 +16,9 @@ import { scopeFiles } from './scope-lib.mjs';
 import { normalizeScopePath } from './validators/paths.mjs';
 import { UsageError, parseCommand, runMain } from './commands.mjs';
 
+/** A wrong command line: the problem, then the command's usage (REQ-005). */
+const usageError = (problem) => new UsageError(`${problem}\nusage: asdd mutate --slice <id> [options] (asdd mutate --help)`);
+
 const BINDING = '.harness/steering/quality-gates.project.md';
 export const TIMEOUT_MS = 30 * 60 * 1000;
 export const OUTPUT_TAIL = 4000;
@@ -33,11 +36,11 @@ const shQuote = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
  */
 export function mutationTargets(root, sliceId, featureId) {
   const slice = listSlices(root).find((s) => s.slice_id === sliceId);
-  if (!slice) throw new UsageError(`unknown slice: ${sliceId}`);
+  if (!slice) throw usageError(`unknown slice: ${sliceId}`);
   const selected = featureId
     ? slice.features.filter((f) => f.id === featureId)
     : slice.features.filter((f) => f.status === 'in_progress' || f.status === 'passing');
-  if (featureId && !selected.length) throw new UsageError(`unknown feature: ${featureId} in slice ${sliceId}`);
+  if (featureId && !selected.length) throw usageError(`unknown feature: ${featureId} in slice ${sliceId}`);
   const scopes = selected.flatMap((f) => (Array.isArray(f.scope_paths) ? f.scope_paths : []).map(normalizeScopePath).filter(Boolean));
   const isTest = testFileMatcher(root);
   const managed = harnessManaged(root);
@@ -90,7 +93,7 @@ export function formatMutation(result) {
 
 export async function run(argv = process.argv.slice(2)) {
   const { values } = parseCommand('mutate', argv);
-  if (!values.slice) throw new UsageError('missing --slice <id>\nusage: asdd mutate --slice <id> [options] (asdd mutate --help)');
+  if (!values.slice) throw usageError('missing --slice <id>');
   const result = runMutation({ root: process.cwd(), sliceId: values.slice, featureId: values.feature });
   process.stdout.write(values.json ? `${JSON.stringify(result, null, 2)}\n` : formatMutation(result));
   return EXIT[result.status];

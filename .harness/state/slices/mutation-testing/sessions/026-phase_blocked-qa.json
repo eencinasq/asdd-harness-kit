@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-mutation-testing-026",
+  "timestamp": "2026-11-23T22:20:15.147Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "mutation-testing",
+  "event_type": "phase_blocked",
+  "phase": "qa",
+  "evidence": "spec-coverage-report.md run 3: BLOCKED, MUST 14/15; UNCOV-007 (LOW): installer-managed files outside .harness/ untested",
+  "concerns": [
+    "UNCOV-007"
+  ]
+}

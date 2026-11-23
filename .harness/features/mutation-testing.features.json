@@ -35,8 +35,8 @@
         ".semgrep/standards/js.yml",
         "cli/README.md"
       ],
-      "evidence": "node --test cli/src/harness/mutate.test.mjs: 8 pass (REQ-001..008); 7 hand mutants of mutate.mjs all killed (flip pass, keep tests, all statuses, no unconfigured, survivors exit 0, keep docs, no quoting); full-pipeline.sh OK (49 commands, mutate smoke run REQ-009); semgrep standards 0 findings on mutate.mjs, semgrep --test 5/5.",
-      "evidence_hash": "4de8e1833a2d18caec19ca5b3602f81216c6d6e44432b81f69d1f9d408f9fa96"
+      "evidence": "node --test cli/src/harness/mutate.test.mjs: 8 pass (REQ-001..008); 7 hand mutants of mutate.mjs all killed (flip pass, keep tests, all statuses, no unconfigured, survivors exit 0, keep docs, no quoting); full-pipeline.sh OK (49 commands, mutate smoke run REQ-009); semgrep standards 0 findings on mutate.mjs, semgrep --test 5/5. QA UNCOV-001..003 fixed: unknown slice/feature now print the usage (REQ-005 bug); CLI exit cases for pass 0, no-files 0, error 2; JSON command after substitution; output_tail stdout\\nstderr last 4000; TIMEOUT_MS. mutate.test 10 pass; 11 hand mutants all killed (incl. QA's M1-M5, M7, M8; M6 cwd accepted as OBS-001); npm test pass + full-pipeline OK. QA run 2 UNCOV-004..006: new REQ-001 selection test (in_progress feature selected; .harness paths named or via a directory scope never reach the tool; every {files} filled); kills the three surviving mutants. mutate.test 11 pass; npm test pass + full-pipeline OK. QA run 3 UNCOV-007: installer-managed files outside .harness/ (installed-versions.json managed_files) never reach the tool; kills M17. mutate.test 12 pass; npm test pass + full-pipeline OK.",
+      "evidence_hash": "cd75bd8a2288a56798dd405e834e5dde1aa90a63a60089ebf9edc2a3c9c3d73a"
     },
     {
       "id": "TASK-002",

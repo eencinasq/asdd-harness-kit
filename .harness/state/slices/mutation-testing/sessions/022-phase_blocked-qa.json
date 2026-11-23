@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-mutation-testing-022",
+  "timestamp": "2026-11-23T22:15:27.416Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "mutation-testing",
+  "event_type": "phase_blocked",
+  "phase": "qa",
+  "evidence": "spec-coverage-report.md run 2: BLOCKED, MUST 14/15; REQ-001 partial: UNCOV-004 in_progress selection, UNCOV-005 harness-path filter, UNCOV-006 every {files} replaced",
+  "concerns": [
+    "UNCOV-004",
+    "UNCOV-005",
+    "UNCOV-006"
+  ]
+}

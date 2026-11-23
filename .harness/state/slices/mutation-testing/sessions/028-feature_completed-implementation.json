@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-mutation-testing-028",
+  "timestamp": "2026-11-23T22:22:03.202Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "mutation-testing",
+  "event_type": "feature_completed",
+  "phase": "implementation",
+  "evidence": "QA run 3 UNCOV-007: installer-managed files outside .harness/ (installed-versions.json managed_files) never reach the tool; kills M17. mutate.test 12 pass; npm test pass + full-pipeline OK.",
+  "concerns": [],
+  "feature_id": "TASK-001"
+}

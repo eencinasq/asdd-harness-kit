@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-mutation-testing-018",
+  "timestamp": "2026-11-23T22:09:46.220Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "mutation-testing",
+  "event_type": "phase_blocked",
+  "phase": "qa",
+  "evidence": "spec-coverage-report.md: BLOCKED (QG-SPEC-05/06): MUST 10/15. UNCOV-001 bug: unknown slice/feature prints no usage (REQ-005); UNCOV-002 exits of pass/no-files/error untested; UNCOV-003 JSON command and output_tail untested. 8 hand mutants survived.",
+  "concerns": [
+    "UNCOV-001",
+    "UNCOV-002",
+    "UNCOV-003"
+  ]
+}
