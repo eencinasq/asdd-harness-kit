@@ -25,7 +25,8 @@
         },
         {
           "at": "2026-11-23T23:41:29.944Z",
-          "slice_id": "agents-use-scripts"
+          "slice_id": "agents-use-scripts",
+          "last_at": "2026-11-23T23:43:50.870Z"
         }
       ],
       "examples": [
@@ -42,7 +43,8 @@
         },
         {
           "at": "2026-11-23T23:41:29.944Z",
-          "slice_id": null
+          "slice_id": null,
+          "last_at": "2026-11-23T23:43:50.870Z"
         }
       ],
       "examples": [
@@ -59,7 +61,8 @@
         },
         {
           "at": "2026-11-23T23:41:29.944Z",
-          "slice_id": null
+          "slice_id": null,
+          "last_at": "2026-11-23T23:43:50.870Z"
         }
       ],
       "examples": [
