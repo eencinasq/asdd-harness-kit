@@ -17,6 +17,8 @@ Mapped files:
 - `.semgrep/standards/js.yml` — `std.no-shell-true` exception for the bound-command runner.
 - `cli/test/full-pipeline.sh` — the registry smoke run for `mutate`.
 - `cli/README.md`, `docs/architecture/domain-model.md` — command row and domain terms.
+- `cli/steering/skills.md` — the new index row costs always-loaded bytes; its Negative space bullets (a restatement of
+  SKL-02…06) are folded into one line so the steering stays under the REQ-013 cap without raising it.
 
 Not in scope: shipping a mutation tool (the project binds its own: Stryker, mutmut, PIT, cargo-mutants); parsing
 tool-specific reports (the contract is the exit code, like `Contract command`); adding a devDependency to the kit.

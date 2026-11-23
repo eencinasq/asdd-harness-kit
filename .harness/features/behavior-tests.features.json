@@ -22,7 +22,7 @@
         "node --test cli/src/harness/skill-eval-lib.test.mjs cli/test/agents-lint.test.mjs",
         "npm test"
       ],
-      "evidence": "GREEN 2026-11-23: skill-eval --skill test-driven-development 1/1 pass; --baseline HEAD 1/1 pass, behavior-not-implementation improved (fails on the HEAD body), 0 regressed; node --test skill-eval-lib.test.mjs agents-lint.test.mjs 29/29; npm test 505/505 (skills-lint 22 skills, agents-lint 15 agents, kit self --check OK); kit guidance PASS (36582 B); asdd check PASS.",
+      "evidence": "GREEN 2026-11-23: skill-eval --skill test-driven-development 1/1 pass; --baseline HEAD 1/1 pass, behavior-not-implementation improved (fails on the HEAD body), 0 regressed; node --test skill-eval-lib.test.mjs agents-lint.test.mjs 29/29; npm test 505/505 (skills-lint 22 skills, agents-lint 15 agents, kit self --check OK); kit guidance PASS (36582 B); asdd check PASS. Re-verified 2026-11-23 after integrating mutation-testing, attack-the-premise and behavior-tests: npm test 525 pass + full-pipeline OK; semgrep --test 23/23 and scan 0 findings; kit self/generate-runtime-steering --check OK; premise 8, skill-eval-lib+agents-lint 29, versions+registry 40, telemetry-lib+profile 86 pass.",
       "scope_paths": [
         "cli/skills/test-driven-development/SKILL.md",
         "cli/agents/asdd-qa-agent.md",
@@ -30,7 +30,7 @@
         "cli/src/harness/skill-eval-lib.test.mjs",
         "cli/test/agents-lint.test.mjs"
       ],
-      "evidence_hash": "6d69e029a9a349e5fa827a206c9066f8000a397858d394408c3cbc205356e5e4"
+      "evidence_hash": "c7da1e16179762f082b053708eb03ab9627a474ce2c0a73596689330fcdc1392"
     }
   ]
 }

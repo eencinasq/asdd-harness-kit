@@ -114,11 +114,11 @@
         "semgrep scan --config .semgrep --exclude .semgrep --json . (0 findings, 0 errors)",
         "node cli/bin/asdd.mjs check"
       ],
-      "evidence": "semgrep --test: 23/23 pass; full-repo scan 79 -> 0 findings, 0 parse errors; harness scan selected+generated: pass, 0 findings",
+      "evidence": "semgrep --test: 23/23 pass; full-repo scan 79 -> 0 findings, 0 parse errors; harness scan selected+generated: pass, 0 findings Re-verified 2026-11-23 after integrating mutation-testing, attack-the-premise and behavior-tests: npm test 525 pass + full-pipeline OK; semgrep --test 23/23 and scan 0 findings; kit self/generate-runtime-steering --check OK; premise 8, skill-eval-lib+agents-lint 29, versions+registry 40, telemetry-lib+profile 86 pass.",
       "scope_paths": [
         ".semgrep"
       ],
-      "evidence_hash": "fe594d870fdd62d8381f921d63b3a4d075bd43b5208ca67e4269b4441c5977a0"
+      "evidence_hash": "2c630f6c3548da6ade2ebd5ee90127eb14360634c3b7b5bd9759fd337080625c"
     }
   ]
 }

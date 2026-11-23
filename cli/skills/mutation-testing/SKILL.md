@@ -1,10 +1,8 @@
 ---
 name: mutation-testing
 description: >-
-  Kills the mutants that survive a feature's tests: strengthens the test, deletes the dead code, or marks the
-  equivalent mutant, until `asdd mutate` reports pass. Use when `asdd mutate` reports survivors, or before a feature
-  with MUST requirements goes passing. Do NOT use for writing the first test of a behavior — use
-  test-driven-development; or when `asdd mutate` reports unconfigured.
+  Kills surviving mutants until `asdd mutate` passes. Use when it reports survivors. Do NOT use for new tests — use
+  test-driven-development.
 metadata:
   tier: leaf
 ---

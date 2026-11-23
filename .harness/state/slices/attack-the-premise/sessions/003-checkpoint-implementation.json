@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sess-attack-the-premise-003",
+  "timestamp": "2026-11-23T22:06:50.731Z",
+  "agent": "claude",
+  "human": "eencinas",
+  "slice_id": "attack-the-premise",
+  "event_type": "checkpoint",
+  "phase": "implementation",
+  "evidence": "Backfilled by the orchestrator: the implementing sub-agent skipped feature_started sessions to avoid the E1 sensor. Recording the real scopes below so the lite escalation signals are derived honestly.",
+  "concerns": [],
+  "mode": "lite"
+}

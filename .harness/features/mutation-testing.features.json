@@ -42,7 +42,7 @@
       "id": "TASK-002",
       "title": "Skill mutation-testing and eval fixtures",
       "user_visible_behavior": "Agents get a skill that classifies each surviving mutant (equivalent, dead code, missing test) and loops until asdd mutate reports pass.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 2,
       "owner": "claude",
       "req_ids": [
@@ -63,14 +63,17 @@
       "scope_paths": [
         "cli/skills/mutation-testing/SKILL.md",
         "cli/eval/skills/mutation-testing",
-        "cli/test/mutation-testing.test.mjs"
-      ]
+        "cli/test/mutation-testing.test.mjs",
+        "cli/steering/skills.md"
+      ],
+      "evidence": "skill-eval mutation-testing 4/4 pass; each fixture fails all its skill_contains assertions on a stripped body (mutation-testing.test REQ-016); skills-lint 23 PASS; skill profile PASS (Bloom tags S-017); always-loaded steering 36624 B < 36627 (guidance.test REQ-013) after folding skills.md Negative space; npm test 525 pass.",
+      "evidence_hash": "713e9c11c1a6cc4e3dafe2986f2d29c77e25d0b04e43e4fe0335c8f739239775"
     },
     {
       "id": "TASK-003",
       "title": "QG-SPEC-11, QA rule, Mutation command binding",
       "user_visible_behavior": "QA counts a MUST requirement as covered only when asdd mutate passes (or unconfigured as INFO) and lists inline disables; projects get an optional Mutation command slot.",
-      "status": "not_started",
+      "status": "passing",
       "priority": 3,
       "owner": "claude",
       "req_ids": [
@@ -89,7 +92,9 @@
         "cli/steering/quality-gates.exec.md",
         "cli/agents/asdd-qa-agent.md",
         "cli/templates/bindings/quality-gates.project.md"
-      ]
+      ],
+      "evidence": "mutation-testing.test REQ-014 (QG-SPEC-11 text in quality-gates.exec.md + QA agent rule) and REQ-015 (optional slot with {files}, contract, stryker/mutmut/pitest) pass; agents-lint 15 PASS; kit self --check OK; npm test 525 pass + full-pipeline OK.",
+      "evidence_hash": "1ef5eff0cdda9f41a2a97f81041a78c4deb92805bfc5c61db42f73baf909a34d"
     }
   ]
 }

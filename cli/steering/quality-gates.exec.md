@@ -38,6 +38,7 @@ The QA Agent evaluates this gate against tests that verify the current spec.
 - **QG-SPEC-07.** When SHOULD requirement coverage is below 95%, the QA Agent shall return WARN.
 - **QG-SPEC-08.** When spec coverage is below 95%, the QA Agent shall return WARN.
 - **QG-SPEC-09.** The QA Agent shall log COULD requirement coverage as INFO and shall not return BLOCK or WARN because that coverage is below any percentage.
+- **QG-SPEC-11.** When `Mutation command` is bound, the QA Agent shall count a MUST requirement as covered only when `asdd mutate` for its features reports `pass`, shall report `survivors` or `error` as `UNCOV-xxx`, shall list each mutation-tool disable comment added in the slice's feature files with its reason (one without a reason leaves its requirement uncovered), and shall record `unconfigured` or `no-files` as INFO without changing coverage.
 - **QG-SPEC-10.** If a failure is in a test file unrelated to the current spec, then the QA Agent shall exclude that failure from this gate, shall record it as `OBS-xxx` in the spec coverage report, and shall append it to the agent failure log.
 
 Unrelated failures excluded here remain in force for the Tech Debt Cleanup Gate.

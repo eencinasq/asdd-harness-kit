@@ -54,6 +54,7 @@ Read by `drift-lib.mjs`, `asdd audit`, and the `spec-drift` MCP server. A slot l
 - Drift base branch: `…` (default: `origin/HEAD`, then `main`, then `master`)
 - Audit commands: `…` (one `name=command` per backtick, for example `deps=npm audit --omit=dev`; unfilled → `unconfigured`)
 - Contract command: `…` (`http-api` module `openapi` adapter; non-zero exit = contract drift)
+- Mutation command: `…` (optional, `asdd mutate`: runs on `{files}`, the feature files, and exits non-zero when a mutant survives; unfilled → `unconfigured`, INFO, never a pass or a block; examples: `npx stryker run --mutate {files}` with `thresholds.break: 100`, `mutmut run --paths-to-mutate {files} && mutmut results`, `mvn pitest:mutationCoverage -DmutationThreshold=100`; mutmut mutates in place: run it on a clean tree)
 - OpenAPI spec: `…` (JSON file compared against endpoints cited by requirements when no Contract command is set)
 
 ## Related project paths

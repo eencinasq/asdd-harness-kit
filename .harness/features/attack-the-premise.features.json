@@ -47,7 +47,7 @@
         "npm test",
         "node cli/bin/asdd.mjs check"
       ],
-      "evidence": "GREEN 2026-11-23: premise.test.mjs 8/8 (fires on 2 same-signature failures, 3rd attempt without premise; silent with premise checkpoint, closed slice, different signature/feature; schema accepts/rejects failure_signature/premise/removes); npm test 511/511 + install/lifecycle/full-pipeline OK; asdd check PASS.",
+      "evidence": "GREEN 2026-11-23: premise.test.mjs 8/8 (fires on 2 same-signature failures, 3rd attempt without premise; silent with premise checkpoint, closed slice, different signature/feature; schema accepts/rejects failure_signature/premise/removes); npm test 511/511 + install/lifecycle/full-pipeline OK; asdd check PASS. Re-verified 2026-11-23 after integrating mutation-testing, attack-the-premise and behavior-tests: npm test 525 pass + full-pipeline OK; semgrep --test 23/23 and scan 0 findings; kit self/generate-runtime-steering --check OK; premise 8, skill-eval-lib+agents-lint 29, versions+registry 40, telemetry-lib+profile 86 pass.",
       "scope_paths": [
         "cli/src/harness/validators/premise.mjs",
         "cli/src/harness/validators/premise.test.mjs",
@@ -55,7 +55,7 @@
         "cli/src/harness/check-invariants.mjs",
         "package.json"
       ],
-      "evidence_hash": "9d8463cd42be0f4d3d39c43a09e49b81fa30fb38e2ff91ab49b21f3bc8b9b02f"
+      "evidence_hash": "2b17fcca3d0e936c6e830f76e3df24447325f9b6bd4d8d11b07600f56cb59590"
     }
   ]
 }

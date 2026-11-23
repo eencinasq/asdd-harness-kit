@@ -111,6 +111,7 @@ Read the following before producing any output:
 - **Do not pass** a gate if any `MUST` requirement is uncovered.
 - **Do not count** a test that asserts implementation details (private methods) or mocks the system under test as coverage of a requirement.
 - **Do not count** a vacuous test (it would still pass if the implementation returned nothing or an empty value) or one that asserts only internal calls or private state; report the requirement as `UNCOV-NNN` with that reason.
+- **Mutation (`QG-SPEC-11`):** run `asdd mutate --slice <slice-id> --json`. With `survivors` or `error`, a MUST requirement of those features is `UNCOV-NNN`; list every mutation-tool disable comment the slice added, with its reason (none → uncovered); `unconfigured` or `no-files` is INFO.
 - **Do not write** tests, code, or fixes; report each gap as `UNCOV-NNN` for the Implementation agent.
 - **Do not modify** `requirements.md` or `design.md`.
 - **Domain placement:** run the boundary checks required by the project binding and apply project quality gates to files in the slice diff only. Record findings in `spec-coverage-report.md`.

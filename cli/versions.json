@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "kit_version": "3.14.0",
-  "generated_at": "2026-11-21T19:14:48.480Z",
+  "generated_at": "2026-11-23T22:01:50.665Z",
   "artifacts": {
     ".github/CODEOWNERS.harness.example": "3.14.0",
     ".github/workflows/harness-audit.yml.example": "3.14.0",
@@ -98,6 +98,7 @@
     "cli/skills/external-trackers/SKILL.md": "3.14.0",
     "cli/skills/external-trackers/references/intent-format.md": "3.14.0",
     "cli/skills/external-trackers/references/mcp-configurations.md": "3.14.0",
+    "cli/skills/mutation-testing/SKILL.md": "3.14.0",
     "cli/skills/product-delivery/SKILL.md": "3.14.0",
     "cli/skills/product-delivery/contracts/scope-map.schema.yaml": "3.14.0",
     "cli/skills/product-delivery/examples/end-to-end-example.md": "3.14.0",

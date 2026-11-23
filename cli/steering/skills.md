@@ -18,9 +18,7 @@ Initial catalog for folders under `.agents/skills/`. Each folder exposes only it
 
 ## Negative space
 
-- Never restate a skill's body, steps, or examples here — name and description only (SKL-04).
-- Never list a skill outside `.agents/skills/` (SKL-06) or hand-edit the generated block.
-- Never use this file to mandate loading a `SKILL.md` — disclosure is pull-by-task (SKL-02/SKL-03).
+- Never a skill body, a skill outside `.agents/skills/`, a hand edit of the generated block, or a mandated load (SKL-02…06).
 
 ## Enforcement
 
@@ -54,7 +52,7 @@ not escalation. Sensors: `asdd check` (index), `asdd kit skills-lint` (skill gra
 | `documentation-and-adrs` | Records architectural decisions as ADRs (the kit's ADR format) and updates the docs a change needs. Use when making an architectural decision or changing public behavior. Do NOT use for designing an API contract (the http-api module); or for tests — use test-driven-development. |
 | `domain-language-extraction` | Extracts the domain terms a business text states into a source-cited glossary. Use when an intent, pitch, or requirements draft needs its vocabulary pinned. Do NOT use for judging requirement quality — use anti-pattern-detection; or for a canvas — use business-model-canvas. |
 | `external-trackers` | Syncs a tracker pitch with the ASDD handoff and imports tracker Intent items as slices. Use when an intent cites a tracker item or an engineer picks up an Intent. Do NOT use to split pitches — use product-delivery. |
-| `mutation-testing` | Kills the mutants that survive a feature's tests: strengthens the test, deletes the dead code, or marks the equivalent mutant, until `asdd mutate` reports pass. Use when `asdd mutate` reports survivors, or before a feature with MUST requirements goes passing. Do NOT use for writing the first test of a behavior — use test-driven-development; or when `asdd mutate` reports unconfigured. |
+| `mutation-testing` | Kills surviving mutants until `asdd mutate` passes. Use when it reports survivors. Do NOT use for new tests — use test-driven-development. |
 | `product-delivery` | Splits a bet Shape Up pitch into scopes and writes one intent.md (one ASDD slice) per scope. Use when a pitch has been bet and building starts in a repository with .harness/. Do NOT use for shaping or betting — use shape-up; or for tracker reads and syncs — use external-trackers. |
 | `shape-up` | Shapes ideas into Shape Up pitches, reviews them, and records the bet. Use when writing or reviewing a pitch or coaching shaping. Do NOT use for splitting a bet pitch into intents in a .harness/ repository — use product-delivery; or for trackers — use external-trackers. |
 | `test-driven-development` | Drives a code change with a failing test first and records the run as feature evidence. Use when changing code whose behavior a test can pin. Do NOT use for live-browser checks, UI craft, or API contract design (module skills); or for configuration or docs. |

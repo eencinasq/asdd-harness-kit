@@ -1,0 +1,36 @@
+{
+  "id": "survivor-gets-a-test",
+  "task": "mutation-testing REQ-010: a surviving mutant in a MUST feature file means a behavior the tests do not pin",
+  "expect": "the skill hands the survivor to test-driven-development for a behavior test",
+  "probes": [
+    {
+      "id": "p1",
+      "run": "{asdd} mutate --help",
+      "cwd": "repo"
+    }
+  ],
+  "assertions": [
+    {
+      "type": "exit_code",
+      "probe": "p1",
+      "code": 0
+    },
+    {
+      "type": "stdout_matches",
+      "probe": "p1",
+      "pattern": "--feature <TASK-NNN>"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "a behavior the tests do not pin"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "handoff → `test-driven-development`"
+    },
+    {
+      "type": "skill_contains",
+      "pattern": "asserting the result a caller would see"
+    }
+  ]
+}

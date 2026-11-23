@@ -25,8 +25,8 @@
       ],
       "owner": "devin",
       "depends_on": [],
-      "evidence": "asdd check: zero steering-tags warnings (pseudo-always+starvation+symmetry all clear); registry coverage narrowed scaffold+installed; 234 npm tests pass",
-      "evidence_hash": "c8a6755726810ea5416b6e4ee7b2fdfcc0cbf56545b39712f2b8d86a6364566d"
+      "evidence": "asdd check: zero steering-tags warnings (pseudo-always+starvation+symmetry all clear); registry coverage narrowed scaffold+installed; 234 npm tests pass Re-verified 2026-11-23 after integrating mutation-testing, attack-the-premise and behavior-tests: npm test 525 pass + full-pipeline OK; semgrep --test 23/23 and scan 0 findings; kit self/generate-runtime-steering --check OK; premise 8, skill-eval-lib+agents-lint 29, versions+registry 40, telemetry-lib+profile 86 pass.",
+      "evidence_hash": "9c10f70d05cabc1e9aea6839795dbcf1aef9213f1888bdf35b7d78100206b5a5"
     },
     {
       "id": "TASK-002",
@@ -46,8 +46,8 @@
       ],
       "owner": "devin",
       "depends_on": [],
-      "evidence": "cli/steering/skills.md gains ## Negative space (3 bullets); skills-lint PASS; guidance PASS at 36505<=37000 recorded decision",
-      "evidence_hash": "b79716349075903d0572e4cb6aa1ef99e8c93513d1fb3e2dc38ae88ec9c419b2"
+      "evidence": "cli/steering/skills.md gains ## Negative space (3 bullets); skills-lint PASS; guidance PASS at 36505<=37000 recorded decision Re-verified 2026-11-23 after integrating mutation-testing, attack-the-premise and behavior-tests: npm test 525 pass + full-pipeline OK; semgrep --test 23/23 and scan 0 findings; kit self/generate-runtime-steering --check OK; premise 8, skill-eval-lib+agents-lint 29, versions+registry 40, telemetry-lib+profile 86 pass.",
+      "evidence_hash": "7c7ca0688f25611220c91541b477698ca4e36008f533c1faa71b8794f8e902e1"
     },
     {
       "id": "TASK-003",
@@ -73,8 +73,8 @@
         "TASK-001",
         "TASK-002"
       ],
-      "evidence": "re-verified 2026-11-21 (domain-layer.project.md: Dependency layers + .semgrep rules): generate-runtime-steering --check PASS, kit self --check OK; proposal Status grep not runnable on this machine Re-verified 2026-11-23 after attack-the-premise (PREMISE-01 validator wired into check-invariants, session-loop clause, package.json test list): generate-runtime-steering --check PASS, kit self --check OK, telemetry-lib+command-gate+validators/telemetry+profile tests pass, asdd profile --json exit 0, v2.md status: converged, npm test 511/511 + full-pipeline OK.",
-      "evidence_hash": "d6b186f96ef2cd32048ce356362a11293bebd4e05dc0d044013de40a85079841"
+      "evidence": "re-verified 2026-11-21 (domain-layer.project.md: Dependency layers + .semgrep rules): generate-runtime-steering --check PASS, kit self --check OK; proposal Status grep not runnable on this machine Re-verified 2026-11-23 after attack-the-premise (PREMISE-01 validator wired into check-invariants, session-loop clause, package.json test list): generate-runtime-steering --check PASS, kit self --check OK, telemetry-lib+command-gate+validators/telemetry+profile tests pass, asdd profile --json exit 0, v2.md status: converged, npm test 511/511 + full-pipeline OK. Re-verified 2026-11-23 after integrating mutation-testing, attack-the-premise and behavior-tests: npm test 525 pass + full-pipeline OK; semgrep --test 23/23 and scan 0 findings; kit self/generate-runtime-steering --check OK; premise 8, skill-eval-lib+agents-lint 29, versions+registry 40, telemetry-lib+profile 86 pass.",
+      "evidence_hash": "970826b22e49ea9d5502452939ad718426bccffb014770096f12c866dfe6d3a0"
     }
   ]
 }
