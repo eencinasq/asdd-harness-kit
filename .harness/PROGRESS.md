@@ -15,6 +15,7 @@
 | asdd-p4 | escalated | knowledge | DONE | 0 |
 | asdd-roadmap | lite | knowledge | DONE | 0 |
 | asdd-ui | escalated | knowledge | DONE | 0 |
+| behavior-tests | lite | qa | in_progress | 0 |
 | ci-npm-ci | escalated | knowledge | DONE | 0 |
 | claude-hook-cwd | escalated | knowledge | DONE | 0 |
 | cli-args | escalated | knowledge | DONE | 0 |

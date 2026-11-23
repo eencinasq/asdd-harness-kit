@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "slice_id": "behavior-tests",
+  "source_tasks": ".harness/specs/behavior-tests/tasks.md",
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Test behavior, not implementation: TDD rule, QA rejection, skill-eval fixture",
+      "user_visible_behavior": "TDD RED drives the public entry point and asserts the observable result; its Verification Gate and the QA agent reject vacuous or implementation-only tests (UNCOV-NNN).",
+      "status": "passing",
+      "priority": 1,
+      "owner": "claude",
+      "req_ids": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "depends_on": [],
+      "verification": [
+        "node cli/bin/asdd.mjs skill-eval --skill test-driven-development --baseline HEAD",
+        "node --test cli/src/harness/skill-eval-lib.test.mjs cli/test/agents-lint.test.mjs",
+        "npm test"
+      ],
+      "evidence": "GREEN 2026-11-23: skill-eval --skill test-driven-development 1/1 pass; --baseline HEAD 1/1 pass, behavior-not-implementation improved (fails on the HEAD body), 0 regressed; node --test skill-eval-lib.test.mjs agents-lint.test.mjs 29/29; npm test 505/505 (skills-lint 22 skills, agents-lint 15 agents, kit self --check OK); kit guidance PASS (36582 B); asdd check PASS.",
+      "scope_paths": [
+        "cli/skills/test-driven-development/SKILL.md",
+        "cli/agents/asdd-qa-agent.md",
+        "cli/eval/skills/test-driven-development/behavior-not-implementation.json",
+        "cli/src/harness/skill-eval-lib.test.mjs",
+        "cli/test/agents-lint.test.mjs"
+      ],
+      "evidence_hash": "6d69e029a9a349e5fa827a206c9066f8000a397858d394408c3cbc205356e5e4"
+    }
+  ]
+}
